@@ -385,53 +385,30 @@
 
   /* =========================================================
      FUSION v3 — lo que aporta el prototipo "rueda-eventbrite"
-     al directorio: los dos patrones estructurales de Eventbrite.
+     al directorio: la caja de compra fija de la pagina de evento.
+
+     La barra de filtros persistente, el otro patron que venia de v1, se
+     elimino: el buscador del hero y los filtros de la vista de resultados
+     cubren la busqueda sin ocupar una franja fija en todas las pantallas.
      ========================================================= */
 
-  /* (1) Barra de filtros persistente.
-     En v2 los filtros viven solo dentro de la vista de resultados: al hacer
-     scroll el usuario los pierde y tiene que volver arriba para reencuadrar la
-     busqueda. Aqui la barra queda pegada bajo el topbar en todas las vistas
-     publicas, que es el patron de Eventbrite. --topbar-h es la altura real del
-     topbar (16px padding x2 + 31px de contenido); si cambia el padding del
-     topbar hay que ajustarla o la barra se despega. */
-  :root{ --topbar-h:63px; --filterbar-h:57px; }
-  .filterbar{
-    position:sticky; top:var(--topbar-h); z-index:35;
-    background:var(--paper); border-bottom:1px solid var(--line);
-  }
-  .filterbar-inner{
-    max-width:1180px; margin:0 auto; padding:12px 28px;
-    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
-  }
-  .filterbar input[type=text]{
-    flex:1 1 200px; min-width:160px; border:1px solid var(--line);
-    background:var(--stone); border-radius:20px; padding:9px 16px; font-size:13.5px;
-  }
-  .filterbar select{border:1px solid var(--line); background:var(--stone); border-radius:20px; padding:9px 14px; font-size:13px;}
-  .filterbar .divider{width:1px; height:22px; background:var(--line);}
-  .filterbar button.go{background:var(--jungle); color:var(--paper); border:none; border-radius:20px; padding:9px 20px; font-size:13px; font-weight:600;}
-  /* El panel admin y el del organizador son areas privadas: buscar eventos ahi
-     no significa nada, y sobre el fondo oscuro del admin la barra clara rompe
-     la lectura. */
-  body.no-filterbar .filterbar{display:none;}
-  @media(max-width:900px){
-    .filterbar-inner{padding:10px 18px;}
-    .filterbar select, .filterbar .divider{display:none;}
-  }
+  /* --topbar-h es la altura real del topbar (16px de padding x2 + 31px de
+     contenido). Si cambia el padding del topbar hay que ajustarla o la caja
+     sticky se mete debajo. */
+  :root{ --topbar-h:63px; }
 
-  /* (2) Caja de compra fija en la pagina de evento.
+  /* Caja de compra fija en la pagina de evento.
      v2 ya tenia la caja con precio y CTA, pero se iba con el scroll: el visitante
      lee la descripcion larga y pierde de vista el boton. Sticky = el CTA sigue
-     ahi cuando termina de convencerse. El offset suma topbar + filterbar. */
+     ahi cuando termina de convencerse. */
   .evento-top{align-items:start;}
   .evento-meta-box{
-    position:sticky; top:calc(var(--topbar-h) + var(--filterbar-h) + 16px);
+    position:sticky; top:calc(var(--topbar-h) + 16px);
   }
   /* Sticky con max-height evita que una caja mas alta que la ventana se corte
      por arriba y deje el boton inalcanzable. */
   @media(min-width:901px){
-    .evento-meta-box{max-height:calc(100vh - var(--topbar-h) - var(--filterbar-h) - 32px); overflow-y:auto;}
+    .evento-meta-box{max-height:calc(100vh - var(--topbar-h) - 32px); overflow-y:auto;}
   }
   @media(max-width:900px){
     .evento-meta-box{position:static; max-height:none;}
@@ -468,44 +445,6 @@
       <button class="btn-publish" onclick="switchView('panel-organizador')">Publicar evento</button>
       <button class="navburger" id="burger" aria-label="Abrir menú"><span></span><span></span><span></span></button>
     </div>
-  </div>
-</div>
-
-<!-- ========= BARRA DE FILTROS PERSISTENTE (patron Eventbrite) =========
-     Viene del prototipo v1. Sigue al usuario por todas las vistas publicas,
-     asi que se puede reencuadrar la busqueda desde una ficha de evento o
-     desde el blog sin volver al inicio. -->
-<div class="filterbar" id="filterbar">
-  <div class="filterbar-inner">
-    <input type="text" id="fbQuery" placeholder="Busca por evento, ciudad o categoria — ej. “yoga en Tulum”" aria-label="Buscar eventos">
-    <div class="divider"></div>
-    <select id="fbCiudad" aria-label="Ciudad o estado">
-      <option>Ciudad / Estado</option>
-      <option>Tulum, Q. Roo</option>
-      <option>Ciudad de México</option>
-      <option>Oaxaca de Juárez</option>
-      <option>San Miguel de Allende</option>
-      <option>Guadalajara</option>
-      <option>Puerto Vallarta</option>
-    </select>
-    <select id="fbCategoria" aria-label="Categoría">
-      <option>Categoría</option>
-      <option>Yoga</option>
-      <option>Meditación</option>
-      <option>Breathwork</option>
-      <option>Sound Healing</option>
-      <option>Ice Bath</option>
-      <option>Retiro</option>
-      <option>Festival</option>
-      <option>Pilates</option>
-    </select>
-    <select id="fbFecha" aria-label="Fecha">
-      <option>Cualquier fecha</option>
-      <option>Este fin de semana</option>
-      <option>Próximos 7 días</option>
-      <option>Este mes</option>
-    </select>
-    <button class="go" onclick="buscarDesdeBarra()">Buscar</button>
   </div>
 </div>
 
@@ -1197,31 +1136,12 @@ document.getElementById('admEventsBody').innerHTML = eventos.map((e,i)=>`
   </tr>`).join('');
 
 /* ---------- navegación entre vistas ---------- */
-/* Vistas privadas: ahi la barra de filtros no aplica (ver .no-filterbar en CSS). */
-const VISTAS_PRIVADAS = ['admin','panel-organizador'];
-
 function switchView(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+name).classList.add('active');
   document.querySelectorAll('nav.mainnav button').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
   document.getElementById('mainnav').classList.remove('open');
-  document.body.classList.toggle('no-filterbar', VISTAS_PRIVADAS.includes(name));
   window.scrollTo({top:0, behavior:'auto'});
-}
-
-/* Barra persistente: lleva lo tecleado al titulo de resultados para que se vea
-   que el filtro viaja con el usuario. En el prototipo no filtra datos reales. */
-function buscarDesdeBarra(){
-  const q   = document.getElementById('fbQuery').value.trim();
-  const cat = document.getElementById('fbCategoria');
-  const ciu = document.getElementById('fbCiudad');
-  const catSel = cat.selectedIndex > 0 ? cat.value : '';
-  const ciuSel = ciu.selectedIndex > 0 ? ciu.value : '';
-
-  let titulo = 'Todos los eventos';
-  if (q)            titulo = 'Resultados para “' + q + '”';
-  else if (catSel)  titulo = 'Eventos de ' + catSel;
-  showResults(ciuSel ? 'Buscar · ' + ciuSel : 'Buscar eventos', titulo);
 }
 document.querySelectorAll('nav.mainnav button').forEach(b=>{
   b.addEventListener('click', ()=>switchView(b.dataset.view));
