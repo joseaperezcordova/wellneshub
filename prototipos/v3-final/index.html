@@ -410,6 +410,28 @@
     .evento-meta-box{position:static; max-height:none;}
   }
   .lowstock{font-size:11.5px; color:var(--clay); margin-top:8px; text-align:center;}
+
+  /* (3) Proximos eventos: tarjetas o lista.
+     Las dos secciones que repetian los mismos eventos ahora son un bloque con
+     toggle. Reutiliza el patron visual de .langtoggle del topbar para que el
+     conmutador se lea como un control ya conocido y no como algo nuevo. */
+  .head-tools{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  .viewtoggle{display:flex; border:1px solid var(--line); border-radius:20px; overflow:hidden; background:var(--paper);}
+  .viewtoggle button{
+    background:none; border:none; padding:7px 14px; font-size:12px;
+    font-family:'IBM Plex Mono',monospace; color:var(--ink); opacity:.7;
+    letter-spacing:.03em; transition:background .15s, color .15s, opacity .15s;
+  }
+  .viewtoggle button:hover{opacity:1;}
+  .viewtoggle button.active{background:var(--jungle); color:var(--paper); opacity:1;}
+  /* El atributo hidden lo pisaria display:grid de .grid-events, que gana por
+     especificidad de clase sobre la regla del navegador. */
+  [hidden]{display:none !important;}
+  @media(max-width:640px){
+    /* En movil el toggle y el enlace caen a su propia linea bajo el titulo;
+       en la misma fila el enlace queda demasiado pegado al conmutador. */
+    .head-tools{width:100%; justify-content:space-between; gap:10px;}
+  }
 </style>
 </head>
 <body>
@@ -539,20 +561,22 @@
     </div>
   </section>
 
+  <!-- Un solo bloque de proximos eventos con dos formas de verlo. Antes eran
+       dos secciones separadas ("destacados" en tarjetas y "proximos" en lista)
+       que mostraban los mismos eventos dos veces seguidas. -->
   <section class="block wrap">
     <div class="block-head">
       <h2>Próximos eventos</h2>
-      <a class="more" href="#" onclick="switchView('resultados'); return false;">Ver todos →</a>
+      <div class="head-tools">
+        <div class="viewtoggle" id="proximosToggle" role="group" aria-label="Forma de ver los eventos">
+          <button type="button" data-modo="tarjetas" class="active" aria-pressed="true">Tarjetas</button>
+          <button type="button" data-modo="lista" aria-pressed="false">Lista</button>
+        </div>
+        <a class="more" href="#" onclick="switchView('resultados'); return false;">Ver todos →</a>
+      </div>
     </div>
-    <div class="grid-events" id="destacadosGrid"></div>
-  </section>
-
-  <section class="block wrap">
-    <div class="block-head">
-      <h2>Próximos eventos</h2>
-      <a class="more" href="#" onclick="switchView('resultados'); return false;">Ver calendario →</a>
-    </div>
-    <div class="rowlist" id="proximosList"></div>
+    <div class="grid-events" id="proximosGrid"></div>
+    <div class="rowlist" id="proximosList" hidden></div>
   </section>
 
   <section class="block wrap">
@@ -1100,8 +1124,24 @@ function rowHTML(e){
     <div class="rowarrow">→</div>
   </div>`;
 }
-document.getElementById('destacadosGrid').innerHTML = eventos.slice(0,3).map(cardHTML).join('');
+/* Las dos vistas del bloque muestran los mismos eventos: cambiar de forma no
+   debe cambiar lo que hay. */
+document.getElementById('proximosGrid').innerHTML = eventos.map(cardHTML).join('');
 document.getElementById('proximosList').innerHTML = eventos.map(rowHTML).join('');
+
+/* ---------- toggle tarjetas / lista ---------- */
+document.querySelectorAll('#proximosToggle button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    const esTarjetas = b.dataset.modo === 'tarjetas';
+    document.querySelectorAll('#proximosToggle button').forEach(x=>{
+      const activo = x === b;
+      x.classList.toggle('active', activo);
+      x.setAttribute('aria-pressed', String(activo));
+    });
+    document.getElementById('proximosGrid').hidden = !esTarjetas;
+    document.getElementById('proximosList').hidden = esTarjetas;
+  });
+});
 document.getElementById('resultsGrid').innerHTML = eventos.map(cardHTML).join('') + eventos.map(cardHTML).join('');
 document.getElementById('orgEventsGrid').innerHTML = eventos.slice(0,3).map(cardHTML).join('');
 document.getElementById('relatedGrid').innerHTML = eventos.slice(1,4).map(cardHTML).join('');
