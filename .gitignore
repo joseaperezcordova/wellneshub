@@ -1,0 +1,25 @@
+# Estado del deploy FTP (lo genera la accion, vive en el servidor)
+.ftp-deploy-sync-state.json
+
+# Entorno / credenciales
+.env
+.env.*
+config/config.local.php
+
+# Dependencias
+/node_modules/
+/vendor/
+
+# Logs y temporales
+*.log
+/logs/
+/tmp/
+
+# Sistema operativo / editor
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*~

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wellneshub — Prototipos de diseño</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1D2620; --jungle:#24402F; --jungle-deep:#152219;
+    --stone:#EEEAE0; --paper:#FAF8F2; --marigold:#D9A23B; --marigold-deep:#B9832A;
+    --clay:#AD6459; --line:rgba(29,38,32,0.14); --line-soft:rgba(29,38,32,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--stone); color:var(--ink); font-family:'Inter',sans-serif; font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Fraunces',serif; font-weight:500; margin:0; letter-spacing:-0.01em;}
+  a{color:inherit; text-decoration:none;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--marigold); opacity:0.9;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 28px;}
+  @media(max-width:640px){.wrap{padding:0 18px;}}
+
+  header{background:var(--jungle-deep); color:var(--paper); padding:58px 0 64px; position:relative; overflow:hidden;}
+  header::before{content:""; position:absolute; inset:0; background:radial-gradient(circle at 82% 15%, rgba(217,162,59,0.16), transparent 55%);}
+  .head-inner{position:relative;}
+  .logo{display:flex; align-items:center; gap:11px; margin-bottom:26px;}
+  .logo-mark{width:30px; height:30px; border-radius:50%; background:conic-gradient(var(--marigold) 0deg 90deg, var(--jungle) 90deg 180deg, var(--clay) 180deg 270deg, var(--marigold-deep) 270deg 360deg);}
+  .logo-text{font-family:'Fraunces',serif; font-weight:600; font-size:19px;}
+  header h1{font-size:38px; max-width:660px; color:var(--paper); margin-top:8px;}
+  header h1 em{font-style:italic; color:var(--marigold);}
+  header p{max-width:560px; color:rgba(250,248,242,0.72); margin-top:14px; font-size:15px;}
+  @media(max-width:640px){header h1{font-size:29px;}}
+
+  main{padding:44px 0 60px;}
+  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; align-items:stretch;}
+  @media(max-width:900px){.grid{grid-template-columns:1fr;}}
+
+  .card{background:var(--paper); border:1px solid var(--line); border-radius:8px; overflow:hidden; display:flex; flex-direction:column; transition:transform .15s, box-shadow .15s;}
+  .card:hover{transform:translateY(-3px); box-shadow:0 14px 28px rgba(21,34,25,0.12);}
+  .card .strip{height:6px;}
+  .card .body{padding:20px 20px 22px; display:flex; flex-direction:column; gap:9px; flex:1;}
+  .tag{align-self:flex-start; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; padding:4px 10px; border-radius:20px; background:var(--stone); color:var(--jungle);}
+  .card h2{font-size:19px; line-height:1.3;}
+  .card p{font-size:13.5px; opacity:0.75; margin:0;}
+  .card ul{list-style:none; padding:0; margin:4px 0 0; font-size:12.5px;}
+  .card li{padding:5px 0; border-bottom:1px dashed var(--line); opacity:0.8;}
+  .card li:last-child{border-bottom:none;}
+  .card .foot{margin-top:auto; padding-top:16px;}
+  .btn{display:block; text-align:center; background:var(--jungle); color:var(--paper); border-radius:6px; padding:11px; font-size:13.5px; font-weight:600;}
+  .btn:hover{background:var(--jungle-deep);}
+  .btn.final{background:var(--marigold); color:var(--jungle-deep);}
+  .btn.final:hover{background:var(--marigold-deep);}
+
+  .note{margin-top:34px; border-left:3px solid var(--marigold); background:var(--paper); padding:16px 20px; border-radius:0 6px 6px 0; font-size:13.5px;}
+  .note h3{font-size:15px; margin-bottom:7px;}
+  .note p{margin:0 0 8px; opacity:0.82;}
+  .note p:last-child{margin-bottom:0;}
+
+  footer{background:var(--jungle-deep); color:rgba(250,248,242,0.5); text-align:center; font-size:11.5px; padding:20px; font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap head-inner">
+    <div class="logo">
+      <div class="logo-mark"></div>
+      <div class="logo-text">Wellneshub</div>
+    </div>
+    <div class="eyebrow">Prototipos de diseño · Iteración en curso</div>
+    <h1>Tres versiones para llegar a <em>un solo diseño</em></h1>
+    <p>Los dos diseños de origen se conservan intactos como referencia. La versión final es donde se prueba la unión de ambos, y es la que se va a ir moviendo hasta cerrar el diseño definitivo.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+
+    <article class="card">
+      <div class="strip" style="background:var(--clay);"></div>
+      <div class="body">
+        <span class="tag">v1 · Origen</span>
+        <h2>Rueda — Estructura Eventbrite</h2>
+        <p>Exploración estructural: qué patrones de Eventbrite vale la pena adoptar, con paleta propia.</p>
+        <ul>
+          <li>Barra de filtros persistente (sticky)</li>
+          <li>Caja de compra fija en la ficha</li>
+          <li>Grid de tarjetas de evento</li>
+        </ul>
+        <div class="foot"><a class="btn" href="prototipos/v1-rueda-eventbrite/">Ver v1 →</a></div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="strip" style="background:var(--jungle);"></div>
+      <div class="body">
+        <span class="tag">v2 · Origen</span>
+        <h2>Directorio Wellness — Prototipo completo</h2>
+        <p>El producto entero navegable: público, panel del organizador y panel admin.</p>
+        <ul>
+          <li>Rueda del bienestar (elemento distintivo)</li>
+          <li>Inicio, resultados, evento, organizador, blog</li>
+          <li>Panel organizador + panel admin con CRUD</li>
+        </ul>
+        <div class="foot"><a class="btn" href="prototipos/v2-directorio-wellness/">Ver v2 →</a></div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="strip" style="background:var(--marigold);"></div>
+      <div class="body">
+        <span class="tag">v3 · Trabajo activo</span>
+        <h2>Prototipo final — La unión</h2>
+        <p>Base v2 (alcance completo) más los dos patrones estructurales que aporta v1.</p>
+        <ul>
+          <li>Filtros que siguen al usuario en todas las vistas</li>
+          <li>Caja de compra sticky en la ficha de evento</li>
+          <li>Todo lo demás heredado de v2</li>
+        </ul>
+        <div class="foot"><a class="btn final" href="prototipos/v3-final/">Ver v3 →</a></div>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="note">
+    <h3>Cómo se trabaja esto</h3>
+    <p><b>v1 y v2 no se tocan.</b> Son la referencia contra la que se compara: si una decisión de v3 empeora algo, se abre el original y se ve cómo estaba.</p>
+    <p><b>v3 es la que evoluciona.</b> Cada ajuste de diseño va ahí, se sube al repositorio y queda publicado automáticamente para revisarlo desde cualquier dispositivo.</p>
+  </div>
+</main>
+
+<footer>Wellneshub · prototipos de diseño</footer>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+name: Deploy via FTP
+
+# El hosting no tiene SSH, asi que el deploy va por FTPS desde GitHub Actions:
+# se hace push a main y la accion sincroniza los archivos contra public_html.
+# Mismo esquema que los proyectos mate y friotrack.
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Varias conexiones FTP simultaneas a un hosting compartido provocan
+# "Timeout (control socket)". Los deploys se encolan en vez de solaparse.
+concurrency:
+  group: ftp-deploy
+  cancel-in-progress: true
+
+jobs:
+  ftp-deploy:
+    name: Sync files to server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to FTP server
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          local-dir: ./
+          protocol: ftps
+          timeout: 120000
+          # La accion guarda .ftp-deploy-sync-state.json en el servidor para
+          # subir solo lo que cambio. Si un deploy queda a medias y el estado
+          # se desincroniza, se borra ese archivo del servidor y el siguiente
+          # push vuelve a subir todo.
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/node_modules/**
+            **/vendor/**
+            **/.ftp-deploy-sync-state.json
+            **/.env
+            **/README.md
+            **/*.md
