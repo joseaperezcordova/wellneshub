@@ -1,0 +1,20 @@
+# El hosting sirve tras un proxy nginx que cachea el HTML. Tras un deploy la URL
+# seguia devolviendo la version anterior (misma ruta, Last-Modified viejo) y solo
+# se veia lo nuevo añadiendo ?x=1 a mano, que para la cache es otra URL.
+#
+# Estos son prototipos en revision continua: lo caro no es volver a descargar
+# 70 KB, es revisar una version vieja sin darse cuenta y decidir sobre ella. Asi
+# que el HTML no se cachea. Cuando el proyecto pase a produccion esto se cambia
+# por una politica normal con hash en los nombres de archivo.
+<IfModule mod_headers.c>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
