@@ -126,16 +126,60 @@
   }
   @media(max-width:640px){ .hero-banner{min-height:360px; border-radius:14px;} }
 
-  /* Pseudo-imagen: la fotografia todavia no existe, asi que la escena se
-     compone con gradientes —cielo, sol, dos lineas de colinas—. Cuando haya
-     foto real basta con cambiar esto por un background-image: ni el titulo ni
-     el velo ni la pastilla se enteran. */
-  .hero-media{
-    position:absolute; inset:0;
-    background:
-      radial-gradient(circle at 78% 26%, rgba(233,221,201,.95) 0 54px, rgba(233,221,201,0) 55px),
-      linear-gradient(178deg, #2F4E5D 0%, #3E6375 44%, #547B6A 72%, #496B52 100%);
+  /* Carrusel: las diapositivas se apilan y se cruzan por opacidad. No se
+     desplazan lateralmente a proposito — un desplazamiento obliga a medir
+     anchos y se rompe en cuanto el banner cambia de tamaño; el fundido no
+     depende de la geometria. */
+  .carrusel{position:absolute; inset:0;}
+  .slide{position:absolute; inset:0; opacity:0; transition:opacity .6s ease;}
+  .slide.activa{opacity:1;}
+
+  /* Etiqueta de la diapositiva: nombra lo que se esta viendo. Va arriba a la
+     izquierda porque abajo esta el titulo y el centro lo tapa la pastilla. */
+  .slide-chip{
+    position:absolute; top:18px; left:20px; z-index:2;
+    display:inline-flex; align-items:center; gap:9px; max-width:calc(100% - 200px);
+    background:rgba(21,33,40,.45); border:1px solid rgba(255,255,255,.28);
+    color:#fff; border-radius:999px; padding:6px 15px; font-size:12.5px;
+    backdrop-filter:blur(3px);
   }
+  .slide-chip .cat{
+    font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--terracota-palida);
+  }
+  @media(max-width:640px){
+    .slide-chip{max-width:calc(100% - 40px); font-size:11.5px; top:14px; left:14px;}
+    .slide-chip .cat{display:none;}
+  }
+
+  /* Controles arriba a la derecha, la unica esquina que queda libre. */
+  .cctrl{position:absolute; top:16px; right:16px; z-index:4; display:flex; align-items:center; gap:10px;}
+  .cdots{display:flex; align-items:center; gap:6px;}
+  .cdots button{
+    width:8px; height:8px; padding:0; border:none; border-radius:50%;
+    background:rgba(255,255,255,.45); transition:width .2s, background .2s;
+  }
+  .cdots button[aria-current="true"]{background:#fff; width:22px; border-radius:999px;}
+  .cnav{
+    width:32px; height:32px; border-radius:50%; border:1px solid rgba(255,255,255,.5);
+    background:rgba(21,33,40,.38); color:#fff; font-size:16px; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .cnav:hover{background:rgba(21,33,40,.65);}
+  .cctrl :focus-visible{outline:2px solid #fff; outline-offset:2px;}
+
+  /* Pseudo-imagen: la fotografia todavia no existe, asi que cada escena se
+     compone con gradientes —cielo, sol, dos lineas de colinas—. Cuando haya
+     foto real basta con cambiar el background de cada .mN por la imagen. */
+  .hero-media{position:absolute; inset:0;}
+  .m1{background:
+      radial-gradient(circle at 78% 24%, rgba(233,221,201,.95) 0 52px, rgba(233,221,201,0) 53px),
+      linear-gradient(178deg, #2F4E5D 0%, #3E6375 44%, #547B6A 72%, #496B52 100%);}
+  .m2{background:linear-gradient(176deg, #3E6375 0%, #496B52 46%, #35513C 100%);}
+  .m3{background:
+      radial-gradient(circle at 24% 30%, rgba(199,110,67,.9) 0 66px, rgba(199,110,67,0) 67px),
+      linear-gradient(180deg, #E9DDC9 0%, #C76E43 40%, #2F4E5D 100%);}
+  .m4{background:linear-gradient(180deg, #2F4E5D 0%, #547B6A 58%, #89A67D 100%);}
   .hero-media::before{
     content:""; position:absolute; left:-8%; right:-8%; bottom:0; height:46%;
     background:var(--verde); border-radius:50% 50% 0 0 / 26% 26% 0 0; opacity:.92;
@@ -152,7 +196,7 @@
     background:linear-gradient(to top, rgba(21,33,40,.86) 0%, rgba(21,33,40,.58) 34%, rgba(21,33,40,.20) 72%, rgba(21,33,40,0) 100%);
   }
 
-  .hero-content{position:relative; padding:40px 40px 64px; max-width:680px;}
+  .hero-content{position:relative; z-index:3; padding:40px 40px 64px; max-width:680px;}
   @media(max-width:640px){ .hero-content{padding:26px 22px 46px;} }
   .hero .eyebrow{color:var(--terracota-palida); opacity:1;}
   .hero h1{font-size:44px; margin-top:10px; color:#fff; text-shadow:0 2px 18px rgba(21,33,40,.4);}
@@ -534,10 +578,49 @@
   <section class="hero">
     <div class="hero-inner">
       <div class="hero-banner">
-        <!-- Escena compuesta con gradientes. Es un marcador de posicion: el dia
-             que haya fotografia se cambia .hero-media por un background-image. -->
-        <div class="hero-media" aria-hidden="true"></div>
-        <div class="hero-scrim" aria-hidden="true"></div>
+        <!-- Carrusel de escenas. Cada .hero-media es un marcador de posicion
+             compuesto con gradientes; el dia que haya fotografia se cambia cada
+             uno por un background-image y ni los controles ni el titulo se
+             enteran.
+
+             El titulo de la pagina NO rota: vive fuera de las diapositivas, al
+             pie del banner. Solo cambian la imagen y la etiqueta de arriba a la
+             izquierda, que nombra el evento que se esta viendo. Asi hay un
+             unico h1 y el mensaje del sitio no depende de donde pare el giro. -->
+        <div class="carrusel" id="carrusel">
+          <div class="slide activa" aria-hidden="false">
+            <div class="hero-media m1"></div>
+            <div class="hero-scrim"></div>
+            <div class="slide-chip"><span class="cat">Sound Healing</span> Amanecer en el Cenote · Tulum</div>
+          </div>
+          <div class="slide" aria-hidden="true">
+            <div class="hero-media m2"></div>
+            <div class="hero-scrim"></div>
+            <div class="slide-chip"><span class="cat">Festival</span> Festival Holístico Raíz · CDMX</div>
+          </div>
+          <div class="slide" aria-hidden="true">
+            <div class="hero-media m3"></div>
+            <div class="hero-scrim"></div>
+            <div class="slide-chip"><span class="cat">Breathwork</span> Bajo las estrellas · San Miguel</div>
+          </div>
+          <div class="slide" aria-hidden="true">
+            <div class="hero-media m4"></div>
+            <div class="hero-scrim"></div>
+            <div class="slide-chip"><span class="cat">Retiro</span> Silencio Vipassana · Oaxaca</div>
+          </div>
+        </div>
+
+        <div class="cctrl">
+          <div class="cdots" id="cdots">
+            <button type="button" aria-current="true"  aria-label="Ver imagen 1"></button>
+            <button type="button" aria-current="false" aria-label="Ver imagen 2"></button>
+            <button type="button" aria-current="false" aria-label="Ver imagen 3"></button>
+            <button type="button" aria-current="false" aria-label="Ver imagen 4"></button>
+          </div>
+          <button type="button" class="cnav" id="cprev" aria-label="Imagen anterior">‹</button>
+          <button type="button" class="cnav" id="cnext" aria-label="Imagen siguiente">›</button>
+        </div>
+
         <div class="hero-content">
           <div class="eyebrow">Directorio de eventos · México</div>
           <h1>Encuentra tu próximo <em>retiro, festival o círculo</em> de bienestar</h1>
@@ -1186,6 +1269,61 @@ function rowHTML(e){
     <div class="rowarrow">→</div>
   </div>`;
 }
+
+/* ---------- carrusel del banner ---------- */
+(function(){
+  var raiz = document.getElementById('carrusel');
+  if (!raiz) return;
+
+  var slides = [].slice.call(raiz.querySelectorAll('.slide'));
+  var puntos = [].slice.call(document.querySelectorAll('#cdots button'));
+  var banner = raiz.parentNode;
+  var i = 0, reloj = null;
+  var ESPERA = 6000;
+
+  /* Si el sistema pide menos movimiento, el carrusel no gira solo. Las flechas
+     y los puntos siguen ahi: se quita el automatismo, no el control. */
+  var quieto = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function ir(n){
+    i = (n + slides.length) % slides.length;
+    slides.forEach(function(s, k){
+      s.classList.toggle('activa', k === i);
+      s.setAttribute('aria-hidden', k === i ? 'false' : 'true');
+    });
+    puntos.forEach(function(p, k){
+      p.setAttribute('aria-current', k === i ? 'true' : 'false');
+    });
+  }
+
+  function parar(){ if (reloj) { clearInterval(reloj); reloj = null; } }
+  function arrancar(){
+    parar();
+    if (!quieto) reloj = setInterval(function(){ ir(i + 1); }, ESPERA);
+  }
+
+  document.getElementById('cprev').addEventListener('click', function(){ ir(i - 1); arrancar(); });
+  document.getElementById('cnext').addEventListener('click', function(){ ir(i + 1); arrancar(); });
+  puntos.forEach(function(p, k){
+    p.addEventListener('click', function(){ ir(k); arrancar(); });
+  });
+
+  /* Se detiene con el raton encima o con el foco dentro. Un carrusel que sigue
+     girando mientras lees o mientras tabulas por sus botones es la queja
+     clasica de este patron. */
+  banner.addEventListener('mouseenter', parar);
+  banner.addEventListener('mouseleave', arrancar);
+  banner.addEventListener('focusin', parar);
+  banner.addEventListener('focusout', arrancar);
+
+  /* En una pestaña de fondo tampoco tiene sentido seguir contando. */
+  document.addEventListener('visibilitychange', function(){
+    if (document.hidden) parar(); else arrancar();
+  });
+
+  ir(0);
+  arrancar();
+})();
 document.getElementById('proximosList').innerHTML = eventos.map(rowHTML).join('');
 document.getElementById('resultsGrid').innerHTML = eventos.map(cardHTML).join('') + eventos.map(cardHTML).join('');
 document.getElementById('orgEventsGrid').innerHTML = eventos.slice(0,3).map(cardHTML).join('');
