@@ -183,6 +183,120 @@ input,select{font-family:inherit; font-size:14px;}
 .aviso-error{background:#FBEAE3; border-color:#E4B49C; color:#7C3A18;}
 .aviso-ok{background:#E7F0E9; border-color:#A9C4AF; color:#2C4A35;}
 
+/* ------------------------------------------------ formulario de evento --- */
+.caja-ancha{max-width:640px;}
+
+.campo textarea, .campo select{
+  width:100%; border:1px solid var(--linea); background:var(--arena-suave);
+  border-radius:9px; padding:11px 13px; font-size:14.5px; color:var(--petroleo);
+  font-family:inherit; line-height:1.55;
+}
+.campo textarea:focus, .campo select:focus{
+  outline:none; border-color:var(--verde); background:var(--blanco);
+}
+.campo textarea{resize:vertical; min-height:120px;}
+
+/* Dos campos por fila en pantalla ancha; uno debajo de otro en móvil, donde
+   partir "ciudad / estado" en dos columnas los deja ilegibles. */
+.campo-fila{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media(max-width:520px){ .campo-fila{grid-template-columns:1fr; gap:0;} }
+
+.campo-error{font-size:12px; color:#7C3A18; margin-top:5px;}
+.opcional{
+  font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.08em;
+  opacity:.5; text-transform:none;
+}
+
+.campo label.check{
+  display:flex; align-items:center; gap:9px; font-family:'Inter',sans-serif;
+  font-size:14.5px; letter-spacing:0; text-transform:none; color:var(--petroleo);
+  cursor:pointer; margin:0;
+}
+.campo label.check input{width:auto; margin:0;}
+
+.colores{display:flex; gap:9px; flex-wrap:wrap;}
+.color-op{cursor:pointer; line-height:0;}
+.color-op input{position:absolute; opacity:0; width:0; height:0;}
+.color-op span{
+  display:block; width:34px; height:34px; border-radius:50%;
+  border:2px solid transparent; box-shadow:0 0 0 1px var(--linea) inset;
+}
+.color-op input:checked + span{
+  border-color:var(--petroleo); box-shadow:0 0 0 2px var(--blanco) inset;
+}
+.color-op input:focus-visible + span{outline:2px solid var(--terracota-texto); outline-offset:2px;}
+
+/* -------------------------------------------------- barra de gestión ----- */
+/* Solo la ve quien puede tocar el evento. Va pegada arriba porque es donde se
+   mira al llegar desde el formulario, que es cuando hay que decidir publicar. */
+.barra-gestion{background:var(--arena); border-bottom:1px solid var(--linea);}
+.barra-gestion.es-borrador{background:var(--arena-suave); border-bottom:2px dashed var(--verde-claro);}
+.barra-inner{
+  max-width:900px; margin:0 auto; padding:13px 22px; display:flex;
+  align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+}
+.barra-texto{font-size:13.5px;}
+.barra-acciones{display:flex; gap:8px; flex-wrap:wrap;}
+.barra-acciones form{margin:0;}
+.btn-barra{
+  display:inline-block; background:var(--blanco); border:1px solid var(--linea);
+  border-radius:999px; padding:8px 16px; font-size:13px; font-weight:600;
+  color:var(--petroleo);
+}
+.btn-barra:hover{border-color:var(--verde);}
+.btn-barra.destacado{background:var(--terracota); border-color:var(--terracota); color:var(--tinta-boton);}
+.btn-barra.destacado:hover{background:var(--terracota-viva);}
+.btn-barra.peligro{color:#7C3A18;}
+.btn-barra.peligro:hover{border-color:#C0563A;}
+
+/* ---------------------------------------------------- ficha del evento --- */
+.ficha-envoltorio{max-width:900px; margin:22px auto 0; padding:0 22px;}
+.ficha{max-width:900px; margin:32px auto 72px; padding:0 22px;}
+
+.ficha-media{
+  position:relative; height:340px; border-radius:16px; overflow:hidden;
+  border:1px solid var(--linea);
+}
+@media(max-width:640px){ .ficha-media{height:220px;} }
+.ficha-media img{width:100%; height:100%; object-fit:cover; display:block;}
+.ficha-fecha{
+  position:absolute; left:20px; bottom:20px; background:var(--blanco);
+  border-radius:12px; padding:9px 14px; text-align:center; line-height:1.1;
+  box-shadow:0 6px 18px rgba(47,78,93,.18);
+}
+.ficha-fecha .d{display:block; font-family:'Fraunces',serif; font-size:24px;}
+.ficha-fecha .m{
+  display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px;
+  letter-spacing:.12em; color:var(--verde);
+}
+
+.ficha-cuerpo{margin-top:26px;}
+.ficha-cat{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--verde); margin-bottom:8px;
+}
+.ficha-cuerpo h1{font-size:34px; line-height:1.15;}
+@media(max-width:640px){ .ficha-cuerpo h1{font-size:26px;} }
+
+.ficha-datos{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));
+  gap:18px; margin:28px 0; padding:22px; background:var(--blanco);
+  border:1px solid var(--linea); border-radius:14px;
+}
+.ficha-datos .dato{display:flex; flex-direction:column; gap:5px;}
+.ficha-datos .k{
+  font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em;
+  text-transform:uppercase; opacity:.55;
+}
+.ficha-datos .val{font-size:14.5px; line-height:1.5;}
+.ficha-datos .tenue{opacity:.6; font-size:13px;}
+.precio-grande{font-family:'IBM Plex Mono',monospace; font-size:19px;}
+.precio-grande.gratis{color:var(--verde);}
+
+.btn-boletos{display:block; text-align:center; text-decoration:none; max-width:320px;}
+
+.ficha-desc{margin-top:30px; font-size:15.5px; line-height:1.75;}
+
 /* --------------------------------------------------------------- footer -- */
 footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;}
 .foot-bottom{

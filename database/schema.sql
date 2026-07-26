@@ -119,6 +119,70 @@ CREATE TABLE IF NOT EXISTS codigos_acceso (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- ----------------------------------------------------------------------------
+--  eventos
+--
+--  DOS NOMBRES QUE CHOCAN, Y CÓMO SE RESUELVEN
+--
+--  "Estado" significa dos cosas distintas en este proyecto: la entidad
+--  federativa (Jalisco, Oaxaca) y la situación de la publicación (borrador,
+--  publicado). Llamar "estado" a las dos columnas garantiza que alguien lea
+--  mal una consulta algún día. Aquí son 'entidad' y 'situacion'.
+--
+--  EL RELOJ DE LAS 24 HORAS
+--
+--  publicado_en no es lo mismo que creado_en, y la diferencia es justo la regla
+--  del producto: el organizador puede corregir su evento durante 24 horas
+--  DESDE QUE LO PUBLICA, no desde que empezó a escribirlo. Un borrador que pasó
+--  tres días a medias no gasta ese margen.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS eventos (
+  id            INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  usuario_id    INT UNSIGNED  NOT NULL,
+
+  titulo        VARCHAR(160)  NOT NULL,
+  slug          VARCHAR(190)  NOT NULL,
+
+  descripcion   TEXT          NOT NULL,
+  categoria     VARCHAR(60)   NOT NULL,
+
+  ciudad        VARCHAR(90)   NOT NULL,
+  entidad       VARCHAR(90)   NOT NULL COMMENT 'Entidad federativa: Jalisco, Oaxaca…',
+  lugar         VARCHAR(160)  NULL DEFAULT NULL,
+
+  fecha_inicio  DATETIME      NOT NULL,
+  fecha_fin     DATETIME      NULL DEFAULT NULL,
+
+  -- Gratuito aparte del precio en vez de deducirlo de precio = 0: "gratis" y
+  -- "todavía no sé el precio" son cosas distintas y con un solo campo se
+  -- confunden.
+  gratuito      TINYINT(1)    NOT NULL DEFAULT 0,
+  precio        DECIMAL(10,2) NULL DEFAULT NULL,
+
+  url_boletos   VARCHAR(500)  NULL DEFAULT NULL,
+  imagen_url    VARCHAR(500)  NULL DEFAULT NULL,
+  color         CHAR(7)       NOT NULL DEFAULT '#89A67D',
+
+  situacion     ENUM('borrador','publicado','oculto')
+                              NOT NULL DEFAULT 'borrador',
+  publicado_en  DATETIME      NULL DEFAULT NULL,
+
+  creado_en     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  actualizado_en DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+                              ON UPDATE CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_eventos_slug (slug),
+  KEY idx_eventos_agenda (situacion, fecha_inicio),
+  KEY idx_eventos_usuario (usuario_id, creado_en),
+  KEY idx_eventos_categoria (categoria, fecha_inicio),
+
+  CONSTRAINT fk_evento_usuario
+    FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 -- ============================================================================
 --  DESPUÉS DE ENTRAR LA PRIMERA VEZ: date permisos de administrador
 --

@@ -10,8 +10,30 @@
  */
 declare(strict_types=1);
 require __DIR__ . '/includes/config.php';
+require __DIR__ . '/includes/eventos.php';
 
 $u = usuarioActual();
+
+/*
+ * Los eventos de verdad, en la forma que ya espera el JavaScript de esta
+ * página. El prototipo traía un array de ejemplo escrito a mano dentro del
+ * script; ahora ese array se rellena desde la base y el render se queda igual.
+ *
+ * Es deliberado no reescribir las funciones de tarjeta: el diseño está cerrado
+ * y aprobado, y cambiarlo para conectar los datos habría mezclado dos cosas que
+ * conviene poder revisar por separado.
+ */
+$eventosJs = array_map('eventoParaTarjeta', eventosPublicados());
+
+// Los del panel del organizador y los del panel de administración.
+$misEventos    = $u ? eventosDeUsuario((int) $u['id']) : [];
+$eventosAdmin  = esAdmin($u) ? eventosTodos() : [];
+
+$avisoPortada = '';
+if (!empty($_SESSION['evento_aviso'])) {
+    $avisoPortada = (string) $_SESSION['evento_aviso'];
+    unset($_SESSION['evento_aviso']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="es-MX">
@@ -285,6 +307,22 @@ $u = usuarioActual();
     scrollbar-width:none; -ms-overflow-style:none;
   }
   .catrail::-webkit-scrollbar{display:none;}
+  /* Carril o rejilla sin nada que enseñar. Un hueco vacío parece un fallo de
+     carga; esto dice qué pasa y ofrece la única acción que lo arregla. */
+  .rail-vacio{
+    width:100%; padding:34px 22px; text-align:center; background:var(--paper);
+    border:1px dashed var(--line); border-radius:14px;
+  }
+  .rail-vacio p{margin:0 0 14px; font-size:14px; opacity:.7;}
+  .btn-vacio{
+    display:inline-block; background:var(--terracota); color:var(--tinta-boton);
+    border-radius:999px; padding:10px 20px; font-size:13.5px; font-weight:600;
+  }
+  .aviso-portada{
+    background:#E7F0E9; border:1px solid #A9C4AF; color:#2C4A35;
+    border-radius:10px; padding:12px 15px; font-size:13.5px;
+  }
+
   .catitem{
     flex:0 0 auto; width:88px; background:none; border:none; padding:0;
     display:flex; flex-direction:column; align-items:center; gap:9px; scroll-snap-align:start;
@@ -729,6 +767,13 @@ $u = usuarioActual();
   </div>
 </div>
 
+<?php if ($avisoPortada): ?>
+  <!-- Aviso de vuelta desde publicar o eliminar un evento. -->
+  <div class="wrap" style="padding-top:18px;">
+    <div class="aviso-portada"><?= e($avisoPortada) ?></div>
+  </div>
+<?php endif; ?>
+
 <!-- ================= INICIO ================= -->
 <main id="view-inicio" class="view active">
   <section class="hero">
@@ -838,19 +883,12 @@ $u = usuarioActual();
       <span class="eyebrow">Explora por categoría</span>
       <div class="catrail-wrap">
         <div class="catrail" id="catrail">
-          <button class="catitem" data-cat="Yoga"><span class="ic">🧘</span><span class="lbl">Yoga</span></button>
-          <button class="catitem" data-cat="Meditación"><span class="ic">🌿</span><span class="lbl">Meditación</span></button>
-          <button class="catitem" data-cat="Retiro"><span class="ic">🏕️</span><span class="lbl">Retiros</span></button>
-          <button class="catitem" data-cat="Breathwork"><span class="ic">🌬️</span><span class="lbl">Breathwork</span></button>
-          <button class="catitem" data-cat="Sound Healing"><span class="ic">🎐</span><span class="lbl">Sound Healing</span></button>
-          <button class="catitem" data-cat="Ceremonia"><span class="ic">🔥</span><span class="lbl">Ceremonias</span></button>
-          <button class="catitem" data-cat="Festival"><span class="ic">☀️</span><span class="lbl">Festivales</span></button>
-          <button class="catitem" data-cat="Temazcal"><span class="ic">♨️</span><span class="lbl">Temazcal</span></button>
-          <button class="catitem" data-cat="Cacao"><span class="ic">🍫</span><span class="lbl">Cacao</span></button>
-          <button class="catitem" data-cat="Ecstatic Dance"><span class="ic">💃</span><span class="lbl">Ecstatic Dance</span></button>
-          <button class="catitem" data-cat="Ice Bath"><span class="ic">🧊</span><span class="lbl">Ice Bath</span></button>
-          <button class="catitem" data-cat="Pilates"><span class="ic">🌀</span><span class="lbl">Pilates</span></button>
-          <button class="catitem" data-cat="Biohacking"><span class="ic">⚡</span><span class="lbl">Biohacking</span></button>
+          <?php /* Salen de categoriasMenu(), la misma lista que valida el formulario
+                   de alta. Escritas a mano en los dos sitios, una categoria nueva
+                   aparecia en el menu y no se podia elegir al publicar. */ ?>
+          <?php foreach (categoriasMenu() as $catNombre => $catDatos): ?>
+            <button class="catitem" data-cat="<?= e($catNombre) ?>"><span class="ic"><?= e($catDatos[0]) ?></span><span class="lbl"><?= e($catDatos[1]) ?></span></button>
+          <?php endforeach; ?>
         </div>
         <button type="button" class="catnext" id="catnext" aria-label="Ver más categorías">›</button>
       </div>
@@ -1140,7 +1178,8 @@ $u = usuarioActual();
             <h1 style="font-size:22px;"><?= e($u['nombre']) ?></h1>
           </div>
         </div>
-        <button class="btn-add" style="background:var(--terracota); color:var(--tinta-boton);" onclick="openModal()">+ Nuevo evento</button>
+        <a class="btn-add" style="background:var(--terracota); color:var(--tinta-boton);"
+           href="<?= URL_BASE ?>/evento-nuevo.php">+ Nuevo evento</a>
       </div>
 
       <div class="op-tabs" id="opTabs">
@@ -1149,14 +1188,45 @@ $u = usuarioActual();
       </div>
 
       <div class="op-panel active" id="op-miseventos">
-        <table class="admtable" style="background:var(--paper); color:var(--ink);">
-          <thead><tr><th>Título</th><th>Fecha</th><th>Estado</th><th></th></tr></thead>
-          <tbody>
-            <tr><td>Amanecer en el Cenote — Retiro de Yoga y Sonido</td><td>16 ago 2026</td><td><span class="badge on" style="color:var(--jungle); background:rgba(47,78,93,0.12);">Publicado</span></td><td><button class="actionbtn" style="color:var(--ink); border-color:var(--line);" onclick="openModal()">Editar</button><button class="actionbtn" style="color:var(--ink); border-color:var(--line);">Eliminar</button></td></tr>
-            <tr><td>Círculo de Cacao y Luna Llena</td><td>30 ago 2026</td><td><span class="badge-pending">Pendiente de aprobación</span></td><td><button class="actionbtn" style="color:var(--ink); border-color:var(--line);" onclick="openModal()">Editar</button><button class="actionbtn" style="color:var(--ink); border-color:var(--line);">Eliminar</button></td></tr>
-          </tbody>
-        </table>
-        <div class="evergreen-note" style="margin-top:18px;">La aprobación del administrador es opcional en el MVP — puede activarse para moderar calidad, o desactivarse para que el evento se publique de inmediato.</div>
+        <?php if (!$misEventos): ?>
+          <div class="evergreen-note">
+            Todavía no has creado ningún evento. Con «+ Nuevo evento» escribes la ficha,
+            la ves como la verá la gente y decides si publicarla.
+          </div>
+        <?php else: ?>
+          <table class="admtable" style="background:var(--paper); color:var(--ink);">
+            <thead><tr><th>Título</th><th>Fecha</th><th>Situación</th><th></th></tr></thead>
+            <tbody>
+              <?php foreach ($misEventos as $me): $p = fechaPartes($me['fecha_inicio']); ?>
+                <tr>
+                  <td><?= e($me['titulo']) ?></td>
+                  <td><?= e($p['d'] . ' ' . $p['m'] . ' ' . date('Y', strtotime($me['fecha_inicio']))) ?></td>
+                  <td>
+                    <?php if ($me['situacion'] === 'publicado'): ?>
+                      <span class="badge on" style="color:var(--jungle); background:rgba(47,78,93,0.12);">Publicado</span>
+                    <?php elseif ($me['situacion'] === 'borrador'): ?>
+                      <span class="badge-pending">Borrador · sin publicar</span>
+                    <?php else: ?>
+                      <span class="badge off">Oculto</span>
+                    <?php endif; ?>
+                  </td>
+                  <td>
+                    <a class="actionbtn" style="color:var(--ink); border-color:var(--line);"
+                       href="<?= URL_BASE ?>/evento.php?id=<?= (int) $me['id'] ?>">Ver</a>
+                    <?php if (puedeEditarEvento($me, $u)): ?>
+                      <a class="actionbtn" style="color:var(--ink); border-color:var(--line);"
+                         href="<?= URL_BASE ?>/evento-editar.php?id=<?= (int) $me['id'] ?>">Editar</a>
+                    <?php endif; ?>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+          <div class="evergreen-note" style="margin-top:18px;">
+            Un evento publicado se puede corregir durante <?= EVENTO_MARGEN_EDICION_H ?> horas.
+            Después, los cambios se le piden al administrador.
+          </div>
+        <?php endif; ?>
       </div>
 
       <div class="op-panel" id="op-perfil">
@@ -1220,23 +1290,37 @@ $u = usuarioActual();
       <!-- EVENTOS -->
       <div class="admin-panel active" id="panel-eventos">
         <div class="panel-toolbar">
-          <input type="text" placeholder="Buscar evento…">
-          <button class="btn-add" onclick="openModal()">+ Nuevo evento</button>
+          <a class="btn-add" href="<?= URL_BASE ?>/evento-nuevo.php">+ Nuevo evento</a>
         </div>
         <table class="admtable">
-          <thead><tr><th>Título</th><th>Categoría</th><th>Ciudad</th><th>Fecha</th><th>Estado</th><th></th></tr></thead>
-          <tbody id="admEventsBody">
-            <tr>
-              <td>Círculo de Cacao y Luna Llena <span class="badge-pending" style="margin-left:6px;">Pendiente</span></td>
-              <td>Meditación</td><td>Tulum</td><td>30 AGO 2026</td>
-              <td><span class="badge off">Sin revisar</span></td>
-              <td>
-                <button class="actionbtn" style="border-color:var(--terracota-palida); color:var(--terracota-palida);">Aprobar</button>
-                <button class="actionbtn">Rechazar</button>
-              </td>
-            </tr>
+          <thead><tr><th>Título</th><th>Organiza</th><th>Ciudad</th><th>Fecha</th><th>Situación</th><th></th></tr></thead>
+          <tbody>
+            <?php if (!$eventosAdmin): ?>
+              <tr><td colspan="6" style="opacity:.6;">Todavía no hay eventos.</td></tr>
+            <?php endif; ?>
+            <?php foreach ($eventosAdmin as $ea): $p = fechaPartes($ea['fecha_inicio']); ?>
+              <tr>
+                <td><?= e($ea['titulo']) ?></td>
+                <td><?= e($ea['organizador']) ?></td>
+                <td><?= e($ea['ciudad']) ?></td>
+                <td><?= e($p['d'] . ' ' . $p['m'] . ' ' . date('Y', strtotime($ea['fecha_inicio']))) ?></td>
+                <td>
+                  <span class="badge <?= $ea['situacion'] === 'publicado' ? 'on' : 'off' ?>">
+                    <?= e(ucfirst($ea['situacion'])) ?>
+                  </span>
+                </td>
+                <td>
+                  <a class="actionbtn" href="<?= URL_BASE ?>/evento.php?id=<?= (int) $ea['id'] ?>">Ver</a>
+                  <a class="actionbtn" href="<?= URL_BASE ?>/evento-editar.php?id=<?= (int) $ea['id'] ?>">Editar</a>
+                </td>
+              </tr>
+            <?php endforeach; ?>
           </tbody>
         </table>
+        <div class="evergreen-note" style="margin-top:18px;">
+          Ocultar y eliminar se hacen desde la ficha del evento, con la confirmación delante.
+          Un botón «Eliminar» en una fila de tabla se pulsa por error con demasiada facilidad.
+        </div>
       </div>
 
       <!-- ORGANIZADORES -->
@@ -1365,109 +1449,77 @@ $u = usuarioActual();
   <div class="foot-bottom">© 2026 Rueda — Directorio de eventos wellness MX. Prototipo de interfaz.</div>
 </footer>
 
-<!-- ================= MODAL: Nuevo evento (CRUD) ================= -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <div class="modal-head">
-      <h3>Nuevo evento</h3>
-      <button class="modal-close" onclick="closeModal()">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="fgrid">
-        <div class="field full"><label>Título</label><input type="text" placeholder="Amanecer en el Cenote — Retiro de Yoga y Sonido"></div>
-        <div class="field full"><label>Descripción</label><textarea placeholder="Describe la experiencia, el formato y para quién es ideal…"></textarea></div>
-
-        <div class="field"><label>País</label><input type="text" value="México"></div>
-        <div class="field"><label>Estado</label><select><option>Quintana Roo</option><option>Ciudad de México</option><option>Oaxaca</option><option>Jalisco</option><option>Guanajuato</option><option>Nuevo León</option></select></div>
-        <div class="field"><label>Ciudad</label><select><option>Tulum</option><option>CDMX</option><option>Oaxaca de Juárez</option><option>Guadalajara</option><option>San Miguel de Allende</option></select></div>
-        <div class="field"><label>Dirección</label><input type="text" placeholder="Cenote Zacil-Ha, carretera Tulum-Cobá"></div>
-        <div class="field"><label>Latitud (Google Maps)</label><input type="text" placeholder="20.2114"></div>
-        <div class="field"><label>Longitud (Google Maps)</label><input type="text" placeholder="-87.4654"></div>
-
-        <div class="field"><label>Categoría</label><select><option>Yoga</option><option>Meditación</option><option>Breathwork</option><option>Pilates</option><option>Retreat</option><option>Festival</option><option>Sound Healing</option><option>Ice Bath</option><option>Biohacking</option><option>Nutrición</option><option>Conferencia</option><option>Networking</option><option>Otro</option></select></div>
-        <div class="field"><label>Organizador</label><select><option>Raíz Colectivo</option><option>Circulo Vivo</option><option>Sana Selva</option><option>Amara Wellness</option></select></div>
-
-        <div class="field"><label>Precio</label><input type="number" placeholder="2450"></div>
-        <div class="field"><label>Precio desde (opcional)</label><input type="number" placeholder="1800"></div>
-        <div class="field"><label>Fecha inicio</label><input type="date"></div>
-        <div class="field"><label>Fecha fin</label><input type="date"></div>
-        <div class="field"><label>Hora</label><input type="time"></div>
-        <div class="field"><label>Capacidad</label><input type="number" placeholder="18"></div>
-
-        <div class="field"><label>Imagen principal</label><input type="file"></div>
-        <div class="field"><label>Galería (varias imágenes)</label><input type="file" multiple></div>
-
-        <div class="field"><label>URL de compra de boletos</label><input type="text" placeholder="https://..."></div>
-        <div class="field"><label>Etiquetas</label><input type="text" placeholder="amanecer, cenote, principiantes"></div>
-        <div class="field"><label>Idioma</label><select><option>Español</option><option>Inglés</option><option>Español / Inglés</option></select></div>
-        <div class="field"><label>Edad mínima</label><input type="number" placeholder="18"></div>
-
-        <div class="field full">
-          <label>Opciones</label>
-          <div class="switchrow">
-            <label><input type="checkbox"> Se permiten mascotas</label>
-            <label><input type="checkbox" checked> Estacionamiento disponible</label>
-            <label><input type="checkbox" checked> Publicado</label>
-            <label><input type="checkbox"> Destacado</label>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
-      <button class="btn-save" onclick="closeModal()">Guardar evento</button>
-    </div>
-  </div>
-</div>
 
 <script>
-/* ---------- datos de ejemplo ---------- */
-/* Cada evento lleva ahora organizador y estado: son los dos datos que la
-   tarjeta nueva muestra al pie y que antes no existian en los datos. */
-const eventos = [
-  {t:"Amanecer en el Cenote", cat:"Sound Healing", city:"Tulum, Quintana Roo", org:"Raíz Colectivo", date:"16 AGO", d:"16", m:"AGO", price:"2,450", free:false, color:"#89A67D"},
-  {t:"Festival Holístico Raíz", cat:"Festival", city:"Ciudad de México", org:"Casa Nahá", date:"22 AGO", d:"22", m:"AGO", price:"890", free:false, color:"#C76E43"},
-  {t:"Breathwork bajo las estrellas", cat:"Breathwork", city:"San Miguel de Allende, Gto.", org:"Origen Retreats", date:"29 AGO", d:"29", m:"AGO", price:"Gratis", free:true, color:"#2F4E5D"},
-  {t:"Ice Bath & Sound Healing Circle", cat:"Ice Bath", city:"Guadalajara, Jalisco", org:"Sonido Sagrado", date:"5 SEP", d:"05", m:"SEP", price:"650", free:false, color:"#496B52"},
-  {t:"Retiro de Silencio", cat:"Meditación", city:"Oaxaca de Juárez, Oax.", org:"Corazón Cacao", date:"12 SEP", d:"12", m:"SEP", price:"3,200", free:false, color:"#E9DDC9"},
-  {t:"Sunset Sound Bath en la Playa", cat:"Sound Healing", city:"Puerto Vallarta, Jalisco", org:"Luz Interior", date:"18 SEP", d:"18", m:"SEP", price:"Gratis", free:true, color:"#3E6375"},
-];
+/* ---------- los eventos, desde la base de datos ----------
+   Antes era un array escrito a mano. Ahora lo rellena PHP con lo que hay
+   publicado, con las mismas claves, para que el render de abajo no cambiara. */
+const eventos = <?= json_encode($eventosJs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+
+/* Escapa antes de meter texto en las plantillas de tarjeta. Los titulos los
+   escribe cualquiera que publique un evento, asi que llegan aqui sin depurar:
+   sin esto, un titulo con etiquetas dentro se ejecutaria en la portada. */
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
 
 /* Tarjeta grande del carril de proximos eventos: fecha sobre la imagen,
    categoria, titulo, ubicacion y, al pie, quien lo organiza y desde cuanto. */
+/* El fondo de la tarjeta: la foto si la hay, y si no el color de la paleta que
+   eligio quien publico, que es como lo hacia el prototipo. */
+function fondoTarjeta(e){
+  return e.img
+    ? `background-image:url('${esc(e.img)}'); background-size:cover; background-position:center;`
+    : `background-color:${esc(e.color)};`;
+}
+
+function precioTexto(e, prefijo){
+  return e.free ? 'Gratis' : (e.price ? prefijo + '$' + esc(e.price) + ' MXN' : 'Por confirmar');
+}
+
 function evCardHTML(e){
-  return `<article class="ev-card" onclick="switchView('evento')">
-    <div class="ev-img" style="background-color:${e.color};">
-      <div class="ev-date"><span class="d">${e.d}</span><span class="m">${e.m}</span></div>
-      <button class="ev-fav" aria-label="Guardar evento" onclick="event.stopPropagation(); this.textContent=this.textContent.trim()==='♡'?'♥':'♡';">♡</button>
+  return `<a class="ev-card" href="${esc(e.url)}">
+    <div class="ev-img" style="${fondoTarjeta(e)}">
+      <div class="ev-date"><span class="d">${esc(e.d)}</span><span class="m">${esc(e.m)}</span></div>
     </div>
     <div class="ev-body">
-      <div class="ev-cat">${e.cat}</div>
-      <h3>${e.t}</h3>
-      <div class="ev-loc">${e.city}</div>
+      <div class="ev-cat">${esc(e.cat)}</div>
+      <h3>${esc(e.t)}</h3>
+      <div class="ev-loc">${esc(e.city)}</div>
       <div class="ev-foot">
-        <span class="ev-org">${e.org}</span>
-        <span class="ev-price ${e.free?'free':''}">${e.free?'Gratis':'Desde $'+e.price+' MXN'}</span>
+        <span class="ev-org">${esc(e.org)}</span>
+        <span class="ev-price ${e.free?'free':''}">${precioTexto(e,'Desde ')}</span>
       </div>
     </div>
-  </article>`;
+  </a>`;
 }
 
 function cardHTML(e){
-  return `<div class="card-event" onclick="switchView('evento')">
-    <div class="card-img" style="background-color:${e.color};">
-      <span class="cat-tag">${e.cat}</span>
-      <button class="fav" onclick="event.stopPropagation(); this.textContent=this.textContent==='♡'?'♥':'♡';">♡</button>
+  return `<a class="card-event" href="${esc(e.url)}">
+    <div class="card-img" style="${fondoTarjeta(e)}">
+      <span class="cat-tag">${esc(e.cat)}</span>
     </div>
     <div class="card-body">
-      <div class="card-date">${e.date}</div>
-      <h3>${e.t}</h3>
-      <div class="card-city">${e.city}</div>
+      <div class="card-date">${esc(e.date)}</div>
+      <h3>${esc(e.t)}</h3>
+      <div class="card-city">${esc(e.city)}</div>
       <div class="card-foot">
-        <span class="price ${e.free?'free':''}">${e.free?'Gratis':'$'+e.price+' MXN'}</span>
+        <span class="price ${e.free?'free':''}">${precioTexto(e,'')}</span>
         <span style="font-size:12px; color:var(--jungle);">Ver evento →</span>
       </div>
     </div>
+  </a>`;
+}
+
+/* Con la base vacia, un carril sin nada parece la pagina rota. Se dice que no
+   hay eventos y se invita a publicar, que es justo lo que hace falta al
+   principio. */
+function vacioHTML(mensaje){
+  return `<div class="rail-vacio">
+    <p>${esc(mensaje)}</p>
+    <a class="btn-vacio" href="<?= URL_BASE ?>/evento-nuevo.php">Publicar el primero</a>
   </div>`;
 }
 /* ---------- carrusel del banner ---------- */
@@ -1524,10 +1576,18 @@ function cardHTML(e){
   ir(0);
   arrancar();
 })();
-document.getElementById('proximosRail').innerHTML = eventos.map(evCardHTML).join('');
-document.getElementById('resultsGrid').innerHTML = eventos.map(cardHTML).join('') + eventos.map(cardHTML).join('');
-document.getElementById('orgEventsGrid').innerHTML = eventos.slice(0,3).map(cardHTML).join('');
-document.getElementById('relatedGrid').innerHTML = eventos.slice(1,4).map(cardHTML).join('');
+/* Antes se duplicaba la lista en resultsGrid para que la rejilla se viera
+   llena en el prototipo. Con datos reales eso serian eventos repetidos. */
+pintar('proximosRail', eventos.map(evCardHTML), 'Todavia no hay eventos publicados.');
+pintar('resultsGrid',  eventos.map(cardHTML),   'Ningun evento coincide por ahora.');
+pintar('relatedGrid',  eventos.slice(0,3).map(cardHTML), '');
+pintar('orgEventsGrid', eventos.slice(0,3).map(cardHTML), '');
+
+function pintar(id, trozos, mensajeVacio){
+  var caja = document.getElementById(id);
+  if (!caja) return;
+  caja.innerHTML = trozos.length ? trozos.join('') : (mensajeVacio ? vacioHTML(mensajeVacio) : '');
+}
 
 /* ---------- panel del organizador ----------
    enterOrgPanel() ya no existe: quién ve el panel lo decide PHP según la sesión,
@@ -1542,14 +1602,25 @@ document.querySelectorAll('#opTabs button').forEach(b=>{
 });
 
 /* ---------- páginas dinámicas por ciudad / categoría ---------- */
-function showResults(eyebrow, title){
+function showResults(eyebrow, title, categoria){
   document.getElementById('resultsEyebrow').textContent = eyebrow;
   document.getElementById('resultsTitle').textContent = title;
+
+  /* El filtro es de verdad: antes el menu de categorias cambiaba el titulo y
+     debajo seguian saliendo los mismos eventos de siempre. */
+  var lista = categoria ? eventos.filter(function(ev){ return ev.cat === categoria; }) : eventos;
+
+  pintar('resultsGrid', lista.map(cardHTML),
+         categoria ? 'Todavia no hay eventos de ' + categoria + '.' : 'Todavia no hay eventos publicados.');
+
+  var cuenta = document.querySelector('#view-resultados .count');
+  if (cuenta) cuenta.textContent = lista.length + (lista.length === 1 ? ' evento encontrado' : ' eventos encontrados');
+
   switchView('resultados');
 }
 document.querySelectorAll('.catitem').forEach(el=>{
   el.addEventListener('click', ()=>{
-    showResults('Página por categoría', 'Eventos de ' + el.dataset.cat);
+    showResults('Página por categoría', 'Eventos de ' + el.dataset.cat, el.dataset.cat);
   });
 });
 
@@ -1568,21 +1639,9 @@ document.querySelectorAll('#langToggle button').forEach(b=>{
   });
 });
 
-const admStatus = ["Publicado","Publicado","Oculto","Publicado","Publicado","Oculto"];
-document.getElementById('admEventsBody').innerHTML = eventos.map((e,i)=>`
-  <tr>
-    <td>${e.t}${i===0?' <span class="badge star" style="margin-left:6px;">Destacado</span>':''}</td>
-    <td>${e.cat}</td>
-    <td>${e.city.split(',')[0]}</td>
-    <td>${e.date} 2026</td>
-    <td><span class="badge ${admStatus[i]==='Publicado'?'on':'off'}">${admStatus[i]}</span></td>
-    <td>
-      <button class="actionbtn" onclick="openModal()">Editar</button>
-      <button class="actionbtn">Duplicar</button>
-      <button class="actionbtn">${admStatus[i]==='Publicado'?'Ocultar':'Publicar'}</button>
-      <button class="actionbtn">Eliminar</button>
-    </td>
-  </tr>`).join('');
+/* La tabla de eventos del panel admin ya no se pinta aqui: la escribe PHP mas
+   arriba, con los eventos reales. Pintarla en el navegador obligaba a mandar
+   tambien los borradores y los ocultos al HTML de cualquier visitante. */
 
 /* ---------- navegación entre vistas ---------- */
 function switchView(name){
@@ -1610,8 +1669,11 @@ document.querySelectorAll('#adminTabs button').forEach(b=>{
 });
 
 /* ---------- modal ---------- */
-function openModal(){ document.getElementById('modalOverlay').classList.add('open'); }
-function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
+/* El modal de "nuevo evento" del prototipo se fue de aqui: era un formulario
+   que no guardaba nada, y ahora el alta de verdad esta en evento-nuevo.php.
+   Su maqueta —con los campos que aun no existen: mapa, aforo, galeria,
+   etiquetas, idioma— sigue intacta en prototipos/v3-final/versiones/v6.html,
+   que es justo para lo que estan congeladas esas versiones. */
 
 /* ---------- newsletter toast ---------- */
 function showToast(form){
