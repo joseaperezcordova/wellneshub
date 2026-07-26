@@ -1,19 +1,26 @@
 {
-  "actual": "paleta de seis colores",
-  "versiones": [
-    {
-      "n": 1,
-      "archivo": "v1.html",
-      "fecha": "2026-07-25",
-      "commit": "cf63ce1",
-      "titulo": "Fondo blanco, verde y azul, naranja en botones"
-    },
-    {
-      "n": 2,
-      "archivo": "v2.html",
-      "fecha": "2026-07-25",
-      "commit": "75233c4",
-      "titulo": "Paleta de seis colores con nombre"
-    }
-  ]
+    "actual":  "Banner con pastilla de búsqueda segmentada",
+    "versiones":  [
+                      {
+                          "n":  1,
+                          "archivo":  "v1.html",
+                          "fecha":  "2026-07-25",
+                          "commit":  "cf63ce1",
+                          "titulo":  "Fondo blanco, verde y azul, naranja en botones"
+                      },
+                      {
+                          "n":  2,
+                          "archivo":  "v2.html",
+                          "fecha":  "2026-07-25",
+                          "commit":  "75233c4",
+                          "titulo":  "Paleta de seis colores con nombre"
+                      },
+                      {
+                          "n":  3,
+                          "archivo":  "v3.html",
+                          "fecha":  "2026-07-25",
+                          "commit":  "c11d483",
+                          "titulo":  "Banner con pastilla de búsqueda segmentada"
+                      }
+                  ]
 }
