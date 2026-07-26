@@ -52,4 +52,4 @@ if (!$ok) {
 }
 
 iniciarSesion((int) $resultado);
-redirigir('/');
+redirigir(destinoTrasLogin());

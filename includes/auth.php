@@ -63,6 +63,7 @@ function iniciarSesion(int $usuarioId): void
     $_SESSION['uid'] = $usuarioId;
 
     // Rastros del flujo del código: ya no hacen falta y no deben sobrevivir.
+    // 'volver_a' no se toca aquí: lo lee la página que redirige justo después.
     unset($_SESSION['codigo_email'], $_SESSION['codigo_error'], $_SESSION['codigo_aviso']);
 
     db()->prepare('UPDATE usuarios SET ultimo_acceso_en = NOW() WHERE id = ?')
@@ -83,8 +84,50 @@ function cerrarSesion(): void
 function exigirSesion(): array
 {
     $u = usuarioActual();
-    if (!$u) redirigir('/login.php');
+
+    if (!$u) {
+        // Se recuerda a dónde iba para devolverlo ahí al entrar. Sin esto, quien
+        // pulsa «Publicar evento» sin sesión aterriza en la portada después del
+        // login y tiene que volver a buscar el botón.
+        guardarDestinoLogin((string) ($_SERVER['REQUEST_URI'] ?? '/'));
+        redirigir('/login.php');
+    }
+
     return $u;
+}
+
+/**
+ * Guarda a dónde volver tras identificarse.
+ *
+ * Solo acepta rutas internas. Una redirección abierta —"//otrositio.com" o una
+ * URL completa— es un clásico de phishing: el enlace enseña nuestro dominio, la
+ * persona entra confiada y acaba en otro sitio ya identificada, creyendo que
+ * sigue aquí.
+ */
+function guardarDestinoLogin(string $ruta): void
+{
+    // REQUEST_URI trae la carpeta desde la que se sirve la aplicación
+    // (/wellneshub en XAMPP, nada en el dominio). redirigir() vuelve a
+    // anteponer URL_BASE, así que aquí hay que quitarla o se duplicaría.
+    $base = (string) parse_url(URL_BASE, PHP_URL_PATH);
+    if ($base !== '' && strpos($ruta, $base) === 0) {
+        $ruta = substr($ruta, strlen($base));
+    }
+
+    if ($ruta === '' || $ruta[0] !== '/') return;
+    if (strpos($ruta, '//') === 0)        return;   // //otrositio.com
+    if (strpos($ruta, '\\') !== false)    return;   // algunos navegadores lo leen como /
+
+    $_SESSION['volver_a'] = $ruta;
+}
+
+/** A dónde mandar a alguien que acaba de entrar. De un solo uso. */
+function destinoTrasLogin(): string
+{
+    $ruta = (string) ($_SESSION['volver_a'] ?? '/');
+    unset($_SESSION['volver_a']);
+
+    return $ruta !== '' ? $ruta : '/';
 }
 
 

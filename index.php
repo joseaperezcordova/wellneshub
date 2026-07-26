@@ -307,6 +307,20 @@ if (!empty($_SESSION['evento_aviso'])) {
     scrollbar-width:none; -ms-overflow-style:none;
   }
   .catrail::-webkit-scrollbar{display:none;}
+  /* Botón de publicar del topbar. En pantalla estrecha se queda en «Publicar»
+     a secas en vez de desaparecer: es la acción que da de comer al directorio y
+     la mitad del tráfico llega desde el móvil. */
+  .btn-publicar{
+    background:var(--terracota); color:var(--tinta-boton); border-radius:999px;
+    padding:9px 18px; font-size:13.5px; font-weight:600; white-space:nowrap;
+    transition:background .15s;
+  }
+  .btn-publicar:hover{background:var(--terracota-viva);}
+  @media(max-width:760px){
+    .btn-publicar{padding:8px 14px; font-size:13px;}
+    .btn-publicar-extra{display:none;}
+  }
+
   /* Carril o rejilla sin nada que enseñar. Un hueco vacío parece un fallo de
      carga; esto dice qué pasa y ofrece la única acción que lo arregla. */
   .rail-vacio{
@@ -727,6 +741,15 @@ if (!empty($_SESSION['evento_aviso'])) {
         <button data-lang="es" class="active">ES</button>
         <button data-lang="en">EN</button>
       </div>
+      <!-- «Publicar evento» lo ve todo el mundo, con sesión o sin ella. Quien no
+           la tenga pasa por el login y vuelve aquí solo: esconder el botón a los
+           visitantes es esconder justo lo que queremos que hagan, y un directorio
+           sin organizadores nuevos no crece. La puerta la guarda el servidor
+           —exigirSesion() en evento-nuevo.php—, no la ausencia del enlace. -->
+      <a class="btn-publicar" href="<?= URL_BASE ?>/evento-nuevo.php">
+        Publicar<span class="btn-publicar-extra"> evento</span>
+      </a>
+
       <?php if ($u): ?>
         <!-- Con sesión: avatar y menú. <details> abre y cierra sin JavaScript y
              el teclado ya sabe manejarlo. -->

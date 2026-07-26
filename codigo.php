@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($ok) {
             iniciarSesion((int) $resultado);
-            redirigir('/');
+            redirigir(destinoTrasLogin());
         }
         $error = $resultado;
     }

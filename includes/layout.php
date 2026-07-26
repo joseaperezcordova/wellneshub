@@ -40,6 +40,13 @@ $u = usuarioActual();
     </nav>
 
     <div class="topbar-right">
+      <!-- Mismo botón que en la portada, y por lo mismo: lo ve todo el mundo.
+           Quien no tenga sesión pasa por el login y vuelve al formulario solo.
+           Quien guarda la puerta es exigirSesion() en evento-nuevo.php. -->
+      <a class="btn-publicar" href="<?= URL_BASE ?>/evento-nuevo.php">
+        Publicar<span class="btn-publicar-extra"> evento</span>
+      </a>
+
       <?php if ($u): ?>
         <details class="cuenta">
           <summary aria-label="Mi cuenta">

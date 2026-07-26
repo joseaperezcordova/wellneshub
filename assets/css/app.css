@@ -183,6 +183,22 @@ input,select{font-family:inherit; font-size:14px;}
 .aviso-error{background:#FBEAE3; border-color:#E4B49C; color:#7C3A18;}
 .aviso-ok{background:#E7F0E9; border-color:#A9C4AF; color:#2C4A35;}
 
+/* Botón de publicar del topbar. En pantalla estrecha se queda en «Publicar» a
+   secas en vez de desaparecer: es la acción que da de comer al directorio y la
+   mitad del tráfico llega desde el móvil.
+   El texto va en #0F1A21 y no en blanco porque sobre terracota el blanco se
+   queda en 3.6:1 y no llega a AA. */
+.btn-publicar{
+  background:var(--terracota); color:var(--tinta-boton); border-radius:999px;
+  padding:9px 18px; font-size:13.5px; font-weight:600; white-space:nowrap;
+  transition:background .15s;
+}
+.btn-publicar:hover{background:var(--terracota-viva);}
+@media(max-width:760px){
+  .btn-publicar{padding:8px 14px; font-size:13px;}
+  .btn-publicar-extra{display:none;}
+}
+
 /* ------------------------------------------------ formulario de evento --- */
 .caja-ancha{max-width:640px;}
 
