@@ -1110,27 +1110,34 @@ $u = usuarioActual();
 <main id="view-panel-organizador" class="view">
   <div class="wrap">
 
-    <!-- login -->
-    <div id="opLogin">
+    <?php if (!$u): ?>
+      <!-- Sin sesión: puerta al login de verdad.
+           Aquí vivía un formulario de correo y contraseña del prototipo que no
+           validaba nada: pulsar «Entrar» enseñaba el panel sin más. Con sesión
+           real habría dos sitios donde escribir la contraseña y solo uno
+           serviría, que es justo la confusión que trajo a José hasta aquí. -->
       <div class="org-login">
         <div class="eyebrow">Panel del organizador</div>
-        <h2 style="margin-top:6px;">Inicia sesión</h2>
+        <h2 style="margin-top:6px;">Entra para publicar</h2>
         <p>Publica y administra tus propios eventos — sin necesitar al equipo de Rueda.</p>
-        <div class="field"><label>Correo</label><input type="email" placeholder="hola@raizcolectivo.mx"></div>
-        <div class="field"><label>Contraseña</label><input type="password" placeholder="••••••••"></div>
-        <button class="btn-primary" onclick="enterOrgPanel()">Entrar</button>
-        <div class="swap"><a href="#" onclick="event.preventDefault(); alert('Prototipo: aquí iría el formulario de registro de organizador.')">¿Aún no tienes cuenta? Crea tu perfil →</a></div>
+        <a class="btn-primary" style="text-decoration:none;" href="<?= URL_BASE ?>/login.php">Iniciar sesión</a>
+        <div class="swap"><a href="<?= URL_BASE ?>/registro.php">¿Aún no tienes cuenta? Crea tu perfil →</a></div>
       </div>
-    </div>
+    <?php else: ?>
 
     <!-- panel -->
-    <div id="opShell" class="op-shell">
+    <div id="opShell" class="op-shell active">
       <div class="op-header">
         <div class="who">
-          <div class="avatar" style="border-radius:50%;"></div>
+          <?php if (!empty($u['avatar_url'])): ?>
+            <img class="avatar" style="border-radius:50%; object-fit:cover;"
+                 src="<?= e($u['avatar_url']) ?>" alt="" referrerpolicy="no-referrer">
+          <?php else: ?>
+            <div class="avatar" style="border-radius:50%;"></div>
+          <?php endif; ?>
           <div>
             <div class="eyebrow">Sesión de organizador</div>
-            <h1 style="font-size:22px;">Raíz Colectivo</h1>
+            <h1 style="font-size:22px;"><?= e($u['nombre']) ?></h1>
           </div>
         </div>
         <button class="btn-add" style="background:var(--terracota); color:var(--tinta-boton);" onclick="openModal()">+ Nuevo evento</button>
@@ -1171,6 +1178,8 @@ $u = usuarioActual();
         </div>
       </div>
     </div>
+    <?php endif; ?>
+
   </div>
 </main>
 
@@ -1520,11 +1529,9 @@ document.getElementById('resultsGrid').innerHTML = eventos.map(cardHTML).join(''
 document.getElementById('orgEventsGrid').innerHTML = eventos.slice(0,3).map(cardHTML).join('');
 document.getElementById('relatedGrid').innerHTML = eventos.slice(1,4).map(cardHTML).join('');
 
-/* ---------- panel del organizador ---------- */
-function enterOrgPanel(){
-  document.getElementById('opLogin').style.display = 'none';
-  document.getElementById('opShell').classList.add('active');
-}
+/* ---------- panel del organizador ----------
+   enterOrgPanel() ya no existe: quién ve el panel lo decide PHP según la sesión,
+   no un clic. Las pestañas de dentro sí siguen siendo cosa del navegador. */
 document.querySelectorAll('#opTabs button').forEach(b=>{
   b.addEventListener('click', ()=>{
     document.querySelectorAll('#opTabs button').forEach(x=>x.classList.remove('active'));
