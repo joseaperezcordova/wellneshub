@@ -93,11 +93,7 @@
   }
   nav.mainnav button:hover{background:var(--line-soft);}
   nav.mainnav button.active{background:var(--jungle); color:var(--paper);}
-  .admin-toggle{
-    margin-left:8px; background:var(--ink); color:var(--paper); border-radius:20px; padding:8px 16px; font-size:13px;
-    display:flex; align-items:center; gap:6px;
-  }
-  .admin-toggle .dot{width:6px;height:6px;border-radius:50%;background:var(--marigold);}
+  /* .admin-toggle se fue con el boton de «Panel admin» del menu publico. */
   .navburger{display:none; background:none;border:none;padding:6px;}
   .navburger span{display:block; width:20px; height:2px; background:var(--ink); margin:4px 0;}
   @media(max-width:900px){
@@ -116,15 +112,19 @@
      esquinas redondeadas y aire a los lados, con la pastilla de busqueda
      montada sobre su borde inferior. Ese solape es lo que hace reconocible el
      patron: sin el, es un banner cualquiera con un buscador debajo. */
-  .hero{padding:26px 0 0;}
+  .hero{padding:0;}
   .hero-inner{position:relative; max-width:1180px; margin:0 auto; padding:0 28px;}
 
+  /* Banner a sangre: ocupa todo el ancho de la ventana, sin esquinas ni
+     margenes. Al perder el redondeo pierde tambien la sombra —una sombra en un
+     bloque que llega a los bordes no cae sobre nada—. El titulo sigue alineado
+     con el resto de la pagina gracias a .hero-content, que si esta limitado. */
   .hero-banner{
-    position:relative; border-radius:20px; overflow:hidden;
-    min-height:420px; display:flex; align-items:flex-end;
-    box-shadow:0 18px 44px rgba(47,78,93,0.22);
+    position:relative; overflow:hidden;
+    min-height:520px; display:flex; align-items:flex-end;
   }
-  @media(max-width:640px){ .hero-banner{min-height:360px; border-radius:14px;} }
+  @media(max-width:900px){ .hero-banner{min-height:440px;} }
+  @media(max-width:640px){ .hero-banner{min-height:400px;} }
 
   /* Carrusel: las diapositivas se apilan y se cruzan por opacidad. No se
      desplazan lateralmente a proposito — un desplazamiento obliga a medir
@@ -136,8 +136,11 @@
 
   /* Etiqueta de la diapositiva: nombra lo que se esta viendo. Va arriba a la
      izquierda porque abajo esta el titulo y el centro lo tapa la pastilla. */
+  /* En un banner a sangre, pegar los controles al borde de la ventana los deja
+     lejisimos del contenido en pantallas anchas. max() los engancha a la misma
+     columna que el titulo cuando hay sitio, y a 28px del borde cuando no. */
   .slide-chip{
-    position:absolute; top:18px; left:20px; z-index:2;
+    position:absolute; top:20px; left:max(28px, calc((100% - 1180px) / 2 + 28px)); z-index:2;
     display:inline-flex; align-items:center; gap:9px; max-width:calc(100% - 200px);
     background:rgba(21,33,40,.45); border:1px solid rgba(255,255,255,.28);
     color:#fff; border-radius:999px; padding:6px 15px; font-size:12.5px;
@@ -153,7 +156,7 @@
   }
 
   /* Controles arriba a la derecha, la unica esquina que queda libre. */
-  .cctrl{position:absolute; top:16px; right:16px; z-index:4; display:flex; align-items:center; gap:10px;}
+  .cctrl{position:absolute; top:20px; right:max(28px, calc((100% - 1180px) / 2 + 28px)); z-index:4; display:flex; align-items:center; gap:10px;}
   .cdots{display:flex; align-items:center; gap:6px;}
   .cdots button{
     width:8px; height:8px; padding:0; border:none; border-radius:50%;
@@ -196,8 +199,14 @@
     background:linear-gradient(to top, rgba(21,33,40,.86) 0%, rgba(21,33,40,.58) 34%, rgba(21,33,40,.20) 72%, rgba(21,33,40,0) 100%);
   }
 
-  .hero-content{position:relative; z-index:3; padding:40px 40px 64px; max-width:680px;}
-  @media(max-width:640px){ .hero-content{padding:26px 22px 46px;} }
+  /* Limitado y centrado para que el titulo caiga sobre la misma columna que el
+     resto de la pagina, aunque el banner llegue a los bordes de la ventana. */
+  .hero-content{
+    position:relative; z-index:3; width:100%; max-width:1180px;
+    margin:0 auto; padding:40px 28px 78px;
+  }
+  .hero-content .eyebrow, .hero-content h1, .hero-content p.sub{max-width:680px;}
+  @media(max-width:640px){ .hero-content{padding:26px 18px 56px;} }
   .hero .eyebrow{color:var(--terracota-palida); opacity:1;}
   .hero h1{font-size:44px; margin-top:10px; color:#fff; text-shadow:0 2px 18px rgba(21,33,40,.4);}
   .hero h1 em{font-style:italic; color:var(--terracota-palida);}
@@ -240,33 +249,103 @@
     .buscador button{width:100%; height:44px; border-radius:999px; margin-top:6px;}
   }
 
-  /* ---------- rueda de bienestar (signature) ---------- */
-  .wheel-section{padding:56px 0 8px;}
-  .wheel-head{display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:8px;}
-  .wheel-head a{font-size:13px; color:var(--jungle); border-bottom:1px solid var(--jungle);}
-  .wheel-stage{position:relative; width:100%; max-width:520px; aspect-ratio:1/1; margin:36px auto 12px;}
-  .wheel-center{
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    width:128px; height:128px; border-radius:50%; background:var(--jungle); color:var(--paper);
-    display:flex; align-items:center; justify-content:center; text-align:center; font-family:'Fraunces',serif;
-    font-size:14px; line-height:1.25; padding:10px; z-index:2; border:6px solid var(--stone);
+  /* ---------- explorar por categoria: menu lineal ----------
+     Sustituye a la rueda del bienestar. La rueda tenia tres problemas: solo
+     cabian ocho categorias de las trece, obligaba a mantener una version
+     distinta en movil (los chips) porque un circulo de 520px no entra en una
+     pantalla estrecha, y el tabulador la recorria en un orden que no coincidia
+     con lo que se veia. Una fila que se desplaza acepta las trece, es la misma
+     en cualquier ancho y se tabula en el orden en que se lee. */
+  .catbar{
+    background:var(--stone); border-top:1px solid var(--line-soft);
+    border-bottom:1px solid var(--line-soft); padding:26px 0 22px;
   }
-  .wheel-ring{position:absolute; inset:0; border:1px dashed var(--line); border-radius:50%;}
-  .wheel-item{
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    width:96px; padding:10px 6px; text-align:center; background:var(--paper); border:1px solid var(--line);
-    border-radius:50%; aspect-ratio:1/1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    font-size:11.5px; gap:4px; transition:transform .18s, background .18s, color .18s; z-index:1;
+  .catbar-inner{max-width:1180px; margin:0 auto; padding:0 28px;}
+  @media(max-width:640px){ .catbar-inner{padding:0 18px;} }
+  .catbar .eyebrow{margin-bottom:16px; display:block;}
+  .catrail-wrap{position:relative;}
+  .catrail{
+    display:flex; gap:26px; overflow-x:auto; scroll-behavior:smooth;
+    scroll-snap-type:x proximity; padding-bottom:2px;
+    scrollbar-width:none; -ms-overflow-style:none;
   }
-  .wheel-item .ic{font-size:16px;}
-  .wheel-item:hover{background:var(--marigold); color:var(--tinta-boton); z-index:3;}
-  @media(max-width:640px){
-    .wheel-stage{display:none;}
-    .wheel-chips{display:flex; gap:8px; overflow-x:auto; padding:4px 2px 14px;}
+  .catrail::-webkit-scrollbar{display:none;}
+  .catitem{
+    flex:0 0 auto; width:88px; background:none; border:none; padding:0;
+    display:flex; flex-direction:column; align-items:center; gap:9px; scroll-snap-align:start;
   }
-  .wheel-chips{display:none;}
-  @media(max-width:640px){.wheel-chips{display:flex;}}
-  .wheel-chips .chip{flex:0 0 auto; background:var(--arena); border:1px solid var(--line); border-radius:20px; padding:9px 15px; font-size:13px; white-space:nowrap;}
+  .catitem .ic{
+    width:58px; height:58px; border-radius:50%; border:1px solid var(--line);
+    background:var(--paper); display:flex; align-items:center; justify-content:center;
+    font-size:22px; transition:background .15s, border-color .15s, transform .15s;
+  }
+  .catitem:hover .ic{background:var(--arena); border-color:var(--jungle); transform:translateY(-2px);}
+  .catitem .lbl{font-size:12.5px; color:var(--ink); text-align:center; line-height:1.25;}
+  /* A la altura del circulo, no del bloque entero: si se centra con el texto
+     incluido queda descolgada respecto a la fila de iconos. */
+  .catnext{
+    position:absolute; right:0; top:29px; transform:translateY(-50%);
+    width:34px; height:34px; border-radius:50%; border:1px solid var(--line);
+    background:var(--paper); color:var(--jungle); font-size:17px; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 14px rgba(47,78,93,.14);
+  }
+  .catnext:hover{background:var(--arena);}
+
+  /* ---------- proximos eventos: tarjetas en carril ---------- */
+  .evrail-wrap{position:relative;}
+  .evrail{
+    display:flex; gap:20px; overflow-x:auto; scroll-behavior:smooth;
+    scroll-snap-type:x proximity; padding:4px 2px 14px;
+    scrollbar-width:none; -ms-overflow-style:none;
+  }
+  .evrail::-webkit-scrollbar{display:none;}
+  .ev-card{
+    flex:0 0 300px; scroll-snap-align:start; background:var(--paper);
+    border:1px solid var(--line); border-radius:12px; overflow:hidden;
+    display:flex; flex-direction:column; cursor:pointer;
+    transition:transform .15s, box-shadow .15s;
+  }
+  /* En movil la tarjeta no llena el ancho: el borde de la siguiente asomando
+     es lo que delata que la fila se desplaza. */
+  @media(max-width:640px){ .ev-card{flex-basis:82%;} }
+  .ev-card:hover{transform:translateY(-3px); box-shadow:0 16px 32px rgba(47,78,93,.14);}
+  .ev-img{position:relative; height:210px; background-size:cover; background-position:center;}
+  .ev-date{
+    position:absolute; top:12px; left:12px; background:rgba(255,255,255,.94);
+    border-radius:8px; padding:6px 10px 5px; text-align:center;
+    font-family:'IBM Plex Mono',monospace; line-height:1.15;
+  }
+  .ev-date .d{display:block; font-size:16px; font-weight:600; color:var(--ink);}
+  .ev-date .m{display:block; font-size:9.5px; letter-spacing:.08em; color:var(--jungle);}
+  .ev-fav{
+    position:absolute; top:12px; right:12px; width:32px; height:32px; border-radius:50%;
+    border:none; background:rgba(255,255,255,.92); color:var(--jungle); font-size:15px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .ev-fav:hover{background:#fff;}
+  .ev-body{padding:16px 18px 18px; display:flex; flex-direction:column; gap:5px; flex:1;}
+  .ev-cat{
+    font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--terracota-texto);
+  }
+  .ev-body h3{font-size:19px; line-height:1.25;}
+  .ev-loc{font-size:12.5px; color:var(--ink); opacity:.7;}
+  .ev-foot{
+    margin-top:auto; padding-top:12px; border-top:1px solid var(--line-soft);
+    display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:11.5px;
+  }
+  .ev-org{color:var(--ink); opacity:.65; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .ev-price{font-family:'IBM Plex Mono',monospace; color:var(--jungle); white-space:nowrap;}
+  .ev-price.free{color:var(--terracota-texto);}
+  .evnext{
+    position:absolute; right:8px; top:86px;
+    width:38px; height:38px; border-radius:50%; border:1px solid var(--line);
+    background:var(--paper); color:var(--jungle); font-size:18px; line-height:1;
+    display:flex; align-items:center; justify-content:center; z-index:2;
+    box-shadow:0 5px 16px rgba(47,78,93,.18);
+  }
+  .evnext:hover{background:var(--arena);}
 
   /* ---------- section shells ---------- */
   section.block{padding:50px 0;}
@@ -298,17 +377,8 @@
   .price.free{color:var(--jungle);}
 
   /* proximos eventos - filas */
-  .rowlist{border-top:1px solid var(--line);}
-  .rowlist .rowitem{display:flex; align-items:center; gap:18px; padding:15px 4px; border-bottom:1px solid var(--line); cursor:pointer;}
-  .rowlist .rowitem:hover{background:var(--arena-suave);}
-  .datebadge{flex:0 0 56px; text-align:center; background:var(--jungle); color:var(--paper); border-radius:6px; padding:7px 0; font-family:'IBM Plex Mono',monospace;}
-  .datebadge .d{font-size:17px; font-weight:600; line-height:1;}
-  .datebadge .m{font-size:9.5px; text-transform:uppercase; letter-spacing:0.08em;}
-  .rowmeta{flex:1; min-width:0;}
-  .rowmeta h4{font-size:15px; font-weight:500;}
-  .rowmeta .sub{font-size:12.5px; opacity:0.6; margin-top:2px;}
-  .rowarrow{font-size:13px; color:var(--jungle); flex-shrink:0;}
-  @media(max-width:640px){.rowmeta .sub{display:block;}}
+  /* La lista de filas (.rowlist / .datebadge / .rowmeta) se fue con el cambio a
+     tarjetas en carril: era el unico sitio que la usaba. */
 
   /* ---------- newsletter ---------- */
   .newsletter{background:var(--jungle); color:var(--paper); border-radius:10px; padding:36px 32px; display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;}
@@ -556,11 +626,13 @@
       <div class="logo-text">Rueda<small>Directorio wellness MX</small></div>
     </div>
     <nav class="mainnav" id="mainnav">
+      <!-- «Organizadores» y «Panel admin» salen del menu publico. Las vistas
+           siguen en el archivo: la del organizador se abre desde «Publicar
+           evento» y desde la ficha de cada evento; la de admin queda sin enlace
+           porque no es algo que un visitante deba encontrar navegando. -->
       <button data-view="inicio" class="active">Inicio</button>
       <button data-view="resultados" onclick="showResults('Buscar eventos','Todos los eventos')">Buscar eventos</button>
       <button data-view="blog">Blog</button>
-      <button data-view="organizador">Organizadores</button>
-      <button class="admin-toggle" data-view="admin"><span class="dot"></span>Panel admin</button>
     </nav>
     <div class="topbar-right">
       <div class="langtoggle" id="langToggle">
@@ -576,7 +648,6 @@
 <!-- ================= INICIO ================= -->
 <main id="view-inicio" class="view active">
   <section class="hero">
-    <div class="hero-inner">
       <div class="hero-banner">
         <!-- Carrusel de escenas. Cada .hero-media es un marcador de posicion
              compuesto con gradientes; el dia que haya fotografia se cambia cada
@@ -628,6 +699,7 @@
         </div>
       </div>
 
+    <div class="hero-inner">
       <form class="buscador" onsubmit="event.preventDefault(); switchView('resultados');">
         <div class="bcampo">
           <label for="bDonde">Dónde</label>
@@ -668,32 +740,30 @@
     </div>
   </section>
 
-  <section class="wheel-section wrap">
-    <div class="wheel-head">
-      <div>
-        <div class="eyebrow">Explora por categoría</div>
-        <h2 style="margin-top:6px;">La rueda del bienestar</h2>
+  <!-- Los emoji son marcadores de posicion, igual que las imagenes: cuando haya
+       un juego de iconos de linea se sustituye el contenido de .ic y nada mas
+       cambia. -->
+  <section class="catbar">
+    <div class="catbar-inner">
+      <span class="eyebrow">Explora por categoría</span>
+      <div class="catrail-wrap">
+        <div class="catrail" id="catrail">
+          <button class="catitem" data-cat="Yoga"><span class="ic">🧘</span><span class="lbl">Yoga</span></button>
+          <button class="catitem" data-cat="Meditación"><span class="ic">🌿</span><span class="lbl">Meditación</span></button>
+          <button class="catitem" data-cat="Retiro"><span class="ic">🏕️</span><span class="lbl">Retiros</span></button>
+          <button class="catitem" data-cat="Breathwork"><span class="ic">🌬️</span><span class="lbl">Breathwork</span></button>
+          <button class="catitem" data-cat="Sound Healing"><span class="ic">🎐</span><span class="lbl">Sound Healing</span></button>
+          <button class="catitem" data-cat="Ceremonia"><span class="ic">🔥</span><span class="lbl">Ceremonias</span></button>
+          <button class="catitem" data-cat="Festival"><span class="ic">☀️</span><span class="lbl">Festivales</span></button>
+          <button class="catitem" data-cat="Temazcal"><span class="ic">♨️</span><span class="lbl">Temazcal</span></button>
+          <button class="catitem" data-cat="Cacao"><span class="ic">🍫</span><span class="lbl">Cacao</span></button>
+          <button class="catitem" data-cat="Ecstatic Dance"><span class="ic">💃</span><span class="lbl">Ecstatic Dance</span></button>
+          <button class="catitem" data-cat="Ice Bath"><span class="ic">🧊</span><span class="lbl">Ice Bath</span></button>
+          <button class="catitem" data-cat="Pilates"><span class="ic">🌀</span><span class="lbl">Pilates</span></button>
+          <button class="catitem" data-cat="Biohacking"><span class="ic">⚡</span><span class="lbl">Biohacking</span></button>
+        </div>
+        <button type="button" class="catnext" id="catnext" aria-label="Ver más categorías">›</button>
       </div>
-      <a href="#" onclick="switchView('resultados'); return false;">Ver las 13 categorías →</a>
-    </div>
-
-    <div class="wheel-stage" id="wheelStage">
-      <div class="wheel-ring"></div>
-      <div class="wheel-center">Elige tu<br>práctica</div>
-      <!-- items posicionados por JS -->
-      <button class="wheel-item" data-cat="Yoga"><span class="ic">🧘</span>Yoga</button>
-      <button class="wheel-item" data-cat="Meditación"><span class="ic">🌿</span>Meditación</button>
-      <button class="wheel-item" data-cat="Breathwork"><span class="ic">🌬️</span>Breathwork</button>
-      <button class="wheel-item" data-cat="Sound Healing"><span class="ic">🎐</span>Sound Healing</button>
-      <button class="wheel-item" data-cat="Ice Bath"><span class="ic">🧊</span>Ice Bath</button>
-      <button class="wheel-item" data-cat="Retreat"><span class="ic">🏕️</span>Retiro</button>
-      <button class="wheel-item" data-cat="Festival"><span class="ic">☀️</span>Festival</button>
-      <button class="wheel-item" data-cat="Pilates"><span class="ic">🌀</span>Pilates</button>
-    </div>
-    <div class="wheel-chips">
-      <div class="chip">🧘 Yoga</div><div class="chip">🌿 Meditación</div><div class="chip">🌬️ Breathwork</div>
-      <div class="chip">🎐 Sound Healing</div><div class="chip">🧊 Ice Bath</div><div class="chip">🏕️ Retiro</div>
-      <div class="chip">☀️ Festival</div><div class="chip">🌀 Pilates</div>
     </div>
   </section>
 
@@ -713,15 +783,48 @@
     </div>
   </section>
 
-  <!-- Una sola seccion de proximos eventos, en lista. Antes habia ademas un
-       grid de "Eventos destacados" justo arriba que mostraba los mismos
-       eventos: dos formas de lo mismo, una tras otra. -->
+  <!-- Proximos eventos en carril horizontal. La lista de filas anterior daba
+       mas densidad, pero la tarjeta con imagen es lo que deja ver de que va
+       cada evento antes de entrar — que es lo que se le pide a un directorio. -->
   <section class="block wrap">
     <div class="block-head">
       <h2>Próximos eventos</h2>
-      <a class="more" href="#" onclick="switchView('resultados'); return false;">Ver todos →</a>
+      <a class="more" href="#" onclick="switchView('resultados'); return false;">Ver todos los eventos →</a>
     </div>
-    <div class="rowlist" id="proximosList"></div>
+    <div class="evrail-wrap">
+      <div class="evrail" id="proximosRail"></div>
+      <button type="button" class="evnext" id="evnext" aria-label="Ver más eventos">›</button>
+    </div>
+  </section>
+
+  <section class="block wrap">
+    <div class="block-head">
+      <h2>Artículos</h2>
+      <a class="more" href="#" onclick="switchView('blog'); return false;">Ir al blog →</a>
+    </div>
+    <div class="grid-blog">
+      <article class="card-blog" onclick="switchView('blog')">
+        <div class="b-img" style="background-color:#496B52;"></div>
+        <div class="b-body">
+          <div class="eyebrow">Guía</div>
+          <h3>Cómo elegir tu primer retiro de silencio</h3>
+        </div>
+      </article>
+      <article class="card-blog" onclick="switchView('blog')">
+        <div class="b-img" style="background-color:#C76E43;"></div>
+        <div class="b-body">
+          <div class="eyebrow">Ciudades</div>
+          <h3>Tulum más allá de la playa: dónde se practica de verdad</h3>
+        </div>
+      </article>
+      <article class="card-blog" onclick="switchView('blog')">
+        <div class="b-img" style="background-color:#3E6375;"></div>
+        <div class="b-body">
+          <div class="eyebrow">Prácticas</div>
+          <h3>Qué esperar de tu primera ceremonia de cacao</h3>
+        </div>
+      </article>
+    </div>
   </section>
 
   <section class="block wrap">
@@ -1236,14 +1339,36 @@
 
 <script>
 /* ---------- datos de ejemplo ---------- */
+/* Cada evento lleva ahora organizador y estado: son los dos datos que la
+   tarjeta nueva muestra al pie y que antes no existian en los datos. */
 const eventos = [
-  {t:"Amanecer en el Cenote — Retiro de Yoga y Sonido", cat:"Sound Healing", city:"Tulum, Q. Roo", date:"16 AGO", d:"16", m:"AGO", price:"2,450", free:false, color:"#89A67D"},
-  {t:"Festival Holístico Raíz", cat:"Festival", city:"Ciudad de México", date:"22 AGO", d:"22", m:"AGO", price:"890", free:false, color:"#C76E43"},
-  {t:"Breathwork bajo las estrellas", cat:"Breathwork", city:"San Miguel de Allende", date:"29 AGO", d:"29", m:"AGO", price:"Gratis", free:true, color:"#2F4E5D"},
-  {t:"Ice Bath & Sound Healing Circle", cat:"Ice Bath", city:"Guadalajara", date:"5 SEP", d:"05", m:"SEP", price:"650", free:false, color:"#496B52"},
-  {t:"Retiro Silencioso de Meditación Vipassana", cat:"Meditación", city:"Oaxaca de Juárez", date:"12 SEP", d:"12", m:"SEP", price:"3,200", free:false, color:"#E9DDC9"},
-  {t:"Sunset Sound Bath en la Playa", cat:"Sound Healing", city:"Puerto Vallarta", date:"18 SEP", d:"18", m:"SEP", price:"Gratis", free:true, color:"#3E6375"},
+  {t:"Amanecer en el Cenote", cat:"Sound Healing", city:"Tulum, Quintana Roo", org:"Raíz Colectivo", date:"16 AGO", d:"16", m:"AGO", price:"2,450", free:false, color:"#89A67D"},
+  {t:"Festival Holístico Raíz", cat:"Festival", city:"Ciudad de México", org:"Casa Nahá", date:"22 AGO", d:"22", m:"AGO", price:"890", free:false, color:"#C76E43"},
+  {t:"Breathwork bajo las estrellas", cat:"Breathwork", city:"San Miguel de Allende, Gto.", org:"Origen Retreats", date:"29 AGO", d:"29", m:"AGO", price:"Gratis", free:true, color:"#2F4E5D"},
+  {t:"Ice Bath & Sound Healing Circle", cat:"Ice Bath", city:"Guadalajara, Jalisco", org:"Sonido Sagrado", date:"5 SEP", d:"05", m:"SEP", price:"650", free:false, color:"#496B52"},
+  {t:"Retiro de Silencio", cat:"Meditación", city:"Oaxaca de Juárez, Oax.", org:"Corazón Cacao", date:"12 SEP", d:"12", m:"SEP", price:"3,200", free:false, color:"#E9DDC9"},
+  {t:"Sunset Sound Bath en la Playa", cat:"Sound Healing", city:"Puerto Vallarta, Jalisco", org:"Luz Interior", date:"18 SEP", d:"18", m:"SEP", price:"Gratis", free:true, color:"#3E6375"},
 ];
+
+/* Tarjeta grande del carril de proximos eventos: fecha sobre la imagen,
+   categoria, titulo, ubicacion y, al pie, quien lo organiza y desde cuanto. */
+function evCardHTML(e){
+  return `<article class="ev-card" onclick="switchView('evento')">
+    <div class="ev-img" style="background-color:${e.color};">
+      <div class="ev-date"><span class="d">${e.d}</span><span class="m">${e.m}</span></div>
+      <button class="ev-fav" aria-label="Guardar evento" onclick="event.stopPropagation(); this.textContent=this.textContent.trim()==='♡'?'♥':'♡';">♡</button>
+    </div>
+    <div class="ev-body">
+      <div class="ev-cat">${e.cat}</div>
+      <h3>${e.t}</h3>
+      <div class="ev-loc">${e.city}</div>
+      <div class="ev-foot">
+        <span class="ev-org">${e.org}</span>
+        <span class="ev-price ${e.free?'free':''}">${e.free?'Gratis':'Desde $'+e.price+' MXN'}</span>
+      </div>
+    </div>
+  </article>`;
+}
 
 function cardHTML(e){
   return `<div class="card-event" onclick="switchView('evento')">
@@ -1262,14 +1387,6 @@ function cardHTML(e){
     </div>
   </div>`;
 }
-function rowHTML(e){
-  return `<div class="rowitem" onclick="switchView('evento')">
-    <div class="datebadge"><div class="d">${e.d}</div><div class="m">${e.m}</div></div>
-    <div class="rowmeta"><h4>${e.t}</h4><div class="sub">${e.cat} · ${e.city}</div></div>
-    <div class="rowarrow">→</div>
-  </div>`;
-}
-
 /* ---------- carrusel del banner ---------- */
 (function(){
   var raiz = document.getElementById('carrusel');
@@ -1324,7 +1441,7 @@ function rowHTML(e){
   ir(0);
   arrancar();
 })();
-document.getElementById('proximosList').innerHTML = eventos.map(rowHTML).join('');
+document.getElementById('proximosRail').innerHTML = eventos.map(evCardHTML).join('');
 document.getElementById('resultsGrid').innerHTML = eventos.map(cardHTML).join('') + eventos.map(cardHTML).join('');
 document.getElementById('orgEventsGrid').innerHTML = eventos.slice(0,3).map(cardHTML).join('');
 document.getElementById('relatedGrid').innerHTML = eventos.slice(1,4).map(cardHTML).join('');
@@ -1349,10 +1466,9 @@ function showResults(eyebrow, title){
   document.getElementById('resultsTitle').textContent = title;
   switchView('resultados');
 }
-document.querySelectorAll('.wheel-item, .wheel-chips .chip').forEach(el=>{
+document.querySelectorAll('.catitem').forEach(el=>{
   el.addEventListener('click', ()=>{
-    const cat = el.dataset.cat || el.textContent.trim().replace(/^\S+\s/, '');
-    showResults('Página por categoría', 'Eventos de ' + cat);
+    showResults('Página por categoría', 'Eventos de ' + el.dataset.cat);
   });
 });
 document.querySelectorAll('.chiprow .chip').forEach(el=>{
@@ -1429,23 +1545,29 @@ function showToast(form){
   form.reset();
 }
 
-/* ---------- rueda de bienestar: posicionamiento circular ---------- */
-function layoutWheel(){
-  const stage = document.getElementById('wheelStage');
-  const items = stage.querySelectorAll('.wheel-item');
-  const size = stage.offsetWidth;
-  if(size === 0) return;
-  const radius = size/2 - 52;
-  const n = items.length;
-  items.forEach((el,i)=>{
-    const angle = (2*Math.PI/n)*i - Math.PI/2;
-    const x = Math.cos(angle)*radius;
-    const y = Math.sin(angle)*radius;
-    el.style.transform = `translate(-50%,-50%) translate(${x}px, ${y}px)`;
+/* ---------- carriles horizontales ----------
+   El menu de categorias y el de eventos comparten comportamiento: avanzan una
+   pantalla y, al llegar al final, vuelven al principio. Una flecha que se queda
+   muerta al final parece rota; que ciclee es lo que el usuario espera. */
+function carril(idRail, idBoton){
+  var rail = document.getElementById(idRail);
+  var boton = document.getElementById(idBoton);
+  if (!rail || !boton) return;
+
+  boton.addEventListener('click', function(){
+    var final = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 8;
+    if (final) rail.scrollTo({left:0, behavior:'smooth'});
+    else rail.scrollBy({left: rail.clientWidth * 0.72, behavior:'smooth'});
   });
+
+  /* Con el raton no hay barra de desplazamiento visible (se oculta a proposito),
+     asi que si todo cabe en pantalla la flecha no pinta nada. */
+  function revisar(){ boton.hidden = rail.scrollWidth <= rail.clientWidth + 4; }
+  revisar();
+  window.addEventListener('resize', revisar);
 }
-window.addEventListener('load', layoutWheel);
-window.addEventListener('resize', layoutWheel);
+carril('catrail', 'catnext');
+carril('proximosRail', 'evnext');
 </script>
 
 <!-- ===== SELECTOR DE VERSIONES =====
