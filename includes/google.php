@@ -92,68 +92,13 @@ function googleUrlAutorizacion(): string
 }
 
 /**
- * POST/GET con cURL, y file_get_contents si el hosting no trae cURL.
- *
- * @return array{0:int,1:string} [código http, cuerpo]
- */
-function googleHttp(string $url, ?array $post = null, array $cabeceras = []): array
-{
-    if (function_exists('curl_init')) {
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 15,
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_HTTPHEADER     => $cabeceras,
-        ]);
-        if ($post !== null) {
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
-        }
-        $cuerpo = curl_exec($ch);
-        $codigo = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-        if ($cuerpo === false) {
-            error_log('cURL contra Google falló: ' . curl_error($ch));
-            curl_close($ch);
-            return [0, ''];
-        }
-        curl_close($ch);
-        return [$codigo, (string) $cuerpo];
-    }
-
-    $opciones = [
-        'http' => [
-            'method'        => $post === null ? 'GET' : 'POST',
-            'header'        => implode("\r\n", array_merge(
-                $post === null ? [] : ['Content-Type: application/x-www-form-urlencoded'],
-                $cabeceras
-            )),
-            'content'       => $post === null ? null : http_build_query($post),
-            'timeout'       => 15,
-            'ignore_errors' => true,
-        ],
-    ];
-
-    $cuerpo = @file_get_contents($url, false, stream_context_create($opciones));
-    if ($cuerpo === false) return [0, ''];
-
-    $codigo = 0;
-    foreach ($http_response_header ?? [] as $linea) {
-        if (preg_match('#^HTTP/\S+\s+(\d{3})#', $linea, $m)) $codigo = (int) $m[1];
-    }
-    return [$codigo, $cuerpo];
-}
-
-/**
  * Cambia el código por un access_token.
  */
 function googleCanjearCodigo(string $codigo): ?string
 {
     global $CONFIG;
 
-    [$http, $cuerpo] = googleHttp(GOOGLE_TOKEN_URL, [
+    [$http, $cuerpo] = peticionHttp(GOOGLE_TOKEN_URL, [
         'code'          => $codigo,
         'client_id'     => $CONFIG['google']['client_id'],
         'client_secret' => $CONFIG['google']['client_secret'],
@@ -175,7 +120,7 @@ function googleCanjearCodigo(string $codigo): ?string
  */
 function googlePerfil(string $accessToken): ?array
 {
-    [$http, $cuerpo] = googleHttp(GOOGLE_USERINFO_URL, null, [
+    [$http, $cuerpo] = peticionHttp(GOOGLE_USERINFO_URL, null, [
         'Authorization: Bearer ' . $accessToken,
     ]);
 

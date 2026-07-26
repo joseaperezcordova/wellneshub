@@ -332,6 +332,73 @@ input,select{font-family:inherit; font-size:14px;}
 
 .ficha-desc{margin-top:30px; font-size:15.5px; line-height:1.75;}
 
+/* --------------------------------------------------------- moderación --- */
+/* El campo trampa del formulario de reportes. Fuera de pantalla y no
+   display:none: los bots ignoran lo que está oculto de verdad, y muerden lo que
+   parece un campo normal. Quien navega con lector de pantalla no lo oye gracias
+   al aria-hidden del contenedor. */
+.trampa{position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;}
+
+.motivos{display:flex; flex-direction:column; gap:2px;}
+.motivo{
+  display:flex; align-items:center; gap:10px; padding:11px 13px;
+  border:1px solid transparent; border-radius:9px; cursor:pointer; font-size:14.5px;
+}
+.motivo:hover{background:var(--arena-suave);}
+.motivo input{margin:0;}
+/* :has aún no está en todos los navegadores; donde no esté, la fila
+   seleccionada simplemente no se resalta y el radio marcado sigue viéndose. */
+.motivo:has(input:checked){background:var(--arena-suave); border-color:var(--verde);}
+
+.ficha-reportar{
+  margin-top:40px; padding-top:20px; border-top:1px solid var(--linea-suave);
+  font-size:13px;
+}
+.ficha-reportar a{opacity:.6; border-bottom:1px solid var(--linea);}
+.ficha-reportar a:hover{opacity:1; color:var(--terracota-texto);}
+
+.pendientes{
+  display:inline-block; min-width:19px; padding:1px 6px; border-radius:999px;
+  background:var(--terracota); color:var(--tinta-boton);
+  font-size:11px; font-weight:700; text-align:center;
+}
+
+.caso{
+  border:1px solid var(--linea); border-radius:14px; padding:20px;
+  margin-bottom:16px; background:var(--blanco);
+}
+.caso-cab{display:flex; justify-content:space-between; align-items:flex-start; gap:16px;}
+.caso-cab h2{font-size:18px; line-height:1.25;}
+.caso-cab h2 a:hover{color:var(--terracota-texto);}
+.caso-meta{font-size:12.5px; opacity:.65; margin-top:4px;}
+.caso-cifras{text-align:center; flex-shrink:0;}
+.caso-cifras .cuenta{
+  display:block; font-family:'IBM Plex Mono',monospace; font-size:26px; color:var(--terracota-texto);
+}
+.caso-cifras .cuenta-lbl{
+  font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.1em;
+  text-transform:uppercase; opacity:.55;
+}
+
+.marca-auto{
+  margin-top:12px; padding:8px 12px; border-radius:8px;
+  background:var(--arena-suave); font-size:12.5px;
+}
+
+.caso-reportes{list-style:none; margin:14px 0 0; padding:0;}
+.caso-reportes li{
+  padding:10px 0; border-top:1px solid var(--linea-suave); font-size:13.5px;
+}
+.motivo-tag{
+  display:inline-block; background:var(--arena); border-radius:999px;
+  padding:2px 10px; font-size:11.5px; margin-right:8px;
+}
+.caso-reportes .comentario{display:block; margin:6px 0 4px; line-height:1.55;}
+.caso-reportes .cuando{font-size:11.5px; opacity:.5;}
+
+.caso-acciones{display:flex; gap:8px; flex-wrap:wrap; margin-top:18px;}
+.caso-acciones form{margin:0;}
+
 /* --------------------------------------------------------------- footer -- */
 footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;}
 .foot-bottom{

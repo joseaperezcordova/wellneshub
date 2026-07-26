@@ -183,6 +183,54 @@ CREATE TABLE IF NOT EXISTS eventos (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- ----------------------------------------------------------------------------
+--  reportes
+--
+--  Los eventos se publican solos: revisar 99 correctos para encontrar uno malo
+--  es trabajo que no se sostiene. Lo que se revisa es lo que alguien señala.
+--
+--  Reportar no esconde el evento. Si bastara un reporte para tumbar una ficha,
+--  tumbar la competencia costaría un clic. El reporte avisa; ocultar o borrar
+--  lo decide una persona.
+--
+--  'origen' distingue el reporte de un visitante del que crea solo el filtro de
+--  palabras. Van a la misma tabla a propósito: una sola bandeja que vaciar.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS reportes (
+  id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  evento_id    INT UNSIGNED    NOT NULL,
+
+  motivo       ENUM('spam','enganoso','inapropiado','no_es_wellness','duplicado','otro')
+                               NOT NULL,
+  comentario   VARCHAR(1000)   NULL DEFAULT NULL,
+
+  origen       ENUM('visitante','automatico')
+                               NOT NULL DEFAULT 'visitante',
+
+  ip           VARBINARY(16)   NOT NULL,
+
+  situacion    ENUM('pendiente','revisado')
+                               NOT NULL DEFAULT 'pendiente',
+  revisado_por INT UNSIGNED    NULL DEFAULT NULL,
+  revisado_en  DATETIME        NULL DEFAULT NULL,
+
+  creado_en    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+  KEY idx_reportes_evento (evento_id, creado_en),
+  KEY idx_reportes_ip (ip, evento_id, creado_en),
+  KEY idx_reportes_bandeja (situacion, creado_en),
+
+  CONSTRAINT fk_reporte_evento
+    FOREIGN KEY (evento_id) REFERENCES eventos (id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+
+  CONSTRAINT fk_reporte_revisor
+    FOREIGN KEY (revisado_por) REFERENCES usuarios (id)
+    ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 -- ============================================================================
 --  DESPUÉS DE ENTRAR LA PRIMERA VEZ: date permisos de administrador
 --

@@ -67,11 +67,37 @@ FTP para hacer tres peticiones HTTP no compensa.
 │   ├── correo.php             Envío con mail()
 │   ├── google.php             OAuth 2.0 a mano
 │   └── layout.php             Cabecera con el acceso a la cuenta, y pie
+├── evento-nuevo.php       Alta: guarda borrador y manda a la vista previa
+├── evento.php             Ficha pública, y vista previa para su dueño
+├── evento-editar.php      Edición, con el plazo de 24 h
+├── reportar.php           Denuncia de un evento · abierto sin cuenta
+├── moderacion.php         Bandeja de avisos · solo administradores
 ├── database/
 │   ├── schema.sql                            Instalación desde cero
-│   └── migracion-01-codigos-por-correo.sql   Para una base que ya existía
+│   ├── migracion-01-codigos-por-correo.sql   Para una base que ya existía
+│   ├── migracion-02-eventos.sql
+│   └── migracion-03-reportes.sql
 └── prototipos/            Los prototipos, con su propio índice en index.html
 ```
+
+### Cómo se modera
+
+Los eventos **se publican solos**. Revisar 99 correctos para encontrar uno malo
+no se sostiene con una persona, así que se revisa lo que alguien señala.
+
+- Cualquier visitante puede reportar un evento **sin cuenta**. Quien se topa con
+  una estafa no se registra para avisar; pedir cuenta no filtra bots —esos sí se
+  registran—, filtra personas.
+- **Reportar no oculta nada.** Si un aviso bastara para tumbar una ficha, tumbar
+  a la competencia costaría un clic. Ocultar o borrar lo decide un administrador
+  en `moderacion.php`.
+- Un filtro de palabras revisa el texto al publicar. **No bloquea**: levanta la
+  mano y crea un aviso automático en la misma bandeja. La lista es corta a
+  propósito — en un directorio de bienestar mexicano, media lista de «términos
+  sospechosos» son palabras del oficio.
+- Contra el spam: campo trampa, un mínimo de segundos entre cargar y enviar, un
+  reporte por IP y evento cada 24 h, motivo obligatorio, y Turnstile o reCAPTCHA
+  si se configuran las claves.
 
 ### Cómo se entra
 

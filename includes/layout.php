@@ -61,6 +61,12 @@ $u = usuarioActual();
               <strong><?= e($u['nombre']) ?></strong>
               <span><?= e($u['email']) ?></span>
             </div>
+            <?php if ($u['rol'] === 'admin'): ?>
+              <?php $pend = contarReportesPendientes(); ?>
+              <a href="<?= URL_BASE ?>/moderacion.php">
+                Moderación<?php if ($pend > 0): ?> <span class="pendientes"><?= $pend ?></span><?php endif; ?>
+              </a>
+            <?php endif; ?>
             <a href="<?= URL_BASE ?>/logout.php">Cerrar sesión</a>
           </div>
         </details>

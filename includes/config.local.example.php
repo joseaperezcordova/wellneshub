@@ -75,6 +75,21 @@ return [
         'nombre'    => 'Rueda',
     ],
 
+    // ---- Captcha del formulario de reportes -------------------------------
+    // OPCIONAL. Sin claves, el formulario sigue defendido por el campo trampa y
+    // el reloj, que no dependen de nadie. Estas claves son una capa encima.
+    //
+    // Turnstile (recomendado): dash.cloudflare.com → Turnstile → Add site.
+    // Es gratis, no rastrea a quien lo usa y no obliga a poner un aviso de
+    // cookies de Google en un formulario donde alguien solo quiere denunciar.
+    //
+    // reCAPTCHA se deja como alternativa por si ya lo tienes en otro sitio. Si
+    // rellenas los dos, gana Turnstile.
+    'captcha' => [
+        'turnstile' => ['site_key' => '', 'secret' => ''],
+        'recaptcha' => ['site_key' => '', 'secret' => ''],
+    ],
+
     // ---- Google OAuth -----------------------------------------------------
     // Se sacan de Google Cloud Console → APIs y servicios → Credenciales →
     // Crear credenciales → ID de cliente de OAuth → Aplicación web.

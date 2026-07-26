@@ -111,14 +111,63 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/http.php';
 require_once __DIR__ . '/correo.php';
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/subidas.php';
+require_once __DIR__ . '/captcha.php';
+require_once __DIR__ . '/moderacion.php';
 
 /** Escapa para HTML. Se usa en todas las plantillas, de ahí el nombre corto. */
 function e(?string $texto): string
 {
     return htmlspecialchars($texto ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+/**
+ * ¿Es una dirección privada, de bucle local o reservada?
+ *
+ * Sirve para reconocer al proxy que hay delante, que siempre se ve desde dentro
+ * de la red.
+ */
+function esIpInterna(string $ip): bool
+{
+    return !filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+}
+
+/**
+ * La IP de quien visita, contando con el nginx que hay delante de Apache.
+ *
+ * Esto importa más de lo que parece. Con un proxy por medio, REMOTE_ADDR es la
+ * dirección del proxy —127.0.0.1— para TODO el mundo. Cualquier límite "por IP"
+ * pasa entonces a ser un límite para el sitio entero: el primero que pide un
+ * código de acceso deja a los demás sin poder pedirlo, y un solo reporte de un
+ * evento bloquearía los de todos los demás visitantes.
+ *
+ * Solo se hace caso a X-Forwarded-For si la petición viene de dentro. Creerla
+ * siempre sería peor que no mirarla: cualquiera podría escribir la IP que
+ * quisiera en la cabecera y saltarse todos los límites de golpe.
+ *
+ * Se lee de derecha a izquierda porque la última dirección de la lista la añade
+ * el proxy más cercano —el nuestro, del que nos fiamos—, mientras que las
+ * anteriores las puede haber escrito el propio cliente.
+ */
+function ipCliente(): string
+{
+    $remota = (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+
+    if (!esIpInterna($remota)) return $remota;
+
+    $lista = explode(',', (string) ($_SERVER['HTTP_X_FORWARDED_FOR'] ?? ''));
+
+    for ($i = count($lista) - 1; $i >= 0; $i--) {
+        $ip = trim($lista[$i]);
+        if ($ip !== '' && filter_var($ip, FILTER_VALIDATE_IP) && !esIpInterna($ip)) {
+            return $ip;
+        }
+    }
+
+    return $remota;
 }
 
 /**

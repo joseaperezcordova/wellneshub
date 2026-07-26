@@ -155,8 +155,10 @@ function csrfValido(?string $enviado): bool
 
 function ipBinaria(): string
 {
-    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-    return inet_pton($ip) ?: inet_pton('0.0.0.0');
+    // ipCliente() y no REMOTE_ADDR a secas: detrás del proxy, REMOTE_ADDR es
+    // 127.0.0.1 para todo el mundo y el límite "por IP" de los códigos pasaría
+    // a valer para el sitio entero. Ver config.php.
+    return inet_pton(ipCliente()) ?: inet_pton('0.0.0.0');
 }
 
 function buscarUsuarioPorEmail(string $email): ?array

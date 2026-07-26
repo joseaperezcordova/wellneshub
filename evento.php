@@ -44,6 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } elseif (isset($_POST['publicar'])) {
         publicarEvento((int) $ev['id'], (int) $ev['usuario_id']);
+
+        // El filtro de palabras se pasa DESPUÉS de publicar y no antes: no
+        // bloquea nada, solo levanta la mano para que un administrador lo mire.
+        // Ver palabrasVigiladas() en moderacion.php para el porqué.
+        revisarAlPublicar($ev);
+
         $_SESSION['evento_aviso'] = '¡Publicado! Ya aparece en la portada.';
         redirigir('/evento.php?id=' . (int) $ev['id']);
 
@@ -192,6 +198,15 @@ require __DIR__ . '/includes/layout.php';
     <?php endif; ?>
 
     <div class="ficha-desc"><?= nl2br(e($ev['descripcion'])) ?></div>
+
+    <?php if ($ev['situacion'] === 'publicado'): ?>
+      <!-- Sin cuenta: quien se topa con una estafa no se registra para avisarnos.
+           Pedir cuenta aquí no filtra bots —esos sí se registran—, filtra
+           personas. Discreto al pie, que es donde se busca cuando hace falta. -->
+      <div class="ficha-reportar">
+        <a href="<?= URL_BASE ?>/reportar.php?id=<?= (int) $ev['id'] ?>">Reportar este evento</a>
+      </div>
+    <?php endif; ?>
   </div>
 </article>
 

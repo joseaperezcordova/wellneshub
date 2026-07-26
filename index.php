@@ -769,6 +769,10 @@ if (!empty($_SESSION['evento_aviso'])) {
             <a href="#" onclick="cerrarMenuCuenta(); switchView('panel-organizador'); return false;">Publicar evento</a>
             <?php if ($u['rol'] === 'admin'): ?>
               <a href="#" onclick="cerrarMenuCuenta(); switchView('admin'); return false;">Panel admin</a>
+              <?php $pend = contarReportesPendientes(); ?>
+              <a href="<?= URL_BASE ?>/moderacion.php">
+                Moderación<?php if ($pend > 0): ?> <span class="pendientes"><?= $pend ?></span><?php endif; ?>
+              </a>
             <?php endif; ?>
             <a href="<?= URL_BASE ?>/logout.php">Cerrar sesión</a>
           </div>
