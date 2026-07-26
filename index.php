@@ -766,7 +766,10 @@ if (!empty($_SESSION['evento_aviso'])) {
               <strong><?= e($u['nombre']) ?></strong>
               <span><?= e($u['email']) ?></span>
             </div>
-            <a href="#" onclick="cerrarMenuCuenta(); switchView('panel-organizador'); return false;">Publicar evento</a>
+            <!-- «Mis eventos» y no «Publicar evento»: publicar ya está en el
+                 botón de al lado, y lo que hay detrás de este enlace es la lista
+                 de los eventos propios, que es otra cosa. -->
+            <a href="#" onclick="cerrarMenuCuenta(); switchView('panel-organizador'); return false;">Mis eventos</a>
             <?php if ($u['rol'] === 'admin'): ?>
               <a href="#" onclick="cerrarMenuCuenta(); switchView('admin'); return false;">Panel admin</a>
               <?php $pend = contarReportesPendientes(); ?>
@@ -1684,6 +1687,20 @@ document.querySelectorAll('nav.mainnav button').forEach(b=>{
 document.getElementById('burger').addEventListener('click', ()=>{
   document.getElementById('mainnav').classList.toggle('open');
 });
+
+/* Llegar a una vista concreta desde fuera de la portada.
+   Las vistas se conmutan con JavaScript y no tienen direccion propia, asi que
+   desde moderacion.php o desde una ficha no habia forma de volver al panel:
+   pulsabas el enlace, caias en el inicio y a buscarlo otra vez. Con el ancla
+   —/#admin, /#panel-organizador— la portada abre directamente donde ibas.
+   Se comprueba que la vista exista para que un ancla inventada no deje la
+   pagina en blanco. */
+function vistaDesdeAncla(){
+  var destino = (location.hash || '').replace('#', '');
+  if (destino && document.getElementById('view-' + destino)) switchView(destino);
+}
+vistaDesdeAncla();
+window.addEventListener('hashchange', vistaDesdeAncla);
 
 /* ---------- admin tabs ---------- */
 document.querySelectorAll('#adminTabs button').forEach(b=>{

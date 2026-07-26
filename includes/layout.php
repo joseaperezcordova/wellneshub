@@ -61,7 +61,14 @@ $u = usuarioActual();
               <strong><?= e($u['nombre']) ?></strong>
               <span><?= e($u['email']) ?></span>
             </div>
+            <!-- Estas dos vistas viven dentro de la portada y se conmutan con
+                 JavaScript, así que desde aquí se llega por el ancla: index.php
+                 la lee al cargar y abre la vista que toque. Sin esto, quien
+                 estaba en moderación o en una ficha no tenía manera de volver
+                 al panel. -->
+            <a href="<?= URL_BASE ?>/#panel-organizador">Mis eventos</a>
             <?php if ($u['rol'] === 'admin'): ?>
+              <a href="<?= URL_BASE ?>/#admin">Panel admin</a>
               <?php $pend = contarReportesPendientes(); ?>
               <a href="<?= URL_BASE ?>/moderacion.php">
                 Moderación<?php if ($pend > 0): ?> <span class="pendientes"><?= $pend ?></span><?php endif; ?>
