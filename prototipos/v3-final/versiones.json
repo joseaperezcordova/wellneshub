@@ -1,5 +1,5 @@
 {
-    "actual":  "Banner con carrusel de cuatro escenas",
+    "actual":  "Banner a sangre, menu lineal de categorias y eventos en tarjetas",
     "versiones":  [
                       {
                           "n":  1,
@@ -28,6 +28,13 @@
                           "fecha":  "2026-07-25",
                           "commit":  "4f62eab",
                           "titulo":  "Banner con carrusel de cuatro escenas"
+                      },
+                      {
+                          "n":  5,
+                          "archivo":  "v5.html",
+                          "fecha":  "2026-07-25",
+                          "commit":  "69e98b5",
+                          "titulo":  "Banner a sangre, menu lineal de categorias y eventos en tarjetas"
                       }
                   ]
 }
