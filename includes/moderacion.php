@@ -185,11 +185,32 @@ function reportesDeEvento(int $eventoId): array
     return $st->fetchAll();
 }
 
+/**
+ * Cuántos eventos tienen avisos sin revisar. Es el número del menú.
+ *
+ * Va envuelto en un try porque esto se ejecuta en la cabecera de TODAS las
+ * páginas cuando quien mira es administrador. Si la consulta falla —la causa
+ * típica es que falte por ejecutar la migración de la tabla en el servidor— sin
+ * este try se cae el sitio entero para el administrador, y encima con un 500
+ * mudo que no dice qué pasa.
+ *
+ * Un contador decorativo no puede tener ese poder. Si no se puede contar, se
+ * enseña cero, no se pinta insignia, y el motivo real queda en el log.
+ */
 function contarReportesPendientes(): int
 {
-    return (int) db()->query(
-        'SELECT COUNT(DISTINCT evento_id) FROM reportes WHERE situacion = "pendiente"'
-    )->fetchColumn();
+    try {
+        return (int) db()->query(
+            'SELECT COUNT(DISTINCT evento_id) FROM reportes WHERE situacion = "pendiente"'
+        )->fetchColumn();
+
+    } catch (Throwable $ex) {
+        error_log('No se pudieron contar los reportes pendientes. '
+            . '¿Está creada la tabla "reportes"? Ejecuta database/migracion-03-reportes.sql. '
+            . 'Detalle: ' . $ex->getMessage());
+
+        return 0;
+    }
 }
 
 /** Da por vistos todos los reportes de un evento. */

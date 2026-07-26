@@ -62,7 +62,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pendientes = reportesPendientes();
+// Aquí sí importa que falle, porque es la razón de ser de la página: se explica
+// en vez de devolver un 500 mudo, que es lo que hacía antes si la migración de
+// la tabla no se había ejecutado en el servidor.
+$pendientes = [];
+$sinTabla   = false;
+
+try {
+    $pendientes = reportesPendientes();
+} catch (Throwable $ex) {
+    error_log('Bandeja de moderación: ' . $ex->getMessage());
+    $sinTabla = true;
+}
 
 $titulo = 'Moderación';
 require __DIR__ . '/includes/layout.php';
@@ -71,7 +82,9 @@ require __DIR__ . '/includes/layout.php';
 <div class="auth-caja caja-ancha">
   <h1>Moderación</h1>
   <p class="sub">
-    <?php if ($pendientes): ?>
+    <?php if ($sinTabla): ?>
+      No se pudo leer la lista de avisos.
+    <?php elseif ($pendientes): ?>
       <?= count($pendientes) ?> evento<?= count($pendientes) === 1 ? '' : 's' ?> con avisos sin revisar.
     <?php else: ?>
       Nada pendiente.
@@ -81,7 +94,16 @@ require __DIR__ . '/includes/layout.php';
   <?php if ($aviso): ?><div class="aviso aviso-ok"><?= e($aviso) ?></div><?php endif; ?>
   <?php if ($error): ?><div class="aviso aviso-error"><?= e($error) ?></div><?php endif; ?>
 
-  <?php if (!$pendientes): ?>
+  <?php if ($sinTabla): ?>
+
+    <div class="aviso aviso-error" style="margin-bottom:0;">
+      <strong>Falta la tabla de reportes en la base de datos.</strong>
+      Entra a phpMyAdmin, selecciona tu base y ejecuta
+      <code>database/migracion-03-reportes.sql</code>. Hasta entonces nadie puede
+      reportar eventos y esta bandeja no funciona.
+    </div>
+
+  <?php elseif (!$pendientes): ?>
 
     <div class="aviso aviso-ok" style="margin-bottom:0;">
       No hay nada que revisar. Es lo normal: los eventos se publican solos y aquí
