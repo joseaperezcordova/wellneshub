@@ -1,5 +1,5 @@
 {
-    "actual":  "Banner a sangre, menu lineal de categorias y eventos en tarjetas",
+    "actual":  "Sin la seccion de Ciudades populares",
     "versiones":  [
                       {
                           "n":  1,
@@ -35,6 +35,13 @@
                           "fecha":  "2026-07-25",
                           "commit":  "69e98b5",
                           "titulo":  "Banner a sangre, menu lineal de categorias y eventos en tarjetas"
+                      },
+                      {
+                          "n":  6,
+                          "archivo":  "v6.html",
+                          "fecha":  "2026-07-25",
+                          "commit":  "fcc22bb",
+                          "titulo":  "Sin la seccion de Ciudades populares"
                       }
                   ]
 }
