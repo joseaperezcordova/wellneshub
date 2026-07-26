@@ -140,8 +140,9 @@ require __DIR__ . '/includes/layout.php';
 <article class="ficha">
 
   <div class="ficha-media" style="background-color:<?= e($ev['color']) ?>;">
-    <?php if (!empty($ev['imagen_url'])): ?>
-      <img src="<?= e($ev['imagen_url']) ?>" alt="" referrerpolicy="no-referrer">
+    <?php $imagen = urlImagen($ev['imagen_url']); ?>
+    <?php if ($imagen !== null): ?>
+      <img src="<?= e($imagen) ?>" alt="" referrerpolicy="no-referrer">
     <?php endif; ?>
     <div class="ficha-fecha">
       <span class="d"><?= e($partes['d']) ?></span>

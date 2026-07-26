@@ -119,11 +119,25 @@ $err = function (string $campo) use ($errores) {
 </div>
 
 <div class="campo">
-  <label for="imagen_url">Imagen por URL <span class="opcional">opcional</span></label>
-  <input id="imagen_url" name="imagen_url" type="url" maxlength="500"
-         value="<?= e($v('imagen_url')) ?>" placeholder="https://…/foto.jpg">
-  <div class="pista">Todavía no se pueden subir archivos: pega la dirección de una imagen ya publicada. Sin imagen se usa el color de abajo.</div>
-  <?= $err('imagen_url') ?>
+  <label for="imagen">Imagen <span class="opcional">opcional</span></label>
+
+  <?php $imagenActual = urlImagen($e['imagen_url'] ?? null); ?>
+  <?php if ($imagenActual !== null): ?>
+    <div class="imagen-actual">
+      <img src="<?= e($imagenActual) ?>" alt="Imagen actual del evento">
+      <label class="check">
+        <input type="checkbox" name="quitar_imagen" value="1">
+        <span>Quitar esta imagen</span>
+      </label>
+    </div>
+  <?php endif; ?>
+
+  <input id="imagen" name="imagen" type="file" accept="image/jpeg,image/png,image/webp">
+  <div class="pista">
+    JPG, PNG o WebP, hasta <?= round(IMAGEN_MAX_BYTES / 1048576) ?> MB. Si es muy grande se reduce sola.
+    Sin imagen se usa el color de abajo, como en el diseño de la portada.
+  </div>
+  <?= $err('imagen') ?>
 </div>
 
 <div class="campo">

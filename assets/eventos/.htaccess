@@ -1,0 +1,34 @@
+# Aquí solo viven imágenes subidas por los organizadores.
+#
+# Nada de lo que hay dentro se ejecuta jamás. La subida ya comprueba que el
+# archivo sea una imagen de verdad abriéndola, pero esa comprobación es la
+# primera barrera y no la última: si algún día se le escapa algo —un fallo en
+# la librería, un formato con datos raros dentro—, aquí seguiría siendo un
+# archivo inerte y no código corriendo en el servidor.
+
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+  php_flag engine off
+</IfModule>
+
+# En hosting con PHP como CGI/FPM las directivas de arriba no existen, así que
+# el corte se hace quitándole el manejador a cualquier extensión ejecutable.
+<FilesMatch "\.(php|php[0-9]?|phtml|phar|pl|py|cgi|sh|htaccess)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+RemoveHandler .php .phtml .phar
+RemoveType .php .phtml .phar
+
+Options -ExecCGI -Indexes

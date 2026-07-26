@@ -230,6 +230,25 @@ input,select{font-family:inherit; font-size:14px;}
 }
 .campo label.check input{width:auto; margin:0;}
 
+/* El input de archivo nativo es feo pero honesto: la gente lo reconoce, sabe
+   arrastrar encima y funciona en todos los navegadores sin JavaScript. Se le
+   ajusta el relleno y poco más. */
+.campo input[type="file"]{
+  width:100%; border:1px dashed var(--linea); background:var(--arena-suave);
+  border-radius:9px; padding:14px 13px; font-size:13.5px; color:var(--petroleo);
+  cursor:pointer;
+}
+.campo input[type="file"]:hover{border-color:var(--verde);}
+
+.imagen-actual{
+  border:1px solid var(--linea); border-radius:10px; padding:10px;
+  background:var(--blanco); margin-bottom:12px;
+}
+.imagen-actual img{
+  display:block; width:100%; max-height:190px; object-fit:cover;
+  border-radius:6px; margin-bottom:10px;
+}
+
 .colores{display:flex; gap:9px; flex-wrap:wrap;}
 .color-op{cursor:pointer; line-height:0;}
 .color-op input{position:absolute; opacity:0; width:0; height:0;}

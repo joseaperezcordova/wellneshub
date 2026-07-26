@@ -38,17 +38,48 @@ $puede = puedeEditarEvento($ev, $u);
 $e       = $ev;
 $errores = [];
 
-if ($puede && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($puede && postDesbordado()) {
+    $errores['general'] = 'La imagen pesa más de lo que admite el servidor. Prueba con una más ligera.';
+
+} elseif ($puede && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValido($_POST['csrf'] ?? null)) {
         $errores['general'] = 'La sesión caducó. Vuelve a enviarlo.';
         $e = $_POST;
     } else {
         [$e, $errores] = validarEvento($_POST);
 
+        // Por defecto se conserva la que ya tenía: no mandar archivo significa
+        // "déjala como está", no "bórrala".
+        $imagenPrevia    = $ev['imagen_url'];
+        $e['imagen_url'] = $imagenPrevia;
+
+        [$okImagen, $nueva] = guardarImagenSubida($_FILES['imagen'] ?? []);
+
+        if (!$okImagen) {
+            $errores['imagen'] = (string) $nueva;
+        } elseif ($nueva !== null) {
+            $e['imagen_url'] = $nueva;
+        } elseif (!empty($_POST['quitar_imagen'])) {
+            $e['imagen_url'] = null;
+        }
+
         if (!$errores) {
             actualizarEvento($e, (int) $ev['id']);
+
+            // La anterior se borra solo cuando el cambio ya está guardado. Al
+            // revés, un fallo al actualizar dejaría la ficha apuntando a un
+            // archivo que ya no existe.
+            if ($imagenPrevia !== null && $e['imagen_url'] !== $imagenPrevia) {
+                borrarImagenGuardada($imagenPrevia);
+            }
+
             $_SESSION['evento_aviso'] = 'Cambios guardados.';
             redirigir('/evento.php?id=' . (int) $ev['id']);
+        }
+
+        if ($errores && $okImagen && $nueva !== null) {
+            borrarImagenGuardada($nueva);
+            $e['imagen_url'] = $imagenPrevia;
         }
     }
 }
@@ -107,7 +138,7 @@ require __DIR__ . '/includes/layout.php';
     <div class="aviso aviso-error">Revisa los campos marcados.</div>
   <?php endif; ?>
 
-  <form method="post" novalidate>
+  <form method="post" enctype="multipart/form-data" novalidate>
     <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
     <?php $textoBoton = 'Guardar cambios'; require __DIR__ . '/includes/form-evento.php'; ?>
   </form>

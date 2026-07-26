@@ -262,11 +262,10 @@ function validarEvento(array $in): array
         $e['url_boletos'] = null;
     }
 
-    $e['imagen_url'] = urlValida((string) ($in['imagen_url'] ?? ''));
-    if ($e['imagen_url'] === false) {
-        $errores['imagen_url'] = 'Esa dirección no parece válida. Empieza por https://';
-        $e['imagen_url'] = null;
-    }
+    // imagen_url no se valida aquí: no viene del formulario de texto sino de la
+    // subida, que la comprueba en includes/subidas.php. La página la asigna
+    // después de llamar a esta función.
+    $e['imagen_url'] = null;
 
     $color = (string) ($in['color'] ?? '');
     $e['color'] = in_array($color, coloresEvento(), true) ? $color : coloresEvento()[0];
@@ -434,6 +433,25 @@ function fechaLarga(string $fecha): string
          . ' de ' . date('Y', $ts) . ', ' . date('H:i', $ts);
 }
 
+/**
+ * La dirección con la que se pinta la imagen de un evento.
+ *
+ * En la base se guarda la ruta relativa ("assets/eventos/2607-ab12.jpg") y no
+ * la dirección completa: si el dominio cambia, o el sitio se mueve de carpeta,
+ * las imágenes siguen apareciendo sin tocar una sola fila.
+ *
+ * Sigue admitiendo direcciones completas porque antes de que hubiera subidas la
+ * imagen se pegaba como URL, y esas fichas tienen que seguir viéndose.
+ */
+function urlImagen(?string $valor): ?string
+{
+    if ($valor === null || $valor === '') return null;
+
+    if (preg_match('#^https?://#i', $valor)) return $valor;
+
+    return URL_BASE . '/' . ltrim($valor, '/');
+}
+
 function precioTexto(array $ev): string
 {
     if (!empty($ev['gratuito']))    return 'Gratis';
@@ -465,7 +483,7 @@ function eventoParaTarjeta(array $ev): array
         'price' => $ev['precio'] !== null ? number_format((float) $ev['precio'], 0, '.', ',') : '',
         'free'  => (bool) $ev['gratuito'],
         'color' => $ev['color'],
-        'img'   => $ev['imagen_url'],
+        'img'   => urlImagen($ev['imagen_url']),
         'url'   => URL_BASE . '/evento.php?id=' . (int) $ev['id'],
     ];
 }

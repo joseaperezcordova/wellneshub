@@ -16,16 +16,36 @@ $u = exigirSesion();
 $e       = ['color' => coloresEvento()[0]];
 $errores = [];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (postDesbordado()) {
+    // Se comprueba antes que el CSRF: con el cuerpo descartado tampoco llega el
+    // token, y el mensaje "la sesión caducó" mandaría a buscar el problema al
+    // sitio equivocado.
+    $errores['general'] = 'La imagen pesa más de lo que admite el servidor. Prueba con una más ligera.';
+
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValido($_POST['csrf'] ?? null)) {
         $errores['general'] = 'La sesión caducó. Vuelve a enviarlo.';
         $e = $_POST;
     } else {
         [$e, $errores] = validarEvento($_POST);
 
+        [$okImagen, $imagen] = guardarImagenSubida($_FILES['imagen'] ?? []);
+        if (!$okImagen) {
+            $errores['imagen'] = (string) $imagen;
+        } else {
+            $e['imagen_url'] = $imagen;
+        }
+
         if (!$errores) {
             $id = crearEvento($e, (int) $u['id']);
             redirigir('/evento.php?id=' . $id);
+        }
+
+        // Si algo falló, la imagen ya guardada no se queda de okupa en el disco:
+        // el formulario vuelve a salir y se subirá otra vez.
+        if ($errores && $okImagen && $imagen !== null) {
+            borrarImagenGuardada($imagen);
+            $e['imagen_url'] = null;
         }
     }
 }
@@ -44,7 +64,7 @@ require __DIR__ . '/includes/layout.php';
     <div class="aviso aviso-error">Revisa los campos marcados.</div>
   <?php endif; ?>
 
-  <form method="post" novalidate>
+  <form method="post" enctype="multipart/form-data" novalidate>
     <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
     <?php $textoBoton = 'Ver la vista previa'; require __DIR__ . '/includes/form-evento.php'; ?>
   </form>

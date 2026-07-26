@@ -113,11 +113,32 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/correo.php';
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/subidas.php';
 
 /** Escapa para HTML. Se usa en todas las plantillas, de ahí el nombre corto. */
 function e(?string $texto): string
 {
     return htmlspecialchars($texto ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+/**
+ * La URL de un archivo estático, con la fecha del archivo pegada detrás.
+ *
+ * Delante de este Apache hay un nginx que cachea, y un CSS servido desde su
+ * caché puede quedarse semanas obsoleto: la página llega con el HTML nuevo y
+ * los estilos viejos, que es lo peor de los dos mundos —parece un fallo de
+ * diseño y no de caché, así que se busca donde no está.
+ *
+ * Con la marca de tiempo en la URL, publicar un cambio cambia la dirección, y
+ * ni nginx ni el navegador tienen nada que reutilizar. Y como la dirección solo
+ * cambia cuando cambia el archivo, se puede seguir cacheando todo lo demás.
+ */
+function assetUrl(string $ruta): string
+{
+    $absoluta = dirname(__DIR__) . '/' . ltrim($ruta, '/');
+    $version  = is_file($absoluta) ? (string) filemtime($absoluta) : '0';
+
+    return URL_BASE . '/' . ltrim($ruta, '/') . '?v=' . $version;
 }
 
 /** Redirige y corta la ejecución. */
