@@ -30,8 +30,27 @@ if (!is_file($rutaLocal)) {
     exit('Falta includes/config.local.php. Copia config.local.example.php y rellénalo.');
 }
 
+/*
+ * El require va envuelto en un búfer de salida a propósito.
+ *
+ * Si config.local.php tiene aunque sea un espacio o una línea suelta antes de
+ * "<?php" —lo típico al copiar y pegar desde un editor web—, ese texto se
+ * imprime al principio de TODAS las páginas. Y como sale antes que cualquier
+ * cabecera, session_start() y las redirecciones dejan de funcionar sin decir
+ * por qué: el sitio se queda sin sesión y nada indica la causa.
+ *
+ * Aquí esa salida accidental se traga y se registra, en vez de romper el sitio.
+ */
+ob_start();
 /** @var array $CONFIG */
 $CONFIG = require $rutaLocal;
+$basura = ob_get_clean();
+
+if ($basura !== '' && trim($basura) !== '') {
+    error_log('config.local.php imprime texto antes de <?php (se ha ignorado): '
+        . substr(trim($basura), 0, 200));
+}
+
 $CONFIG['es_local'] = $esLocal;
 
 /**

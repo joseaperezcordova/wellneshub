@@ -36,6 +36,36 @@ function googleRedirectUri(): string
     return URL_BASE . '/google-callback.php';
 }
 
+/**
+ * Permisos que se le piden a Google.
+ *
+ * Lo natural sería 'openid email profile', que trae también nombre y foto. Pero
+ * este hosting tiene una regla de mod_security que devuelve 403 ante cualquier
+ * URL que contenga la cadena ".profile" —es un archivo de shell de Unix y el
+ * WAF lo trata como intento de acceder a él—. Y Google, al volver del login,
+ * incluye siempre en el callback:
+ *
+ *     scope=...https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile...
+ *
+ * O sea que pedir 'profile' hace que el callback sea bloqueado por el servidor
+ * antes de llegar a PHP, y el login con Google es imposible. Comprobado: la URL
+ * "…/login.php?x=.profile" da 403, y "…?x=.email" da 200.
+ *
+ * Sin 'profile' seguimos recibiendo el identificador estable y el correo, que
+ * es lo que de verdad hace falta para tener cuenta. El nombre se deriva del
+ * correo hasta que la persona lo cambie.
+ *
+ * Cuando el hosting desactive esa regla, basta con poner 'pedir_perfil' => true
+ * en config.local.php y se recuperan nombre y avatar sin tocar código.
+ */
+function googleScope(): string
+{
+    global $CONFIG;
+    return !empty($CONFIG['google']['pedir_perfil'])
+        ? 'openid email profile'
+        : 'openid email';
+}
+
 /** URL a la que mandamos al usuario para que elija su cuenta. */
 function googleUrlAutorizacion(): string
 {
@@ -51,7 +81,7 @@ function googleUrlAutorizacion(): string
         'client_id'     => $CONFIG['google']['client_id'],
         'redirect_uri'  => googleRedirectUri(),
         'response_type' => 'code',
-        'scope'         => 'openid email profile',
+        'scope'         => googleScope(),
         'state'         => $state,
         'access_type'   => 'online',
 

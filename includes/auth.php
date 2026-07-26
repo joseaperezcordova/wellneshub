@@ -273,11 +273,21 @@ function entrarConGoogle(array $perfil): array
                   WHERE id = ?'
             )->execute([$perfil['picture'] ?? null, $usuarioId]);
         } else {
+            // Sin el permiso 'profile' Google no manda nombre (ver googleScope()
+            // en google.php y por qué está desactivado). Se deriva del correo:
+            // "ana.perez@gmail.com" -> "Ana Perez". Mejor eso que "Sin nombre",
+            // y la persona podrá cambiarlo cuando haya perfil editable.
+            $nombre = trim((string) ($perfil['name'] ?? ''));
+            if ($nombre === '') {
+                $local  = explode('@', $email)[0];
+                $nombre = mb_convert_case(str_replace(['.', '_', '-'], ' ', $local), MB_CASE_TITLE, 'UTF-8');
+            }
+
             $pdo->prepare(
                 'INSERT INTO usuarios (nombre, email, email_verificado_en, avatar_url)
                  VALUES (?, ?, ?, ?)'
             )->execute([
-                trim((string) ($perfil['name'] ?? 'Sin nombre')),
+                $nombre,
                 $email,
                 $verificado ? date('Y-m-d H:i:s') : null,
                 $perfil['picture'] ?? null,

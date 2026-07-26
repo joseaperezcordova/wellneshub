@@ -47,6 +47,15 @@ return [
     'google' => [
         'client_id'     => '',
         'client_secret' => '',
+
+        // Déjalo en false mientras el hosting mantenga la regla de mod_security
+        // que devuelve 403 ante cualquier URL con la cadena ".profile": Google
+        // la incluye siempre en el callback si se pide el permiso 'profile', y
+        // el login se vuelve imposible. Ver googleScope() en google.php.
+        //
+        // Cuando soporte desactive esa regla, ponlo en true y se recuperan el
+        // nombre y la foto de la cuenta de Google.
+        'pedir_perfil'  => false,
     ],
 
 ];
