@@ -37,6 +37,9 @@ jobs:
           # subir solo lo que cambio. Si un deploy queda a medias y el estado
           # se desincroniza, se borra ese archivo del servidor y el siguiente
           # push vuelve a subir todo.
+          # config.local.php se sube a mano por FTP una sola vez y se queda.
+          # Si el deploy lo sincronizara, cada push pisaría las credenciales de
+          # producción con las de XAMPP y la aplicación dejaría de conectar.
           exclude: |
             **/.git*
             **/.git*/**
@@ -45,5 +48,6 @@ jobs:
             **/vendor/**
             **/.ftp-deploy-sync-state.json
             **/.env
+            **/config.local.php
             **/README.md
             **/*.md

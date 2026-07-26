@@ -1,0 +1,17 @@
+# Nada de esta carpeta se sirve por HTTP.
+#
+# config.local.php lleva la contraseña de la base y el secreto de Google. Si el
+# servidor dejara de interpretar PHP por cualquier motivo —un fallo de módulo,
+# un cambio de versión mal aplicado— los .php se servirían como texto plano y
+# esas credenciales quedarían a la vista de cualquiera que adivine la ruta.
+#
+# Los archivos se siguen incluyendo desde PHP con normalidad: esto solo corta el
+# acceso directo desde el navegador.
+
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>

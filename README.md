@@ -35,6 +35,109 @@ Se ocultan en las vistas privadas (`admin`, `panel-organizador`): buscar eventos
 ahí no significa nada, y sobre el fondo oscuro del admin la barra clara rompe la
 lectura.
 
+## La aplicación (`app/`)
+
+La v6 del prototipo quedó como diseño final, así que a partir de ahí empieza la
+aplicación real. Vive en `app/` y no toca los prototipos: se sirve en
+`…/app/` mientras se va trayendo el diseño sección por sección.
+
+**PHP 7.4 + MySQL, sin framework y sin Composer.** El XAMPP de esta máquina trae
+PHP 7.4, así que el código evita sintaxis de PHP 8 (`match`, `str_starts_with`,
+`never`) y corre igual en 7.4 y en 8.x. Sin Composer porque el hosting no tiene
+SSH: no hay forma de ejecutar `composer install` allí, y subir un `vendor/` por
+FTP para hacer tres peticiones HTTP no compensa.
+
+```
+app/
+├── index.php              Portada (por ahora, banco de pruebas de la sesión)
+├── login.php              Entrar: Google + correo y contraseña
+├── registro.php           Crear cuenta
+├── logout.php
+├── google-redirect.php    Manda a Google
+├── google-callback.php    Vuelta de Google  ← esta es la URI a registrar
+├── assets/css/app.css
+└── includes/
+    ├── .htaccess              Corta el acceso HTTP a esta carpeta
+    ├── config.php             Sesión, errores, arranque
+    ├── config.local.php       Credenciales · NO está en git · se crea a mano
+    ├── config.local.example.php
+    ├── db.php                 PDO
+    ├── auth.php               Sesión, registro, login, CSRF, freno de fuerza bruta
+    ├── google.php             OAuth 2.0 a mano
+    └── layout.php             Cabecera con el acceso a la cuenta, y pie
+```
+
+### Puesta en marcha
+
+**1. Crear las tablas.** El esquema está en `database/schema.sql`.
+
+- *En el hosting:* cPanel → phpMyAdmin → selecciona la base en el panel
+  izquierdo → pestaña **Importar** → elige el archivo → Continuar.
+- *En local:* phpMyAdmin de XAMPP (`http://localhost/phpmyadmin`), crea la base
+  `wellneshub` y haz lo mismo.
+
+El archivo es idempotente (`CREATE TABLE IF NOT EXISTS`): puedes volver a
+ejecutarlo sin romper nada.
+
+**2. Crear `config.local.php`** a partir de `config.local.example.php`. Hay que
+hacerlo dos veces —una en local y otra subiéndolo por FTP al servidor— porque
+no está en git ni lo sincroniza el deploy. Eso es deliberado: si el deploy lo
+sincronizara, cada push pisaría las credenciales de producción con las de XAMPP.
+
+**3. Credenciales de Google.** En [Google Cloud Console](https://console.cloud.google.com/):
+
+1. Crea un proyecto (o elige uno).
+2. **Pantalla de consentimiento de OAuth** → tipo *Externo* → rellena nombre de
+   la app, correo de asistencia y correo del desarrollador. Mientras esté en
+   modo *Prueba*, solo entran las cuentas que añadas como usuarios de prueba;
+   para abrirlo a cualquiera hay que **Publicar la aplicación**.
+3. **Credenciales** → *Crear credenciales* → *ID de cliente de OAuth* →
+   **Aplicación web**.
+4. En **URI de redireccionamiento autorizados**, añade las dos, exactas y sin
+   barra final:
+   ```
+   http://localhost/wellneshub/app/google-callback.php
+   https://wellnesshubmx.jpcorelab.com/app/google-callback.php
+   ```
+5. Copia el *ID de cliente* y el *secreto* a `config.local.php`.
+
+> El error más habitual aquí es `redirect_uri_mismatch`: significa que la URL
+> registrada no coincide **carácter a carácter** con `url_base` +
+> `/google-callback.php`. Vigila `http` frente a `https` y la barra final.
+
+**4. Date permisos de admin.** No hay usuario administrador semilla a propósito:
+una contraseña conocida escrita en el repositorio es una puerta abierta desde el
+primer día. Regístrate por la interfaz y luego, una sola vez:
+
+```sql
+UPDATE usuarios SET rol = 'admin' WHERE email = 'tucorreo@ejemplo.com';
+```
+
+### Decisiones de seguridad
+
+Están comentadas en el código, pero las que más condicionan el esquema:
+
+- **Las identidades de Google van en su propia tabla**, no en una columna de
+  `usuarios`. Permite tener contraseña *y* Google sobre la misma cuenta, y
+  añadir otro proveedor sin tocar el esquema.
+- **Se guarda el `sub` de Google, no el correo.** El correo de una cuenta de
+  Google puede cambiar; el `sub` no. Emparejar por correo es exactamente lo que
+  permite quedarse con la cuenta de otro.
+- **Una cuenta con contraseña solo se enlaza a Google si Google confirma que el
+  correo está verificado.** Sin esa comprobación, cualquiera que cree una cuenta
+  de Google con el correo de otra persona hereda su cuenta de aquí.
+- **El login se frena a los 5 fallos en 15 minutos**, contando por correo *y*
+  por IP. Solo por correo permitiría atacar muchas cuentas desde un sitio; solo
+  por IP dejaría pasar los ataques repartidos.
+- **Correo inexistente y contraseña incorrecta dan el mismo mensaje**, o el
+  formulario se convierte en un comprobador de qué correos están registrados.
+
+### Pendiente
+
+- Recuperación de contraseña por correo
+- Verificación del correo en las altas con contraseña
+- Traer el diseño de la v6 a la aplicación, sección por sección
+
 ## Histórico de versiones de v3
 
 v3 lleva un selector de versiones abajo a la derecha: un desplegable que salta

@@ -2,9 +2,13 @@
 .ftp-deploy-sync-state.json
 
 # Entorno / credenciales
+# config.local.php lleva la contraseña de la base y el secreto de OAuth de
+# Google. Nunca entra en el repositorio: se crea a mano en cada sitio donde
+# corre la aplicación (local y servidor).
 .env
 .env.*
 config/config.local.php
+app/includes/config.local.php
 
 # Dependencias
 /node_modules/

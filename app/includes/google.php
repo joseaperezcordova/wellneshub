@@ -1,0 +1,159 @@
+<?php
+/**
+ * OAuth 2.0 con Google, a mano.
+ *
+ * Sin librería y sin Composer: el hosting no tiene SSH, así que no hay forma de
+ * ejecutar `composer install` allí. Subir un vendor/ entero por FTP para usar
+ * tres peticiones HTTP no compensa.
+ *
+ * El flujo es el de "authorization code":
+ *   1. Mandamos al usuario a Google con un "state" aleatorio.
+ *   2. Google lo devuelve a nuestro callback con un código.
+ *   3. Cambiamos ese código por un token, servidor contra servidor.
+ *   4. Con el token pedimos el perfil.
+ *
+ * El perfil se pide al endpoint userinfo en vez de decodificar el id_token que
+ * viene en el paso 3. Un JWT hay que verificarlo con las claves públicas de
+ * Google, que rotan y habría que cachear; si no se verifica la firma, el
+ * id_token no vale nada. La llamada a userinfo llega por TLS directamente de
+ * Google, así que no hay nada que verificar a mano.
+ */
+
+declare(strict_types=1);
+
+const GOOGLE_AUTH_URL     = 'https://accounts.google.com/o/oauth2/v2/auth';
+const GOOGLE_TOKEN_URL    = 'https://oauth2.googleapis.com/token';
+const GOOGLE_USERINFO_URL = 'https://openidconnect.googleapis.com/v1/userinfo';
+
+function googleConfigurado(): bool
+{
+    global $CONFIG;
+    return !empty($CONFIG['google']['client_id']) && !empty($CONFIG['google']['client_secret']);
+}
+
+function googleRedirectUri(): string
+{
+    return URL_BASE . '/google-callback.php';
+}
+
+/** URL a la que mandamos al usuario para que elija su cuenta. */
+function googleUrlAutorizacion(): string
+{
+    global $CONFIG;
+
+    // El "state" viaja a Google y vuelve. Si al volver no coincide con el que
+    // guardamos en sesión, la petición no la inició este navegador: es un CSRF
+    // sobre el login y se descarta.
+    $state = bin2hex(random_bytes(16));
+    $_SESSION['google_state'] = $state;
+
+    return GOOGLE_AUTH_URL . '?' . http_build_query([
+        'client_id'     => $CONFIG['google']['client_id'],
+        'redirect_uri'  => googleRedirectUri(),
+        'response_type' => 'code',
+        'scope'         => 'openid email profile',
+        'state'         => $state,
+        'access_type'   => 'online',
+
+        // Sin esto, quien tenga varias cuentas de Google entra siempre con la
+        // última y no hay manera de cambiar sin cerrar sesión en Google.
+        'prompt'        => 'select_account',
+    ]);
+}
+
+/**
+ * POST/GET con cURL, y file_get_contents si el hosting no trae cURL.
+ *
+ * @return array{0:int,1:string} [código http, cuerpo]
+ */
+function googleHttp(string $url, ?array $post = null, array $cabeceras = []): array
+{
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 15,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_HTTPHEADER     => $cabeceras,
+        ]);
+        if ($post !== null) {
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
+        }
+        $cuerpo = curl_exec($ch);
+        $codigo = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if ($cuerpo === false) {
+            error_log('cURL contra Google falló: ' . curl_error($ch));
+            curl_close($ch);
+            return [0, ''];
+        }
+        curl_close($ch);
+        return [$codigo, (string) $cuerpo];
+    }
+
+    $opciones = [
+        'http' => [
+            'method'        => $post === null ? 'GET' : 'POST',
+            'header'        => implode("\r\n", array_merge(
+                $post === null ? [] : ['Content-Type: application/x-www-form-urlencoded'],
+                $cabeceras
+            )),
+            'content'       => $post === null ? null : http_build_query($post),
+            'timeout'       => 15,
+            'ignore_errors' => true,
+        ],
+    ];
+
+    $cuerpo = @file_get_contents($url, false, stream_context_create($opciones));
+    if ($cuerpo === false) return [0, ''];
+
+    $codigo = 0;
+    foreach ($http_response_header ?? [] as $linea) {
+        if (preg_match('#^HTTP/\S+\s+(\d{3})#', $linea, $m)) $codigo = (int) $m[1];
+    }
+    return [$codigo, $cuerpo];
+}
+
+/**
+ * Cambia el código por un access_token.
+ */
+function googleCanjearCodigo(string $codigo): ?string
+{
+    global $CONFIG;
+
+    [$http, $cuerpo] = googleHttp(GOOGLE_TOKEN_URL, [
+        'code'          => $codigo,
+        'client_id'     => $CONFIG['google']['client_id'],
+        'client_secret' => $CONFIG['google']['client_secret'],
+        'redirect_uri'  => googleRedirectUri(),
+        'grant_type'    => 'authorization_code',
+    ]);
+
+    if ($http !== 200) {
+        error_log("Google /token respondió $http: $cuerpo");
+        return null;
+    }
+
+    $datos = json_decode($cuerpo, true);
+    return $datos['access_token'] ?? null;
+}
+
+/**
+ * Perfil del usuario. Devuelve sub, email, email_verified, name y picture.
+ */
+function googlePerfil(string $accessToken): ?array
+{
+    [$http, $cuerpo] = googleHttp(GOOGLE_USERINFO_URL, null, [
+        'Authorization: Bearer ' . $accessToken,
+    ]);
+
+    if ($http !== 200) {
+        error_log("Google /userinfo respondió $http: $cuerpo");
+        return null;
+    }
+
+    $perfil = json_decode($cuerpo, true);
+    return is_array($perfil) && !empty($perfil['sub']) ? $perfil : null;
+}
