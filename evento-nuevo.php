@@ -58,11 +58,7 @@ require __DIR__ . '/includes/layout.php';
   <h1>Publicar un evento</h1>
   <p class="sub">Rellena la ficha. Antes de publicarla la vas a ver tal como la verá la gente.</p>
 
-  <?php if (!empty($errores['general'])): ?>
-    <div class="aviso aviso-error"><?= e($errores['general']) ?></div>
-  <?php elseif ($errores): ?>
-    <div class="aviso aviso-error">Revisa los campos marcados.</div>
-  <?php endif; ?>
+  <?php require __DIR__ . '/includes/aviso-errores.php'; ?>
 
   <form method="post" enctype="multipart/form-data" novalidate>
     <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">

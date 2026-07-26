@@ -29,16 +29,28 @@ $err = function (string $campo) use ($errores) {
         ? '<div class="campo-error">' . e($errores[$campo]) . '</div>'
         : '';
 };
+
+/**
+ * La clase del contenedor cuando el campo falló.
+ *
+ * Sin esto, el único indicio del error era una línea de texto pequeña bajo el
+ * campo, igual de discreta que las pistas grises de al lado. El aviso de arriba
+ * decía «revisa los campos marcados» y no había ningún campo marcado: había que
+ * repasar el formulario entero a ojo.
+ */
+$mal = function (string $campo) use ($errores) {
+    return isset($errores[$campo]) ? ' con-error' : '';
+};
 ?>
 
-<div class="campo">
+<div class="campo<?= $mal('titulo') ?>">
   <label for="titulo">Título del evento</label>
   <input id="titulo" name="titulo" type="text" required maxlength="160"
          value="<?= e($v('titulo')) ?>" placeholder="Amanecer en el Cenote — Yoga y Sonido">
   <?= $err('titulo') ?>
 </div>
 
-<div class="campo">
+<div class="campo<?= $mal('categoria') ?>">
   <label for="categoria">Categoría</label>
   <select id="categoria" name="categoria" required>
     <option value="">Elige una…</option>
@@ -51,7 +63,7 @@ $err = function (string $campo) use ($errores) {
   <?= $err('categoria') ?>
 </div>
 
-<div class="campo">
+<div class="campo<?= $mal('descripcion') ?>">
   <label for="descripcion">Descripción</label>
   <textarea id="descripcion" name="descripcion" rows="7" required
             placeholder="Qué van a vivir, qué incluye, qué llevar, para quién es."><?= e($v('descripcion')) ?></textarea>
@@ -60,13 +72,13 @@ $err = function (string $campo) use ($errores) {
 </div>
 
 <div class="campo-fila">
-  <div class="campo">
+  <div class="campo<?= $mal('ciudad') ?>">
     <label for="ciudad">Ciudad</label>
     <input id="ciudad" name="ciudad" type="text" required maxlength="90"
            value="<?= e($v('ciudad')) ?>" placeholder="Tulum">
     <?= $err('ciudad') ?>
   </div>
-  <div class="campo">
+  <div class="campo<?= $mal('entidad') ?>">
     <label for="entidad">Estado</label>
     <input id="entidad" name="entidad" type="text" required maxlength="90"
            value="<?= e($v('entidad')) ?>" placeholder="Quintana Roo">
@@ -81,13 +93,13 @@ $err = function (string $campo) use ($errores) {
 </div>
 
 <div class="campo-fila">
-  <div class="campo">
+  <div class="campo<?= $mal('fecha_inicio') ?>">
     <label for="fecha_inicio">Empieza</label>
     <input id="fecha_inicio" name="fecha_inicio" type="datetime-local" required
            value="<?= e($fechaInput('fecha_inicio')) ?>">
     <?= $err('fecha_inicio') ?>
   </div>
-  <div class="campo">
+  <div class="campo<?= $mal('fecha_fin') ?>">
     <label for="fecha_fin">Termina <span class="opcional">opcional</span></label>
     <input id="fecha_fin" name="fecha_fin" type="datetime-local"
            value="<?= e($fechaInput('fecha_fin')) ?>">
@@ -104,21 +116,21 @@ $err = function (string $campo) use ($errores) {
   </label>
 </div>
 
-<div class="campo" id="campoPrecio">
+<div class="campo<?= $mal('precio') ?>" id="campoPrecio">
   <label for="precio">Precio por persona (MXN)</label>
   <input id="precio" name="precio" type="text" inputmode="decimal"
          value="<?= e($v('precio')) ?>" placeholder="2450">
   <?= $err('precio') ?>
 </div>
 
-<div class="campo">
+<div class="campo<?= $mal('url_boletos') ?>">
   <label for="url_boletos">Enlace para comprar o reservar <span class="opcional">opcional</span></label>
   <input id="url_boletos" name="url_boletos" type="url" maxlength="500"
          value="<?= e($v('url_boletos')) ?>" placeholder="https://…">
   <?= $err('url_boletos') ?>
 </div>
 
-<div class="campo">
+<div class="campo<?= $mal('imagen') ?>">
   <label for="imagen">Imagen <span class="opcional">opcional</span></label>
 
   <?php $imagenActual = urlImagen($e['imagen_url'] ?? null); ?>

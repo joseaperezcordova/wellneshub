@@ -192,6 +192,29 @@ function eventosTodos(int $limite = 200): array
 // ------------------------------------------------------------ validación ----
 
 /**
+ * El nombre visible de cada campo, para poder decir cuál falló.
+ *
+ * Vive aquí y no en la plantilla porque lo usan las dos páginas —alta y
+ * edición— y porque tiene que cuadrar con las claves que devuelve
+ * validarEvento(): si se separan, el aviso acaba nombrando un campo que no es.
+ */
+function etiquetasCampos(): array
+{
+    return [
+        'titulo'       => 'Título del evento',
+        'categoria'    => 'Categoría',
+        'descripcion'  => 'Descripción',
+        'ciudad'       => 'Ciudad',
+        'entidad'      => 'Estado',
+        'fecha_inicio' => 'Fecha de inicio',
+        'fecha_fin'    => 'Fecha de fin',
+        'precio'       => 'Precio',
+        'url_boletos'  => 'Enlace para comprar o reservar',
+        'imagen'       => 'Imagen',
+    ];
+}
+
+/**
  * Revisa y normaliza lo que llega del formulario.
  *
  * @return array{0:array,1:array} [datos limpios, errores por campo]
@@ -236,6 +259,21 @@ function validarEvento(array $in): array
     if ($e['fecha_fin'] !== null && $e['fecha_inicio'] !== null
         && strtotime($e['fecha_fin']) < strtotime($e['fecha_inicio'])) {
         $errores['fecha_fin'] = 'El final no puede ser anterior al principio.';
+    }
+
+    // Un evento que ya terminó se puede guardar, pero no aparecería en el
+    // listado —la agenda corta por COALESCE(fecha_fin, fecha_inicio) >= NOW()—
+    // y quien lo publicara se quedaría esperando a verlo. Mejor decirlo aquí.
+    //
+    // Se mira el final y no el principio: un retiro de cinco días que empezó
+    // ayer sigue vigente, y rechazarlo por la fecha de inicio sería un error.
+    if (!isset($errores['fecha_inicio']) && !isset($errores['fecha_fin'])) {
+        $termina = $e['fecha_fin'] ?? $e['fecha_inicio'];
+
+        if ($termina !== null && strtotime($termina) < time()) {
+            $campo = $e['fecha_fin'] !== null ? 'fecha_fin' : 'fecha_inicio';
+            $errores[$campo] = 'Esa fecha ya pasó, así que el evento no aparecería en el listado.';
+        }
     }
 
     $e['gratuito'] = !empty($in['gratuito']) ? 1 : 0;

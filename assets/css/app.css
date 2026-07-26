@@ -217,7 +217,32 @@ input,select{font-family:inherit; font-size:14px;}
 .campo-fila{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
 @media(max-width:520px){ .campo-fila{grid-template-columns:1fr; gap:0;} }
 
-.campo-error{font-size:12px; color:#7C3A18; margin-top:5px;}
+/* El campo que falló tiene que verse SIN leer nada. Antes el único indicio era
+   la línea de texto de abajo, del mismo tamaño y color apagado que las pistas
+   de ayuda de al lado: en un formulario de doce campos, invisible. */
+.campo.con-error input,
+.campo.con-error textarea,
+.campo.con-error select{
+  border-color:#C0563A; background:#FDF3EF;
+}
+.campo.con-error input:focus,
+.campo.con-error textarea:focus,
+.campo.con-error select:focus{border-color:#A0522D;}
+.campo.con-error > label{color:#A0522D;}
+
+.campo-error{
+  font-size:12.5px; color:#7C3A18; margin-top:6px; font-weight:600;
+  display:flex; align-items:flex-start; gap:6px;
+}
+/* La marca va por CSS y no en el HTML para que los lectores de pantalla no la
+   lean como si fuera parte del mensaje. */
+.campo-error::before{content:"!";
+  flex-shrink:0; width:15px; height:15px; border-radius:50%;
+  background:#C0563A; color:#fff; font-size:11px; line-height:15px;
+  text-align:center; font-weight:700;
+}
+
+.aviso-error a{color:inherit; text-decoration:underline; text-underline-offset:2px;}
 .opcional{
   font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.08em;
   opacity:.5; text-transform:none;
