@@ -27,16 +27,18 @@ return [
     ],
 
     // ---- URL base ---------------------------------------------------------
-    // Sin barra final. Tiene que coincidir EXACTAMENTE con lo que registres en
-    // Google Cloud Console, incluido http/https: si allí pones https y aquí
-    // http, Google rechaza el callback con redirect_uri_mismatch.
+    // DÉJALO VACÍO. La aplicación la deduce de la propia petición, y así este
+    // archivo sirve igual en local y en el servidor.
     //
-    //   local:      http://localhost/wellneshub
-    //   producción: https://wellnesshubmx.jpcorelab.com
+    // Ponerlo a mano fue la causa de un fallo tonto: al copiar este archivo al
+    // servidor se quedó apuntando a localhost, y el sitio publicado generaba
+    // todos sus enlaces —incluido el del CSS— hacia la máquina del visitante.
     //
-    // En producción la aplicación está en la raíz del dominio, así que aquí no
-    // va ninguna subcarpeta. En local sí, porque XAMPP sirve htdocs entero.
-    'url_base' => 'http://localhost/wellneshub',
+    // Solo hace falta rellenarlo si el servidor está detrás de un proxy que no
+    // manda X-Forwarded-Proto y hace falta forzar https. Sin barra final, y
+    // entonces tiene que coincidir EXACTAMENTE con lo registrado en Google
+    // Cloud Console o el login con Google falla con redirect_uri_mismatch.
+    'url_base' => '',
 
     // ---- Google OAuth -----------------------------------------------------
     // Se sacan de Google Cloud Console → APIs y servicios → Credenciales →

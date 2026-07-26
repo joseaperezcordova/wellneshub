@@ -34,7 +34,40 @@ if (!is_file($rutaLocal)) {
 $CONFIG = require $rutaLocal;
 $CONFIG['es_local'] = $esLocal;
 
-define('URL_BASE', rtrim($CONFIG['url_base'], '/'));
+/**
+ * Deduce la URL base de la propia petición.
+ *
+ * Existe porque copiar el config.local.php de local al servidor y olvidar
+ * cambiar 'url_base' deja el sitio publicado generando enlaces a localhost:
+ * el CSS no carga, los enlaces no van a ningún sitio y la página parece rota
+ * sin ningún error que lo explique. Con esto, dejarlo vacío es la opción
+ * correcta y no hay nada que olvidar.
+ */
+function detectarUrlBase(): string
+{
+    // Detrás de un proxy que termina el TLS (aquí hay nginx delante de Apache),
+    // $_SERVER['HTTPS'] llega vacío aunque el visitante venga por https.
+    $esquema = 'http';
+    if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+        $esquema = strtolower(trim(explode(',', $_SERVER['HTTP_X_FORWARDED_PROTO'])[0]));
+    } elseif (!empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off') {
+        $esquema = 'https';
+    } elseif (($_SERVER['SERVER_PORT'] ?? '') === '443') {
+        $esquema = 'https';
+    }
+
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+    // Carpeta desde la que se sirve la aplicación: '' en la raíz del dominio,
+    // '/wellneshub' bajo XAMPP.
+    $dir = str_replace('\\', '/', dirname((string) ($_SERVER['SCRIPT_NAME'] ?? '/')));
+    $dir = ($dir === '/' || $dir === '.') ? '' : rtrim($dir, '/');
+
+    return $esquema . '://' . $host . $dir;
+}
+
+$urlBase = trim((string) ($CONFIG['url_base'] ?? ''));
+define('URL_BASE', $urlBase !== '' ? rtrim($urlBase, '/') : detectarUrlBase());
 
 /**
  * Sesión.
