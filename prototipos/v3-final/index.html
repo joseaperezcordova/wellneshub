@@ -354,10 +354,9 @@
   .block-head a.more{font-size:13px; color:var(--jungle); border-bottom:1px solid var(--jungle); flex-shrink:0;}
 
   /* ---------- chips (ciudades) ---------- */
-  .chiprow{display:flex; flex-wrap:wrap; gap:9px;}
-  .chiprow .chip{background:var(--arena); border:1px solid var(--line); padding:9px 16px; border-radius:20px; font-size:13.5px; display:flex; align-items:center; gap:8px;}
-  .chiprow .chip .n{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--jungle); opacity:0.6;}
-  .chiprow .chip:hover{border-color:var(--jungle);}
+  /* .chiprow se fue con la seccion de «Ciudades populares»: era su unico uso.
+     La busqueda por ciudad sigue disponible en el campo «Donde» del buscador y
+     en el filtro de la vista de resultados. */
 
   /* ---------- event cards ---------- */
   .grid-events{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
@@ -764,22 +763,6 @@
         </div>
         <button type="button" class="catnext" id="catnext" aria-label="Ver más categorías">›</button>
       </div>
-    </div>
-  </section>
-
-  <section class="block wrap">
-    <div class="block-head">
-      <h2>Ciudades populares</h2>
-    </div>
-    <div class="chiprow">
-      <div class="chip">Tulum, Q. Roo <span class="n">24</span></div>
-      <div class="chip">Ciudad de México <span class="n">41</span></div>
-      <div class="chip">Oaxaca de Juárez <span class="n">18</span></div>
-      <div class="chip">San Miguel de Allende <span class="n">15</span></div>
-      <div class="chip">Guadalajara <span class="n">12</span></div>
-      <div class="chip">Puerto Vallarta <span class="n">9</span></div>
-      <div class="chip">Playa del Carmen <span class="n">11</span></div>
-      <div class="chip">Monterrey <span class="n">7</span></div>
     </div>
   </section>
 
@@ -1469,12 +1452,6 @@ function showResults(eyebrow, title){
 document.querySelectorAll('.catitem').forEach(el=>{
   el.addEventListener('click', ()=>{
     showResults('Página por categoría', 'Eventos de ' + el.dataset.cat);
-  });
-});
-document.querySelectorAll('.chiprow .chip').forEach(el=>{
-  el.addEventListener('click', ()=>{
-    const city = el.textContent.split('\n')[0].split(/\s\d/)[0].trim();
-    showResults('Página por ciudad', 'Eventos wellness en ' + city.split(',')[0]);
   });
 });
 
