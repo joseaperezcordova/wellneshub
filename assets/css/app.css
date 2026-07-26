@@ -250,7 +250,9 @@ input,select{font-family:inherit; font-size:14px;}
 }
 
 .colores{display:flex; gap:9px; flex-wrap:wrap;}
-.color-op{cursor:pointer; line-height:0;}
+/* Con el nombre del elemento delante, por lo mismo que .motivo: si no, el
+   margin-bottom de .campo label le mete un hueco de más bajo los círculos. */
+.campo label.color-op{cursor:pointer; line-height:0; margin:0;}
 .color-op input{position:absolute; opacity:0; width:0; height:0;}
 .color-op span{
   display:block; width:34px; height:34px; border-radius:50%;
@@ -340,15 +342,23 @@ input,select{font-family:inherit; font-size:14px;}
 .trampa{position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;}
 
 .motivos{display:flex; flex-direction:column; gap:2px;}
-.motivo{
+
+/* Va escrito «.campo label.motivo» y no «.motivo» a secas por especificidad:
+   .campo label —que pone display:block y mayúsculas de etiqueta— tiene más peso
+   que una clase suelta y le ganaba, así que el radio salía encima del texto y en
+   versalitas. Por eso hay que repetir aquí todo lo que .campo label impone. */
+.campo label.motivo{
   display:flex; align-items:center; gap:10px; padding:11px 13px;
-  border:1px solid transparent; border-radius:9px; cursor:pointer; font-size:14.5px;
+  border:1px solid transparent; border-radius:9px; cursor:pointer;
+  font-family:'Inter',sans-serif; font-size:14.5px; letter-spacing:0;
+  text-transform:none; color:var(--petroleo); margin:0;
 }
-.motivo:hover{background:var(--arena-suave);}
-.motivo input{margin:0;}
+.campo label.motivo:hover{background:var(--arena-suave);}
+.campo label.motivo input{width:auto; margin:0; flex-shrink:0;}
+
 /* :has aún no está en todos los navegadores; donde no esté, la fila
    seleccionada simplemente no se resalta y el radio marcado sigue viéndose. */
-.motivo:has(input:checked){background:var(--arena-suave); border-color:var(--verde);}
+.campo label.motivo:has(input:checked){background:var(--arena-suave); border-color:var(--verde);}
 
 .ficha-reportar{
   margin-top:40px; padding-top:20px; border-top:1px solid var(--linea-suave);
