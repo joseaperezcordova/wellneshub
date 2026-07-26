@@ -119,8 +119,22 @@ require __DIR__ . '/includes/layout.php';
                 ? '<code>' . e($spf) . '</code>'
                 : '<strong>No hay registro SPF en este dominio.</strong>' ?></td></tr>
       <tr><td style="padding:7px 0; opacity:.7;">MX</td>
-          <td><?= $mx ? e(implode(', ', array_column($mx, 'target'))) : '(ninguno)' ?></td></tr>
+          <td><?= $mx ? e(implode(', ', array_column($mx, 'target'))) : '<strong>(ninguno)</strong>' ?></td></tr>
     </table>
+
+    <?php if (!$mx): ?>
+      <div class="aviso aviso-error" style="margin-top:16px;">
+        <strong>Sin MX no se puede enviar desde este dominio.</strong>
+        Los filtros de salida hacen <em>callout verification</em>: antes de aceptar el mensaje
+        se conectan al servidor de correo del remitente para comprobar que la dirección existe.
+        Sin registro MX no hay a quién preguntar, y el correo se rechaza con
+        <code>550 Invalid sender</code> sin llegar a salir.
+        <br><br>
+        Manda desde un dominio que sí tenga MX y con el buzón creado en cPanel → Email Accounts.
+        Y ten en cuenta que el filtro <strong>cachea el fallo</strong>: una dirección que ya
+        rebotó sigue rechazándose un buen rato aunque crees el buzón después.
+      </div>
+    <?php endif; ?>
 
     <?php if ($spf === ''): ?>
       <div class="aviso aviso-error" style="margin-top:16px;">

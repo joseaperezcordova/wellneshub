@@ -41,19 +41,37 @@ return [
     'url_base' => '',
 
     // ---- Correo saliente --------------------------------------------------
-    // Desde aquí salen los códigos de acceso.
+    // Desde aquí salen los códigos de acceso. RELLÉNALO: el valor por defecto
+    // —no-responder@ más el dominio de la petición— no sirve si el sitio vive
+    // en un subdominio, por lo que se explica abajo.
     //
-    // 'remitente' TIENE que ser una dirección de tu propio dominio. Gmail y
-    // Outlook comprueban que quien firma el correo tenga permiso sobre el
-    // dominio del remitente; mandar desde un @gmail.com a través del servidor
-    // del hosting es exactamente el patrón de la suplantación, y acaba en spam.
+    // 'remitente' tiene que cumplir DOS cosas, y la segunda es la que se olvida:
     //
-    // Déjalo vacío y se usa no-responder@ + el dominio de la petición, que es
-    // lo correcto en la mayoría de los casos. No hace falta que ese buzón
-    // exista para enviar, pero créalo en cPanel si quieres leer las respuestas
-    // y los rebotes.
+    //   1. Ser una dirección de tu propio dominio. Gmail y Outlook comprueban
+    //      que quien firma el correo tenga permiso sobre el dominio del
+    //      remitente; mandar desde un @gmail.com a través del servidor del
+    //      hosting es el patrón de la suplantación, y acaba en spam.
+    //
+    //   2. Ser un buzón que EXISTA y pueda recibir correo. Los filtros de
+    //      salida hacen "callout verification": antes de aceptar tu mensaje se
+    //      conectan al servidor de correo del remitente para comprobar que esa
+    //      dirección es real. Si el dominio no tiene registro MX, o el buzón no
+    //      está creado, el correo se rechaza sin salir siquiera:
+    //
+    //          550 Verification failed for <no-responder@…>
+    //          550 Invalid sender
+    //
+    //      Aquí pasó exactamente eso. El subdominio wellnesshubmx.jpcorelab.com
+    //      no tiene MX, así que ninguna dirección suya supera el callout. Se
+    //      manda desde el dominio principal, que sí lo tiene, y con el buzón
+    //      creado en cPanel → Email Accounts.
+    //
+    // Ojo si alguna vez falla: el filtro CACHEA el resultado negativo. Después
+    // de crear un buzón que ya había fallado, sigue rechazando un buen rato.
+    // Por eso conviene probar con una dirección nueva en vez de insistir con la
+    // que ya está en la lista negra.
     'correo' => [
-        'remitente' => '',
+        'remitente' => 'no-responder@tudominio.com',
         'nombre'    => 'Rueda',
     ],
 
