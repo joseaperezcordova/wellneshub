@@ -6,8 +6,12 @@
 # 70 KB, es revisar una version vieja sin darse cuenta y decidir sobre ella. Asi
 # que el HTML no se cachea. Cuando el proyecto pase a produccion esto se cambia
 # por una politica normal con hash en los nombres de archivo.
+#
+# El .json entra en la misma regla: versiones.json alimenta el selector de
+# versiones del prototipo. Si se cachea, las versiones nuevas no aparecen en el
+# menu de las instantaneas ya publicadas y el histórico se queda mudo.
 <IfModule mod_headers.c>
-  <FilesMatch "\.html$">
+  <FilesMatch "\.(html|json)$">
     Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
     Header set Pragma "no-cache"
     Header set Expires "0"
@@ -17,4 +21,5 @@
 <IfModule mod_expires.c>
   ExpiresActive On
   ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType application/json "access plus 0 seconds"
 </IfModule>

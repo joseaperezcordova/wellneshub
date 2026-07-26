@@ -35,6 +35,47 @@ Se ocultan en las vistas privadas (`admin`, `panel-organizador`): buscar eventos
 ahí no significa nada, y sobre el fondo oscuro del admin la barra clara rompe la
 lectura.
 
+## Histórico de versiones de v3
+
+v3 lleva un selector de versiones abajo a la derecha: un desplegable que salta
+entre el estado actual y cada versión congelada. Sirve para comparar decisiones
+de diseño sin tener que abrir git.
+
+```
+prototipos/v3-final/
+├── index.html            La versión viva. Aquí se itera.
+├── versiones.json        La lista que alimenta el desplegable
+└── versiones/
+    ├── v1.html           Instantáneas congeladas, byte a byte
+    └── v2.html
+```
+
+Las instantáneas **no se reescriben nunca**. El desplegable no lleva la lista
+dentro: la pide a `versiones.json` al cargar, así que una instantánea publicada
+hace meses muestra igualmente las versiones nuevas. Lo congelado es el diseño,
+no el menú.
+
+El selector va deliberadamente en gris pizarra, fuera de la paleta, para que no
+se confunda con un control del propio prototipo.
+
+### Crear una versión
+
+```powershell
+# 1. Cambias el diseño en prototipos/v3-final/index.html
+# 2. Lo commiteas
+# 3. Congelas ese estado como versión
+.\scripts\nueva-version.ps1 "Título corto de lo que cambió"
+# 4. Commiteas la versión nueva
+```
+
+El orden importa: el script guarda el hash de `HEAD`, así que ejecutarlo
+**después** de commitear es lo que hace que la versión quede etiquetada con el
+commit que produjo ese diseño. Al revés apuntaría al commit anterior.
+
+No toda modificación merece versión. Un ajuste de caché o un arreglo de una
+errata no son estados de diseño que valga la pena comparar; el histórico pierde
+utilidad si se llena de entradas que nadie va a abrir.
+
 ## Ver los prototipos
 
 - **En local (XAMPP):** con Apache arrancado, <http://localhost/wellneshub/>.
