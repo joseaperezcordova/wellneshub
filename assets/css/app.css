@@ -147,6 +147,34 @@ input,select{font-family:inherit; font-size:14px;}
 .auth-pie a{color:var(--verde); border-bottom:1px solid var(--verde);}
 .auth-pie a:hover{color:var(--terracota-texto); border-bottom-color:var(--terracota-texto);}
 
+/* ------------------------------------------------- paso del código ------- */
+/* El correo al que se mandó, en firme y con salida. Enseñarlo evita el "¿a cuál
+   lo mandé?" cuando alguien tiene tres cuentas, y el enlace corrige la errata
+   sin obligar a empezar de cero. */
+.correo-fijo{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  border:1px solid var(--linea); background:var(--arena-suave);
+  border-radius:9px; padding:11px 13px; margin-bottom:16px; font-size:14px;
+}
+.correo-fijo span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.correo-fijo a{color:var(--verde); font-weight:600; font-size:13.5px; flex-shrink:0;}
+.correo-fijo a:hover{color:var(--terracota-texto);}
+
+/* Seis cifras separadas y en monoespaciada: así se comparan de un vistazo con
+   las del correo, que es justo lo que hace la gente mientras las teclea. */
+.campo input.codigo{
+  font-family:'IBM Plex Mono',monospace; font-size:26px; letter-spacing:.34em;
+  text-align:center; padding:14px 13px;
+}
+.campo input.codigo::placeholder{letter-spacing:.24em; opacity:.35;}
+
+.reenviar-form{text-align:center; margin-top:14px;}
+.enlace-boton{
+  background:none; border:none; padding:4px; font-size:13.5px; font-weight:600;
+  color:var(--verde); text-decoration:underline; text-underline-offset:3px;
+}
+.enlace-boton:hover{color:var(--terracota-texto);}
+
 /* ------------------------------------------------------------- avisos ---- */
 .aviso{
   border-radius:10px; padding:12px 15px; font-size:13.5px; margin-bottom:20px;

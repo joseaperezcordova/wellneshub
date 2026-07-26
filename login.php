@@ -3,11 +3,12 @@ declare(strict_types=1);
 require __DIR__ . '/includes/config.php';
 require __DIR__ . '/includes/google.php';
 
-// Quien ya entró no tiene nada que hacer aquí.
 if (haySesion()) redirigir('/');
 
 $error = '';
-$email = '';
+
+// Si venía de escribir el correo y volvió con «Editar», que lo encuentre puesto.
+$email = (string) ($_SESSION['codigo_email'] ?? '');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = (string) ($_POST['email'] ?? '');
@@ -15,12 +16,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValido($_POST['csrf'] ?? null)) {
         $error = 'La sesión caducó. Vuelve a intentarlo.';
     } else {
-        [$ok, $resultado] = autenticar($email, (string) ($_POST['password'] ?? ''));
+        $normalizado    = mb_strtolower(trim($email));
+        [$ok, $mensaje] = solicitarCodigo($email);
+
         if ($ok) {
-            iniciarSesion((int) $resultado);
-            redirigir('/');
+            $_SESSION['codigo_email'] = $normalizado;
+            redirigir('/codigo.php');
         }
-        $error = $resultado;
+
+        // Si ya se había mandado un código a este mismo correo, el fallo es
+        // "espera un minuto", no "no se pudo". Dejarlo aquí sería un callejón
+        // sin salida: el código está en su buzón y esta pantalla no tiene dónde
+        // escribirlo. Se le manda al paso siguiente con el aviso.
+        if (($_SESSION['codigo_email'] ?? '') === $normalizado) {
+            $_SESSION['codigo_error'] = $mensaje;
+            redirigir('/codigo.php');
+        }
+
+        $error = $mensaje;
     }
 }
 
@@ -46,8 +59,8 @@ require __DIR__ . '/includes/layout.php';
 ?>
 
 <div class="auth-caja">
-  <h1>Entrar</h1>
-  <p class="sub">Accede para guardar eventos y publicar los tuyos.</p>
+  <h1>Entrar o crear cuenta</h1>
+  <p class="sub">Sin contraseñas: te mandamos un código al correo. Si es tu primera vez, la cuenta se crea sola.</p>
 
   <?php if ($error): ?>
     <div class="aviso aviso-error"><?= e($error) ?></div>
@@ -71,21 +84,12 @@ require __DIR__ . '/includes/layout.php';
 
     <div class="campo">
       <label for="email">Correo</label>
-      <input id="email" name="email" type="email" autocomplete="email" required
+      <input id="email" name="email" type="email" autocomplete="email" required autofocus
              value="<?= e($email) ?>" placeholder="tucorreo@ejemplo.com">
     </div>
 
-    <div class="campo">
-      <label for="password">Contraseña</label>
-      <input id="password" name="password" type="password" autocomplete="current-password" required>
-    </div>
-
-    <button class="btn-principal" type="submit">Entrar</button>
+    <button class="btn-principal" type="submit">Continuar</button>
   </form>
-
-  <div class="auth-pie">
-    ¿No tienes cuenta? <a href="<?= URL_BASE ?>/registro.php">Regístrate</a>
-  </div>
 </div>
 
 <?php pie(); ?>

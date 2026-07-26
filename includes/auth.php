@@ -1,13 +1,25 @@
 <?php
 /**
- * Sesión de usuario, registro, login con contraseña, CSRF y freno de fuerza
- * bruta.
+ * Sesión de usuario, acceso por código de un solo uso, alta por Google y CSRF.
+ *
+ * Aquí no hay contraseñas. Se entra de dos maneras y ninguna las necesita:
+ *
+ *   · con Google, que ya sabe quién eres;
+ *   · pidiendo un código de seis cifras al correo, que demuestra lo mismo que
+ *     demostraría una contraseña —control del buzón— sin obligar a nadie a
+ *     inventarse una, ni a nosotros a custodiarla.
+ *
+ * La consecuencia práctica es que no hay "registro" separado. La primera vez
+ * que alguien entra con un correo desconocido, la cuenta se crea sola.
  */
 
 declare(strict_types=1);
 
-const LOGIN_MAX_INTENTOS = 5;   // fallos permitidos…
-const LOGIN_VENTANA_MIN  = 15;  // …dentro de esta ventana, en minutos
+const CODIGO_VIGENCIA_MIN = 15;  // minutos que vale un código
+const CODIGO_MAX_INTENTOS = 5;   // fallos sobre un mismo código antes de anularlo
+const CODIGO_ESPERA_SEG   = 60;  // entre dos envíos al mismo correo
+const CODIGO_MAX_POR_HORA = 5;   // envíos por correo y hora
+const CODIGO_MAX_IP_HORA  = 15;  // envíos por IP y hora, sea cual sea el correo
 
 
 // ---------------------------------------------------------------- sesión ----
@@ -49,6 +61,9 @@ function iniciarSesion(int $usuarioId): void
     // sesión: si alguien plantó un id de sesión antes del login, deja de servir.
     session_regenerate_id(true);
     $_SESSION['uid'] = $usuarioId;
+
+    // Rastros del flujo del código: ya no hacen falta y no deben sobrevivir.
+    unset($_SESSION['codigo_email'], $_SESSION['codigo_error'], $_SESSION['codigo_aviso']);
 
     db()->prepare('UPDATE usuarios SET ultimo_acceso_en = NOW() WHERE id = ?')
         ->execute([$usuarioId]);
@@ -93,42 +108,13 @@ function csrfValido(?string $enviado): bool
 }
 
 
-// ------------------------------------------------- freno de fuerza bruta ----
+// -------------------------------------------------------------- usuarios ----
 
 function ipBinaria(): string
 {
     $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     return inet_pton($ip) ?: inet_pton('0.0.0.0');
 }
-
-function registrarIntento(string $email, bool $exito): void
-{
-    db()->prepare('INSERT INTO intentos_login (email, ip, exito) VALUES (?, ?, ?)')
-        ->execute([mb_strtolower($email), ipBinaria(), $exito ? 1 : 0]);
-}
-
-/** ¿Está frenado este correo o esta IP ahora mismo? */
-function loginBloqueado(string $email): bool
-{
-    $st = db()->prepare(
-        'SELECT COUNT(*) FROM intentos_login
-          WHERE exito = 0
-            AND creado_en > DATE_SUB(NOW(), INTERVAL ? MINUTE)
-            AND (email = ? OR ip = ?)'
-    );
-    $st->execute([LOGIN_VENTANA_MIN, mb_strtolower($email), ipBinaria()]);
-
-    return (int) $st->fetchColumn() >= LOGIN_MAX_INTENTOS;
-}
-
-function limpiarIntentos(string $email): void
-{
-    db()->prepare('DELETE FROM intentos_login WHERE email = ? OR ip = ?')
-        ->execute([mb_strtolower($email), ipBinaria()]);
-}
-
-
-// -------------------------------------------------------------- usuarios ----
 
 function buscarUsuarioPorEmail(string $email): ?array
 {
@@ -138,89 +124,216 @@ function buscarUsuarioPorEmail(string $email): ?array
 }
 
 /**
- * Alta con contraseña.
+ * Un nombre presentable a partir del correo: ana.perez@… -> "Ana Perez".
  *
- * @return array{0:bool,1:string} [ok, mensaje o id como texto]
+ * Nadie escribe su nombre en este flujo —el formulario es solo el correo—, y
+ * "Sin nombre" en la cabecera de tu propia cuenta se lee como un error de la
+ * página. Esto acierta lo bastante a menudo, y quien no se reconozca podrá
+ * cambiarlo cuando haya perfil editable.
  */
-function registrarUsuario(string $nombre, string $email, string $password): array
+function nombreDesdeCorreo(string $email): string
 {
-    $nombre = trim($nombre);
-    $email  = mb_strtolower(trim($email));
+    $local  = explode('@', $email)[0];
+    $nombre = trim(mb_convert_case(
+        str_replace(['.', '_', '-', '+'], ' ', $local),
+        MB_CASE_TITLE,
+        'UTF-8'
+    ));
 
-    if (mb_strlen($nombre) < 2)                      return [false, 'Escribe tu nombre.'];
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL))  return [false, 'Ese correo no tiene buena pinta.'];
-    if (mb_strlen($password) < 8)                    return [false, 'La contraseña necesita al menos 8 caracteres.'];
+    return $nombre !== '' ? mb_substr($nombre, 0, 120) : 'Sin nombre';
+}
 
-    $existente = buscarUsuarioPorEmail($email);
+/**
+ * Encuentra la cuenta de ese correo o la crea.
+ *
+ * Solo se llama después de comprobar un código, así que llegar aquí ya prueba
+ * que quien lo pide abre ese buzón. Por eso el correo se da por verificado.
+ *
+ * @return array{0:bool,1:string} [ok, id como texto o mensaje de error]
+ */
+function buscarOCrearUsuario(string $email): array
+{
+    $email = mb_strtolower(trim($email));
+    $u     = buscarUsuarioPorEmail($email);
 
-    if ($existente) {
-        // Cuenta creada con Google que ahora quiere contraseña: en vez de
-        // rechazarla, se le añade la contraseña a la cuenta que ya tiene. Si no,
-        // quedaría atrapada sin poder registrarse ni recuperar nada.
-        if ($existente['password_hash'] === null) {
-            db()->prepare('UPDATE usuarios SET password_hash = ? WHERE id = ?')
-                ->execute([password_hash($password, PASSWORD_DEFAULT), $existente['id']]);
-            return [true, (string) $existente['id']];
+    if ($u) {
+        if ($u['estado'] !== 'activo') {
+            return [false, 'Esta cuenta está suspendida.'];
         }
-        return [false, 'Ya hay una cuenta con ese correo. Inicia sesión.'];
+
+        // Cuenta que venía de Google sin verificar, o de antes de esto.
+        if (empty($u['email_verificado_en'])) {
+            db()->prepare('UPDATE usuarios SET email_verificado_en = NOW() WHERE id = ?')
+                ->execute([$u['id']]);
+        }
+
+        return [true, (string) $u['id']];
     }
 
     $st = db()->prepare(
-        'INSERT INTO usuarios (nombre, email, password_hash) VALUES (?, ?, ?)'
+        'INSERT INTO usuarios (nombre, email, email_verificado_en) VALUES (?, ?, NOW())'
     );
-    $st->execute([$nombre, $email, password_hash($password, PASSWORD_DEFAULT)]);
+    $st->execute([nombreDesdeCorreo($email), $email]);
 
     return [true, (string) db()->lastInsertId()];
 }
 
+
+// ------------------------------------------------- códigos de un solo uso ----
+
 /**
- * Login con correo y contraseña.
+ * Borra códigos caducados de vez en cuando.
  *
- * @return array{0:bool,1:string} [ok, mensaje o id como texto]
+ * Uno de cada cincuenta accesos hace la limpieza. No hay cron en este hosting y
+ * la tabla crece sola; borrar en cada petición sería una escritura de más el
+ * 100% de las veces para conseguir exactamente lo mismo.
  */
-function autenticar(string $email, string $password): array
+function purgarCodigosViejos(): void
+{
+    if (random_int(1, 50) !== 1) return;
+
+    db()->prepare('DELETE FROM codigos_acceso WHERE expira_en < DATE_SUB(NOW(), INTERVAL 1 DAY)')
+        ->execute();
+}
+
+/**
+ * Genera un código, lo guarda y lo manda por correo.
+ *
+ * @return array{0:bool,1:string} [ok, mensaje para enseñar]
+ */
+function solicitarCodigo(string $email): array
 {
     $email = mb_strtolower(trim($email));
 
-    if (loginBloqueado($email)) {
-        return [false, 'Demasiados intentos fallidos. Espera ' . LOGIN_VENTANA_MIN . ' minutos.'];
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 190) {
+        return [false, 'Ese correo no tiene buena pinta. Revísalo.'];
     }
 
-    $u = buscarUsuarioPorEmail($email);
+    $pdo = db();
+    purgarCodigosViejos();
 
-    // Cuenta que solo existe vía Google: decírselo es más útil que un "datos
-    // incorrectos" que le haría probar contraseñas que nunca existieron. No
-    // revela nada que Google no confirme ya en su propia pantalla.
-    if ($u && $u['password_hash'] === null) {
-        return [false, 'Esta cuenta se creó con Google. Entra con el botón de Google.'];
+    // Freno por correo. Las dos cuentas salen del reloj de MySQL y no del de
+    // PHP: si las zonas horarias de los dos no coinciden —y en hosting
+    // compartido pasa— comparar fechas entre ambos da resultados absurdos.
+    $espera = CODIGO_ESPERA_SEG;
+    $st = $pdo->prepare(
+        "SELECT COUNT(*) AS total,
+                COALESCE(SUM(creado_en > DATE_SUB(NOW(), INTERVAL $espera SECOND)), 0) AS recientes
+           FROM codigos_acceso
+          WHERE email = ? AND creado_en > DATE_SUB(NOW(), INTERVAL 1 HOUR)"
+    );
+    $st->execute([$email]);
+    $porCorreo = $st->fetch();
+
+    if ((int) $porCorreo['recientes'] > 0) {
+        return [false, 'Acabamos de enviarte uno. Espera un minuto antes de pedir otro.'];
+    }
+    if ((int) $porCorreo['total'] >= CODIGO_MAX_POR_HORA) {
+        return [false, 'Has pedido demasiados códigos. Prueba dentro de un rato o entra con Google.'];
     }
 
-    if (!$u || !password_verify($password, $u['password_hash'])) {
-        registrarIntento($email, false);
-        // Mismo mensaje exista o no el correo: distinguirlos convierte el
-        // formulario en un comprobador de qué correos están registrados.
-        return [false, 'Correo o contraseña incorrectos.'];
+    // Freno por IP: sin esto, el de arriba se esquiva pidiendo códigos a mil
+    // correos distintos, que es como se usa un formulario así para inundar de
+    // mensajes buzones ajenos con nuestro dominio en el remitente.
+    $st = $pdo->prepare(
+        'SELECT COUNT(*) FROM codigos_acceso
+          WHERE ip = ? AND creado_en > DATE_SUB(NOW(), INTERVAL 1 HOUR)'
+    );
+    $st->execute([ipBinaria()]);
+
+    if ((int) $st->fetchColumn() >= CODIGO_MAX_IP_HORA) {
+        return [false, 'Demasiadas peticiones desde esta conexión. Prueba más tarde.'];
     }
 
-    if ($u['estado'] !== 'activo') {
-        return [false, 'Esta cuenta está suspendida.'];
+    // Un código vivo por correo: al pedir uno nuevo, el anterior deja de valer.
+    // Si no, quien pide tres seguidos tiene tres códigos buenos a la vez y
+    // acaba probando el del primer correo, que es el que tiene más a mano.
+    $pdo->prepare('UPDATE codigos_acceso SET usado_en = NOW() WHERE email = ? AND usado_en IS NULL')
+        ->execute([$email]);
+
+    // random_int y no rand(): este número es la credencial entera.
+    $codigo   = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    $vigencia = CODIGO_VIGENCIA_MIN;
+
+    $pdo->prepare(
+        "INSERT INTO codigos_acceso (email, codigo_hash, expira_en, ip)
+         VALUES (?, ?, DATE_ADD(NOW(), INTERVAL $vigencia MINUTE), ?)"
+    )->execute([$email, password_hash($codigo, PASSWORD_DEFAULT), ipBinaria()]);
+
+    $id = (int) $pdo->lastInsertId();
+
+    if (!enviarCodigoAcceso($email, $codigo, CODIGO_VIGENCIA_MIN)) {
+        // El envío falló, así que este código no existe para nadie. Se borra
+        // para que no cuente contra el límite por hora: si no, un problema del
+        // servidor de correo dejaría a la persona sin poder reintentar.
+        $pdo->prepare('DELETE FROM codigos_acceso WHERE id = ?')->execute([$id]);
+        return [false, 'No pudimos enviar el correo. Inténtalo otra vez o entra con Google.'];
     }
 
-    // Rehash si el coste por defecto de PHP subió desde que se creó la cuenta.
-    if (password_needs_rehash($u['password_hash'], PASSWORD_DEFAULT)) {
-        db()->prepare('UPDATE usuarios SET password_hash = ? WHERE id = ?')
-            ->execute([password_hash($password, PASSWORD_DEFAULT), $u['id']]);
-    }
-
-    limpiarIntentos($email);
-    return [true, (string) $u['id']];
+    return [true, 'Te enviamos un código a ' . $email];
 }
+
+/**
+ * Comprueba el código y devuelve el usuario, creándolo si es la primera vez.
+ *
+ * @return array{0:bool,1:string} [ok, id como texto o mensaje de error]
+ */
+function verificarCodigo(string $email, string $codigo): array
+{
+    $email = mb_strtolower(trim($email));
+
+    // Que se pueda pegar "123 456" o "123-456" tal como venga del correo.
+    $codigo = preg_replace('/\D+/', '', $codigo);
+
+    if (strlen((string) $codigo) !== 6) {
+        return [false, 'El código son seis cifras.'];
+    }
+
+    $pdo = db();
+
+    $st = $pdo->prepare(
+        'SELECT id, codigo_hash, intentos
+           FROM codigos_acceso
+          WHERE email = ? AND usado_en IS NULL AND expira_en > NOW()
+       ORDER BY id DESC LIMIT 1'
+    );
+    $st->execute([$email]);
+    $fila = $st->fetch();
+
+    if (!$fila) {
+        return [false, 'Ese código caducó o ya se usó. Pide uno nuevo.'];
+    }
+
+    if ((int) $fila['intentos'] >= CODIGO_MAX_INTENTOS) {
+        $pdo->prepare('UPDATE codigos_acceso SET usado_en = NOW() WHERE id = ?')->execute([$fila['id']]);
+        return [false, 'Demasiados intentos con ese código. Pide uno nuevo.'];
+    }
+
+    // El intento se cuenta ANTES de comprobar. Contarlo después deja la puerta
+    // abierta a quien corte la conexión al ver que falla: el contador nunca
+    // subiría y el millón de combinaciones estaría disponible entero.
+    $pdo->prepare('UPDATE codigos_acceso SET intentos = intentos + 1 WHERE id = ?')->execute([$fila['id']]);
+
+    if (!password_verify((string) $codigo, $fila['codigo_hash'])) {
+        $quedan = CODIGO_MAX_INTENTOS - ((int) $fila['intentos'] + 1);
+        return [false, $quedan > 0
+            ? "Código incorrecto. Te quedan $quedan intentos."
+            : 'Código incorrecto. Pide uno nuevo.'];
+    }
+
+    $pdo->prepare('UPDATE codigos_acceso SET usado_en = NOW() WHERE id = ?')->execute([$fila['id']]);
+
+    return buscarOCrearUsuario($email);
+}
+
+
+// ---------------------------------------------------------------- Google ----
 
 /**
  * Entrada por Google: encuentra la cuenta, la enlaza o la crea.
  *
  * @param array $perfil sub, email, email_verified, name, picture
- * @return array{0:bool,1:string} [ok, mensaje o id como texto]
+ * @return array{0:bool,1:string} [ok, id como texto o mensaje de error]
  */
 function entrarConGoogle(array $perfil): array
 {
@@ -247,16 +360,17 @@ function entrarConGoogle(array $perfil): array
         return [true, (string) $u['id']];
     }
 
-    // 2. Primera vez con Google, pero quizá ya existe una cuenta con ese correo.
+    // 2. Primera vez con Google, pero quizá ya existe la cuenta —creada al
+    //    entrar con un código a ese mismo correo.
     //
     //    Solo se enlazan si Google confirma que el correo está verificado. Sin
     //    esa comprobación, cualquiera que cree una cuenta de Google con el
     //    correo de otra persona se quedaría con su cuenta de aquí.
-    $existente = buscarUsuarioPorEmail($email);
+    $existente  = buscarUsuarioPorEmail($email);
     $verificado = !empty($perfil['email_verified']);
 
     if ($existente && !$verificado) {
-        return [false, 'Ese correo ya está registrado. Entra con tu contraseña.'];
+        return [false, 'Ese correo ya está registrado. Entra pidiendo un código.'];
     }
 
     $pdo->beginTransaction();
@@ -274,13 +388,11 @@ function entrarConGoogle(array $perfil): array
             )->execute([$perfil['picture'] ?? null, $usuarioId]);
         } else {
             // Sin el permiso 'profile' Google no manda nombre (ver googleScope()
-            // en google.php y por qué está desactivado). Se deriva del correo:
-            // "ana.perez@gmail.com" -> "Ana Perez". Mejor eso que "Sin nombre",
-            // y la persona podrá cambiarlo cuando haya perfil editable.
+            // en google.php y por qué está desactivado): se deriva del correo,
+            // igual que en el acceso por código.
             $nombre = trim((string) ($perfil['name'] ?? ''));
             if ($nombre === '') {
-                $local  = explode('@', $email)[0];
-                $nombre = mb_convert_case(str_replace(['.', '_', '-'], ' ', $local), MB_CASE_TITLE, 'UTF-8');
+                $nombre = nombreDesdeCorreo($email);
             }
 
             $pdo->prepare(

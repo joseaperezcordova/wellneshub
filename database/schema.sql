@@ -12,15 +12,19 @@
 --  Este archivo es idempotente: puedes volver a ejecutarlo sin romper nada.
 --  No incluye CREATE DATABASE a propósito — en hosting compartido la base la
 --  crea el panel con un prefijo de cuenta y el nombre no se puede adivinar.
+--
+--  ¿YA TENÍAS LA VERSIÓN ANTERIOR, la de contraseñas? Entonces no es este el
+--  archivo que buscas: ejecuta migracion-01-codigos-por-correo.sql.
 -- ============================================================================
 
 
 -- ----------------------------------------------------------------------------
 --  usuarios
 --
---  password_hash admite NULL a propósito: quien entra con Google nunca elige
---  contraseña, y guardar una cadena vacía o inventada obligaría a distinguir
---  "sin contraseña" de "contraseña rara" en cada consulta.
+--  No hay columna de contraseña, y no es un olvido. Aquí se entra de dos
+--  maneras y ninguna la necesita: con Google, o pidiendo un código de un solo
+--  uso al correo. Una contraseña que nadie usa es solo una cosa más que se
+--  puede filtrar, reutilizar entre sitios y perder.
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS usuarios (
   id                  INT UNSIGNED     NOT NULL AUTO_INCREMENT,
@@ -32,7 +36,6 @@ CREATE TABLE IF NOT EXISTS usuarios (
   email               VARCHAR(190)     NOT NULL,
   email_verificado_en DATETIME         NULL DEFAULT NULL,
 
-  password_hash       VARCHAR(255)     NULL DEFAULT NULL,
   avatar_url          VARCHAR(500)     NULL DEFAULT NULL,
 
   rol                 ENUM('visitante','organizador','admin')
@@ -56,9 +59,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
 --
 --  Tabla aparte en vez de una columna google_id en usuarios. Dos razones:
 --
---    · Una persona puede tener contraseña Y Google sobre la misma cuenta. Con
---      una columna suelta eso se puede modelar, pero añadir Apple o Facebook
---      más adelante obliga a otra columna, y otra, y otra.
+--    · Una persona puede entrar hoy con Google y mañana con un código al mismo
+--      correo, sobre la misma cuenta. Con una columna suelta eso se modela,
+--      pero añadir Apple o Facebook más adelante obliga a otra columna, y otra.
 --    · El identificador de Google que se guarda es "sub", no el correo. El
 --      correo de una cuenta de Google puede cambiar; "sub" no cambia nunca.
 --      Emparejar por correo es lo que permite que alguien secuestre una cuenta
@@ -84,38 +87,47 @@ CREATE TABLE IF NOT EXISTS identidades_oauth (
 
 
 -- ----------------------------------------------------------------------------
---  intentos_login
+--  codigos_acceso
 --
---  Un formulario de login sin freno se prueba a miles de contraseñas por
---  minuto. Se registra cada intento fallido por correo y por IP, y el login se
---  bloquea temporalmente al pasar del umbral.
+--  Los códigos de un solo uso que se mandan por correo.
 --
---  Se guarda también la IP porque frenar solo por correo permite atacar muchas
---  cuentas distintas desde un mismo sitio, y frenar solo por IP deja pasar los
---  ataques repartidos entre varias.
+--  El código NO se guarda en claro, se guarda su hash. Quien lea la base —una
+--  copia de seguridad mal guardada, un backup en el escritorio de alguien— no
+--  puede usar los códigos que estén vivos en ese momento.
+--
+--  "intentos" se cuenta por código y no por cuenta a propósito. Contar por
+--  cuenta deja que cualquiera bloquee el acceso de otra persona pidiendo su
+--  correo y fallando cinco veces. Contando por código, el atacante solo quema
+--  el código que él mismo pidió.
 -- ----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS intentos_login (
-  id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  email      VARCHAR(190)    NOT NULL,
-  ip         VARBINARY(16)   NOT NULL COMMENT 'inet6_pton / inet_pton: vale para IPv4 e IPv6',
-  exito      TINYINT(1)      NOT NULL DEFAULT 0,
-  creado_en  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE IF NOT EXISTS codigos_acceso (
+  id           BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  email        VARCHAR(190)     NOT NULL,
+  codigo_hash  VARCHAR(255)     NOT NULL,
+
+  intentos     TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  expira_en    DATETIME         NOT NULL,
+  usado_en     DATETIME         NULL DEFAULT NULL,
+
+  ip           VARBINARY(16)    NOT NULL COMMENT 'inet_pton: vale para IPv4 e IPv6',
+  creado_en    DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   PRIMARY KEY (id),
-  KEY idx_intentos_email_fecha (email, creado_en),
-  KEY idx_intentos_ip_fecha (ip, creado_en)
+  KEY idx_codigos_email (email, creado_en),
+  KEY idx_codigos_ip (ip, creado_en),
+  KEY idx_codigos_expira (expira_en)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 -- ============================================================================
---  DESPUÉS DE REGISTRARTE: date permisos de administrador
+--  DESPUÉS DE ENTRAR LA PRIMERA VEZ: date permisos de administrador
 --
---  No hay usuario administrador semilla en este archivo. Un usuario con
---  contraseña conocida y escrita en el repositorio es una puerta abierta desde
---  el minuto uno, y en un hosting compartido nadie se acuerda de cambiarla.
+--  No hay usuario administrador semilla en este archivo. Un administrador
+--  creado a ciegas desde el repositorio es una puerta abierta desde el minuto
+--  uno, y en un hosting compartido nadie se acuerda de cerrarla.
 --
---  El camino correcto: regístrate por la interfaz y luego ejecuta esto una vez,
---  con tu correo:
+--  El camino correcto: entra por la interfaz —con Google o con un código— y
+--  luego ejecuta esto una vez, con tu correo:
 --
 --      UPDATE usuarios SET rol = 'admin' WHERE email = 'tucorreo@ejemplo.com';
 -- ============================================================================

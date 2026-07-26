@@ -1,0 +1,127 @@
+<?php
+/**
+ * Envío de correo con mail().
+ *
+ * Sin librería y sin SMTP autenticado: el hosting no tiene SSH para instalar
+ * nada, y cPanel ya trae un MTA local que mail() usa directamente. Para un
+ * código de acceso cada pocos minutos sobra.
+ *
+ * El día que esto se quede corto —cuando haya avisos a organizadores, boletines
+ * o cualquier cosa con volumen— el cambio es meter un proveedor de envío
+ * (Postmark, Resend, Brevo) por HTTPS. Toda la aplicación manda correo por las
+ * funciones de este archivo, así que ese cambio se hace aquí y en ningún otro
+ * sitio.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Dirección y nombre desde los que se manda.
+ *
+ * Tiene que ser una dirección DEL PROPIO DOMINIO. Gmail y Outlook comprueban
+ * que quien firma el correo tenga permiso sobre el dominio del remitente
+ * (SPF/DKIM); mandar desde un @gmail.com a través del servidor del hosting es
+ * exactamente el patrón de la suplantación, y acaba en spam o rechazado.
+ *
+ * @return array{0:string,1:string} [dirección, nombre]
+ */
+function correoRemitente(): array
+{
+    global $CONFIG;
+
+    $host      = parse_url(URL_BASE, PHP_URL_HOST) ?: 'localhost';
+    $direccion = trim((string) ($CONFIG['correo']['remitente'] ?? ''));
+    $nombre    = trim((string) ($CONFIG['correo']['nombre'] ?? ''));
+
+    return [
+        $direccion !== '' ? $direccion : 'no-responder@' . $host,
+        $nombre    !== '' ? $nombre    : 'Rueda',
+    ];
+}
+
+/**
+ * Envía un correo de texto plano.
+ *
+ * De texto plano y no HTML a propósito: un correo con maquetación pesa más,
+ * pasa peor los filtros y aquí no aporta nada — el contenido es un número de
+ * seis cifras.
+ *
+ * Ojo con lo que significa "true": mail() solo confirma que el servidor de
+ * correo local aceptó el mensaje. No dice que llegara, ni que no acabara en
+ * spam. Eso solo se comprueba mirando el buzón.
+ */
+function enviarCorreo(string $para, string $asunto, string $cuerpo): bool
+{
+    global $CONFIG;
+
+    [$de, $nombreDe] = correoRemitente();
+
+    // En local no hay MTA: XAMPP en Windows no manda nada y mail() devolvería
+    // false sin más. En vez de dejar el desarrollo bloqueado, el mensaje entero
+    // va al log de errores de PHP, así que el código se lee ahí y el flujo se
+    // puede probar de principio a fin sin servidor de correo.
+    if (!empty($CONFIG['es_local'])) {
+        error_log("=== CORREO (no enviado, entorno local) ===\nPara: $para\nAsunto: $asunto\n\n$cuerpo\n===");
+        return true;
+    }
+
+    // El asunto lleva acentos y el estándar de cabeceras solo admite ASCII.
+    $asuntoCodificado = mb_encode_mimeheader($asunto, 'UTF-8', 'B', "\r\n");
+
+    // El nombre del remitente va por el mismo camino: "Código" sin codificar
+    // llega como texto roto en algunos clientes.
+    $nombreCodificado = mb_encode_mimeheader($nombreDe, 'UTF-8', 'B', "\r\n");
+
+    $cabeceras = implode("\r\n", [
+        'From: ' . $nombreCodificado . ' <' . $de . '>',
+        'Reply-To: ' . $de,
+        'MIME-Version: 1.0',
+        'Content-Type: text/plain; charset=UTF-8',
+        'Content-Transfer-Encoding: 8bit',
+
+        // Que ningún filtro de vacaciones ni autorespondedor conteste a esto.
+        'Auto-Submitted: auto-generated',
+        'X-Auto-Response-Suppress: All',
+    ]);
+
+    // El quinto parámetro fija el remitente del sobre (el "return-path"). Sin
+    // él, el MTA de cPanel manda desde el usuario de la cuenta —algo como
+    // jpcorela@servidor.hostname.com— que no coincide con el From y hace
+    // saltar las comprobaciones de alineación de SPF.
+    $ok = @mail($para, $asuntoCodificado, $cuerpo, $cabeceras, '-f' . $de);
+
+    if (!$ok) {
+        error_log("mail() rechazó el envío a $para (asunto: $asunto)");
+    }
+
+    return $ok;
+}
+
+/**
+ * El correo con el código de un solo uso.
+ *
+ * El código va también en el asunto para que se lea en la notificación del
+ * móvil sin abrir nada. Es deliberado: quien ve el mensaje ya lo tiene, y quien
+ * no tiene acceso al buzón no ve ni la notificación.
+ */
+function enviarCodigoAcceso(string $para, string $codigo, int $minutos): bool
+{
+    $asunto = $codigo . ' es tu código para entrar en Rueda';
+
+    $cuerpo = <<<TEXTO
+Tu código para entrar en Rueda es:
+
+    $codigo
+
+Caduca en $minutos minutos y sirve una sola vez.
+
+Si no has pedido este código, no hagas nada: sin él nadie entra, y el
+código deja de valer solo. Nadie de Rueda te lo va a pedir por teléfono,
+por WhatsApp ni por correo.
+
+--
+Rueda · Directorio de eventos wellness en México
+TEXTO;
+
+    return enviarCorreo($para, $asunto, $cuerpo);
+}

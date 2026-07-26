@@ -40,6 +40,23 @@ return [
     // Cloud Console o el login con Google falla con redirect_uri_mismatch.
     'url_base' => '',
 
+    // ---- Correo saliente --------------------------------------------------
+    // Desde aquí salen los códigos de acceso.
+    //
+    // 'remitente' TIENE que ser una dirección de tu propio dominio. Gmail y
+    // Outlook comprueban que quien firma el correo tenga permiso sobre el
+    // dominio del remitente; mandar desde un @gmail.com a través del servidor
+    // del hosting es exactamente el patrón de la suplantación, y acaba en spam.
+    //
+    // Déjalo vacío y se usa no-responder@ + el dominio de la petición, que es
+    // lo correcto en la mayoría de los casos. No hace falta que ese buzón
+    // exista para enviar, pero créalo en cPanel si quieres leer las respuestas
+    // y los rebotes.
+    'correo' => [
+        'remitente' => '',
+        'nombre'    => 'Rueda',
+    ],
+
     // ---- Google OAuth -----------------------------------------------------
     // Se sacan de Google Cloud Console → APIs y servicios → Credenciales →
     // Crear credenciales → ID de cliente de OAuth → Aplicación web.

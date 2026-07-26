@@ -51,8 +51,8 @@ FTP para hacer tres peticiones HTTP no compensa.
 ```
 /
 ├── index.php              Portada (por ahora, banco de pruebas de la sesión)
-├── login.php              Entrar: Google + correo y contraseña
-├── registro.php           Crear cuenta
+├── login.php              Paso 1: Google, o escribir el correo
+├── codigo.php             Paso 2: el código de seis cifras que llegó al correo
 ├── logout.php
 ├── google-redirect.php    Manda a Google
 ├── google-callback.php    Vuelta de Google  ← esta es la URI a registrar
@@ -63,12 +63,28 @@ FTP para hacer tres peticiones HTTP no compensa.
 │   ├── config.local.php       Credenciales · NO está en git · se crea a mano
 │   ├── config.local.example.php
 │   ├── db.php                 PDO
-│   ├── auth.php               Sesión, registro, login, CSRF, freno de fuerza bruta
+│   ├── auth.php               Sesión, códigos de acceso, alta por Google, CSRF
+│   ├── correo.php             Envío con mail()
 │   ├── google.php             OAuth 2.0 a mano
 │   └── layout.php             Cabecera con el acceso a la cuenta, y pie
-├── database/schema.sql
+├── database/
+│   ├── schema.sql                            Instalación desde cero
+│   └── migracion-01-codigos-por-correo.sql   Para una base que ya existía
 └── prototipos/            Los prototipos, con su propio índice en index.html
 ```
+
+### Cómo se entra
+
+No hay contraseñas ni pantalla de registro. Dos caminos, y los dos crean la
+cuenta sola la primera vez:
+
+- **Google**, que ya sabe quién eres.
+- **Un código de seis cifras al correo**, que demuestra lo mismo que
+  demostraría una contraseña —control del buzón— sin obligar a nadie a
+  inventarse una ni a nosotros a custodiarla.
+
+El código vale 15 minutos, sirve una vez, admite cinco intentos y se guarda
+hasheado. Pedir uno nuevo anula el anterior.
 
 > No puede haber un `index.html` en la raíz junto a `index.php`: el orden de
 > `DirectoryIndex` decide cuál gana y no es el mismo en todos los servidores.

@@ -1120,8 +1120,8 @@ $u = usuarioActual();
         <div class="eyebrow">Panel del organizador</div>
         <h2 style="margin-top:6px;">Entra para publicar</h2>
         <p>Publica y administra tus propios eventos — sin necesitar al equipo de Rueda.</p>
-        <a class="btn-primary" style="text-decoration:none;" href="<?= URL_BASE ?>/login.php">Iniciar sesión</a>
-        <div class="swap"><a href="<?= URL_BASE ?>/registro.php">¿Aún no tienes cuenta? Crea tu perfil →</a></div>
+        <a class="btn-primary" style="text-decoration:none;" href="<?= URL_BASE ?>/login.php">Entrar o crear cuenta</a>
+        <div class="swap">Con Google o con un código al correo. No hace falta contraseña.</div>
       </div>
     <?php else: ?>
 

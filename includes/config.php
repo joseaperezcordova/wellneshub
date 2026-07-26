@@ -111,6 +111,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/correo.php';
 require_once __DIR__ . '/auth.php';
 
 /** Escapa para HTML. Se usa en todas las plantillas, de ahí el nombre corto. */
