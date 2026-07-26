@@ -197,7 +197,7 @@ function captchaValido(array $post): array
         return [false, 'Confirma que no eres un robot. Si no ves la casilla, recarga la página.'];
     }
 
-    [$http, $cuerpo] = googleHttp(
+    [$http, $cuerpo] = peticionHttp(
         $p === 'turnstile' ? TURNSTILE_VERIFY : RECAPTCHA_VERIFY,
         [
             'secret'   => $CONFIG['captcha'][$p]['secret'],
