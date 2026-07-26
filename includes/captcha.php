@@ -29,14 +29,47 @@ const CAPTCHA_SEGUNDOS_MINIMOS = 3;
 const TURNSTILE_VERIFY  = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const RECAPTCHA_VERIFY  = 'https://www.google.com/recaptcha/api/siteverify';
 
+/**
+ * ¿Es esto una clave de verdad o el hueco de la plantilla sin rellenar?
+ *
+ * Existe por un tropiezo real: se copió el ejemplo de la documentación tal cual
+ * y quedó 'TU_CLAVE' en la configuración. Como no estaba vacía, el widget se
+ * pintaba, Cloudflare rechazaba la clave inventada y el formulario de reportes
+ * quedaba imposible de enviar para todo el mundo.
+ *
+ * Una clave a medio poner tiene que comportarse como una clave ausente, no como
+ * una rota: el formulario sigue defendido por la trampa y el reloj, y el aviso
+ * queda en el log para quien administre.
+ */
+function claveUtilizable(?string $valor): bool
+{
+    $valor = trim((string) $valor);
+
+    if ($valor === '') return false;
+
+    // Las claves de Turnstile y reCAPTCHA pasan de 30 caracteres con holgura.
+    // Cualquier cosa corta es un marcador de posición o una copia a medias.
+    if (strlen($valor) < 20) return false;
+
+    return !preg_match('/^(tu[_ -]|your[_ -]|cambia|pon[_ -]|xxx|clave|secreto)/i', $valor);
+}
+
 /** 'turnstile', 'recaptcha' o '' si no hay ninguno configurado. */
 function captchaProveedor(): string
 {
     global $CONFIG;
 
     foreach (['turnstile', 'recaptcha'] as $p) {
-        if (!empty($CONFIG['captcha'][$p]['site_key']) && !empty($CONFIG['captcha'][$p]['secret'])) {
+        $clave   = $CONFIG['captcha'][$p]['site_key'] ?? null;
+        $secreto = $CONFIG['captcha'][$p]['secret']   ?? null;
+
+        if (claveUtilizable($clave) && claveUtilizable($secreto)) {
             return $p;
+        }
+
+        // Puesto a medias: se ignora, pero que no pase en silencio.
+        if (trim((string) $clave) !== '' || trim((string) $secreto) !== '') {
+            error_log("Captcha $p configurado a medias o con un valor de ejemplo: se ignora.");
         }
     }
 
@@ -59,12 +92,26 @@ function captchaHtml(): string
 
     $clave = htmlspecialchars(captchaSiteKey(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
+    // Si el widget no llega a cargar, Cloudflare pinta un enlace «Troubleshoot»
+    // que a quien está delante no le dice nada. Este aviso sí: explica qué pasó
+    // y qué hacer, sin destapar nada de la configuración.
+    $fallo = '<div id="captchaFallo" class="captcha-fallo" hidden>'
+           . 'No se pudo cargar la comprobación de seguridad. Recarga la página; '
+           . 'si vuelve a pasar, avísanos y lo revisamos.'
+           . '</div>'
+           . '<script>function captchaError(){var a=document.getElementById("captchaFallo");'
+           . 'if(a)a.hidden=false;return true;}</script>';
+
     if ($p === 'turnstile') {
-        return '<div class="cf-turnstile" data-sitekey="' . $clave . '"></div>'
+        return '<div class="cf-turnstile" data-sitekey="' . $clave . '"'
+             . ' data-error-callback="captchaError" data-theme="light"></div>'
+             . $fallo
              . '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>';
     }
 
-    return '<div class="g-recaptcha" data-sitekey="' . $clave . '"></div>'
+    return '<div class="g-recaptcha" data-sitekey="' . $clave . '"'
+         . ' data-error-callback="captchaError"></div>'
+         . $fallo
          . '<script src="https://www.google.com/recaptcha/api.js" async defer></script>';
 }
 
@@ -139,7 +186,15 @@ function captchaValido(array $post): array
     $respuesta = (string) ($post[$campo] ?? '');
 
     if ($respuesta === '') {
-        return [false, 'Confirma que no eres un robot.'];
+        // Se corta aquí a propósito. Dejar pasar los envíos sin token haría que
+        // el captcha no sirviera de nada: a un bot le basta con no mandarlo.
+        //
+        // El otro caso —que el servicio no conteste— sí se deja pasar, más
+        // abajo. La diferencia es quién falla: ahí falla un tercero y se
+        // comprueba desde el servidor, donde nadie puede fingirlo; aquí falta
+        // algo que tenía que mandar el navegador, y eso sí se puede omitir a
+        // voluntad.
+        return [false, 'Confirma que no eres un robot. Si no ves la casilla, recarga la página.'];
     }
 
     [$http, $cuerpo] = googleHttp(

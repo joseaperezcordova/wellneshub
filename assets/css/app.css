@@ -341,6 +341,11 @@ input,select{font-family:inherit; font-size:14px;}
    al aria-hidden del contenedor. */
 .trampa{position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;}
 
+.captcha-fallo{
+  background:#FBEAE3; border:1px solid #E4B49C; color:#7C3A18;
+  border-radius:9px; padding:10px 13px; font-size:13px; margin-bottom:14px;
+}
+
 .motivos{display:flex; flex-direction:column; gap:2px;}
 
 /* Va escrito «.campo label.motivo» y no «.motivo» a secas por especificidad:
