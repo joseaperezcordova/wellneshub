@@ -111,24 +111,90 @@
   .view{display:none;}
   .view.active{display:block;}
 
-  /* ---------- hero / buscador ---------- */
-  .hero{background:var(--jungle-deep); color:var(--paper); padding:64px 0 84px; position:relative; overflow:hidden;}
-  .hero::before{content:"";position:absolute; inset:0; background:radial-gradient(circle at 82% 15%, rgba(199,110,67,0.18), transparent 55%);}
+  /* ---------- hero: banner ----------
+     El hero deja de ser una franja de color a sangre y pasa a ser una caja con
+     esquinas redondeadas y aire a los lados, con la pastilla de busqueda
+     montada sobre su borde inferior. Ese solape es lo que hace reconocible el
+     patron: sin el, es un banner cualquiera con un buscador debajo. */
+  .hero{padding:26px 0 0;}
   .hero-inner{position:relative; max-width:1180px; margin:0 auto; padding:0 28px;}
-  .hero .eyebrow{color:var(--terracota-palida);}
-  .hero h1{font-size:44px; max-width:640px; margin-top:10px; color:var(--paper);}
-  .hero h1 em{font-style:italic; color:var(--terracota-palida);}
-  .hero p.sub{max-width:520px; color:rgba(255,255,255,0.72); margin-top:14px; font-size:15.5px;}
-  @media(max-width:640px){.hero h1{font-size:32px;}}
 
-  .buscador{
-    margin-top:32px; background:var(--paper); border-radius:8px; padding:8px;
-    display:flex; gap:8px; max-width:640px; box-shadow:0 18px 40px rgba(47,78,93,0.30);
+  .hero-banner{
+    position:relative; border-radius:20px; overflow:hidden;
+    min-height:420px; display:flex; align-items:flex-end;
+    box-shadow:0 18px 44px rgba(47,78,93,0.22);
   }
-  .buscador input{flex:1; border:none; background:none; padding:12px 14px; color:var(--ink); font-size:14.5px;}
-  .buscador input:focus{outline:none;}
-  .buscador button{background:var(--marigold); color:var(--tinta-boton); border:none; font-weight:600; padding:0 22px; border-radius:5px; font-size:14px;}
+  @media(max-width:640px){ .hero-banner{min-height:360px; border-radius:14px;} }
+
+  /* Pseudo-imagen: la fotografia todavia no existe, asi que la escena se
+     compone con gradientes —cielo, sol, dos lineas de colinas—. Cuando haya
+     foto real basta con cambiar esto por un background-image: ni el titulo ni
+     el velo ni la pastilla se enteran. */
+  .hero-media{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 78% 26%, rgba(233,221,201,.95) 0 54px, rgba(233,221,201,0) 55px),
+      linear-gradient(178deg, #2F4E5D 0%, #3E6375 44%, #547B6A 72%, #496B52 100%);
+  }
+  .hero-media::before{
+    content:""; position:absolute; left:-8%; right:-8%; bottom:0; height:46%;
+    background:var(--verde); border-radius:50% 50% 0 0 / 26% 26% 0 0; opacity:.92;
+  }
+  .hero-media::after{
+    content:""; position:absolute; left:-14%; right:24%; bottom:0; height:32%;
+    background:var(--verde-claro); border-radius:50% 50% 0 0 / 34% 34% 0 0; opacity:.55;
+  }
+
+  /* Velo oscuro de abajo hacia arriba. No es decoracion: sin el, el titulo
+     blanco cae sobre el verde claro de las colinas y se queda en 2.6:1. */
+  .hero-scrim{
+    position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(21,33,40,.86) 0%, rgba(21,33,40,.58) 34%, rgba(21,33,40,.20) 72%, rgba(21,33,40,0) 100%);
+  }
+
+  .hero-content{position:relative; padding:40px 40px 64px; max-width:680px;}
+  @media(max-width:640px){ .hero-content{padding:26px 22px 46px;} }
+  .hero .eyebrow{color:var(--terracota-palida); opacity:1;}
+  .hero h1{font-size:44px; margin-top:10px; color:#fff; text-shadow:0 2px 18px rgba(21,33,40,.4);}
+  .hero h1 em{font-style:italic; color:var(--terracota-palida);}
+  .hero p.sub{max-width:520px; color:rgba(255,255,255,0.88); margin-top:12px; font-size:15.5px;}
+  @media(max-width:640px){.hero h1{font-size:30px;}}
+
+  /* Pastilla de busqueda segmentada: tres campos separados por linea fina y un
+     boton circular. Va fuera de .hero-banner —que recorta por overflow— y sube
+     con margin negativo para montarse encima. */
+  .buscador{
+    position:relative; z-index:2; margin:-34px auto 0; max-width:920px;
+    background:var(--paper); border:1px solid var(--line); border-radius:999px;
+    display:flex; align-items:center; padding:7px 7px 7px 10px;
+    box-shadow:0 14px 38px rgba(47,78,93,0.20);
+  }
+  .bcampo{flex:1 1 0; min-width:0; padding:8px 16px; border-radius:999px;}
+  .bcampo:hover{background:var(--arena-suave);}
+  .bcampo label{
+    display:block; font-family:'IBM Plex Mono',monospace; font-size:10px;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--jungle); margin-bottom:2px;
+  }
+  .bcampo input, .bcampo select{
+    width:100%; border:none; background:none; padding:0; font-size:14px; color:var(--ink);
+  }
+  .bcampo input:focus, .bcampo select:focus{outline:none;}
+  .bsep{width:1px; height:34px; background:var(--line); flex-shrink:0;}
+  .buscador button{
+    flex-shrink:0; width:48px; height:48px; border-radius:50%; border:none;
+    background:var(--marigold); color:var(--tinta-boton);
+    display:flex; align-items:center; justify-content:center;
+  }
   .buscador button:hover{background:var(--marigold-deep);}
+  /* En movil la pastilla se rompe en filas: tres campos de 90px de ancho no se
+     pueden rellenar, y el circulo del boton deja de tener sentido. */
+  @media(max-width:760px){
+    .buscador{flex-wrap:wrap; border-radius:18px; margin-top:-26px; padding:8px;}
+    .bcampo{flex:1 1 100%;}
+    .bcampo + .bcampo{border-top:1px solid var(--line-soft);}
+    .bsep{display:none;}
+    .buscador button{width:100%; height:44px; border-radius:999px; margin-top:6px;}
+  }
 
   /* ---------- rueda de bienestar (signature) ---------- */
   .wheel-section{padding:56px 0 8px;}
@@ -358,9 +424,12 @@
   .langtoggle button.active{background:var(--jungle); color:var(--paper);}
   .btn-publish{background:var(--terracota); color:var(--tinta-boton); border:none; border-radius:20px; padding:8px 16px; font-size:13px; font-weight:500;}
   .btn-publish:hover{background:var(--terracota-viva);}
-  .hero-actions{display:flex; align-items:center; gap:16px; margin-top:18px; flex-wrap:wrap;}
-  .hero-actions .ghostlink{font-size:13px; color:var(--paper); opacity:.75; border-bottom:1px solid rgba(255,255,255,.4);}
-  .hero-actions .ghostlink:hover{opacity:1;}
+  /* Antes vivia dentro del hero oscuro y por eso era blanco. Ahora cae debajo
+     de la pastilla, sobre el fondo claro: en blanco seria invisible. Va
+     centrado porque la pastilla tambien lo esta. */
+  .hero-actions{display:flex; align-items:center; justify-content:center; gap:16px; margin-top:20px; flex-wrap:wrap;}
+  .hero-actions .ghostlink{font-size:13px; color:var(--jungle); border-bottom:1px solid var(--jungle);}
+  .hero-actions .ghostlink:hover{color:var(--terracota-texto); border-bottom-color:var(--terracota-texto);}
 
   /* ---------- fuera de alcance ---------- */
   .scope-banner{background:#2A4453; border:1px dashed rgba(255,255,255,0.25); color:rgba(255,255,255,0.75); border-radius:8px; padding:16px 18px; font-size:12.5px; margin:26px 0;}
@@ -464,13 +533,52 @@
 <main id="view-inicio" class="view active">
   <section class="hero">
     <div class="hero-inner">
-      <div class="eyebrow">Directorio de eventos · México</div>
-      <h1>Encuentra tu próximo <em>retiro, festival o círculo</em> de bienestar</h1>
-      <p class="sub">Retiros de yoga, breathwork, sound healing y festivales holísticos, reunidos en un solo lugar — sin buscar por veinte cuentas de Instagram distintas.</p>
+      <div class="hero-banner">
+        <!-- Escena compuesta con gradientes. Es un marcador de posicion: el dia
+             que haya fotografia se cambia .hero-media por un background-image. -->
+        <div class="hero-media" aria-hidden="true"></div>
+        <div class="hero-scrim" aria-hidden="true"></div>
+        <div class="hero-content">
+          <div class="eyebrow">Directorio de eventos · México</div>
+          <h1>Encuentra tu próximo <em>retiro, festival o círculo</em> de bienestar</h1>
+          <p class="sub">Retiros de yoga, breathwork, sound healing y festivales holísticos, reunidos en un solo lugar — sin buscar por veinte cuentas de Instagram distintas.</p>
+        </div>
+      </div>
+
       <form class="buscador" onsubmit="event.preventDefault(); switchView('resultados');">
-        <input type="text" placeholder="Busca por evento, ciudad o categoría — ej. “yoga en Tulum”">
-        <button type="submit">Buscar</button>
+        <div class="bcampo">
+          <label for="bDonde">Dónde</label>
+          <input id="bDonde" type="text" placeholder="Tulum, CDMX, Oaxaca…">
+        </div>
+        <div class="bsep" aria-hidden="true"></div>
+        <div class="bcampo">
+          <label for="bCuando">Cuándo</label>
+          <select id="bCuando">
+            <option>Cualquier fecha</option>
+            <option>Este fin de semana</option>
+            <option>Próximos 7 días</option>
+            <option>Este mes</option>
+          </select>
+        </div>
+        <div class="bsep" aria-hidden="true"></div>
+        <div class="bcampo">
+          <label for="bQue">Qué</label>
+          <select id="bQue">
+            <option>Cualquier práctica</option>
+            <option>Yoga</option>
+            <option>Meditación</option>
+            <option>Breathwork</option>
+            <option>Sound Healing</option>
+            <option>Ice Bath</option>
+            <option>Retiro</option>
+            <option>Festival</option>
+          </select>
+        </div>
+        <button type="submit" aria-label="Buscar eventos">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20.2 20.2l-4-4"/></svg>
+        </button>
       </form>
+
       <div class="hero-actions">
         <a href="#" class="ghostlink" onclick="switchView('panel-organizador'); return false;">¿Organizas eventos? Publica el tuyo →</a>
       </div>
