@@ -106,21 +106,27 @@ function enviarCorreo(string $para, string $asunto, string $cuerpo): bool
  */
 function enviarCodigoAcceso(string $para, string $codigo, int $minutos): bool
 {
-    $asunto = $codigo . ' es tu código para entrar en Rueda';
+    // El nombre sale de la configuración y no escrito a mano aquí. Si el
+    // remitente se llama de una manera y el texto del mensaje de otra, el
+    // correo parece suplantado —a la persona que lo lee y a los filtros de
+    // spam, que comparan justo eso.
+    [, $marca] = correoRemitente();
+
+    $asunto = $codigo . ' es tu código para entrar en ' . $marca;
 
     $cuerpo = <<<TEXTO
-Tu código para entrar en Rueda es:
+Tu código para entrar en $marca es:
 
     $codigo
 
 Caduca en $minutos minutos y sirve una sola vez.
 
 Si no has pedido este código, no hagas nada: sin él nadie entra, y el
-código deja de valer solo. Nadie de Rueda te lo va a pedir por teléfono,
+código deja de valer solo. Nadie de $marca te lo va a pedir por teléfono,
 por WhatsApp ni por correo.
 
 --
-Rueda · Directorio de eventos wellness en México
+$marca · Directorio de eventos wellness en México
 TEXTO;
 
     return enviarCorreo($para, $asunto, $cuerpo);
