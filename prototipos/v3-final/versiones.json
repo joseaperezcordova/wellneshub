@@ -1,5 +1,5 @@
 {
-    "actual":  "Banner con pastilla de búsqueda segmentada",
+    "actual":  "Banner con carrusel de cuatro escenas",
     "versiones":  [
                       {
                           "n":  1,
@@ -21,6 +21,13 @@
                           "fecha":  "2026-07-25",
                           "commit":  "c11d483",
                           "titulo":  "Banner con pastilla de búsqueda segmentada"
+                      },
+                      {
+                          "n":  4,
+                          "archivo":  "v4.html",
+                          "fecha":  "2026-07-25",
+                          "commit":  "4f62eab",
+                          "titulo":  "Banner con carrusel de cuatro escenas"
                       }
                   ]
 }
