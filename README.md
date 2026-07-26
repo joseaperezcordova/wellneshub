@@ -35,11 +35,12 @@ Se ocultan en las vistas privadas (`admin`, `panel-organizador`): buscar eventos
 ahí no significa nada, y sobre el fondo oscuro del admin la barra clara rompe la
 lectura.
 
-## La aplicación (`app/`)
+## La aplicación
 
 La v6 del prototipo quedó como diseño final, así que a partir de ahí empieza la
-aplicación real. Vive en `app/` y no toca los prototipos: se sirve en
-`…/app/` mientras se va trayendo el diseño sección por sección.
+aplicación real. **Vive en la raíz del dominio**, que es donde tiene que estar:
+la portada del sitio es `index.php`, no una subcarpeta. Los prototipos se
+apartaron a `prototipos/`, con su propio índice.
 
 **PHP 7.4 + MySQL, sin framework y sin Composer.** El XAMPP de esta máquina trae
 PHP 7.4, así que el código evita sintaxis de PHP 8 (`match`, `str_starts_with`,
@@ -48,7 +49,7 @@ SSH: no hay forma de ejecutar `composer install` allí, y subir un `vendor/` por
 FTP para hacer tres peticiones HTTP no compensa.
 
 ```
-app/
+/
 ├── index.php              Portada (por ahora, banco de pruebas de la sesión)
 ├── login.php              Entrar: Google + correo y contraseña
 ├── registro.php           Crear cuenta
@@ -56,16 +57,22 @@ app/
 ├── google-redirect.php    Manda a Google
 ├── google-callback.php    Vuelta de Google  ← esta es la URI a registrar
 ├── assets/css/app.css
-└── includes/
-    ├── .htaccess              Corta el acceso HTTP a esta carpeta
-    ├── config.php             Sesión, errores, arranque
-    ├── config.local.php       Credenciales · NO está en git · se crea a mano
-    ├── config.local.example.php
-    ├── db.php                 PDO
-    ├── auth.php               Sesión, registro, login, CSRF, freno de fuerza bruta
-    ├── google.php             OAuth 2.0 a mano
-    └── layout.php             Cabecera con el acceso a la cuenta, y pie
+├── includes/
+│   ├── .htaccess              Corta el acceso HTTP a esta carpeta
+│   ├── config.php             Sesión, errores, arranque
+│   ├── config.local.php       Credenciales · NO está en git · se crea a mano
+│   ├── config.local.example.php
+│   ├── db.php                 PDO
+│   ├── auth.php               Sesión, registro, login, CSRF, freno de fuerza bruta
+│   ├── google.php             OAuth 2.0 a mano
+│   └── layout.php             Cabecera con el acceso a la cuenta, y pie
+├── database/schema.sql
+└── prototipos/            Los prototipos, con su propio índice en index.html
 ```
+
+> No puede haber un `index.html` en la raíz junto a `index.php`: el orden de
+> `DirectoryIndex` decide cuál gana y no es el mismo en todos los servidores.
+> Por eso el índice de prototipos se movió a `prototipos/index.html`.
 
 ### Puesta en marcha
 
@@ -96,8 +103,8 @@ sincronizara, cada push pisaría las credenciales de producción con las de XAMP
 4. En **URI de redireccionamiento autorizados**, añade las dos, exactas y sin
    barra final:
    ```
-   http://localhost/wellneshub/app/google-callback.php
-   https://wellnesshubmx.jpcorelab.com/app/google-callback.php
+   http://localhost/wellneshub/google-callback.php
+   https://wellnesshubmx.jpcorelab.com/google-callback.php
    ```
 5. Copia el *ID de cliente* y el *secreto* a `config.local.php`.
 

@@ -27,7 +27,7 @@ ini_set('log_errors', '1');
 $rutaLocal = __DIR__ . '/config.local.php';
 if (!is_file($rutaLocal)) {
     http_response_code(500);
-    exit('Falta app/includes/config.local.php. Copia config.local.example.php y rellénalo.');
+    exit('Falta includes/config.local.php. Copia config.local.example.php y rellénalo.');
 }
 
 /** @var array $CONFIG */

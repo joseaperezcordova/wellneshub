@@ -8,7 +8,7 @@
 .env
 .env.*
 config/config.local.php
-app/includes/config.local.php
+includes/config.local.php
 
 # Dependencias
 /node_modules/

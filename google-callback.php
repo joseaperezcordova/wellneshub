@@ -5,8 +5,8 @@
  * Esta URL es la que hay que registrar en Google Cloud Console como "URI de
  * redireccionamiento autorizado", tal cual, sin barra final:
  *
- *   http://localhost/wellneshub/app/google-callback.php
- *   https://wellnesshubmx.jpcorelab.com/app/google-callback.php
+ *   http://localhost/wellneshub/google-callback.php
+ *   https://wellnesshubmx.jpcorelab.com/google-callback.php
  */
 
 declare(strict_types=1);

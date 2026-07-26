@@ -34,6 +34,10 @@ require __DIR__ . '/includes/layout.php';
       No hay sesión iniciada. Usa el botón <strong>Entrar</strong> de arriba a la derecha.
     </p>
   <?php endif; ?>
+
+  <div class="auth-pie">
+    <a href="<?= URL_BASE ?>/prototipos/">Ver los prototipos de diseño</a>
+  </div>
 </div>
 
 <?php pie(); ?>

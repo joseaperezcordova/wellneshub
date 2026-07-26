@@ -8,7 +8,7 @@
  * tu copia local pisaría la del servidor en cada push.
  *
  * Por eso hay que crearlo DOS veces, una en cada sitio:
- *   · en local:    app/includes/config.local.php  (con los datos de XAMPP)
+ *   · en local:    includes/config.local.php  (con los datos de XAMPP)
  *   · en el server: subirlo a mano por FTP una sola vez
  */
 
@@ -31,9 +31,12 @@ return [
     // Google Cloud Console, incluido http/https: si allí pones https y aquí
     // http, Google rechaza el callback con redirect_uri_mismatch.
     //
-    //   local:      http://localhost/wellneshub/app
-    //   producción: https://wellnesshubmx.jpcorelab.com/app
-    'url_base' => 'http://localhost/wellneshub/app',
+    //   local:      http://localhost/wellneshub
+    //   producción: https://wellnesshubmx.jpcorelab.com
+    //
+    // En producción la aplicación está en la raíz del dominio, así que aquí no
+    // va ninguna subcarpeta. En local sí, porque XAMPP sirve htdocs entero.
+    'url_base' => 'http://localhost/wellneshub',
 
     // ---- Google OAuth -----------------------------------------------------
     // Se sacan de Google Cloud Console → APIs y servicios → Credenciales →
