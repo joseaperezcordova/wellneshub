@@ -299,11 +299,16 @@ if (!empty($_SESSION['evento_aviso'])) {
   }
   .catbar-inner{max-width:1180px; margin:0 auto; padding:0 28px;}
   @media(max-width:640px){ .catbar-inner{padding:0 18px;} }
-  .catbar .eyebrow{margin-bottom:16px; display:block;}
+  .catbar .eyebrow{margin-bottom:12px; display:block;}
   .catrail-wrap{position:relative;}
+  /* El padding de arriba no es decorativo: «overflow-x:auto» recorta tambien
+     por arriba, asi que sin el hueco el circulo se comia sus dos primeros
+     pixeles justo al pasar el raton, que es cuando se sube. Los 4px cubren el
+     desplazamiento y el borde; el margen del eyebrow baja otros 4 para que el
+     bloque siga midiendo lo mismo. */
   .catrail{
     display:flex; gap:26px; overflow-x:auto; scroll-behavior:smooth;
-    scroll-snap-type:x proximity; padding-bottom:2px;
+    scroll-snap-type:x proximity; padding:4px 0 2px;
     scrollbar-width:none; -ms-overflow-style:none;
   }
   .catrail::-webkit-scrollbar{display:none;}
@@ -351,7 +356,7 @@ if (!empty($_SESSION['evento_aviso'])) {
   /* A la altura del circulo, no del bloque entero: si se centra con el texto
      incluido queda descolgada respecto a la fila de iconos. */
   .catnext{
-    position:absolute; right:0; top:29px; transform:translateY(-50%);
+    position:absolute; right:0; top:33px; transform:translateY(-50%);
     width:34px; height:34px; border-radius:50%; border:1px solid var(--line);
     background:var(--paper); color:var(--jungle); font-size:17px; line-height:1;
     display:flex; align-items:center; justify-content:center;
