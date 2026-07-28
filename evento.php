@@ -43,7 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         http_response_code(403);
         exit('No puedes hacer eso.');
 
-    } elseif (isset($_POST['publicar'])) {
+    } elseif (isset($_POST['publicar']) && ($ev['situacion'] !== 'oculto' || esAdmin($u))) {
+        // Volver a publicar un evento oculto deshace una decisión de moderación,
+        // así que es cosa de un administrador. Sin esto, el dueño podría mandar
+        // el POST a mano y saltarse por qué se ocultó en primer lugar.
         publicarEvento((int) $ev['id'], (int) $ev['usuario_id']);
 
         // El filtro de palabras se pasa DESPUÉS de publicar y no antes: no
@@ -141,6 +144,14 @@ require __DIR__ . '/includes/layout.php';
           <form method="post">
             <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
             <button class="btn-barra destacado" type="submit" name="publicar" value="1">Publicar</button>
+          </form>
+        <?php elseif ($ev['situacion'] === 'oculto' && esAdmin($u)): ?>
+          <!-- Ocultar es una decisión de moderación, así que deshacerla también
+               lo es: el organizador no puede volver a publicar lo que un
+               administrador retiró, aunque siga dentro de su plazo de edición. -->
+          <form method="post">
+            <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+            <button class="btn-barra destacado" type="submit" name="publicar" value="1">Volver a publicar</button>
           </form>
         <?php endif; ?>
 
