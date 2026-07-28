@@ -65,9 +65,12 @@ $mal = function (string $campo) use ($errores) {
 
 <div class="campo<?= $mal('descripcion') ?>">
   <label for="descripcion">Descripción</label>
-  <textarea id="descripcion" name="descripcion" rows="7" required
-            placeholder="Qué van a vivir, qué incluye, qué llevar, para quién es."><?= e($v('descripcion')) ?></textarea>
-  <div class="pista">Se muestra tal cual en la ficha. Los saltos de línea se respetan.</div>
+  <textarea id="descripcion" name="descripcion" rows="7" required minlength="50" maxlength="2000"
+            placeholder="Describe tu actividad. Incluye qué aprenderán los asistentes, a quién está dirigida, qué incluye y cualquier información importante."><?= e($v('descripcion')) ?></textarea>
+  <div class="pista pista-fila">
+    <span>Se muestra tal cual en la ficha. Los saltos de línea se respetan.</span>
+    <span class="contador" id="contadorDescripcion"></span>
+  </div>
   <?= $err('descripcion') ?>
 </div>
 
@@ -226,6 +229,24 @@ $mal = function (string $campo) use ($errores) {
   var precio = document.getElementById('campoPrecio');
   function sync(){ precio.style.display = check.checked ? 'none' : ''; }
   check.addEventListener('change', sync);
+  sync();
+})();
+
+/* Contador de la descripción. El mínimo y máximo ya los exige el servidor
+   —esto es solo para que se vean venir antes de enviar—. */
+(function(){
+  var campo    = document.getElementById('descripcion');
+  var contador = document.getElementById('contadorDescripcion');
+  if (!campo || !contador) return;
+
+  var MIN = 50, MAX = 2000;
+
+  function sync(){
+    var n = campo.value.length;
+    contador.textContent = n + ' / ' + MAX;
+    contador.classList.toggle('corto', n < MIN);
+  }
+  campo.addEventListener('input', sync);
   sync();
 })();
 </script>

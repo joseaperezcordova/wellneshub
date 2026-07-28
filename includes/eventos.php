@@ -233,8 +233,10 @@ function validarEvento(array $in): array
     }
 
     $e['descripcion'] = trim((string) ($in['descripcion'] ?? ''));
-    if (mb_strlen($e['descripcion']) < 40) {
-        $errores['descripcion'] = 'Cuenta un poco más: al menos 40 caracteres.';
+    if (mb_strlen($e['descripcion']) < 50) {
+        $errores['descripcion'] = 'Agrega una descripción más completa (mínimo 50 caracteres).';
+    } elseif (mb_strlen($e['descripcion']) > 2000) {
+        $errores['descripcion'] = 'La descripción no puede pasar de 2,000 caracteres.';
     }
 
     $e['categoria'] = (string) ($in['categoria'] ?? '');
