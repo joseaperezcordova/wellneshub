@@ -131,6 +131,8 @@ require __DIR__ . '/includes/layout.php';
   <h1>Editar evento</h1>
   <?php if ($ev['situacion'] === 'borrador'): ?>
     <p class="sub">Es un borrador: no lo ve nadie más que tú hasta que lo publiques.</p>
+  <?php elseif ($ev['situacion'] === 'oculto'): ?>
+    <p class="sub">Oculto. No aparece en el listado.</p>
   <?php else: ?>
     <?php $quedan = minutosRestantesEdicion($ev); ?>
     <p class="sub">
@@ -147,15 +149,23 @@ require __DIR__ . '/includes/layout.php';
     <?php $textoBoton = 'Guardar cambios'; require __DIR__ . '/includes/form-evento.php'; ?>
   </form>
 
-  <?php /* Mismo permiso que habilitó esta página ($puede), y el mismo endpoint
-           que ya borra desde la ficha —evento.php—: no hace falta duplicar
-           aquí la comprobación de plazo ni la de quién manda. */ ?>
-  <form method="post" action="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>"
-        onsubmit="return confirm('¿Eliminar «<?= e(addslashes($ev['titulo'])) ?>»? No se puede deshacer.');"
-        style="margin-top:18px;">
-    <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-    <button class="btn-barra peligro" type="submit" name="eliminar" value="1">Eliminar evento</button>
-  </form>
+  <?php /* Mismas comprobaciones que ya hace evento.php al recibir el POST
+           —permiso de admin para republicar, plazo para borrar—: estos botones
+           mandan ahí en vez de duplicar esa lógica aquí. */ ?>
+  <div class="barra-acciones" style="margin-top:18px;">
+    <?php if ($ev['situacion'] === 'oculto' && esAdmin($u)): ?>
+      <form method="post" action="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>">
+        <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+        <button class="btn-barra destacado" type="submit" name="publicar" value="1">Volver a publicar</button>
+      </form>
+    <?php endif; ?>
+
+    <form method="post" action="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>"
+          onsubmit="return confirm('¿Eliminar «<?= e(addslashes($ev['titulo'])) ?>»? No se puede deshacer.');">
+      <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+      <button class="btn-barra peligro" type="submit" name="eliminar" value="1">Eliminar evento</button>
+    </form>
+  </div>
 
 <?php endif; ?>
 
