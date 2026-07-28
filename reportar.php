@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = $captcha[1];
 
     } elseif (!isset(motivosReporte()[$motivo])) {
-        $error = 'Elige un motivo.';
+        $error = 'Ayúdanos a mantener una comunidad segura. Selecciona el motivo por el que deseas reportar este evento.';
 
     } elseif (reporteRepetido((int) $ev['id'])) {
         // Se dice claramente en vez de fingir que se aceptó. Quien ya reportó de
