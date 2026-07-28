@@ -267,12 +267,12 @@
       <ul class="indice">
         <li><a href="#s0"><span class="n">00</span> Antes de empezar</a></li>
         <li><a href="#s1"><span class="n">01</span> La portada</a></li>
-        <li><a href="#s2" class="nuevo"><span class="n">02</span> Buscar y filtrar</a></li>
+        <li><a href="#s2"><span class="n">02</span> Buscar y filtrar</a></li>
         <li><a href="#s3"><span class="n">03</span> Entrar</a></li>
-        <li><a href="#s4" class="nuevo"><span class="n">04</span> Publicar</a></li>
+        <li><a href="#s4"><span class="n">04</span> Publicar</a></li>
         <li><a href="#s5"><span class="n">05</span> Editar</a></li>
         <li><a href="#s6"><span class="n">06</span> Reportar</a></li>
-        <li><a href="#s7"><span class="n">07</span> Administración</a></li>
+        <li><a href="#s7" class="nuevo"><span class="n">07</span> Administración</a></li>
         <li><a href="#s8"><span class="n">08</span> Móvil</a></li>
         <li><a href="#s9"><span class="n">09</span> Lo que no está hecho</a></li>
         <li><a href="#s10"><span class="n">10</span> Cómo avisar</a></li>
@@ -314,14 +314,15 @@
           <p><strong>Si ya habías visto esta guía antes, esto es lo que cambió</strong>
           — está marcado con un punto naranja en el índice:</p>
           <ul class="lista">
-            <li>Inicio, buscar, blog y la ficha de cada evento son ahora <b>páginas separadas</b>, con su propia dirección.</li>
-            <li>El <b>buscador funciona de verdad</b>: hay una sección nueva entera para él.</li>
-            <li>Al publicar, la <b>foto ya no se pierde</b> si falla otro campo.</li>
-            <li>Un evento puede llevar su <b>ubicación en un mapa</b>.</li>
+            <li>Cada ficha tiene un botón <b>↗ Compartir</b>, para copiar su enlace o abrir el menú nativo del teléfono.</li>
+            <li>Un evento oculto por moderación se puede <b>volver a publicar desde su propia ficha</b>. Moderación deja de enseñarlo en cuanto lo ocultas, así que ese ya no es el sitio para deshacerlo.</li>
+            <li>Eliminar un evento ya no obliga a volver a la ficha: el botón está también en <b>Editar</b>.</li>
+            <li>Editar un evento y reportar uno tienen ahora su <b>flecha para volver atrás</b> desde que se abren, no solo al final.</li>
+            <li>Si entraste a un evento desde el <b>panel admin</b>, esa flecha te devuelve ahí, no a la búsqueda pública.</li>
           </ul>
           <p>
-            Las casillas se reiniciaron una vez, porque los puntos ya no son los mismos.
-            A partir de ahora no volverá a pasar aunque la guía crezca.
+            Las casillas no se pierden con esto: cada prueba se recuerda por su propio
+            texto, así que añadir o cambiar puntos no toca las que ya tenías marcadas.
           </p>
         </div>
 
@@ -393,6 +394,12 @@
 
         <label class="prueba">
           <input type="checkbox">
+          <span class="qué">Busca el botón «↗ Compartir», justo debajo del título.</span>
+          <span class="esperado">En el ordenador copia el enlace y avisa <b>«Enlace copiado.»</b> junto al botón. En el móvil abre el <b>menú nativo</b> del teléfono para compartir.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
           <span class="qué">Si la ficha tiene botón para reservar, púlsalo.</span>
           <span class="esperado">Abre <b>en una pestaña nueva</b> y va a donde dice.</span>
         </label>
@@ -418,7 +425,7 @@
 
       <!-- 02 ─────────────────────────────────────────────── -->
       <section id="s2">
-        <div class="cab-sec"><span class="n">02</span><h2>Buscar y filtrar</h2><span class="sello">Nuevo</span></div>
+        <div class="cab-sec"><span class="n">02</span><h2>Buscar y filtrar</h2></div>
         <p class="quien">Lo que más ojos necesita esta ronda</p>
         <p class="intro-sec">
           Hasta hace poco estos filtros eran decorado: se veían pero no hacían nada. Ahora
@@ -638,7 +645,7 @@
 
       <!-- 04 ─────────────────────────────────────────────── -->
       <section id="s4">
-        <div class="cab-sec"><span class="n">04</span><h2>Publicar un evento</h2><span class="sello">Cambió</span></div>
+        <div class="cab-sec"><span class="n">04</span><h2>Publicar un evento</h2></div>
         <p class="quien">Como alguien que organiza</p>
         <p class="intro-sec">
           Nada se publica directamente desde el formulario: primero se guarda como borrador
@@ -794,6 +801,12 @@
 
         <label class="prueba">
           <input type="checkbox">
+          <span class="qué">Entra a editar cualquier evento tuyo y mira arriba del todo, antes de tocar nada.</span>
+          <span class="esperado">Hay una flecha <b>«← Volver a la ficha»</b> desde que se abre la pantalla, no solo si el plazo ya venció.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
           <span class="qué">Entra a tu evento recién publicado y cambia el título.</span>
           <span class="esperado">Deja guardar, y el cambio <b>se ve también en la portada</b>.</span>
         </label>
@@ -826,6 +839,12 @@
           <input type="checkbox">
           <span class="qué">Edita un evento que tenga mapa y cambia el enlace por el de otro sitio.</span>
           <span class="esperado">La ficha pasa a enseñar <b>el nuevo punto</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Desde esa misma pantalla de editar, baja hasta el final del formulario.</span>
+          <span class="esperado">Hay un botón <b>«Eliminar evento»</b> ahí también, no solo en la ficha, y pide la misma confirmación antes de borrar.</span>
         </label>
 
         <label class="prueba">
@@ -864,6 +883,12 @@
 
         <label class="prueba">
           <input type="checkbox">
+          <span class="qué">Abre ese formulario y mira arriba, antes de rellenar nada.</span>
+          <span class="esperado">Hay una flecha <b>«← Volver al evento»</b> por si cambias de idea, no solo después de enviarlo.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
           <span class="qué">Intenta enviar sin elegir motivo.</span>
           <span class="esperado">No lo acepta: el motivo <b>es obligatorio</b>.</span>
         </label>
@@ -895,7 +920,7 @@
 
       <!-- 07 ─────────────────────────────────────────────── -->
       <section id="s7">
-        <div class="cab-sec"><span class="n">07</span><h2>Administración</h2></div>
+        <div class="cab-sec"><span class="n">07</span><h2>Administración</h2><span class="sello">Cambió</span></div>
         <p class="quien">Con tu propia cuenta, no con la suya</p>
         <p class="intro-sec">
           Lo mejor es que José te dé permisos de administrador a <b>tu</b> cuenta durante las
@@ -945,6 +970,18 @@
 
         <label class="prueba">
           <input type="checkbox">
+          <span class="qué">Desde el panel admin (pestaña Eventos), pulsa «Ver» en cualquiera y luego la flecha de arriba del todo.</span>
+          <span class="esperado">Vuelve al <b>panel admin</b>, no a la lista pública de eventos.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Repite pulsando «Editar» en vez de «Ver», guarda cualquier cambio, y mira la flecha en la ficha donde caes después de guardar.</span>
+          <span class="esperado">Sigue llevando <b>de vuelta al panel admin</b>, aunque hayas pasado por Editar en medio.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
           <span class="qué">Entra a Moderación.</span>
           <span class="esperado">Están los eventos que reportaste antes, con <b>el motivo y el comentario</b> que escribiste.</span>
         </label>
@@ -967,10 +1004,25 @@
           <span class="esperado">Desapareció del listado, pero <b>no se borró</b>.</span>
         </label>
 
+        <div class="nota">
+          <p>
+            <strong>Ojo con el siguiente paso.</strong> Ocultar marca sus avisos como
+            revisados, así que ese evento <b>ya no aparece en Moderación</b> — no es un
+            fallo, es que ahí ya no queda ningún aviso pendiente que enseñar. Para
+            volver a publicarlo hay que entrar a su propia ficha.
+          </p>
+        </div>
+
         <label class="prueba">
           <input type="checkbox">
-          <span class="qué">Vuelve a Moderación y publícalo otra vez.</span>
-          <span class="esperado">Reaparece en el listado donde estaba.</span>
+          <span class="qué">Entra a la ficha de ese evento oculto —por «Mis eventos» del organizador, o buscándolo en el panel admin— y mira la barra de arriba.</span>
+          <span class="esperado">Dice <b>«Oculto»</b> y, por ser administradora, ofrece un botón <b>«Volver a publicar»</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Púlsalo.</span>
+          <span class="esperado">Reaparece en el listado donde estaba. Al organizador <b>no</b> le regala horas extra de edición.</span>
         </label>
 
         <label class="prueba">
