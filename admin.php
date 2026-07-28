@@ -97,8 +97,8 @@ require __DIR__ . '/includes/layout.php';
                 </span>
               </td>
               <td>
-                <a class="actionbtn" href="<?= URL_BASE ?>/evento.php?id=<?= (int) $ea['id'] ?>">Ver</a>
-                <a class="actionbtn" href="<?= URL_BASE ?>/evento-editar.php?id=<?= (int) $ea['id'] ?>">Editar</a>
+                <a class="actionbtn" href="<?= URL_BASE ?>/evento.php?id=<?= (int) $ea['id'] ?>&volver=admin">Ver</a>
+                <a class="actionbtn" href="<?= URL_BASE ?>/evento-editar.php?id=<?= (int) $ea['id'] ?>&volver=admin">Editar</a>
               </td>
             </tr>
           <?php endforeach; ?>

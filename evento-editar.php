@@ -70,7 +70,12 @@ if ($puede && postDesbordado()) {
             }
 
             $_SESSION['evento_aviso'] = 'Cambios guardados.';
-            redirigir('/evento.php?id=' . (int) $ev['id']);
+
+            // Si se llegó aquí desde el panel admin, esa procedencia se lleva
+            // a la ficha para que su enlace de vuelta apunte al mismo sitio.
+            $volver = (string) ($_GET['volver'] ?? '');
+            redirigir('/evento.php?id=' . (int) $ev['id']
+                . ($volver !== '' ? '&volver=' . urlencode($volver) : ''));
         }
 
         /*

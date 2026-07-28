@@ -99,16 +99,26 @@ $partes     = fechaPartes($ev['fecha_inicio']);
  *
  * El botón «atrás» del navegador hace lo mismo por su cuenta. Este enlace es
  * para cuando no lo hay: una pestaña nueva, un enlace compartido.
+ *
+ * Si se llegó desde el panel admin, «volver» no trae filtros de búsqueda sino
+ * la palabra «admin»: no tendría sentido devolver ahí a alguien a la lista
+ * pública de eventos cuando venía de gestionarlos.
  */
-$volverA = urlVolverABuscar(isset($_GET['volver']) ? (string) $_GET['volver'] : null);
-$vieneDeBusqueda = isset($_GET['volver']) && $_GET['volver'] !== '';
+$volverAdmin = ($_GET['volver'] ?? '') === 'admin' && esAdmin($u);
+
+if ($volverAdmin) {
+    $volverA = URL_BASE . '/admin.php';
+} else {
+    $volverA = urlVolverABuscar(isset($_GET['volver']) ? (string) $_GET['volver'] : null);
+}
+$vieneDeBusqueda = !$volverAdmin && isset($_GET['volver']) && $_GET['volver'] !== '';
 
 $titulo = $ev['titulo'];
 require __DIR__ . '/includes/layout.php';
 ?>
 
 <div class="ficha-envoltorio">
-  <a class="volver" href="<?= e($volverA) ?>">← <?= $vieneDeBusqueda ? 'Volver a los resultados' : 'Ver todos los eventos' ?></a>
+  <a class="volver" href="<?= e($volverA) ?>">← <?= $volverAdmin ? 'Volver al panel admin' : ($vieneDeBusqueda ? 'Volver a los resultados' : 'Ver todos los eventos') ?></a>
 </div>
 
 <?php if ($aviso): ?>
