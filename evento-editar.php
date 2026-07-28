@@ -42,29 +42,25 @@ if ($puede && postDesbordado()) {
     $errores['general'] = 'La imagen pesa más de lo que admite el servidor. Prueba con una más ligera.';
 
 } elseif ($puede && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // La que ya tiene guardada. No mandar archivo significa «déjala como está»,
+    // no «bórrala».
+    $imagenPrevia = $ev['imagen_url'];
+
     if (!csrfValido($_POST['csrf'] ?? null)) {
         $errores['general'] = 'La sesión caducó. Vuelve a enviarlo.';
         $e = $_POST;
+        $e['imagen_url'] = imagenArrastrada($_POST['imagen_previa'] ?? null, $imagenPrevia);
     } else {
         [$e, $errores] = validarEvento($_POST);
 
-        // Por defecto se conserva la que ya tenía: no mandar archivo significa
-        // "déjala como está", no "bórrala".
-        $imagenPrevia    = $ev['imagen_url'];
-        $e['imagen_url'] = $imagenPrevia;
-
-        [$okImagen, $nueva] = guardarImagenSubida($_FILES['imagen'] ?? []);
-
-        if (!$okImagen) {
-            $errores['imagen'] = (string) $nueva;
-        } elseif ($nueva !== null) {
-            $e['imagen_url'] = $nueva;
-        } elseif (!empty($_POST['quitar_imagen'])) {
-            $e['imagen_url'] = null;
+        [$e['imagen_url'], $errorImagen] = imagenDelFormulario($_POST, $_FILES, $imagenPrevia);
+        if ($errorImagen !== null) {
+            $errores['imagen'] = $errorImagen;
         }
 
         if (!$errores) {
             actualizarEvento($e, (int) $ev['id']);
+            olvidarImagenEnVuelo($e['imagen_url']);
 
             // La anterior se borra solo cuando el cambio ya está guardado. Al
             // revés, un fallo al actualizar dejaría la ficha apuntando a un
@@ -77,10 +73,14 @@ if ($puede && postDesbordado()) {
             redirigir('/evento.php?id=' . (int) $ev['id']);
         }
 
-        if ($errores && $okImagen && $nueva !== null) {
-            borrarImagenGuardada($nueva);
-            $e['imagen_url'] = $imagenPrevia;
-        }
+        /*
+         * Si algo falló, la foto recién subida SE QUEDA y el formulario vuelve a
+         * salir con ella puesta. Antes se borraba y se volvía a enseñar la
+         * antigua, con lo que el cambio de imagen se perdía sin avisar: parecía
+         * que no se había llegado a elegir ninguna.
+         *
+         * La guardada del evento no se toca hasta que el cambio esté escrito.
+         */
     }
 }
 

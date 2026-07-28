@@ -26,28 +26,44 @@ if (postDesbordado()) {
     if (!csrfValido($_POST['csrf'] ?? null)) {
         $errores['general'] = 'La sesión caducó. Vuelve a enviarlo.';
         $e = $_POST;
+        $e['imagen_url'] = imagenArrastrada($_POST['imagen_previa'] ?? null, null);
     } else {
         [$e, $errores] = validarEvento($_POST);
 
-        [$okImagen, $imagen] = guardarImagenSubida($_FILES['imagen'] ?? []);
-        if (!$okImagen) {
-            $errores['imagen'] = (string) $imagen;
-        } else {
-            $e['imagen_url'] = $imagen;
+        [$e['imagen_url'], $errorImagen] = imagenDelFormulario($_POST, $_FILES, null);
+        if ($errorImagen !== null) {
+            $errores['imagen'] = $errorImagen;
         }
 
         if (!$errores) {
             $id = crearEvento($e, (int) $u['id']);
+            olvidarImagenEnVuelo($e['imagen_url']);   // ya tiene dueño
             redirigir('/evento.php?id=' . $id);
         }
 
-        // Si algo falló, la imagen ya guardada no se queda de okupa en el disco:
-        // el formulario vuelve a salir y se subirá otra vez.
-        if ($errores && $okImagen && $imagen !== null) {
-            borrarImagenGuardada($imagen);
-            $e['imagen_url'] = null;
-        }
+        /*
+         * Si algo falló, la imagen SE QUEDA.
+         *
+         * Antes se borraba aquí para no dejar archivos sueltos en el disco, y el
+         * precio lo pagaba quien rellenaba la ficha: bastaba una descripción
+         * corta para tener que volver a buscar la foto en el ordenador. Un
+         * <input type="file"> no se puede rellenar desde el servidor —el
+         * navegador no lo permite—, así que conservarla es la única forma.
+         *
+         * Los archivos que queden de una ficha abandonada se los lleva
+         * limpiarImagenesHuerfanas(), abajo.
+         */
     }
+}
+
+/*
+ * Barrido de imágenes abandonadas, de vez en cuando y solo al abrir el
+ * formulario. Es el mismo patrón que usa PHP para caducar sesiones: hacerlo
+ * siempre sería una consulta de más en cada visita, y hacerlo nunca llena el
+ * disco de un hosting compartido.
+ */
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && random_int(1, 20) === 1) {
+    limpiarImagenesHuerfanas();
 }
 
 $titulo = 'Publicar un evento';

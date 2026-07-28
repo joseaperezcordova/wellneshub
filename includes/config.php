@@ -115,6 +115,7 @@ require_once __DIR__ . '/http.php';
 require_once __DIR__ . '/correo.php';
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/subidas.php';
+require_once __DIR__ . '/mapa.php';
 require_once __DIR__ . '/captcha.php';
 require_once __DIR__ . '/moderacion.php';
 

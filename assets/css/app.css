@@ -273,6 +273,13 @@ input,select{font-family:inherit; font-size:14px;}
   display:block; width:100%; max-height:190px; object-fit:cover;
   border-radius:6px; margin-bottom:10px;
 }
+/* «Esta es la que acabas de elegir». Va en verde y no en gris como las demás
+   pistas: es una buena noticia —la foto no se perdió— y quien acaba de ver un
+   formulario lleno de errores no está leyendo el texto pequeño. */
+.imagen-actual .pista{
+  color:var(--verde); opacity:1; margin:0 0 10px;
+  font-size:12.5px; font-weight:500;
+}
 
 .colores{display:flex; gap:9px; flex-wrap:wrap;}
 /* Con el nombre del elemento delante, por lo mismo que .motivo: si no, el
@@ -320,6 +327,35 @@ input,select{font-family:inherit; font-size:14px;}
    entera. */
 .volver{display:inline-block; font-size:13px; color:var(--verde); padding:4px 0;}
 .volver:hover{text-decoration:underline;}
+
+/* ---------------------------------------------------------------- mapa --- */
+/* El iframe no lleva alto propio, así que sin esto colapsa a 150px por defecto
+   del navegador. El recuadro se calcula apaisado en urlMapaEmbebido(), y estas
+   proporciones son las que le corresponden. */
+.ficha-mapa{margin-top:30px;}
+.ficha-mapa iframe{
+  display:block; width:100%; height:300px; border:1px solid var(--linea);
+  border-radius:12px; background:var(--arena);
+}
+@media(max-width:640px){ .ficha-mapa iframe{height:220px;} }
+
+.btn-comollegar{
+  display:inline-block; margin-top:12px; padding:10px 20px;
+  background:var(--verde); color:var(--blanco);
+  border-radius:999px; font-size:13.5px; font-weight:600;
+}
+.btn-comollegar:hover{background:var(--petroleo);}
+
+/* El mismo mapa dentro del formulario, más pequeño: aquí solo sirve para
+   comprobar que el punto cayó donde tenía que caer. */
+.mapa-previo{margin-top:10px;}
+.mapa-previo iframe{
+  display:block; width:100%; height:180px; border:1px solid var(--linea);
+  border-radius:8px; background:var(--arena);
+}
+/* Verde y sin la opacidad de las demás pistas: es la confirmación de que el
+   enlace se entendió, y se lee de un vistazo o no sirve de nada. */
+.campo .pista.pista-ok{color:var(--verde); opacity:1; font-weight:500; margin-bottom:8px;}
 
 .ficha-media{
   position:relative; height:340px; border-radius:16px; overflow:hidden;

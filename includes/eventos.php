@@ -206,6 +206,7 @@ function etiquetasCampos(): array
         'descripcion'  => 'Descripción',
         'ciudad'       => 'Ciudad',
         'entidad'      => 'Estado',
+        'mapa_url'     => 'Enlace de Google Maps',
         'fecha_inicio' => 'Fecha de inicio',
         'fecha_fin'    => 'Fecha de fin',
         'precio'       => 'Precio',
@@ -248,6 +249,37 @@ function validarEvento(array $in): array
     if ($e['entidad'] === '') $errores['entidad'] = 'Falta el estado.';
 
     $e['lugar'] = trim((string) ($in['lugar'] ?? '')) ?: null;
+
+    /*
+     * El punto en el mapa. Opcional, pero si se pone un enlace tiene que poder
+     * leerse: guardarlo sin coordenadas dejaría una ficha con un mapa vacío y
+     * nadie se enteraría hasta que alguien fuera a buscar el sitio.
+     *
+     * El mensaje de error explica el camino entero. Es más largo de lo normal a
+     * propósito: aquí falla justo quien no sabe de dónde sacar el enlace bueno,
+     * y un «enlace no válido» a secas le deja igual de perdido.
+     */
+    $mapa = trim((string) ($in['mapa_url'] ?? ''));
+
+    $e['mapa_url'] = null;
+    $e['latitud']  = null;
+    $e['longitud'] = null;
+
+    if ($mapa !== '') {
+        if (mb_strlen($mapa) > 500) {
+            $errores['mapa_url'] = 'Ese enlace es larguísimo. Copia el que da el botón «Compartir» de Google Maps.';
+        } else {
+            $e['mapa_url'] = $mapa;
+            $punto = coordenadasDeEnlace($mapa);
+
+            if ($punto === null) {
+                $errores['mapa_url'] = 'No pudimos sacar la ubicación de ahí. '
+                    . 'Abre Google Maps, busca el sitio, pulsa «Compartir» y pega el enlace que te dé.';
+            } else {
+                [$e['latitud'], $e['longitud']] = $punto;
+            }
+        }
+    }
 
     // Los campos datetime-local llegan como "2026-08-16T19:30".
     $e['fecha_inicio'] = normalizarFecha((string) ($in['fecha_inicio'] ?? ''));
@@ -369,14 +401,15 @@ function crearEvento(array $e, int $usuarioId): int
     $pdo->prepare(
         'INSERT INTO eventos
            (usuario_id, titulo, slug, descripcion, categoria, ciudad, entidad,
-            lugar, fecha_inicio, fecha_fin, gratuito, precio, url_boletos,
-            imagen_url, color, situacion)
-         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
+            lugar, mapa_url, latitud, longitud, fecha_inicio, fecha_fin,
+            gratuito, precio, url_boletos, imagen_url, color, situacion)
+         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
     )->execute([
         $usuarioId, $e['titulo'], $e['descripcion'], $e['categoria'],
-        $e['ciudad'], $e['entidad'], $e['lugar'], $e['fecha_inicio'],
-        $e['fecha_fin'], $e['gratuito'], $e['precio'], $e['url_boletos'],
-        $e['imagen_url'], $e['color'],
+        $e['ciudad'], $e['entidad'], $e['lugar'],
+        $e['mapa_url'], $e['latitud'], $e['longitud'],
+        $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
+        $e['url_boletos'], $e['imagen_url'], $e['color'],
     ]);
 
     // El slug lleva el id dentro, así que solo puede calcularse después de
@@ -393,12 +426,14 @@ function actualizarEvento(array $e, int $id): void
     db()->prepare(
         'UPDATE eventos SET
             titulo = ?, slug = ?, descripcion = ?, categoria = ?, ciudad = ?,
-            entidad = ?, lugar = ?, fecha_inicio = ?, fecha_fin = ?,
+            entidad = ?, lugar = ?, mapa_url = ?, latitud = ?, longitud = ?,
+            fecha_inicio = ?, fecha_fin = ?,
             gratuito = ?, precio = ?, url_boletos = ?, imagen_url = ?, color = ?
           WHERE id = ?'
     )->execute([
         $e['titulo'], generarSlug($e['titulo'], $id), $e['descripcion'],
         $e['categoria'], $e['ciudad'], $e['entidad'], $e['lugar'],
+        $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
         $e['url_boletos'], $e['imagen_url'], $e['color'], $id,
     ]);
@@ -439,7 +474,24 @@ function cambiarSituacionEvento(int $id, string $situacion): void
 
 function eliminarEvento(int $id): void
 {
+    /*
+     * La imagen se va con él. Antes se quedaba en el disco para siempre: nadie
+     * volvía a apuntar a ese archivo y nadie sabía que estaba ahí, así que en un
+     * hosting compartido solo podía crecer.
+     *
+     * Se lee ANTES de borrar la fila, que es la última vez que se sabe cuál era,
+     * y se borra el archivo DESPUÉS, cuando la fila ya no está: al revés, un
+     * fallo al borrar dejaría un evento apuntando a un archivo que ya no existe.
+     */
+    $st = db()->prepare('SELECT imagen_url FROM eventos WHERE id = ?');
+    $st->execute([$id]);
+    $imagen = $st->fetchColumn();
+
     db()->prepare('DELETE FROM eventos WHERE id = ?')->execute([$id]);
+
+    if (is_string($imagen) && $imagen !== '') {
+        borrarImagenGuardada($imagen);
+    }
 }
 
 

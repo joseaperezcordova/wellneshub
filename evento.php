@@ -222,6 +222,30 @@ require __DIR__ . '/includes/layout.php';
 
     <div class="ficha-desc"><?= nl2br(e($ev['descripcion'])) ?></div>
 
+    <?php
+    /*
+     * El mapa va DEBAJO de la descripción, no arriba con los demás datos.
+     *
+     * Quien abre una ficha decide primero si le interesa el evento y solo
+     * después mira dónde cae. Un mapa entre el título y el texto se come el
+     * sitio de lo que hay que leer para tomar esa decisión.
+     *
+     * Es OpenStreetMap: no pide clave ni tarjeta. El botón sí lleva a Google
+     * Maps, que es lo que la gente tiene en el teléfono para conducir.
+     */
+    if (eventoTienePunto($ev)):
+        $lat = (float) $ev['latitud'];
+        $lng = (float) $ev['longitud'];
+    ?>
+      <div class="ficha-mapa">
+        <iframe src="<?= e(urlMapaEmbebido($lat, $lng)) ?>"
+                title="Mapa con la ubicación de <?= e($ev['titulo']) ?>"
+                loading="lazy" referrerpolicy="no-referrer"></iframe>
+        <a class="btn-comollegar" href="<?= e(urlComoLlegar($lat, $lng)) ?>"
+           target="_blank" rel="noopener">Cómo llegar →</a>
+      </div>
+    <?php endif; ?>
+
     <?php if ($ev['situacion'] === 'publicado'): ?>
       <!-- Sin cuenta: quien se topa con una estafa no se registra para avisarnos.
            Pedir cuenta aquí no filtra bots —esos sí se registran—, filtra

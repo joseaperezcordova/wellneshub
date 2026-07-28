@@ -150,6 +150,14 @@ CREATE TABLE IF NOT EXISTS eventos (
   entidad       VARCHAR(90)   NOT NULL COMMENT 'Entidad federativa: Jalisco, Oaxaca…',
   lugar         VARCHAR(160)  NULL DEFAULT NULL,
 
+  -- El punto en el mapa. El enlace se guarda solo para poder volver a
+  -- enseñarlo en el formulario; quien manda son latitud y longitud, que es lo
+  -- que pinta la ficha y lo que serviría para buscar por cercanía.
+  -- DECIMAL y no FLOAT: una coordenada aquí es un dato, no una medida.
+  mapa_url      VARCHAR(500)  NULL DEFAULT NULL COMMENT 'Enlace de Google Maps tal como lo pegó el organizador',
+  latitud       DECIMAL(10,7) NULL DEFAULT NULL,
+  longitud      DECIMAL(10,7) NULL DEFAULT NULL,
+
   fecha_inicio  DATETIME      NOT NULL,
   fecha_fin     DATETIME      NULL DEFAULT NULL,
 
@@ -176,6 +184,8 @@ CREATE TABLE IF NOT EXISTS eventos (
   KEY idx_eventos_agenda (situacion, fecha_inicio),
   KEY idx_eventos_usuario (usuario_id, creado_en),
   KEY idx_eventos_categoria (categoria, fecha_inicio),
+  -- Para el día que haya un «eventos cerca de mí». Todavía no lo usa nadie.
+  KEY idx_eventos_punto (latitud, longitud),
 
   CONSTRAINT fk_evento_usuario
     FOREIGN KEY (usuario_id) REFERENCES usuarios (id)

@@ -92,6 +92,39 @@ $mal = function (string $campo) use ($errores) {
          value="<?= e($v('lugar')) ?>" placeholder="Cenote Zacil-Ha">
 </div>
 
+<div class="campo<?= $mal('mapa_url') ?>">
+  <label for="mapa_url">Ubicación en el mapa <span class="opcional">opcional</span></label>
+  <input id="mapa_url" name="mapa_url" type="text" maxlength="500"
+         value="<?= e($v('mapa_url')) ?>" placeholder="https://maps.app.goo.gl/…">
+
+  <?php /* Las instrucciones van antes del error y no después: quien las
+           necesita es justo quien acaba de equivocarse, y si están debajo del
+           mensaje rojo se leen tarde. */ ?>
+  <div class="pista">
+    Busca el sitio en Google Maps, pulsa <strong>Compartir</strong> y pega aquí el enlace.
+    En la ficha sale un mapa con el punto y un botón para llegar.
+    Si tienes las coordenadas a mano, también valen: <span class="mono">20.2114, -87.4654</span>.
+  </div>
+
+  <?php
+  /*
+   * Si el enlace ya se leyó, se enseña el mapa aquí mismo. Es la única forma de
+   * que el organizador compruebe que el punto cayó donde tenía que caer antes
+   * de publicar: un enlace copiado de una búsqueda a medias apunta al centro de
+   * la ciudad, y desde el texto del enlace eso no se ve.
+   */
+  if (!empty($e['latitud']) && !empty($e['longitud'])):
+  ?>
+    <div class="mapa-previo">
+      <div class="pista pista-ok">Ubicación reconocida. Comprueba que el punto está donde debe.</div>
+      <iframe src="<?= e(urlMapaEmbebido((float) $e['latitud'], (float) $e['longitud'])) ?>"
+              title="Vista previa de la ubicación" loading="lazy" referrerpolicy="no-referrer"></iframe>
+    </div>
+  <?php endif; ?>
+
+  <?= $err('mapa_url') ?>
+</div>
+
 <div class="campo-fila">
   <div class="campo<?= $mal('fecha_inicio') ?>">
     <label for="fecha_inicio">Empieza</label>
@@ -133,10 +166,26 @@ $mal = function (string $campo) use ($errores) {
 <div class="campo<?= $mal('imagen') ?>">
   <label for="imagen">Imagen <span class="opcional">opcional</span></label>
 
-  <?php $imagenActual = urlImagen($e['imagen_url'] ?? null); ?>
+  <?php
+  /*
+   * El campo oculto es lo que hace que una foto ya elegida sobreviva a un
+   * formulario devuelto por otro error. Un <input type="file"> no se puede
+   * rellenar desde el servidor —el navegador no lo permite, y con razón: si se
+   * pudiera, una página podría mandarse archivos del ordenador de quien la
+   * visita—. Así que la foto se guarda ya y aquí solo viaja su nombre.
+   *
+   * Quién puede usar ese nombre lo decide imagenArrastrada(), en subidas.php.
+   */
+  $imagenGuardada = $e['imagen_url'] ?? null;
+  $imagenActual   = urlImagen($imagenGuardada);
+  ?>
   <?php if ($imagenActual !== null): ?>
+    <input type="hidden" name="imagen_previa" value="<?= e((string) $imagenGuardada) ?>">
     <div class="imagen-actual">
-      <img src="<?= e($imagenActual) ?>" alt="Imagen actual del evento">
+      <img src="<?= e($imagenActual) ?>" alt="Imagen del evento">
+      <?php if (esImagenEnVuelo($imagenGuardada)): ?>
+        <div class="pista">Esta es la que acabas de elegir. Sigue puesta: no hace falta que la busques otra vez.</div>
+      <?php endif; ?>
       <label class="check">
         <input type="checkbox" name="quitar_imagen" value="1">
         <span>Quitar esta imagen</span>
@@ -147,7 +196,7 @@ $mal = function (string $campo) use ($errores) {
   <input id="imagen" name="imagen" type="file" accept="image/jpeg,image/png,image/webp">
   <div class="pista">
     JPG, PNG o WebP, hasta <?= round(IMAGEN_MAX_BYTES / 1048576) ?> MB. Si es muy grande se reduce sola.
-    Sin imagen se usa el color de abajo, como en el diseño de la portada.
+    <?= $imagenActual !== null ? 'Elige otra solo si quieres cambiarla.' : 'Sin imagen se usa el color de abajo, como en el diseño de la portada.' ?>
   </div>
   <?= $err('imagen') ?>
 </div>

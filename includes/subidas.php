@@ -156,6 +156,158 @@ function reducirImagen(string $ruta, int $tipo): void
     imagedestroy($destino);
 }
 
+/* ---------------------------------------------------------------------------
+ * Imágenes «en vuelo»: subidas que todavía no son de ningún evento.
+ *
+ * Cuando alguien rellena la ficha, elige una foto y el formulario falla por otra
+ * cosa —la descripción corta, una fecha pasada—, la foto se perdía y había que
+ * buscarla otra vez en el disco. El navegador no puede volver a poner un archivo
+ * en un <input type="file"> por seguridad, así que la única manera de conservarla
+ * es guardarla ya y que el formulario se acuerde de ella.
+ *
+ * El formulario la recuerda en un campo oculto, y ese campo lo escribe el
+ * navegador: no se puede creer sin más. Si solo se comprobara que la ruta está
+ * dentro de la carpeta, cualquiera podría poner ahí la imagen de OTRO evento y
+ * conseguir que se la borráramos al subir la suya.
+ *
+ * Por eso la lista de lo que está en vuelo vive en la sesión. Solo se acepta
+ * —y solo se borra— lo que subió esta misma persona en este mismo rato.
+ * ------------------------------------------------------------------------- */
+
+const IMAGENES_EN_VUELO_MAX = 20;
+
+function recordarImagenEnVuelo(string $relativa): void
+{
+    $_SESSION['imagenes_en_vuelo'][$relativa] = time();
+
+    // Sin tope, un rato largo peleándose con el formulario llena la sesión.
+    while (count($_SESSION['imagenes_en_vuelo']) > IMAGENES_EN_VUELO_MAX) {
+        array_shift($_SESSION['imagenes_en_vuelo']);
+    }
+}
+
+function esImagenEnVuelo(?string $relativa): bool
+{
+    return $relativa !== null && isset($_SESSION['imagenes_en_vuelo'][$relativa]);
+}
+
+function olvidarImagenEnVuelo(?string $relativa): void
+{
+    if ($relativa !== null) unset($_SESSION['imagenes_en_vuelo'][$relativa]);
+}
+
+/**
+ * La imagen que el formulario dice traer puesta, si de verdad puede traerla.
+ *
+ * Vale si es la que ya tiene el evento, o si la subió esta persona en un intento
+ * anterior. Cualquier otra cosa se ignora en silencio: no es un ataque que haya
+ * que contarle a nadie, es un campo manipulado.
+ */
+function imagenArrastrada($valor, ?string $propia): ?string
+{
+    if (!is_string($valor) || $valor === '') return null;
+    if ($valor === $propia)                  return $propia;
+    if (!esImagenEnVuelo($valor))            return null;
+
+    // Pudo borrarla la limpieza de huérfanas mientras el formulario estaba abierto.
+    return is_file(dirname(__DIR__) . '/' . $valor) ? $valor : null;
+}
+
+/** Suelta una subida de un intento anterior. Nunca la que ya tiene el evento. */
+function soltarImagenTemporal(?string $ruta, ?string $propia): void
+{
+    if ($ruta === null || $ruta === $propia || !esImagenEnVuelo($ruta)) return;
+
+    borrarImagenGuardada($ruta);
+    olvidarImagenEnVuelo($ruta);
+}
+
+/**
+ * Con qué imagen se queda la ficha en este envío.
+ *
+ * Lo comparten el alta y la edición porque las reglas son las mismas, y cuando
+ * estaban escritas dos veces no coincidían: en el alta la imagen se borraba al
+ * fallar y en la edición se volvía a la anterior.
+ *
+ * @param  ?string $propia  la que ya tiene guardada el evento (null si es un alta)
+ * @return array{0:?string,1:?string} [ruta para la ficha, error o null]
+ */
+function imagenDelFormulario(array $post, array $files, ?string $propia): array
+{
+    $arrastrada = imagenArrastrada($post['imagen_previa'] ?? null, $propia);
+
+    [$ok, $nueva] = guardarImagenSubida($files['imagen'] ?? []);
+
+    // El archivo nuevo no valía. Se conserva lo que hubiera antes: el mensaje ya
+    // dice qué pasó, y quitarle además la foto anterior sería castigar dos veces.
+    if (!$ok) return [$arrastrada ?? $propia, (string) $nueva];
+
+    if ($nueva !== null) {
+        recordarImagenEnVuelo($nueva);
+        soltarImagenTemporal($arrastrada, $propia);   // la tentativa anterior sobra
+        return [$nueva, null];
+    }
+
+    if (!empty($post['quitar_imagen'])) {
+        soltarImagenTemporal($arrastrada, $propia);
+        return [null, null];
+    }
+
+    // No mandó archivo: se queda como estaba.
+    return [$arrastrada ?? $propia, null];
+}
+
+/**
+ * Barre las imágenes que ya no son de nadie.
+ *
+ * Salen de dos sitios: fichas que se empezaron con foto y nunca se terminaron, y
+ * —hasta que eliminarEvento() se encargó— eventos borrados. Nada volvía a
+ * apuntar a esos archivos y nadie sabía que estaban ahí.
+ *
+ * Solo se miran archivos de más de $horas para no pisar una subida que está en
+ * mitad de un formulario abierto, y como mucho 200 por pasada, que es de sobra
+ * para el ritmo de este sitio y acota la consulta.
+ */
+function limpiarImagenesHuerfanas(int $horas = 24): int
+{
+    $carpeta = dirname(__DIR__) . '/' . IMAGEN_CARPETA;
+    if (!is_dir($carpeta)) return 0;
+
+    $limite    = time() - $horas * 3600;
+    $candidatas = [];
+
+    foreach ((array) @scandir($carpeta) as $nombre) {
+        if ($nombre === '.' || $nombre === '..' || $nombre[0] === '.') continue;
+
+        $ruta = $carpeta . '/' . $nombre;
+        if (!is_file($ruta) || @filemtime($ruta) > $limite) continue;
+
+        $candidatas[IMAGEN_CARPETA . '/' . $nombre] = $ruta;
+        if (count($candidatas) >= 200) break;
+    }
+
+    if (!$candidatas) return 0;
+
+    try {
+        $marcas = implode(',', array_fill(0, count($candidatas), '?'));
+        $st = db()->prepare('SELECT imagen_url FROM eventos WHERE imagen_url IN (' . $marcas . ')');
+        $st->execute(array_keys($candidatas));
+
+        foreach ($st->fetchAll(PDO::FETCH_COLUMN) as $enUso) {
+            unset($candidatas[$enUso]);
+        }
+    } catch (Throwable $ex) {
+        // Si la consulta falla no se borra nada: mejor dejar basura que llevarse
+        // por delante la foto de un evento publicado.
+        error_log('No se pudieron listar las imágenes en uso: ' . $ex->getMessage());
+        return 0;
+    }
+
+    foreach ($candidatas as $ruta) @unlink($ruta);
+
+    return count($candidatas);
+}
+
 /** Borra una imagen guardada. Se le pasa la ruta relativa de la base. */
 function borrarImagenGuardada(?string $relativa): void
 {
