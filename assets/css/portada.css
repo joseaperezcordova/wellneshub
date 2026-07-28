@@ -432,10 +432,20 @@
 
   /* ---------- newsletter ---------- */
   .newsletter{background:var(--jungle); color:var(--paper); border-radius:10px; padding:36px 32px; display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;}
+  @media(max-width:640px){ .newsletter{padding:26px 20px;} }
+  /* Un <div> sin clase es tan flex item como .nform, y por defecto un flex
+     item no encoge por debajo del ancho minimo de su contenido: sin esto, el
+     texto de al lado le imponia un piso que .nform heredaba igual. */
+  .newsletter > div{min-width:0;}
   .newsletter h3{font-size:22px; color:var(--paper); max-width:360px;}
   .newsletter p{font-size:13px; opacity:0.75; margin-top:6px;}
   .nform{display:flex; gap:8px; flex:1; min-width:260px; max-width:400px;}
-  .nform input{flex:1; border:none; border-radius:5px; padding:11px 13px; font-size:13.5px;}
+  /* min-width:260px es para que en desktop el input no se aplaste dentro de la
+     fila; en un telefono angosto no hay «fila» que compartir con el texto de
+     al lado —ya se envolvieron aparte por flex-wrap— y ese minimo desbordaba
+     la pagina entera en vez de solo encogerse. */
+  @media(max-width:400px){ .nform{min-width:0; width:100%;} }
+  .nform input{flex:1; min-width:0; border:none; border-radius:5px; padding:11px 13px; font-size:13.5px;}
   .nform button{background:var(--marigold); border:none; color:var(--tinta-boton); font-weight:600; border-radius:5px; padding:0 18px; font-size:13.5px;}
   .nform button:hover{background:var(--marigold-deep);}
   .toast{font-size:12.5px; color:var(--terracota-palida); margin-top:8px; display:none;}
