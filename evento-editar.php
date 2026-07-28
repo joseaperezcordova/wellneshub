@@ -139,6 +139,16 @@ require __DIR__ . '/includes/layout.php';
     <?php $textoBoton = 'Guardar cambios'; require __DIR__ . '/includes/form-evento.php'; ?>
   </form>
 
+  <?php /* Mismo permiso que habilitó esta página ($puede), y el mismo endpoint
+           que ya borra desde la ficha —evento.php—: no hace falta duplicar
+           aquí la comprobación de plazo ni la de quién manda. */ ?>
+  <form method="post" action="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>"
+        onsubmit="return confirm('¿Eliminar «<?= e(addslashes($ev['titulo'])) ?>»? No se puede deshacer.');"
+        style="margin-top:18px;">
+    <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+    <button class="btn-barra peligro" type="submit" name="eliminar" value="1">Eliminar evento</button>
+  </form>
+
 <?php endif; ?>
 
 </div>
