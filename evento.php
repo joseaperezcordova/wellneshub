@@ -113,7 +113,8 @@ if ($volverAdmin) {
 }
 $vieneDeBusqueda = !$volverAdmin && isset($_GET['volver']) && $_GET['volver'] !== '';
 
-$titulo = $ev['titulo'];
+$titulo        = $ev['titulo'];
+$scriptsPagina = ['assets/js/evento.js'];
 require __DIR__ . '/includes/layout.php';
 ?>
 
@@ -203,6 +204,13 @@ require __DIR__ . '/includes/layout.php';
   <div class="ficha-cuerpo">
     <div class="ficha-cat"><?= e((categorias()[$ev['categoria']] ?? '') . ' ' . $ev['categoria']) ?></div>
     <h1><?= e($ev['titulo']) ?></h1>
+
+    <div class="ficha-compartir">
+      <button type="button" class="btn-barra" id="btnCompartir"
+              data-url="<?= e(URL_BASE . '/evento.php?id=' . (int) $ev['id']) ?>"
+              data-titulo="<?= e($ev['titulo']) ?>">↗ Compartir</button>
+      <span class="aviso-copiado" id="avisoCopiado">Enlace copiado.</span>
+    </div>
 
     <div class="ficha-datos">
       <div class="dato">
