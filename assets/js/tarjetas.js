@@ -1,0 +1,113 @@
+/* ============================================================================
+   Las tarjetas de evento, en el navegador.
+
+   Las pinta el navegador y no PHP porque la lista se filtra y se reordena sin
+   recargar: en buscar.php cada casilla que se marca vuelve a componer la
+   rejilla entera. Los datos llegan desde PHP en un array —eventoParaTarjeta()
+   en includes/eventos.php decide qué campos— y aquí solo se dibujan.
+
+   Estas funciones las usan la portada (el carril de próximos), buscar.php (la
+   rejilla de resultados) y la ficha (los relacionados), así que viven en un
+   archivo compartido en vez de repetidas en cada una.
+   ========================================================================== */
+
+/* Todo lo que sale de la base pasa por aquí antes de entrar en el HTML. Los
+   títulos y las descripciones los escribe cualquiera que publique un evento,
+   así que llegan sin depurar: sin esto, un título con etiquetas dentro se
+   ejecutaría en la portada. */
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+/* El fondo de la tarjeta: la foto si la hay, y si no el color de la paleta que
+   eligió quien publicó. */
+function fondoTarjeta(e) {
+  return e.img
+    ? "background-image:url('" + esc(e.img) + "'); background-size:cover; background-position:center;"
+    : 'background-color:' + esc(e.color) + ';';
+}
+
+function precioTexto(e, prefijo) {
+  return e.free ? 'Gratis' : (e.price ? prefijo + '$' + esc(e.price) + ' MXN' : 'Por confirmar');
+}
+
+/* Tarjeta grande del carril de próximos eventos: fecha sobre la imagen,
+   categoría, título, ubicación y, al pie, quién lo organiza y desde cuánto. */
+function evCardHTML(e) {
+  return '<a class="ev-card" href="' + esc(e.url) + '">'
+    + '<div class="ev-img" style="' + fondoTarjeta(e) + '">'
+    +   '<div class="ev-date"><span class="d">' + esc(e.d) + '</span><span class="m">' + esc(e.m) + '</span></div>'
+    + '</div>'
+    + '<div class="ev-body">'
+    +   '<div class="ev-cat">' + esc(e.cat) + '</div>'
+    +   '<h3>' + esc(e.t) + '</h3>'
+    +   '<div class="ev-loc">' + esc(e.city) + '</div>'
+    +   '<div class="ev-foot">'
+    +     '<span class="ev-org">' + esc(e.org) + '</span>'
+    +     '<span class="ev-price ' + (e.free ? 'free' : '') + '">' + precioTexto(e, 'Desde ') + '</span>'
+    +   '</div>'
+    + '</div>'
+    + '</a>';
+}
+
+/* La tarjeta de la rejilla de resultados y de los relacionados.
+   El segundo argumento se le pega a la dirección: buscar.php lo usa para
+   llevarse los filtros a la ficha y que desde allí se pueda volver. */
+function cardHTML(e, cola) {
+  var url = esc(e.url) + (cola ? '&amp;' + cola : '');
+
+  return '<a class="card-event" href="' + url + '">'
+    + '<div class="card-img" style="' + fondoTarjeta(e) + '">'
+    +   '<span class="cat-tag">' + esc(e.cat) + '</span>'
+    + '</div>'
+    + '<div class="card-body">'
+    +   '<div class="card-date">' + esc(e.date) + '</div>'
+    +   '<h3>' + esc(e.t) + '</h3>'
+    +   '<div class="card-city">' + esc(e.city) + '</div>'
+    +   '<div class="card-foot">'
+    +     '<span class="price ' + (e.free ? 'free' : '') + '">' + precioTexto(e, '') + '</span>'
+    +     '<span style="font-size:12px; color:var(--jungle);">Ver evento →</span>'
+    +   '</div>'
+    + '</div>'
+    + '</a>';
+}
+
+/* Con la base vacía, un carril sin nada parece la página rota. Se dice que no
+   hay eventos y se invita a publicar, que es justo lo que hace falta al
+   principio. */
+function vacioHTML(mensaje) {
+  return '<div class="rail-vacio">'
+    + '<p>' + esc(mensaje) + '</p>'
+    + '<a class="btn-vacio" href="' + RUEDA.base + '/evento-nuevo.php">Publicar el primero</a>'
+    + '</div>';
+}
+
+function pintar(id, trozos, mensajeVacio) {
+  var caja = document.getElementById(id);
+  if (!caja) return;
+  caja.innerHTML = trozos.length ? trozos.join('') : (mensajeVacio ? vacioHTML(mensajeVacio) : '');
+}
+
+/* ---------- carriles horizontales ----------
+   El menú de categorías y el de eventos comparten comportamiento: avanzan una
+   pantalla y, al llegar al final, vuelven al principio. Una flecha que se queda
+   muerta al final parece rota; que cicle es lo que se espera. */
+function carril(idRail, idBoton) {
+  var rail  = document.getElementById(idRail);
+  var boton = document.getElementById(idBoton);
+  if (!rail || !boton) return;
+
+  boton.addEventListener('click', function () {
+    var final = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 8;
+    if (final) rail.scrollTo({left: 0, behavior: 'smooth'});
+    else rail.scrollBy({left: rail.clientWidth * 0.72, behavior: 'smooth'});
+  });
+
+  /* Con el ratón no hay barra de desplazamiento visible (se oculta a
+     propósito), así que si todo cabe en pantalla la flecha no pinta nada. */
+  function revisar() { boton.hidden = rail.scrollWidth <= rail.clientWidth + 4; }
+  revisar();
+  window.addEventListener('resize', revisar);
+}

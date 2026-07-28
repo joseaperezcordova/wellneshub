@@ -523,5 +523,36 @@ function eventoParaTarjeta(array $ev): array
         'color' => $ev['color'],
         'img'   => urlImagen($ev['imagen_url']),
         'url'   => URL_BASE . '/evento.php?id=' . (int) $ev['id'],
+
+        /*
+         * De aquí para abajo no se pinta nada: es lo que necesita el buscador
+         * de la portada para filtrar y ordenar.
+         *
+         * Van aparte de lo que ya se enseña porque las claves de arriba están
+         * pensadas para leerse, no para compararse. Filtrar por «city»
+         * obligaría a partir «Tulum, Quintana Roo» en el navegador, y ordenar
+         * por «price» compararía «2,450» como texto: 2,450 saldría antes que
+         * 900.
+         */
+        'ciudad'  => $ev['ciudad'],
+        'entidad' => $ev['entidad'],
+
+        // Con la T en medio, que es lo que sabe leer new Date() en todos los
+        // navegadores. Con el espacio de MySQL, Safari devuelve fecha inválida.
+        'ini' => fechaIso($ev['fecha_inicio'] ?? null),
+        'fin' => fechaIso($ev['fecha_fin'] ?? null),
+        'pub' => fechaIso($ev['publicado_en'] ?? null),
+
+        // Gratis es cero, y «todavía no sé el precio» es null: son cosas
+        // distintas y al ordenar tienen que caer en sitios distintos.
+        'pnum' => !empty($ev['gratuito'])
+            ? 0.0
+            : ($ev['precio'] !== null ? (float) $ev['precio'] : null),
     ];
+}
+
+/** Una fecha de MySQL en la forma que entiende new Date() sin sorpresas. */
+function fechaIso(?string $fecha): ?string
+{
+    return ($fecha === null || $fecha === '') ? null : str_replace(' ', 'T', $fecha);
 }

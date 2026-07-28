@@ -14,6 +14,7 @@
 declare(strict_types=1);
 require __DIR__ . '/includes/config.php';
 require __DIR__ . '/includes/eventos.php';
+require __DIR__ . '/includes/busqueda.php';
 
 $u  = usuarioActual();
 $ev = buscarEvento((int) ($_GET['id'] ?? 0));
@@ -81,9 +82,31 @@ if (!empty($_SESSION['evento_aviso'])) {
 $esBorrador = $ev['situacion'] === 'borrador';
 $partes     = fechaPartes($ev['fecha_inicio']);
 
+/*
+ * A dónde vuelve el enlace de arriba.
+ *
+ * Si se llegó desde una búsqueda, la tarjeta trajo esa búsqueda pegada en el
+ * parámetro «volver», y ahí se vuelve: con los mismos filtros puestos. Es lo
+ * que evita el camino de siempre —filtrar, entrar a un evento, volver y tener
+ * que filtrar otra vez.
+ *
+ * No se usa lo que llega tal cual: urlVolverABuscar() lo deshace, lo valida
+ * contra las listas de verdad y arma la dirección de nuevo. Así lo que acaba en
+ * el enlace lo hemos escrito nosotros, y por ahí no se cuela un destino ajeno.
+ *
+ * El botón «atrás» del navegador hace lo mismo por su cuenta. Este enlace es
+ * para cuando no lo hay: una pestaña nueva, un enlace compartido.
+ */
+$volverA = urlVolverABuscar(isset($_GET['volver']) ? (string) $_GET['volver'] : null);
+$vieneDeBusqueda = isset($_GET['volver']) && $_GET['volver'] !== '';
+
 $titulo = $ev['titulo'];
 require __DIR__ . '/includes/layout.php';
 ?>
+
+<div class="ficha-envoltorio">
+  <a class="volver" href="<?= e($volverA) ?>">← <?= $vieneDeBusqueda ? 'Volver a los resultados' : 'Ver todos los eventos' ?></a>
+</div>
 
 <?php if ($aviso): ?>
   <div class="ficha-envoltorio"><div class="aviso aviso-ok"><?= e($aviso) ?></div></div>

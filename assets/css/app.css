@@ -315,6 +315,12 @@ input,select{font-family:inherit; font-size:14px;}
 .ficha-envoltorio{max-width:900px; margin:22px auto 0; padding:0 22px;}
 .ficha{max-width:900px; margin:32px auto 72px; padding:0 22px;}
 
+/* La vuelta a los resultados. Va arriba del todo y no al pie: quien entra a una
+   ficha, mira la fecha y decide que no, quiere salir sin recorrer la página
+   entera. */
+.volver{display:inline-block; font-size:13px; color:var(--verde); padding:4px 0;}
+.volver:hover{text-decoration:underline;}
+
 .ficha-media{
   position:relative; height:340px; border-radius:16px; overflow:hidden;
   border:1px solid var(--linea);
