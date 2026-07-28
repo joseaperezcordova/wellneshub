@@ -125,6 +125,9 @@ require __DIR__ . '/includes/layout.php';
 
 <?php else: ?>
 
+  <?php $volverAdmin = ($_GET['volver'] ?? '') === 'admin' && esAdmin($u); ?>
+  <a class="volver" href="<?= $volverAdmin ? URL_BASE . '/admin.php' : URL_BASE . '/evento.php?id=' . (int) $ev['id'] ?>">← <?= $volverAdmin ? 'Volver al panel admin' : 'Volver a la ficha' ?></a>
+
   <h1>Editar evento</h1>
   <?php if ($ev['situacion'] === 'borrador'): ?>
     <p class="sub">Es un borrador: no lo ve nadie más que tú hasta que lo publiques.</p>

@@ -79,6 +79,8 @@ require __DIR__ . '/includes/layout.php';
 
 <?php else: ?>
 
+  <a class="volver" href="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>">← Volver al evento</a>
+
   <h1>Reportar evento</h1>
   <p class="sub">«<?= e($ev['titulo']) ?>»</p>
 
