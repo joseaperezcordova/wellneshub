@@ -139,6 +139,13 @@
   }
   @media(max-width:900px){ .hero-banner{min-height:440px;} }
   @media(max-width:640px){ .hero-banner{min-height:400px;} }
+  /* Los tres min-height de arriba solo miran el ancho. Un telefono acostado es
+     ancho Y bajo a la vez, y esa combinacion nunca entraba: el banner pedia
+     mas alto que la pantalla entera y tapaba todo lo demas. max-height mira lo
+     que realmente falta -la altura- sin tocar el diseño en vertical. Baja
+     tambien el padding y el titulo, que si no siguen midiendo lo mismo que en
+     escritorio y el contenido empuja el banner por encima del min-height. */
+  @media(max-height:500px){ .hero-banner{min-height:280px;} }
 
   /* Carrusel: las diapositivas se apilan y se cruzan por opacidad. No se
      desplazan lateralmente a proposito — un desplazamiento obliga a medir
@@ -221,11 +228,13 @@
   }
   .hero-content .eyebrow, .hero-content h1, .hero-content p.sub{max-width:680px;}
   @media(max-width:640px){ .hero-content{padding:26px 18px 56px;} }
+  @media(max-height:500px){ .hero-content{padding:20px 24px 34px;} }
   .hero .eyebrow{color:var(--terracota-palida); opacity:1;}
   .hero h1{font-size:44px; margin-top:10px; color:#fff; text-shadow:0 2px 18px rgba(21,33,40,.4);}
   .hero h1 em{font-style:italic; color:var(--terracota-palida);}
   .hero p.sub{max-width:520px; color:rgba(255,255,255,0.88); margin-top:12px; font-size:15.5px;}
   @media(max-width:640px){.hero h1{font-size:30px;}}
+  @media(max-height:500px){.hero h1{font-size:28px; margin-top:6px;} .hero p.sub{margin-top:6px;}}
 
   /* Pastilla de busqueda segmentada: tres campos separados por linea fina y un
      boton circular. Va fuera de .hero-banner —que recorta por overflow— y sube
