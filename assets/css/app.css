@@ -399,7 +399,7 @@ input,select{font-family:inherit; font-size:14px;}
 
 .btn-boletos{display:block; text-align:center; text-decoration:none; max-width:320px;}
 
-.ficha-desc{margin-top:30px; font-size:15.5px; line-height:1.75;}
+.ficha-desc{margin-top:30px; font-size:15.5px; line-height:1.75; overflow-wrap:break-word;}
 
 /* --------------------------------------------------------- moderación --- */
 /* El campo trampa del formulario de reportes. Fuera de pantalla y no

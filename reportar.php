@@ -66,8 +66,8 @@ require __DIR__ . '/includes/layout.php';
 
 <?php if ($enviado): ?>
 
-  <h1>Gracias</h1>
-  <p class="sub">Tu aviso llegó y alguien lo va a mirar.</p>
+  <h1>Gracias por tu reporte</h1>
+  <p class="sub">Lo revisaremos lo antes posible.</p>
 
   <div class="aviso aviso-ok">
     El evento sigue publicado mientras tanto. No lo retiramos por un aviso

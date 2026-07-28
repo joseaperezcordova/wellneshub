@@ -87,6 +87,7 @@
     border-bottom:1px solid var(--line);
   }
   .topbar-inner{display:flex; align-items:center; justify-content:space-between; padding:16px 28px; max-width:1180px; margin:0 auto;}
+  @media(max-width:640px){ .topbar-inner{padding:14px 18px;} }
   .logo{display:flex; align-items:center; gap:10px;}
   /* La marca es una rueda de cuatro cuartos: es el sitio donde la paleta se
      presenta entera, asi que lleva los cuatro colores con caracter propio en
@@ -398,7 +399,7 @@
   .evnext:hover{background:var(--arena);}
 
   /* ---------- section shells ---------- */
-  section.block{padding:50px 0;}
+  section.block{padding-top:50px; padding-bottom:50px;}
   .block-head{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:22px; gap:16px; flex-wrap:wrap;}
   .block-head h2{font-size:26px;}
   .block-head a.more{font-size:13px; color:var(--jungle); border-bottom:1px solid var(--jungle); flex-shrink:0;}
@@ -604,6 +605,10 @@
   .langtoggle{display:flex; border:1px solid var(--line); border-radius:20px; overflow:hidden;}
   .langtoggle button{background:none; border:none; padding:7px 12px; font-size:12px; font-family:'IBM Plex Mono',monospace;}
   .langtoggle button.active{background:var(--jungle); color:var(--paper);}
+  /* Con logo + Publicar + cuenta + hamburguesa, el selector de idioma es lo
+     primero que deja de caber en un telefono en vertical. Se esconde antes de
+     que el topbar empiece a desbordar la ventana (ver Caso 20). */
+  @media(max-width:480px){ .langtoggle{display:none;} }
   /* .btn-publish se fue con el botón de «Publicar evento»: ahora esa acción
      vive dentro del menú de cuenta, porque exige estar identificado. */
 
