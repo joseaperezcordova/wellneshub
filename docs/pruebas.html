@@ -1,0 +1,1295 @@
+<title>Guía de pruebas · Rueda</title>
+
+<style>
+  /* ── Tokens ────────────────────────────────────────────────────────────
+     La paleta sale del propio sitio que se va a probar (verde, petróleo,
+     terracota, arena), pero con otro reparto: aquí manda el petróleo como
+     color estructural y la terracota queda reservada para "esto pide
+     atención". Así la guía se reconoce como parte del proyecto sin imitar
+     su portada, que es lo que se está evaluando. */
+  :root{
+    --ground:#F6F8F8;
+    --panel:#FFFFFF;
+    --ink:#1E2E37;
+    --ink-soft:#5A6E79;
+    --rule:#D9E1E4;
+    --rule-soft:#EAF0F1;
+
+    --petroleo:#2F4E5D;
+    --verde:#3F6149;
+    --terracota:#B05C33;
+    --arena:#EFE6D6;
+
+    --ok-bg:#EAF1EC;
+    --warn-bg:#FAEEE7;
+
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Code","Roboto Mono",Consolas,monospace;
+
+    --wrap:1120px;
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ground:#131E25;
+      --panel:#1A272F;
+      --ink:#E3ECEF;
+      --ink-soft:#9FB2BC;
+      --rule:#2C3E48;
+      --rule-soft:#233139;
+      --petroleo:#8FB6C7;
+      --verde:#8FBC9C;
+      --terracota:#E39468;
+      --arena:#3A3527;
+      --ok-bg:#1D2E24;
+      --warn-bg:#33241C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#131E25; --panel:#1A272F; --ink:#E3ECEF; --ink-soft:#9FB2BC;
+    --rule:#2C3E48; --rule-soft:#233139; --petroleo:#8FB6C7; --verde:#8FBC9C;
+    --terracota:#E39468; --arena:#3A3527; --ok-bg:#1D2E24; --warn-bg:#33241C;
+  }
+  :root[data-theme="light"]{
+    --ground:#F6F8F8; --panel:#FFFFFF; --ink:#1E2E37; --ink-soft:#5A6E79;
+    --rule:#D9E1E4; --rule-soft:#EAF0F1; --petroleo:#2F4E5D; --verde:#3F6149;
+    --terracota:#B05C33; --arena:#EFE6D6; --ok-bg:#EAF1EC; --warn-bg:#FAEEE7;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); font-size:15.5px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--petroleo);}
+  :focus-visible{outline:2px solid var(--terracota); outline-offset:2px; border-radius:3px;}
+
+  .marco{max-width:var(--wrap); margin:0 auto; padding:0 24px 96px;}
+
+  /* ── Cabecera ── */
+  .cabecera{border-bottom:1px solid var(--rule); padding:44px 0 26px; margin-bottom:32px;}
+  .kicker{
+    font-family:var(--mono); font-size:11px; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--terracota); margin:0 0 12px;
+  }
+  h1{
+    font-size:clamp(28px,4.4vw,42px); line-height:1.1; margin:0 0 14px;
+    letter-spacing:-.02em; text-wrap:balance; font-weight:640;
+  }
+  .entradilla{max-width:64ch; color:var(--ink-soft); margin:0; font-size:17px;}
+
+  /* ── Dos columnas ── */
+  .cuerpo{display:grid; grid-template-columns:236px 1fr; gap:44px; align-items:start;}
+  @media(max-width:900px){ .cuerpo{grid-template-columns:1fr; gap:28px;} }
+
+  .rail{position:sticky; top:24px;}
+  @media(max-width:900px){ .rail{position:static;} }
+
+  .marcador{
+    background:var(--panel); border:1px solid var(--rule); border-radius:12px;
+    padding:16px 18px; margin-bottom:20px;
+  }
+  .marcador .cuenta{
+    font-family:var(--mono); font-size:26px; letter-spacing:-.02em;
+    font-variant-numeric:tabular-nums; line-height:1.1;
+  }
+  .marcador .cuenta small{font-size:14px; color:var(--ink-soft);}
+  .marcador .etiqueta{
+    font-family:var(--mono); font-size:10px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--ink-soft); margin-top:6px;
+  }
+  .barra{height:5px; background:var(--rule-soft); border-radius:99px; margin-top:12px; overflow:hidden;}
+  .barra i{display:block; height:100%; width:0; background:var(--verde); transition:width .25s ease;}
+  @media (prefers-reduced-motion: reduce){ .barra i{transition:none;} }
+
+  /* Si el navegador no deja guardar, hay que decirlo AQUÍ y de entrada. Antes
+     fallaba en silencio: se marcaban cuarenta casillas, se recargaba y se
+     descubría que no se había guardado nada. */
+  .estado{
+    margin-top:12px; font-size:12px; line-height:1.45;
+    display:flex; gap:7px; align-items:flex-start;
+  }
+  .estado .punto{
+    width:7px; height:7px; border-radius:50%; flex-shrink:0; margin-top:5px;
+    background:var(--verde);
+  }
+  .estado.mal .punto{background:var(--terracota);}
+  .estado.mal{color:var(--terracota);}
+  .estado.bien{color:var(--ink-soft);}
+
+  /* ── Respaldo manual ──
+     El único método que funciona siempre, incluso con el guardado bloqueado. */
+  .respaldo{
+    background:var(--panel); border:1px solid var(--rule); border-radius:12px;
+    padding:0; margin-bottom:20px; font-size:13.5px; overflow:hidden;
+  }
+  .respaldo summary{
+    padding:11px 16px; cursor:pointer; font-weight:560; list-style:none;
+    display:flex; justify-content:space-between; gap:8px; align-items:center;
+  }
+  .respaldo summary::-webkit-details-marker{display:none;}
+  .respaldo summary::after{content:"+"; color:var(--ink-soft); font-family:var(--mono);}
+  .respaldo[open] summary::after{content:"−";}
+  .respaldo .dentro{padding:0 16px 15px; border-top:1px solid var(--rule-soft);}
+  .respaldo p{margin:11px 0 9px; color:var(--ink-soft); font-size:12.5px; line-height:1.5;}
+  .respaldo textarea{
+    width:100%; height:74px; resize:vertical; font-family:var(--mono); font-size:11px;
+    padding:8px; border:1px solid var(--rule); border-radius:7px;
+    background:var(--ground); color:var(--ink); line-height:1.4;
+  }
+  .respaldo .botones{display:flex; gap:7px; margin-top:9px; flex-wrap:wrap;}
+  .respaldo button{
+    font:inherit; font-size:12.5px; padding:7px 13px; border-radius:99px;
+    border:1px solid var(--rule); background:var(--ground); color:var(--ink);
+    cursor:pointer;
+  }
+  .respaldo button:hover{background:var(--rule-soft);}
+  .respaldo button.principal{background:var(--verde); border-color:var(--verde); color:#fff;}
+  .respaldo .acuse{font-size:12px; color:var(--verde); margin:8px 0 0; min-height:1.2em;}
+
+  .indice{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:1px;}
+  .indice a{
+    display:flex; gap:10px; padding:7px 10px; border-radius:7px;
+    text-decoration:none; color:var(--ink); font-size:14px;
+  }
+  .indice a:hover{background:var(--panel);}
+  .indice .n{font-family:var(--mono); font-size:12px; color:var(--ink-soft); padding-top:2px;}
+  /* La marca de sección nueva: un punto, no una palabra. En una lista de once
+     entradas, cuatro etiquetas «nuevo» son ruido. */
+  .indice .nuevo::after{
+    content:""; width:6px; height:6px; border-radius:50%;
+    background:var(--terracota); margin-left:auto; align-self:center;
+  }
+
+  /* ── Secciones ── */
+  section{margin-bottom:52px; scroll-margin-top:20px;}
+  .cab-sec{display:flex; align-items:baseline; gap:12px; margin-bottom:6px; flex-wrap:wrap;}
+  .cab-sec .n{
+    font-family:var(--mono); font-size:13px; color:var(--terracota);
+    font-variant-numeric:tabular-nums;
+  }
+  h2{font-size:23px; margin:0; letter-spacing:-.015em; font-weight:640; text-wrap:balance;}
+  .sello{
+    font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--terracota); border:1px solid currentColor; border-radius:99px;
+    padding:2px 8px; white-space:nowrap;
+  }
+  .quien{
+    font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-soft); margin:0 0 16px 34px;
+  }
+  @media(max-width:560px){ .quien{margin-left:0;} }
+  .intro-sec{margin:0 0 18px; color:var(--ink-soft); max-width:66ch;}
+
+  /* ── Prueba ── */
+  .prueba{
+    display:grid; grid-template-columns:auto 1fr; gap:0 14px;
+    background:var(--panel); border:1px solid var(--rule); border-radius:11px;
+    padding:14px 16px; margin-bottom:8px;
+  }
+  .prueba:has(input:checked){border-color:var(--verde); background:var(--ok-bg);}
+  .prueba input{
+    width:19px; height:19px; margin:3px 0 0; accent-color:var(--verde); cursor:pointer;
+  }
+  .prueba .qué{font-weight:560; cursor:pointer;}
+  .prueba .esperado{
+    grid-column:2; margin-top:5px; font-size:14.5px; color:var(--ink-soft);
+    padding-left:13px; border-left:2px solid var(--rule);
+  }
+  .prueba .esperado b{color:var(--verde); font-weight:600;}
+  .prueba:has(input:checked) .esperado{border-left-color:var(--verde);}
+
+  code{
+    font-family:var(--mono); font-size:.88em; background:var(--rule-soft);
+    padding:1px 5px; border-radius:4px;
+    overflow-wrap:anywhere;
+  }
+
+  /* ── Recuadros ── */
+  .nota{
+    border-radius:11px; padding:15px 18px; margin:0 0 10px;
+    border:1px solid var(--rule); background:var(--panel); font-size:14.5px;
+  }
+  .nota.ojo{background:var(--warn-bg); border-color:var(--terracota); }
+  .nota.ojo strong{color:var(--terracota);}
+  .nota.fuera{background:var(--arena); border-color:transparent;}
+  .nota p{margin:0 0 8px;} .nota p:last-child{margin-bottom:0;}
+
+  ul.lista{margin:8px 0 0; padding-left:20px;} ul.lista li{margin-bottom:6px;}
+
+  .pie{
+    margin-top:56px; padding-top:22px; border-top:1px solid var(--rule);
+    font-size:13.5px; color:var(--ink-soft);
+  }
+</style>
+
+<div class="marco">
+
+  <header class="cabecera">
+    <p class="kicker">Rueda · Directorio wellness MX</p>
+    <h1>Guía de pruebas del sitio</h1>
+    <p class="entradilla">
+      No hace falta saber nada del proyecto para usar esto. Cada punto dice qué hacer
+      y qué debería pasar. Si lo que pasa es otra cosa, ahí hay algo que arreglar
+      — aunque parezca una tontería.
+    </p>
+  </header>
+
+  <div class="cuerpo">
+
+    <aside class="rail">
+      <div class="marcador">
+        <div class="cuenta" id="cuenta">0 <small>/ 0</small></div>
+        <div class="etiqueta">Comprobadas</div>
+        <div class="barra"><i id="barra"></i></div>
+        <div class="estado" id="estado"><span class="punto"></span><span id="estadoTexto"></span></div>
+      </div>
+
+      <details class="respaldo" id="respaldo">
+        <summary>Guardar o pasar mi avance</summary>
+        <div class="dentro">
+          <p>
+            Este código lleva lo que tienes marcado. Cópialo y guárdalo donde quieras
+            —una nota, un mensaje a ti misma— y podrás recuperarlo aquí o en otro
+            dispositivo. Es la manera que funciona siempre, aunque el navegador no
+            deje guardar solo.
+          </p>
+          <textarea id="codigo" spellcheck="false" aria-label="Código con tu avance"></textarea>
+          <div class="botones">
+            <button type="button" class="principal" id="btnCopiar">Copiar</button>
+            <button type="button" id="btnPegar">Recuperar lo pegado</button>
+          </div>
+          <p class="acuse" id="acuse"></p>
+        </div>
+      </details>
+
+      <ul class="indice">
+        <li><a href="#s0"><span class="n">00</span> Antes de empezar</a></li>
+        <li><a href="#s1"><span class="n">01</span> La portada</a></li>
+        <li><a href="#s2" class="nuevo"><span class="n">02</span> Buscar y filtrar</a></li>
+        <li><a href="#s3"><span class="n">03</span> Entrar</a></li>
+        <li><a href="#s4" class="nuevo"><span class="n">04</span> Publicar</a></li>
+        <li><a href="#s5"><span class="n">05</span> Editar</a></li>
+        <li><a href="#s6"><span class="n">06</span> Reportar</a></li>
+        <li><a href="#s7"><span class="n">07</span> Administración</a></li>
+        <li><a href="#s8"><span class="n">08</span> Móvil</a></li>
+        <li><a href="#s9"><span class="n">09</span> Lo que no está hecho</a></li>
+        <li><a href="#s10"><span class="n">10</span> Cómo avisar</a></li>
+      </ul>
+    </aside>
+
+    <main>
+
+      <!-- 00 ─────────────────────────────────────────────── -->
+      <section id="s0">
+        <div class="cab-sec"><span class="n">00</span><h2>Antes de empezar</h2></div>
+        <p class="intro-sec">
+          Rueda es un directorio de eventos de bienestar en México: retiros, temazcales,
+          círculos de cacao, yoga. Cualquiera puede buscar eventos sin cuenta. Quien quiera
+          publicar los suyos entra con su correo o con Google.
+        </p>
+
+        <div class="nota ojo">
+          <p><strong>Esto es el sitio de verdad, no una copia de pruebas.</strong></p>
+          <p>
+            Lo que publiques se ve publicado, y los correos que se manden llegan a buzones
+            reales. Ponle a tus eventos de prueba un título que se reconozca —por ejemplo
+            empezando por <code>PRUEBA</code>— para poder borrarlos después sin dudar.
+          </p>
+        </div>
+
+        <div class="nota">
+          <p><strong>Lo que necesitas:</strong></p>
+          <ul class="lista">
+            <li>La dirección del sitio.</li>
+            <li>Un correo al que puedas entrar, para recibir el código de acceso.</li>
+            <li>Una cuenta de Google, si quieres probar también esa vía.</li>
+            <li>Una foto cualquiera en el ordenador o el móvil, para probar las imágenes.</li>
+            <li>El teléfono, para repetir lo principal en pantalla pequeña.</li>
+          </ul>
+        </div>
+
+        <div class="nota">
+          <p><strong>Si ya habías visto esta guía antes, esto es lo que cambió</strong>
+          — está marcado con un punto naranja en el índice:</p>
+          <ul class="lista">
+            <li>Inicio, buscar, blog y la ficha de cada evento son ahora <b>páginas separadas</b>, con su propia dirección.</li>
+            <li>El <b>buscador funciona de verdad</b>: hay una sección nueva entera para él.</li>
+            <li>Al publicar, la <b>foto ya no se pierde</b> si falla otro campo.</li>
+            <li>Un evento puede llevar su <b>ubicación en un mapa</b>.</li>
+          </ul>
+          <p>
+            Las casillas se reiniciaron una vez, porque los puntos ya no son los mismos.
+            A partir de ahora no volverá a pasar aunque la guía crezca.
+          </p>
+        </div>
+
+        <div class="nota">
+          <p><strong>Sobre las casillas que se borraban.</strong></p>
+          <p>
+            Estaba fallando de verdad, y en silencio. Ahora la barra de la izquierda
+            <b>dice si se está guardando o no</b>, en vez de dejar que te enteres al recargar.
+          </p>
+          <p>
+            Si avisa de que este navegador no deja guardar —le pasa sobre todo a Safari
+            y al iPhone—, tienes dos salidas: abrir la guía en su propia pestaña, o usar
+            el <b>«Guardar o pasar mi avance»</b> de la izquierda. Ese código funciona
+            siempre, y sirve también para seguir en otro dispositivo: lo copias en el
+            ordenador y lo pegas en el móvil.
+          </p>
+        </div>
+      </section>
+
+      <!-- 01 ─────────────────────────────────────────────── -->
+      <section id="s1">
+        <div class="cab-sec"><span class="n">01</span><h2>La portada</h2></div>
+        <p class="quien">Como cualquiera que llega de Google</p>
+        <p class="intro-sec">
+          Empieza sin iniciar sesión. Si ya la tienes abierta, usa una ventana de incógnito.
+        </p>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Abre la portada.</span>
+          <span class="esperado">Carga sin huecos en blanco ni textos rotos. El banner de arriba <b>cambia de imagen solo</b> cada pocos segundos.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Deja el ratón quieto encima del banner.</span>
+          <span class="esperado">Deja de pasar imágenes mientras el ratón esté encima, y <b>vuelve a girar</b> al quitarlo.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Pasa el ratón por encima de los círculos de «Explora por categoría».</span>
+          <span class="esperado">El círculo sube un poco y <b>no se le corta la parte de arriba</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Pulsa una categoría, por ejemplo Yoga.</span>
+          <span class="esperado">Llegas a la página de buscar y <b>solo salen eventos de esa categoría</b>. Mira la barra de direcciones: pone <code>buscar.php?cat=Yoga</code>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Vuelve atrás con el botón del navegador.</span>
+          <span class="esperado">Regresas a la portada. <b>El botón «atrás» funciona</b> como en cualquier sitio.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Pulsa una tarjeta de «Próximos eventos».</span>
+          <span class="esperado">Se abre la ficha de <b>ese</b> evento, no de otro, y con dirección propia.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Lee la ficha entera.</span>
+          <span class="esperado">Cuadran fecha, ciudad, precio y quién organiza. Los saltos de línea de la descripción <b>se respetan</b>, no sale todo pegado.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Si la ficha tiene botón para reservar, púlsalo.</span>
+          <span class="esperado">Abre <b>en una pestaña nueva</b> y va a donde dice.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Recorre el menú de arriba: Inicio, Buscar eventos, Blog.</span>
+          <span class="esperado">Cada una es una página distinta y <b>el enlace de la que estás viendo aparece marcado</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Fíjate en la cabecera al pasar de una página a otra.</span>
+          <span class="esperado">Es <b>siempre la misma</b>: mismo logo, mismo menú, mismo botón de publicar. No debería cambiar de aspecto por el camino.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Escribe «Tulum» en el buscador grande del banner y dale a la lupa.</span>
+          <span class="esperado">Llegas a la página de buscar <b>con esa búsqueda ya hecha</b>.</span>
+        </label>
+      </section>
+
+      <!-- 02 ─────────────────────────────────────────────── -->
+      <section id="s2">
+        <div class="cab-sec"><span class="n">02</span><h2>Buscar y filtrar</h2><span class="sello">Nuevo</span></div>
+        <p class="quien">Lo que más ojos necesita esta ronda</p>
+        <p class="intro-sec">
+          Hasta hace poco estos filtros eran decorado: se veían pero no hacían nada. Ahora
+          funcionan, y además la búsqueda se guarda en la dirección de la página. Eso es lo
+          que hay que verificar: que puedas filtrar, entrar a un evento y <b>volver sin
+          perder lo que habías filtrado</b>.
+        </p>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Entra a «Buscar eventos» sin filtrar nada.</span>
+          <span class="esperado">Salen todos los publicados, del <b>más próximo al más lejano</b>, y arriba pone cuántos son.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Cuenta las tarjetas que ves.</span>
+          <span class="esperado">Son <b>las mismas</b> que dice el número de arriba.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Marca una categoría en la columna de la izquierda.</span>
+          <span class="esperado">La lista se reduce <b>al momento</b>, sin recargar la página, y el título de arriba pasa a decir esa categoría.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Marca una segunda categoría.</span>
+          <span class="esperado">Salen las dos, no ninguna. Marcar más <b>suma</b>, no resta.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Mira la barra de direcciones mientras vas marcando.</span>
+          <span class="esperado">Va cambiando sola: aparecen cosas como <code>?cat=Yoga,Cacao</code>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Con esos filtros puestos, recarga la página (F5).</span>
+          <span class="esperado">Vuelve <b>con los mismos filtros marcados</b> y la misma lista.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Copia esa dirección y ábrela en una ventana de incógnito.</span>
+          <span class="esperado">Se ve <b>la misma búsqueda</b>. Una búsqueda se puede compartir por WhatsApp.</span>
+        </label>
+
+        <div class="nota ojo">
+          <p><strong>Esta es la prueba principal de la sección.</strong></p>
+          <p>Hazla despacio, es la que se pidió expresamente.</p>
+        </div>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Filtra por lo que quieras, entra a uno de los eventos que salgan, y arriba del todo pulsa «← Volver a los resultados».</span>
+          <span class="esperado">Vuelves a la lista <b>con los filtros exactamente como los dejaste</b>. No hay que volver a marcar nada.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Repite, pero volviendo con el botón «atrás» del navegador en vez del enlace.</span>
+          <span class="esperado">Igual: <b>los filtros siguen puestos</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Ahora entra a una ficha desde la portada, sin haber buscado nada.</span>
+          <span class="esperado">El enlace de arriba dice <b>«Ver todos los eventos»</b> en vez de prometer unos resultados que no existen.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Usa el desplegable de Estado y luego el de Ciudad.</span>
+          <span class="esperado">Solo ofrecen sitios <b>donde de verdad hay eventos</b>. No debería aparecer un estado vacío.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Escribe algo en el campo «Nombre», por ejemplo <code>cenote</code>.</span>
+          <span class="esperado">La lista se va estrechando <b>mientras escribes</b>, sin pulsar nada.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Prueba a escribir sin acentos algo que sí los lleve: <code>meditacion</code>, <code>circulo</code>.</span>
+          <span class="esperado">Lo encuentra igual. <b>Los acentos no deberían hacer falta.</b></span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Escribe el nombre de una ciudad en ese mismo campo.</span>
+          <span class="esperado">También encuentra por lugar y por quién organiza, no solo por el título.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Marca «Solo gratuitos».</span>
+          <span class="esperado">Quedan únicamente los que ponen <b>Gratis</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Prueba las tres opciones de «Fecha»: este fin de semana, próximos 7 días, este mes.</span>
+          <span class="esperado">Cada una deja menos o igual que la anterior más amplia. Un retiro de varios días que <b>cruce</b> ese fin de semana debería salir, aunque empiece antes.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Cambia el orden a «Precio: menor a mayor».</span>
+          <span class="esperado">Los gratuitos van primero y los caros al final. Los que ponen <b>«Por confirmar» se van al final del todo</b>, no mezclados entre los precios.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Ponle filtros hasta que no quede ningún evento.</span>
+          <span class="esperado">En vez de un hueco vacío, dice que no coincide nada y ofrece un botón para <b>quitar los filtros</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Pulsa ese botón, o el de «Quitar filtros» de la columna izquierda.</span>
+          <span class="esperado">Vuelven a salir todos y la dirección se queda <b>limpia</b>, sin parámetros.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Sin ningún filtro puesto, busca el botón «Quitar filtros».</span>
+          <span class="esperado">No está. Aparece <b>solo cuando hay algo que quitar</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Inventa una dirección a mano: añade <code>?cat=Inventada</code> al final de <code>buscar.php</code>.</span>
+          <span class="esperado">No se rompe nada. Sale la lista completa, como si no hubieras puesto nada.</span>
+        </label>
+      </section>
+
+      <!-- 03 ─────────────────────────────────────────────── -->
+      <section id="s3">
+        <div class="cab-sec"><span class="n">03</span><h2>Entrar y crear cuenta</h2></div>
+        <p class="quien">No hay contraseñas en ningún sitio</p>
+        <p class="intro-sec">
+          Se entra de dos maneras: con Google, o pidiendo un código de seis cifras al correo.
+          La primera vez que entras, la cuenta se crea sola — no hay pantalla de registro,
+          y eso es a propósito.
+        </p>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Pulsa el icono de persona, arriba a la derecha.</span>
+          <span class="esperado">Llegas a una pantalla que pide <b>solo el correo</b>. Si te pide una contraseña, algo va mal.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Escribe tu correo y continúa.</span>
+          <span class="esperado">Pasa a una pantalla que dice «Revisa tu correo» y <b>enseña la dirección</b> a la que lo mandó.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Busca el correo. Mira también en spam.</span>
+          <span class="esperado">Llega en menos de un minuto y <b>el código se lee en el asunto</b>, sin abrirlo.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Escribe un código equivocado a propósito.</span>
+          <span class="esperado">Dice que es incorrecto y <b>cuántos intentos quedan</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Ahora el bueno. Prueba a pegarlo con espacios, tipo <code>123 456</code>.</span>
+          <span class="esperado">Lo acepta igual y entras. Arriba a la derecha aparece <b>tu inicial o tu foto</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Cierra sesión y vuelve a pedir un código. Pide otro enseguida, sin esperar.</span>
+          <span class="esperado">Te pide que <b>esperes un minuto</b> en vez de mandar diez correos seguidos.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Vuelve a intentar entrar con el código de hace un rato, el que ya usaste.</span>
+          <span class="esperado">No sirve. Un código <b>vale una sola vez</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Cierra sesión y entra ahora con Google.</span>
+          <span class="esperado">Te deja <b>elegir la cuenta</b> y vuelve al sitio ya dentro.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Si usaste el mismo correo en las dos vías, mira el menú de tu cuenta.</span>
+          <span class="esperado">Es <b>la misma cuenta</b>, no dos. El correo aparece una vez.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Sin sesión, pulsa el botón naranja «Publicar evento».</span>
+          <span class="esperado">Te manda a entrar y, al terminar, <b>te deja en el formulario de publicar</b> — no en la portada.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Sin sesión, escribe <code>/mis-eventos.php</code> al final de la dirección del sitio.</span>
+          <span class="esperado">Te manda a entrar y, después, <b>te deja en «Mis eventos»</b>.</span>
+        </label>
+      </section>
+
+      <!-- 04 ─────────────────────────────────────────────── -->
+      <section id="s4">
+        <div class="cab-sec"><span class="n">04</span><h2>Publicar un evento</h2><span class="sello">Cambió</span></div>
+        <p class="quien">Como alguien que organiza</p>
+        <p class="intro-sec">
+          Nada se publica directamente desde el formulario: primero se guarda como borrador
+          y se ve una vista previa. Publicar es un segundo paso, aparte.
+        </p>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Envía el formulario vacío.</span>
+          <span class="esperado">No se guarda nada, y arriba te dice <b>qué campos concretos</b> faltan, con su nombre y un enlace a cada uno.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Escribe una descripción muy corta, de tres palabras, y envía.</span>
+          <span class="esperado">Marca ese campo <b>en color, no solo con texto pequeño</b>, y dice el mínimo.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Pon una fecha de la semana pasada.</span>
+          <span class="esperado">Avisa de que <b>ya pasó y no aparecería</b> en el listado.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Marca la casilla «Es gratuito».</span>
+          <span class="esperado">El campo del precio <b>desaparece</b>, y al desmarcar vuelve.</span>
+        </label>
+
+        <div class="nota ojo">
+          <p><strong>Los tres puntos siguientes son de algo que se acaba de arreglar.</strong></p>
+          <p>
+            Antes, si elegías una foto y fallaba cualquier otro campo, la foto se perdía y
+            había que buscarla otra vez en el ordenador. Hazlos en orden.
+          </p>
+        </div>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Rellena la ficha entera, elige una foto, pero <b>deja la descripción de tres palabras a propósito</b>. Envía.</span>
+          <span class="esperado">Vuelve el formulario con el error de la descripción y <b>la foto sigue puesta</b>, con su miniatura y un aviso en verde diciendo que no hace falta volver a buscarla.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Arregla solo la descripción. <b>No toques el selector de archivo.</b> Envía.</span>
+          <span class="esperado">El evento se guarda <b>con esa foto</b>, la que elegiste en el primer intento.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Empieza otra ficha, elige foto, falla otro campo, y esta vez marca «Quitar esta imagen».</span>
+          <span class="esperado">Desaparece la miniatura y el evento se guarda <b>sin foto</b>, con el color de la tarjeta.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Prueba a subir algo que no sea una imagen, un PDF o un Word.</span>
+          <span class="esperado">Lo rechaza y <b>explica qué formatos valen</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Sube una foto grande, de las que salen del móvil sin recortar.</span>
+          <span class="esperado">La acepta, y en la ficha <b>no tarda una eternidad</b> en aparecer.</span>
+        </label>
+
+        <div class="nota">
+          <p>
+            <strong>La ubicación en el mapa es nueva y es opcional.</strong> Se pide un enlace
+            de Google Maps, no hay que arrastrar ningún pin. Para conseguirlo: abre Google Maps,
+            busca el sitio, pulsa <b>Compartir</b> y copia el enlace que te da.
+          </p>
+        </div>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Pega en «Ubicación en el mapa» un enlace de Compartir de Google Maps y envía.</span>
+          <span class="esperado">El formulario vuelve enseñando <b>un mapa con el pin puesto</b> y un «Ubicación reconocida» en verde.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Mira dónde cayó el pin.</span>
+          <span class="esperado">Está <b>en el sitio que buscaste</b>, no en el centro de la ciudad.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Prueba también con un enlace copiado de la barra de direcciones de Google Maps, el largo.</span>
+          <span class="esperado">Funciona igual.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Ahora pega ahí cualquier otra cosa: la dirección de un periódico, o un texto suelto.</span>
+          <span class="esperado">Lo rechaza y <b>explica de dónde sacar el enlace bueno</b>, con el paso de «Compartir». No un «no válido» a secas.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Guarda un evento sin poner nada en ese campo.</span>
+          <span class="esperado">Se guarda sin problema. La ficha simplemente <b>no enseña mapa</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Termina una ficha con título empezando por <code>PRUEBA</code> y llega a la vista previa. Lee la barra de arriba.</span>
+          <span class="esperado">Deja claro que <b>todavía no lo ve nadie más</b> y ofrece el botón de publicar.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Copia la dirección de la vista previa y ábrela en una ventana de incógnito.</span>
+          <span class="esperado">Dice que <b>no existe</b>. Un borrador no lo puede ver nadie más, ni con el enlace.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Vuelve y pulsa «Publicar».</span>
+          <span class="esperado">Avisa de que ya está publicado y <b>aparece en la portada</b> y en su categoría.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">En la ficha ya publicada, baja hasta el mapa y pulsa «Cómo llegar».</span>
+          <span class="esperado">Abre <b>Google Maps en otra pestaña</b>, apuntando al sitio del evento.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Crea otro evento y déjalo sin publicar.</span>
+          <span class="esperado">En «Mis eventos» sale marcado como <b>borrador</b>, y no aparece en la portada.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Publica uno sin subir foto.</span>
+          <span class="esperado">La tarjeta usa <b>el color que elegiste</b>, no un hueco gris ni un icono roto.</span>
+        </label>
+      </section>
+
+      <!-- 05 ─────────────────────────────────────────────── -->
+      <section id="s5">
+        <div class="cab-sec"><span class="n">05</span><h2>Editar, y hasta cuándo</h2></div>
+        <p class="quien">La regla que más fácil es romper</p>
+        <p class="intro-sec">
+          Un evento publicado se puede corregir durante 24 horas. Después se congela, y los
+          cambios hay que pedírselos al administrador. La idea es que una ficha no cambie de
+          fecha o de precio cuando la gente ya se apuntó.
+        </p>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Entra a tu evento recién publicado y cambia el título.</span>
+          <span class="esperado">Deja guardar, y el cambio <b>se ve también en la portada</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Mira la barra de arriba de la ficha.</span>
+          <span class="esperado">Dice <b>cuánto tiempo te queda</b> para poder corregirlo.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Edita y marca «Quitar esta imagen».</span>
+          <span class="esperado">La foto desaparece y vuelve <b>el color de la tarjeta</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Edita otra vez, cambia solo la ciudad y guarda sin tocar la foto.</span>
+          <span class="esperado">La foto <b>sigue ahí</b>. No mandar una nueva significa «déjala como está».</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Edita un evento que ya tenga foto: elige una foto <b>distinta</b> y a la vez borra el título para que falle.</span>
+          <span class="esperado">Vuelve el formulario con el error del título y con <b>la foto nueva</b> puesta, no la vieja. Al arreglar el título y guardar, queda la nueva.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Edita un evento que tenga mapa y cambia el enlace por el de otro sitio.</span>
+          <span class="esperado">La ficha pasa a enseñar <b>el nuevo punto</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Pídele a José que te ponga un evento con el plazo ya vencido.</span>
+          <span class="esperado">Al intentar editarlo, <b>explica por qué no se puede</b> y a quién pedírselo. No un «no tienes permiso» a secas.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Abre el menú de tu cuenta y entra a «Mis eventos».</span>
+          <span class="esperado">Están todos los tuyos con su situación: publicado, borrador u oculto.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Pide a José el enlace de <b>editar</b> un evento suyo, y ábrelo con tu cuenta.</span>
+          <span class="esperado">No te deja. Cada quien edita <b>solo lo suyo</b>.</span>
+        </label>
+      </section>
+
+      <!-- 06 ─────────────────────────────────────────────── -->
+      <section id="s6">
+        <div class="cab-sec"><span class="n">06</span><h2>Reportar un evento</h2></div>
+        <p class="quien">Sin cuenta, como cualquier visitante</p>
+        <p class="intro-sec">
+          Cualquiera puede avisar de que un evento está mal. El aviso no lo esconde: solo lo
+          pone en la lista de lo que hay que revisar. Hazlo desde una ventana de incógnito.
+        </p>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Baja del todo en la ficha de un evento.</span>
+          <span class="esperado">Hay un enlace <b>«Reportar este evento»</b>, discreto pero encontrable.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Intenta enviar sin elegir motivo.</span>
+          <span class="esperado">No lo acepta: el motivo <b>es obligatorio</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Elige un motivo, escribe una explicación y envía.</span>
+          <span class="esperado">Sale una pantalla de gracias que aclara que <b>el evento sigue publicado</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Vuelve a la ficha y comprueba.</span>
+          <span class="esperado">Efectivamente <b>sigue ahí</b>, sin cambios.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Reporta el mismo evento otra vez.</span>
+          <span class="esperado">Te dice que <b>ya lo reportaste</b> y que se está revisando.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Reporta un evento distinto.</span>
+          <span class="esperado">Ese sí lo acepta. El límite es <b>por evento</b>, no un reporte al día en total.</span>
+        </label>
+      </section>
+
+      <!-- 07 ─────────────────────────────────────────────── -->
+      <section id="s7">
+        <div class="cab-sec"><span class="n">07</span><h2>Administración</h2></div>
+        <p class="quien">Con tu propia cuenta, no con la suya</p>
+        <p class="intro-sec">
+          Lo mejor es que José te dé permisos de administrador a <b>tu</b> cuenta durante las
+          pruebas, y te los quite al terminar. Compartir la suya no sirve: acabaríais
+          peleando por la misma sesión y no sabrías si algo falla o es que te echó el otro.
+        </p>
+
+        <div class="nota ojo">
+          <p><strong>Los tres primeros puntos hay que hacerlos ANTES de que te dé permisos.</strong></p>
+          <p>
+            Comprueban que una cuenta normal no puede entrar donde no debe. Si ya eres
+            administradora, ya no hay forma de probarlo con esa cuenta.
+          </p>
+        </div>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Todavía sin permisos, escribe <code>/moderacion.php</code> al final de la dirección del sitio.</span>
+          <span class="esperado">Te lo niega y lo dice con claridad. Esa página <b>no es para cualquiera</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Prueba también con <code>/admin.php</code>.</span>
+          <span class="esperado">Lo mismo: te lo niega.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Abre el menú de tu cuenta y míralo bien.</span>
+          <span class="esperado">No aparecen ni «Moderación» ni «Panel admin».</span>
+        </label>
+
+        <div class="nota">
+          <p>
+            <strong>Ahora sí: que te dé permisos.</strong> Es una línea que él ejecuta en la base
+            de datos con tu correo. Después, <b>cierra sesión y vuelve a entrar</b> — el permiso
+            se lee al iniciar sesión, así que si no lo haces parecerá que no funcionó.
+          </p>
+        </div>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Vuelve a abrir el menú de tu cuenta.</span>
+          <span class="esperado">Ahora sí están <b>«Panel admin» y «Moderación»</b>, y al lado de Moderación un número con los avisos pendientes.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Entra a Moderación.</span>
+          <span class="esperado">Están los eventos que reportaste antes, con <b>el motivo y el comentario</b> que escribiste.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Desde Moderación, busca cómo volver al panel de administración.</span>
+          <span class="esperado">El menú de tu cuenta <b>sigue ofreciendo «Panel admin»</b> desde cualquier página.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Pregúntale a José si le llegó un correo cuando reportaste.</span>
+          <span class="esperado">Le llegó un aviso con el nombre del evento. A ti también deberían llegarte los próximos, ahora que eres administradora.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Pulsa «Ocultar» en uno y mira luego la portada.</span>
+          <span class="esperado">Desapareció del listado, pero <b>no se borró</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Vuelve a Moderación y publícalo otra vez.</span>
+          <span class="esperado">Reaparece en el listado donde estaba.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">En otro, pulsa «Descartar avisos».</span>
+          <span class="esperado">Sale de la lista de pendientes y <b>el evento sigue publicado</b>. Descartar es decir «lo miré y está bien».</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Edita un evento de otra persona que ya pasó de las 24 horas.</span>
+          <span class="esperado">Como administradora <b>sí puedes</b>, y la pantalla lo dice.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Borra uno de los eventos que empiezan por <code>PRUEBA</code>.</span>
+          <span class="esperado">Pide <b>confirmación</b> antes, y avisa de que no se puede deshacer.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Después de borrarlo, vuelve a Moderación.</span>
+          <span class="esperado">Sus avisos se fueron con él. No quedan reportes de un evento que ya no existe.</span>
+        </label>
+
+        <div class="nota fuera">
+          <p>
+            <strong>Qué puedes romper siendo administradora, para que estés tranquila:</strong>
+            solo puedes ocultar, editar y borrar eventos. No hay forma de tocar cuentas de
+            usuario ni de cambiar la configuración del sitio. Lo único sin vuelta atrás es
+            borrar un evento — por eso pide confirmación.
+          </p>
+        </div>
+      </section>
+
+      <!-- 08 ─────────────────────────────────────────────── -->
+      <section id="s8">
+        <div class="cab-sec"><span class="n">08</span><h2>En el móvil</h2></div>
+        <p class="quien">De donde viene la mitad de la gente</p>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Abre la portada en el teléfono.</span>
+          <span class="esperado">Nada se sale de la pantalla y <b>no hay que deslizar de lado</b> para leer.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Toca las tres rayas de arriba a la derecha.</span>
+          <span class="esperado">Se abre el menú con Inicio, Buscar eventos y Blog, y <b>llevan a donde dicen</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Busca el botón de publicar.</span>
+          <span class="esperado">Sigue estando, aunque diga solo «Publicar».</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Entra a «Buscar eventos» y usa los filtros de la columna.</span>
+          <span class="esperado">En pantalla estrecha los filtros se colocan <b>encima</b> de la lista, y se pueden usar igual.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Filtra, entra a un evento y vuelve.</span>
+          <span class="esperado">Los filtros <b>siguen puestos</b> también en el móvil.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Abre una ficha que tenga mapa.</span>
+          <span class="esperado">El mapa se ve entero, se puede acercar con los dedos, y el botón «Cómo llegar» <b>abre la app de Google Maps</b> si la tienes instalada.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Publica un evento entero desde el móvil, con foto de la galería.</span>
+          <span class="esperado">Se puede de principio a fin. El teclado <b>no tapa</b> el campo que estás escribiendo.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Pide un código de acceso en el móvil.</span>
+          <span class="esperado">Al tocar el campo del código sale <b>el teclado de números</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Gira el teléfono y prueba una ficha en horizontal.</span>
+          <span class="esperado">Se recoloca sin romperse.</span>
+        </label>
+      </section>
+
+      <!-- 09 ─────────────────────────────────────────────── -->
+      <section id="s9">
+        <div class="cab-sec"><span class="n">09</span><h2>Lo que todavía no está hecho</h2></div>
+        <p class="quien">No hace falta que lo reportes</p>
+        <p class="intro-sec">
+          Esto está a medias a propósito, porque aún no le toca. Si te topas con ello, no es
+          un fallo. Lo apunto para que no pierdas tiempo.
+        </p>
+
+        <div class="nota fuera">
+          <ul class="lista">
+            <li><b>Blog</b> — la sección existe pero los artículos son de mentira. Ninguna tarjeta abre nada.</li>
+            <li><b>Guardar favoritos</b> — no hay corazones. No hay dónde guardarlos aún.</li>
+            <li><b>Venta de boletos y pagos</b> — solo hay enlace a la página del organizador.</li>
+            <li><b>Perfil público del organizador</b> — no existe. En la ficha solo sale su nombre.</li>
+            <li><b>Poner el pin arrastrando</b> — la ubicación se pone pegando un enlace de Google Maps, no moviendo un pin sobre el mapa. Es a propósito, de momento.</li>
+            <li><b>El selector ES / EN</b> — de momento solo cambia el titular de la portada.</li>
+            <li><b>Panel de administración</b> — solo funciona la pestaña de eventos. Organizadores, categorías, ciudades, usuarios y boletín son maqueta, con nombres y cifras inventados.</li>
+            <li><b>El boletín de la portada</b> — el formulario dice «gracias» pero no guarda el correo en ninguna parte.</li>
+            <li><b>Pedirle un cambio al administrador</b> — no hay mensajería dentro del sitio. Se hace por fuera.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 10 ─────────────────────────────────────────────── -->
+      <section id="s10">
+        <div class="cab-sec"><span class="n">10</span><h2>Cómo avisar de lo que encuentres</h2></div>
+        <p class="intro-sec">
+          Lo más útil no es la lista de fallos, sino poder repetirlos. Con estas cuatro
+          líneas se arregla casi cualquier cosa:
+        </p>
+
+        <div class="nota">
+          <ul class="lista">
+            <li><b>Qué hice</b> — los pasos, en orden, desde dónde empezaste.</li>
+            <li><b>Qué esperaba</b> que pasara.</li>
+            <li><b>Qué pasó</b> en realidad, con la frase exacta si salió un mensaje.</li>
+            <li><b>Dónde</b> — móvil u ordenador, y qué navegador.</li>
+          </ul>
+        </div>
+
+        <div class="nota ojo">
+          <p>
+            <strong>Una captura vale por todo lo anterior.</strong> Si algo se ve raro, fotografía
+            la pantalla entera, con la barra de direcciones visible: dice en qué página estabas.
+          </p>
+          <p>
+            Eso importa más que antes. Ahora cada pantalla tiene su propia dirección, y en la
+            de buscar la dirección <b>lleva dentro los filtros</b>: con esa línea se reproduce
+            exactamente lo que estabas viendo.
+          </p>
+        </div>
+
+        <div class="nota">
+          <p>
+            Y apunta también lo que te resultó <b>confuso aunque funcionara</b>. Un botón que no
+            se entiende es un problema igual que uno que falla, y es justo lo que ya no vemos
+            los que llevamos semanas mirando esto.
+          </p>
+        </div>
+      </section>
+
+      <p class="pie">
+        Marca cada punto según lo compruebes; se quedan guardados en este navegador.
+        Si algo de la guía no coincide con lo que ves en pantalla, avisa también: puede
+        que la guía se haya quedado vieja.
+      </p>
+
+    </main>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   Recordar lo marcado.
+
+   La primera versión guardaba una lista de POSICIONES —"la 3, la 17, la 40"—
+   en localStorage, y fallaba de dos maneras distintas:
+
+   1. Al añadir pruebas nuevas por el medio, todas las posteriores se corrían y
+      las marcas caían sobre puntos que no eran. Ahora cada prueba se identifica
+      por una huella de su propio texto: da igual dónde esté en la página, y
+      añadir o reordenar pruebas no toca las demás. Si se reescribe el texto de
+      una, esa pierde su marca — que es lo correcto: ya no es la misma prueba.
+
+   2. Esta página se muestra dentro de un marco, así que para el navegador el
+      guardado es "de terceros". Safari lo bloquea entero y otros lo reparten
+      por sitio. Antes eso fallaba EN SILENCIO: se marcaban cuarenta casillas,
+      se recargaba, y se descubría el problema con el trabajo ya perdido.
+
+   Ahora hay tres redes: localStorage, sessionStorage si aquel no va, y memoria
+   si tampoco. Se dice en pantalla cuál se está usando, y hay un código para
+   copiar y pegar que funciona siempre, incluso sin ninguna de las tres.
+   ══════════════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+
+  var LLAVE = 'rueda-pruebas-v3';
+
+  var cajas   = Array.prototype.slice.call(document.querySelectorAll('.prueba input'));
+  var cuenta  = document.getElementById('cuenta');
+  var barra   = document.getElementById('barra');
+  var estado  = document.getElementById('estado');
+  var estadoT = document.getElementById('estadoTexto');
+  var codigo  = document.getElementById('codigo');
+  var acuse   = document.getElementById('acuse');
+
+  /* ── La huella de cada prueba ──
+     djb2 sobre el texto visible. No hace falta que sea criptográfica: solo que
+     dos pruebas distintas no coincidan, y con 91 textos largos eso no pasa. */
+  function huella(texto){
+    var h = 5381;
+    var limpio = texto.replace(/\s+/g, ' ').trim();
+    for (var i = 0; i < limpio.length; i++) {
+      h = ((h << 5) + h + limpio.charCodeAt(i)) >>> 0;
+    }
+    return h.toString(36);
+  }
+
+  cajas.forEach(function(c){
+    var qué = c.parentNode.querySelector('.qué');
+    c.dataset.id = huella(qué ? qué.textContent : '');
+  });
+
+  /* ── Dónde se guarda ── */
+  var almacen = (function(){
+    function sirve(s){
+      try {
+        var k = '__prueba__';
+        s.setItem(k, '1');
+        s.removeItem(k);
+        return true;
+      } catch (e) { return false; }
+    }
+    try { if (sirve(window.localStorage))   return {tipo:'local',  s:window.localStorage};  } catch (e) {}
+    try { if (sirve(window.sessionStorage)) return {tipo:'sesion', s:window.sessionStorage}; } catch (e) {}
+    return {tipo:'ninguno', s:null};
+  })();
+
+  var enMemoria = [];
+
+  function leer(){
+    if (!almacen.s) return enMemoria.slice();
+    try {
+      var v = JSON.parse(almacen.s.getItem(LLAVE) || '[]');
+      return Array.isArray(v) ? v : [];
+    } catch (e) { return []; }
+  }
+
+  function guardar(v){
+    enMemoria = v.slice();
+    if (!almacen.s) return;
+    try { almacen.s.setItem(LLAVE, JSON.stringify(v)); } catch (e) {}
+  }
+
+  /* ── Lo que se ve ── */
+  function marcadas(){
+    return cajas.filter(function(c){ return c.checked; }).map(function(c){ return c.dataset.id; });
+  }
+
+  function aplicar(ids){
+    cajas.forEach(function(c){ c.checked = ids.indexOf(c.dataset.id) !== -1; });
+  }
+
+  function pintar(){
+    var n = cajas.filter(function(c){ return c.checked; }).length;
+    cuenta.innerHTML = n + ' <small>/ ' + cajas.length + '</small>';
+    barra.style.width = (cajas.length ? (n / cajas.length * 100) : 0) + '%';
+    codigo.value = marcadas().join(' ');
+  }
+
+  var mensajes = {
+    local:   ['bien', 'Se va guardando en este navegador.'],
+    sesion:  ['mal',  'Solo se recuerda hasta que cierres la pestaña. Copia tu avance antes de salir.'],
+    ninguno: ['mal',  'Este navegador no deja guardar aquí. Abre la guía en su propia pestaña, o copia tu avance abajo.']
+  };
+
+  estado.className = 'estado ' + mensajes[almacen.tipo][0];
+  estadoT.textContent = mensajes[almacen.tipo][1];
+
+  // Si no se puede guardar solo, el respaldo manual deja de ser opcional.
+  if (almacen.tipo !== 'local') document.getElementById('respaldo').open = true;
+
+  /* ── Enganches ── */
+  aplicar(leer());
+
+  cajas.forEach(function(c){
+    c.addEventListener('change', function(){
+      guardar(marcadas());
+      pintar();
+    });
+  });
+
+  document.getElementById('btnCopiar').addEventListener('click', function(){
+    codigo.select();
+    var listo = false;
+
+    /* El portapapeles moderno puede estar prohibido dentro de un marco, así que
+       queda el método viejo detrás. Y si tampoco, el texto ya está seleccionado
+       y se copia a mano. */
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(codigo.value).then(function(){
+        acuse.textContent = 'Copiado.';
+      }, function(){
+        acuse.textContent = document.execCommand('copy') ? 'Copiado.' : 'Selecciónalo y cópialo a mano.';
+      });
+      listo = true;
+    }
+    if (!listo) {
+      try { acuse.textContent = document.execCommand('copy') ? 'Copiado.' : 'Selecciónalo y cópialo a mano.'; }
+      catch (e) { acuse.textContent = 'Selecciónalo y cópialo a mano.'; }
+    }
+  });
+
+  document.getElementById('btnPegar').addEventListener('click', function(){
+    var ids = codigo.value.split(/[\s,]+/).filter(Boolean);
+    aplicar(ids);
+    guardar(marcadas());
+    pintar();
+    var n = cajas.filter(function(c){ return c.checked; }).length;
+    acuse.textContent = 'Recuperadas ' + n + (n === 1 ? ' prueba.' : ' pruebas.');
+  });
+
+  pintar();
+})();
+</script>
