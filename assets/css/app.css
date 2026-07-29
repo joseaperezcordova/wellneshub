@@ -220,24 +220,28 @@ input,select{font-family:inherit; font-size:14px;}
   color:var(--petroleo); margin:0;
 }
 
-/* Segmentado "de un día / recurrente", con el mismo truco que .color-op: el
-   radio se esconde y su span vecino carga el estilo, así el clic funciona en
-   toda la tarjeta y no solo en un punto diminuto. */
-.tipo-actividad{display:grid; grid-template-columns:1fr 1fr; gap:9px;}
-.campo label.tipo-op{
-  display:flex; align-items:center; gap:9px; padding:11px 12px;
-  border:1px solid var(--linea); border-radius:10px; cursor:pointer;
-  font-family:'Inter',sans-serif; font-size:13px; letter-spacing:0;
-  text-transform:none; color:var(--petroleo); margin:0;
+/* De un día / recurrente: dos tarjetas lado a lado, cada una con sus propios
+   campos de fecha dentro. La tarjeta entera se resalta con :has() cuando su
+   radio está marcado —el radio y el encabezado van en un <label> chico
+   aparte, y no envolviendo toda la tarjeta, para que el clic dentro de un
+   campo de fecha no compita con el clic que selecciona la tarjeta. */
+.tipo-fecha-grupo{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;}
+.tipo-fecha-tarjeta{
+  border:1px solid var(--linea); border-radius:12px; padding:16px;
+  transition:border-color .15s, background .15s;
 }
-.campo label.tipo-op input{position:absolute; opacity:0; width:0; height:0;}
-.campo label.tipo-op .tipo-icono{flex-shrink:0; opacity:.55;}
-.campo label.tipo-op:has(input:checked){
-  border-color:var(--terracota); background:rgba(199,110,67,.08);
+.tipo-fecha-tarjeta:has(input:checked){border-color:var(--terracota); background:rgba(199,110,67,.04);}
+.tipo-fecha-header{
+  display:flex; align-items:center; gap:8px; cursor:pointer; margin:0 0 14px;
+  font-family:'Inter',sans-serif; font-size:13.5px; font-weight:600;
+  letter-spacing:0; text-transform:none; color:var(--petroleo);
 }
-.campo label.tipo-op:has(input:checked) .tipo-icono{opacity:1; color:var(--terracota);}
-.campo label.tipo-op:has(input:focus-visible){outline:2px solid var(--terracota-texto); outline-offset:2px;}
-@media(max-width:460px){ .tipo-actividad{grid-template-columns:1fr;} }
+.tipo-fecha-header input{position:absolute; opacity:0; width:0; height:0;}
+.tipo-fecha-header svg{flex-shrink:0; opacity:.55;}
+.tipo-fecha-tarjeta:has(input:checked) .tipo-fecha-header svg{opacity:1; color:var(--terracota);}
+.tipo-fecha-header:has(input:focus-visible){outline:2px solid var(--terracota-texto); outline-offset:2px;}
+.tipo-fecha-campos .campo:last-child{margin-bottom:0;}
+@media(max-width:640px){ .tipo-fecha-grupo{grid-template-columns:1fr;} }
 
 /* Presencial / en línea / híbrida: mismas tarjetas que .tipo-op pero con
    descripción debajo del título, así que llevan su propio bloque en vez de

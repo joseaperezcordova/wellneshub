@@ -147,13 +147,15 @@ CREATE TABLE IF NOT EXISTS eventos (
   categoria     VARCHAR(60)   NOT NULL,
 
   -- De un día (de siempre) o recurrente. Si es recurrente, frecuencia y
-  -- hora_recurrente vienen llenas; fecha_inicio/fecha_fin siguen siendo el
-  -- rango real —primera y última ocurrencia—, no un dato aparte.
+  -- hora_recurrente/hora_fin_recurrente vienen llenas; fecha_inicio/fecha_fin
+  -- siguen siendo el rango real —primera y última ocurrencia—, no un dato
+  -- aparte.
   tipo_actividad  ENUM('unico','recurrente')
                                 NOT NULL DEFAULT 'unico',
   frecuencia      ENUM('diaria','semanal','quincenal','mensual')
                                 NULL DEFAULT NULL,
-  hora_recurrente TIME          NULL DEFAULT NULL,
+  hora_recurrente     TIME      NULL DEFAULT NULL COMMENT 'Hora de inicio de cada sesión',
+  hora_fin_recurrente TIME      NULL DEFAULT NULL COMMENT 'Hora de fin de cada sesión',
 
   -- Presencial, en línea o híbrida. "En línea" es la única que no lleva
   -- ciudad/entidad/lugar/mapa —validarEvento() los deja vacíos aunque

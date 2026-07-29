@@ -296,10 +296,20 @@ function etiquetasCampos(): array
         'lugar'           => 'Lugar',
         'enlace_acceso'   => 'Enlace de acceso',
         'mapa_url'        => 'Enlace de Google Maps',
-        'fecha_inicio'    => 'Fecha de inicio',
-        'fecha_fin'       => 'Fecha de fin',
-        'frecuencia'      => 'Frecuencia',
-        'hora_recurrente' => 'Hora',
+
+        // Actividad de un día.
+        'fecha_unica'        => 'Fecha',
+        'hora_inicio_unica'  => 'Hora de inicio',
+        'hora_fin_unica'     => 'Hora de fin',
+        'fecha_fin_unica'    => 'Fecha de fin',
+
+        // Actividad recurrente.
+        'fecha_inicio_rec'   => 'Fecha de inicio',
+        'fecha_fin_rec'      => 'Fecha de fin',
+        'frecuencia'         => 'Frecuencia',
+        'hora_recurrente'    => 'Hora de inicio',
+        'hora_fin_recurrente' => 'Hora de fin',
+
         'precio'          => 'Precio',
         'url_boletos'     => 'Enlace para comprar o reservar',
         'imagen'          => 'Imagen',
@@ -416,6 +426,10 @@ function validarEvento(array $in): array
      */
     $e['tipo_actividad'] = ($in['tipo_actividad'] ?? '') === 'recurrente' ? 'recurrente' : 'unico';
 
+    $horaValida = static function (string $hora): ?string {
+        return preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $hora) ? $hora : null;
+    };
+
     if ($e['tipo_actividad'] === 'recurrente') {
         $e['frecuencia'] = (string) ($in['frecuencia'] ?? '');
         if (!isset(frecuenciasRecurrencia()[$e['frecuencia']])) {
@@ -423,43 +437,75 @@ function validarEvento(array $in): array
             $e['frecuencia'] = null;
         }
 
-        $hora = trim((string) ($in['hora_recurrente'] ?? ''));
-        $e['hora_recurrente'] = preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $hora) ? $hora : null;
+        $e['hora_recurrente'] = $horaValida(trim((string) ($in['hora_recurrente'] ?? '')));
         if ($e['hora_recurrente'] === null) {
-            $errores['hora_recurrente'] = 'Pon la hora a la que ocurre cada vez.';
+            $errores['hora_recurrente'] = 'Pon la hora a la que empieza cada sesión.';
+        }
+
+        $e['hora_fin_recurrente'] = $horaValida(trim((string) ($in['hora_fin_recurrente'] ?? '')));
+        if ($e['hora_fin_recurrente'] === null) {
+            $errores['hora_fin_recurrente'] = 'Pon la hora a la que termina cada sesión.';
+        } elseif ($e['hora_recurrente'] !== null && $e['hora_fin_recurrente'] <= $e['hora_recurrente']) {
+            $errores['hora_fin_recurrente'] = 'El final no puede ser antes que el inicio.';
         }
 
         $inicioRec = trim((string) ($in['fecha_inicio_rec'] ?? ''));
-        $finRec    = trim((string) ($in['fecha_fin_rec'] ?? ''));
-
-        $e['fecha_inicio'] = ($inicioRec !== '' && $e['hora_recurrente'] !== null)
-            ? normalizarFecha($inicioRec . 'T' . $e['hora_recurrente']) : null;
-        if ($e['fecha_inicio'] === null) {
-            $errores['fecha_inicio'] = 'Pon la fecha en la que empieza a repetirse.';
+        $inicioRecValido = ($inicioRec !== '' && strtotime($inicioRec) !== false) ? $inicioRec : null;
+        if ($inicioRecValido === null) {
+            $errores['fecha_inicio_rec'] = 'Pon la fecha en la que empieza a repetirse.';
         }
 
-        $e['fecha_fin'] = ($finRec !== '' && $e['hora_recurrente'] !== null)
-            ? normalizarFecha($finRec . 'T' . $e['hora_recurrente']) : null;
-        if ($e['fecha_fin'] === null) {
-            $errores['fecha_fin'] = 'Pon la fecha en la que termina de repetirse.';
-        } elseif ($e['fecha_inicio'] !== null
-            && strtotime($e['fecha_fin']) < strtotime($e['fecha_inicio'])) {
-            $errores['fecha_fin'] = 'El final no puede ser anterior al principio.';
-        }
-    } else {
-        $e['frecuencia']      = null;
-        $e['hora_recurrente'] = null;
-
-        // Los campos datetime-local llegan como "2026-08-16T19:30".
-        $e['fecha_inicio'] = normalizarFecha((string) ($in['fecha_inicio'] ?? ''));
-        if ($e['fecha_inicio'] === null) {
-            $errores['fecha_inicio'] = 'Pon la fecha y la hora de inicio.';
+        $finRec = trim((string) ($in['fecha_fin_rec'] ?? ''));
+        $finRecValido = ($finRec !== '' && strtotime($finRec) !== false) ? $finRec : null;
+        if ($finRecValido === null) {
+            $errores['fecha_fin_rec'] = 'Pon la fecha en la que termina de repetirse.';
         }
 
-        $e['fecha_fin'] = normalizarFecha((string) ($in['fecha_fin'] ?? ''));
+        $e['fecha_inicio'] = ($inicioRecValido !== null && $e['hora_recurrente'] !== null)
+            ? normalizarFecha($inicioRecValido . 'T' . $e['hora_recurrente']) : null;
+
+        $e['fecha_fin'] = ($finRecValido !== null && $e['hora_fin_recurrente'] !== null)
+            ? normalizarFecha($finRecValido . 'T' . $e['hora_fin_recurrente']) : null;
+
         if ($e['fecha_fin'] !== null && $e['fecha_inicio'] !== null
             && strtotime($e['fecha_fin']) < strtotime($e['fecha_inicio'])) {
-            $errores['fecha_fin'] = 'El final no puede ser anterior al principio.';
+            $errores['fecha_fin_rec'] = 'El final no puede ser anterior al principio.';
+        }
+    } else {
+        $e['frecuencia']          = null;
+        $e['hora_recurrente']     = null;
+        $e['hora_fin_recurrente'] = null;
+
+        $fechaUnica = trim((string) ($in['fecha_unica'] ?? ''));
+        $fechaUnicaValida = ($fechaUnica !== '' && strtotime($fechaUnica) !== false) ? $fechaUnica : null;
+        if ($fechaUnicaValida === null) {
+            $errores['fecha_unica'] = 'Pon la fecha de la actividad.';
+        }
+
+        $horaIniValida = $horaValida(trim((string) ($in['hora_inicio_unica'] ?? '')));
+        if ($horaIniValida === null) {
+            $errores['hora_inicio_unica'] = 'Pon la hora de inicio.';
+        }
+
+        $horaFinValida = $horaValida(trim((string) ($in['hora_fin_unica'] ?? '')));
+        if ($horaFinValida === null) {
+            $errores['hora_fin_unica'] = 'Pon la hora de fin.';
+        }
+
+        // El día de término es opcional: sin él, se asume el mismo día de inicio.
+        $fechaFinInput = trim((string) ($in['fecha_fin_unica'] ?? ''));
+        $fechaFinUnicaValida = ($fechaFinInput !== '' && strtotime($fechaFinInput) !== false)
+            ? $fechaFinInput : $fechaUnicaValida;
+
+        $e['fecha_inicio'] = ($fechaUnicaValida !== null && $horaIniValida !== null)
+            ? normalizarFecha($fechaUnicaValida . 'T' . $horaIniValida) : null;
+
+        $e['fecha_fin'] = ($fechaFinUnicaValida !== null && $horaFinValida !== null)
+            ? normalizarFecha($fechaFinUnicaValida . 'T' . $horaFinValida) : null;
+
+        if ($e['fecha_fin'] !== null && $e['fecha_inicio'] !== null
+            && strtotime($e['fecha_fin']) < strtotime($e['fecha_inicio'])) {
+            $errores['hora_fin_unica'] = 'El final no puede ser anterior al principio.';
         }
     }
 
@@ -469,11 +515,18 @@ function validarEvento(array $in): array
     //
     // Se mira el final y no el principio: un retiro de cinco días que empezó
     // ayer sigue vigente, y rechazarlo por la fecha de inicio sería un error.
-    if (!isset($errores['fecha_inicio']) && !isset($errores['fecha_fin'])) {
+    $recurrente    = $e['tipo_actividad'] === 'recurrente';
+    $huboErrorFecha = $recurrente
+        ? (isset($errores['fecha_inicio_rec']) || isset($errores['fecha_fin_rec'])
+            || isset($errores['hora_recurrente']) || isset($errores['hora_fin_recurrente']))
+        : (isset($errores['fecha_unica']) || isset($errores['hora_inicio_unica'])
+            || isset($errores['hora_fin_unica']));
+
+    if (!$huboErrorFecha) {
         $termina = $e['fecha_fin'] ?? $e['fecha_inicio'];
 
         if ($termina !== null && strtotime($termina) < time()) {
-            $campo = $e['fecha_fin'] !== null ? 'fecha_fin' : 'fecha_inicio';
+            $campo = $recurrente ? 'fecha_fin_rec' : 'fecha_unica';
             $errores[$campo] = 'Esa fecha ya pasó, así que la actividad no aparecería en el listado.';
         }
     }
@@ -571,13 +624,13 @@ function crearEvento(array $e, int $usuarioId): int
     $pdo->prepare(
         'INSERT INTO eventos
            (usuario_id, titulo, slug, descripcion, categoria, tipo_actividad,
-            frecuencia, hora_recurrente, modalidad, enlace_acceso, ciudad, entidad,
-            lugar, mapa_url, latitud, longitud, fecha_inicio, fecha_fin,
+            frecuencia, hora_recurrente, hora_fin_recurrente, modalidad, enlace_acceso,
+            ciudad, entidad, lugar, mapa_url, latitud, longitud, fecha_inicio, fecha_fin,
             gratuito, precio, url_boletos, imagen_url, color, situacion)
-         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
+         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
     )->execute([
         $usuarioId, $e['titulo'], $e['descripcion'], $e['categoria'],
-        $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'],
+        $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
         $e['modalidad'], $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
@@ -598,7 +651,7 @@ function actualizarEvento(array $e, int $id): void
     db()->prepare(
         'UPDATE eventos SET
             titulo = ?, slug = ?, descripcion = ?, categoria = ?,
-            tipo_actividad = ?, frecuencia = ?, hora_recurrente = ?,
+            tipo_actividad = ?, frecuencia = ?, hora_recurrente = ?, hora_fin_recurrente = ?,
             modalidad = ?, enlace_acceso = ?, ciudad = ?,
             entidad = ?, lugar = ?, mapa_url = ?, latitud = ?, longitud = ?,
             fecha_inicio = ?, fecha_fin = ?,
@@ -606,7 +659,7 @@ function actualizarEvento(array $e, int $id): void
           WHERE id = ?'
     )->execute([
         $e['titulo'], generarSlug($e['titulo'], $id), $e['descripcion'],
-        $e['categoria'], $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'],
+        $e['categoria'], $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
         $e['modalidad'], $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
