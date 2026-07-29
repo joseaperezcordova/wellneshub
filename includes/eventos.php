@@ -83,6 +83,17 @@ function coloresEvento(): array
     return ['#89A67D', '#C76E43', '#2F4E5D', '#496B52', '#E9DDC9', '#3E6375'];
 }
 
+/** clave => etiqueta. Con qué frecuencia se repite una actividad recurrente. */
+function frecuenciasRecurrencia(): array
+{
+    return [
+        'diaria'    => 'Diaria',
+        'semanal'   => 'Semanal',
+        'quincenal' => 'Quincenal',
+        'mensual'   => 'Mensual',
+    ];
+}
+
 
 // ------------------------------------------------------------- permisos ----
 
@@ -220,17 +231,19 @@ function eventosTodos(int $limite = 200): array
 function etiquetasCampos(): array
 {
     return [
-        'titulo'       => 'Título de la actividad',
-        'categoria'    => 'Categoría',
-        'descripcion'  => 'Descripción',
-        'ciudad'       => 'Ciudad',
-        'entidad'      => 'Estado',
-        'mapa_url'     => 'Enlace de Google Maps',
-        'fecha_inicio' => 'Fecha de inicio',
-        'fecha_fin'    => 'Fecha de fin',
-        'precio'       => 'Precio',
-        'url_boletos'  => 'Enlace para comprar o reservar',
-        'imagen'       => 'Imagen',
+        'titulo'          => 'Título de la actividad',
+        'categoria'       => 'Categoría',
+        'descripcion'     => 'Descripción',
+        'ciudad'          => 'Ciudad',
+        'entidad'         => 'Estado',
+        'mapa_url'        => 'Enlace de Google Maps',
+        'fecha_inicio'    => 'Fecha de inicio',
+        'fecha_fin'       => 'Fecha de fin',
+        'frecuencia'      => 'Frecuencia',
+        'hora_recurrente' => 'Hora',
+        'precio'          => 'Precio',
+        'url_boletos'     => 'Enlace para comprar o reservar',
+        'imagen'          => 'Imagen',
     ];
 }
 
@@ -302,16 +315,59 @@ function validarEvento(array $in): array
         }
     }
 
-    // Los campos datetime-local llegan como "2026-08-16T19:30".
-    $e['fecha_inicio'] = normalizarFecha((string) ($in['fecha_inicio'] ?? ''));
-    if ($e['fecha_inicio'] === null) {
-        $errores['fecha_inicio'] = 'Pon la fecha y la hora de inicio.';
-    }
+    /*
+     * Única o recurrente cambia de dónde salen fecha_inicio y fecha_fin, pero
+     * no lo que significan una vez guardadas: el resto del sitio —agenda,
+     * buscador, ficha— sigue leyendo las mismas dos columnas DATETIME de
+     * siempre y no necesita saber cuál de los dos formularios las llenó.
+     */
+    $e['tipo_actividad'] = ($in['tipo_actividad'] ?? '') === 'recurrente' ? 'recurrente' : 'unico';
 
-    $e['fecha_fin'] = normalizarFecha((string) ($in['fecha_fin'] ?? ''));
-    if ($e['fecha_fin'] !== null && $e['fecha_inicio'] !== null
-        && strtotime($e['fecha_fin']) < strtotime($e['fecha_inicio'])) {
-        $errores['fecha_fin'] = 'El final no puede ser anterior al principio.';
+    if ($e['tipo_actividad'] === 'recurrente') {
+        $e['frecuencia'] = (string) ($in['frecuencia'] ?? '');
+        if (!isset(frecuenciasRecurrencia()[$e['frecuencia']])) {
+            $errores['frecuencia'] = 'Elige cada cuánto se repite.';
+            $e['frecuencia'] = null;
+        }
+
+        $hora = trim((string) ($in['hora_recurrente'] ?? ''));
+        $e['hora_recurrente'] = preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $hora) ? $hora : null;
+        if ($e['hora_recurrente'] === null) {
+            $errores['hora_recurrente'] = 'Pon la hora a la que ocurre cada vez.';
+        }
+
+        $inicioRec = trim((string) ($in['fecha_inicio_rec'] ?? ''));
+        $finRec    = trim((string) ($in['fecha_fin_rec'] ?? ''));
+
+        $e['fecha_inicio'] = ($inicioRec !== '' && $e['hora_recurrente'] !== null)
+            ? normalizarFecha($inicioRec . 'T' . $e['hora_recurrente']) : null;
+        if ($e['fecha_inicio'] === null) {
+            $errores['fecha_inicio'] = 'Pon la fecha en la que empieza a repetirse.';
+        }
+
+        $e['fecha_fin'] = ($finRec !== '' && $e['hora_recurrente'] !== null)
+            ? normalizarFecha($finRec . 'T' . $e['hora_recurrente']) : null;
+        if ($e['fecha_fin'] === null) {
+            $errores['fecha_fin'] = 'Pon la fecha en la que termina de repetirse.';
+        } elseif ($e['fecha_inicio'] !== null
+            && strtotime($e['fecha_fin']) < strtotime($e['fecha_inicio'])) {
+            $errores['fecha_fin'] = 'El final no puede ser anterior al principio.';
+        }
+    } else {
+        $e['frecuencia']      = null;
+        $e['hora_recurrente'] = null;
+
+        // Los campos datetime-local llegan como "2026-08-16T19:30".
+        $e['fecha_inicio'] = normalizarFecha((string) ($in['fecha_inicio'] ?? ''));
+        if ($e['fecha_inicio'] === null) {
+            $errores['fecha_inicio'] = 'Pon la fecha y la hora de inicio.';
+        }
+
+        $e['fecha_fin'] = normalizarFecha((string) ($in['fecha_fin'] ?? ''));
+        if ($e['fecha_fin'] !== null && $e['fecha_inicio'] !== null
+            && strtotime($e['fecha_fin']) < strtotime($e['fecha_inicio'])) {
+            $errores['fecha_fin'] = 'El final no puede ser anterior al principio.';
+        }
     }
 
     // Un evento que ya terminó se puede guardar, pero no aparecería en el
@@ -421,12 +477,14 @@ function crearEvento(array $e, int $usuarioId): int
 
     $pdo->prepare(
         'INSERT INTO eventos
-           (usuario_id, titulo, slug, descripcion, categoria, ciudad, entidad,
+           (usuario_id, titulo, slug, descripcion, categoria, tipo_actividad,
+            frecuencia, hora_recurrente, ciudad, entidad,
             lugar, mapa_url, latitud, longitud, fecha_inicio, fecha_fin,
             gratuito, precio, url_boletos, imagen_url, color, situacion)
-         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
+         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
     )->execute([
         $usuarioId, $e['titulo'], $e['descripcion'], $e['categoria'],
+        $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'],
         $e['ciudad'], $e['entidad'], $e['lugar'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
@@ -446,14 +504,16 @@ function actualizarEvento(array $e, int $id): void
 {
     db()->prepare(
         'UPDATE eventos SET
-            titulo = ?, slug = ?, descripcion = ?, categoria = ?, ciudad = ?,
+            titulo = ?, slug = ?, descripcion = ?, categoria = ?,
+            tipo_actividad = ?, frecuencia = ?, hora_recurrente = ?, ciudad = ?,
             entidad = ?, lugar = ?, mapa_url = ?, latitud = ?, longitud = ?,
             fecha_inicio = ?, fecha_fin = ?,
             gratuito = ?, precio = ?, url_boletos = ?, imagen_url = ?, color = ?
           WHERE id = ?'
     )->execute([
         $e['titulo'], generarSlug($e['titulo'], $id), $e['descripcion'],
-        $e['categoria'], $e['ciudad'], $e['entidad'], $e['lugar'],
+        $e['categoria'], $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'],
+        $e['ciudad'], $e['entidad'], $e['lugar'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
         $e['url_boletos'], $e['imagen_url'], $e['color'], $id,

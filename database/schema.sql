@@ -146,6 +146,15 @@ CREATE TABLE IF NOT EXISTS eventos (
   descripcion   TEXT          NOT NULL,
   categoria     VARCHAR(60)   NOT NULL,
 
+  -- De un día (de siempre) o recurrente. Si es recurrente, frecuencia y
+  -- hora_recurrente vienen llenas; fecha_inicio/fecha_fin siguen siendo el
+  -- rango real —primera y última ocurrencia—, no un dato aparte.
+  tipo_actividad  ENUM('unico','recurrente')
+                                NOT NULL DEFAULT 'unico',
+  frecuencia      ENUM('diaria','semanal','quincenal','mensual')
+                                NULL DEFAULT NULL,
+  hora_recurrente TIME          NULL DEFAULT NULL,
+
   ciudad        VARCHAR(90)   NOT NULL,
   entidad       VARCHAR(90)   NOT NULL COMMENT 'Entidad federativa: Jalisco, Oaxaca…',
   lugar         VARCHAR(160)  NULL DEFAULT NULL,

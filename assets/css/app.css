@@ -120,9 +120,17 @@ input,select{font-family:inherit; font-size:14px;}
 }
 .campo input:focus{outline:none; border-color:var(--verde); background:var(--blanco);}
 .campo .pista{font-size:11.5px; opacity:.6; margin-top:5px;}
-.campo .pista-fila{display:flex; justify-content:space-between; align-items:baseline; gap:12px;}
-.campo .pista-fila .contador{flex-shrink:0; font-variant-numeric:tabular-nums; white-space:nowrap;}
-.campo .pista-fila .contador.corto{color:#A0522D; opacity:1;}
+
+/* Título y descripción llevan el contador junto a la etiqueta, arriba del
+   campo, y no debajo: así se ve venir el límite sin tener que buscarlo. */
+.campo .label-fila{display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:6px;}
+.campo .label-fila label{margin-bottom:0;}
+.campo .label-fila .contador{
+  flex-shrink:0; font-family:'IBM Plex Mono',monospace; font-size:10px;
+  letter-spacing:.05em; color:var(--verde); opacity:.65;
+  font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+.campo .label-fila .contador.corto{color:#A0522D; opacity:1;}
 
 .btn-principal{
   width:100%; background:var(--terracota); color:var(--tinta-boton);
@@ -204,6 +212,32 @@ input,select{font-family:inherit; font-size:14px;}
 
 /* ------------------------------------------------ formulario de evento --- */
 .caja-ancha{max-width:640px;}
+
+.form-seccion-titulo{display:flex; align-items:center; gap:9px; margin:0 0 18px;}
+.form-seccion-titulo svg{color:var(--terracota); flex-shrink:0;}
+.form-seccion-titulo h2{
+  font-family:'Inter',sans-serif; font-size:14.5px; font-weight:600;
+  color:var(--petroleo); margin:0;
+}
+
+/* Segmentado "de un día / recurrente", con el mismo truco que .color-op: el
+   radio se esconde y su span vecino carga el estilo, así el clic funciona en
+   toda la tarjeta y no solo en un punto diminuto. */
+.tipo-actividad{display:grid; grid-template-columns:1fr 1fr; gap:9px;}
+.campo label.tipo-op{
+  display:flex; align-items:center; gap:9px; padding:11px 12px;
+  border:1px solid var(--linea); border-radius:10px; cursor:pointer;
+  font-family:'Inter',sans-serif; font-size:13px; letter-spacing:0;
+  text-transform:none; color:var(--petroleo); margin:0;
+}
+.campo label.tipo-op input{position:absolute; opacity:0; width:0; height:0;}
+.campo label.tipo-op .tipo-icono{flex-shrink:0; opacity:.55;}
+.campo label.tipo-op:has(input:checked){
+  border-color:var(--terracota); background:rgba(199,110,67,.08);
+}
+.campo label.tipo-op:has(input:checked) .tipo-icono{opacity:1; color:var(--terracota);}
+.campo label.tipo-op:has(input:focus-visible){outline:2px solid var(--terracota-texto); outline-offset:2px;}
+@media(max-width:460px){ .tipo-actividad{grid-template-columns:1fr;} }
 
 /* Panel con la guía rápida, a la derecha del formulario de alta/edición.
    Es una tarjeta aparte y no una nota dentro de la caja del formulario:

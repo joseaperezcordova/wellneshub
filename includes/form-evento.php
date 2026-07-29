@@ -23,6 +23,22 @@ $fechaInput = function (string $campo) use ($e) {
     return $ts === false ? '' : date('Y-m-d\TH:i', $ts);
 };
 
+/** Formato que exige type="date": 2026-08-16. Para la fecha de una recurrente. */
+$fechaSoloInput = function (string $campo) use ($e) {
+    if (empty($e[$campo])) return '';
+    $ts = strtotime((string) $e[$campo]);
+    return $ts === false ? '' : date('Y-m-d', $ts);
+};
+
+/** Formato que exige type="time": 19:30. */
+$horaInput = function () use ($e) {
+    if (empty($e['hora_recurrente'])) return '';
+    $ts = strtotime((string) $e['hora_recurrente']);
+    return $ts === false ? '' : date('H:i', $ts);
+};
+
+$esRecurrente = ($e['tipo_actividad'] ?? 'unico') === 'recurrente';
+
 /** El mensaje de error de un campo, si lo hay. */
 $err = function (string $campo) use ($errores) {
     return isset($errores[$campo])
@@ -43,34 +59,109 @@ $mal = function (string $campo) use ($errores) {
 };
 ?>
 
+<div class="form-seccion-titulo">
+  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>
+    <path d="M14 3v4h4"/>
+  </svg>
+  <h2>1. Información general</h2>
+</div>
+
 <div class="campo<?= $mal('titulo') ?>">
-  <label for="titulo">Título de la actividad</label>
+  <div class="label-fila">
+    <label for="titulo">Título de la actividad</label>
+    <span class="contador" id="contadorTitulo"></span>
+  </div>
   <input id="titulo" name="titulo" type="text" required maxlength="160"
          value="<?= e($v('titulo')) ?>" placeholder="Amanecer en el Cenote — Yoga y Sonido">
   <?= $err('titulo') ?>
 </div>
 
-<div class="campo<?= $mal('categoria') ?>">
-  <label for="categoria">Categoría</label>
-  <select id="categoria" name="categoria" required>
-    <option value="">Elige una…</option>
-    <?php foreach (categorias() as $nombre => $icono): ?>
-      <option value="<?= e($nombre) ?>" <?= $v('categoria') === $nombre ? 'selected' : '' ?>>
-        <?= e($icono . '  ' . $nombre) ?>
-      </option>
-    <?php endforeach; ?>
-  </select>
-  <?= $err('categoria') ?>
+<div class="campo-fila">
+  <div class="campo<?= $mal('categoria') ?>">
+    <label for="categoria">Categoría</label>
+    <select id="categoria" name="categoria" required>
+      <option value="">Elige una…</option>
+      <?php foreach (categorias() as $nombre => $icono): ?>
+        <option value="<?= e($nombre) ?>" <?= $v('categoria') === $nombre ? 'selected' : '' ?>>
+          <?= e($icono . '  ' . $nombre) ?>
+        </option>
+      <?php endforeach; ?>
+    </select>
+    <?= $err('categoria') ?>
+  </div>
+
+  <div class="campo">
+    <label>Tipo de actividad</label>
+    <div class="tipo-actividad">
+      <label class="tipo-op">
+        <input type="radio" name="tipo_actividad" value="unico" id="tipoUnico" <?= $esRecurrente ? '' : 'checked' ?>>
+        <svg class="tipo-icono" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3.5" y="5" width="17" height="15" rx="2"/>
+          <path d="M3.5 9.5h17"/>
+          <path d="M8 3v4M16 3v4"/>
+        </svg>
+        <span>Actividad de un día</span>
+      </label>
+      <label class="tipo-op">
+        <input type="radio" name="tipo_actividad" value="recurrente" id="tipoRecurrente" <?= $esRecurrente ? 'checked' : '' ?>>
+        <svg class="tipo-icono" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 7h13a3 3 0 0 1 3 3v1"/>
+          <path d="M17 4l3 3-3 3"/>
+          <path d="M20 17H7a3 3 0 0 1-3-3v-1"/>
+          <path d="M7 20l-3-3 3-3"/>
+        </svg>
+        <span>Actividad recurrente</span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<div class="campo-fila" id="bloqueFechaRecurrente" <?= $esRecurrente ? '' : 'style="display:none;"' ?>>
+  <div class="campo<?= $mal('fecha_inicio') ?>">
+    <?php // El id se lleva a "fecha_inicio" solo cuando este es el bloque activo:
+          // es al que tiene que apuntar el enlace de aviso-errores.php cuando el
+          // error viene de aquí y no del otro modo. ?>
+    <label for="<?= $esRecurrente ? 'fecha_inicio' : 'fecha_inicio_rec' ?>">Fecha inicio</label>
+    <input id="<?= $esRecurrente ? 'fecha_inicio' : 'fecha_inicio_rec' ?>" name="fecha_inicio_rec" type="date" <?= $esRecurrente ? 'required' : '' ?>
+           value="<?= e($esRecurrente ? $fechaSoloInput('fecha_inicio') : '') ?>">
+    <?= $err('fecha_inicio') ?>
+  </div>
+  <div class="campo<?= $mal('fecha_fin') ?>">
+    <label for="<?= $esRecurrente ? 'fecha_fin' : 'fecha_fin_rec' ?>">Fecha fin</label>
+    <input id="<?= $esRecurrente ? 'fecha_fin' : 'fecha_fin_rec' ?>" name="fecha_fin_rec" type="date" <?= $esRecurrente ? 'required' : '' ?>
+           value="<?= e($esRecurrente ? $fechaSoloInput('fecha_fin') : '') ?>">
+    <?= $err('fecha_fin') ?>
+  </div>
+  <div class="campo<?= $mal('frecuencia') ?>">
+    <label for="frecuencia">Frecuencia</label>
+    <select id="frecuencia" name="frecuencia" <?= $esRecurrente ? 'required' : '' ?>>
+      <option value="">Elige una…</option>
+      <?php foreach (frecuenciasRecurrencia() as $clave => $etiqueta): ?>
+        <option value="<?= e($clave) ?>" <?= $v('frecuencia') === $clave ? 'selected' : '' ?>><?= e($etiqueta) ?></option>
+      <?php endforeach; ?>
+    </select>
+    <?= $err('frecuencia') ?>
+  </div>
+  <div class="campo<?= $mal('hora_recurrente') ?>">
+    <label for="hora_recurrente">Hora</label>
+    <input id="hora_recurrente" name="hora_recurrente" type="time" <?= $esRecurrente ? 'required' : '' ?>
+           value="<?= e($horaInput()) ?>">
+    <?= $err('hora_recurrente') ?>
+  </div>
 </div>
 
 <div class="campo<?= $mal('descripcion') ?>">
-  <label for="descripcion">Descripción</label>
-  <textarea id="descripcion" name="descripcion" rows="7" required minlength="50" maxlength="2000"
-            placeholder="Describe tu actividad. Incluye qué aprenderán los asistentes, a quién está dirigida, qué incluye y cualquier información importante."><?= e($v('descripcion')) ?></textarea>
-  <div class="pista pista-fila">
-    <span>Se muestra tal cual en la ficha. Los saltos de línea se respetan.</span>
+  <div class="label-fila">
+    <label for="descripcion">Descripción</label>
     <span class="contador" id="contadorDescripcion"></span>
   </div>
+  <textarea id="descripcion" name="descripcion" rows="7" required minlength="50" maxlength="2000"
+            placeholder="Describe tu actividad. Incluye qué aprenderán los asistentes, a quién está dirigida, qué incluye y cualquier información importante."><?= e($v('descripcion')) ?></textarea>
+  <div class="pista">Se muestra tal cual en la ficha. Los saltos de línea se respetan.</div>
   <?= $err('descripcion') ?>
 </div>
 
@@ -128,19 +219,19 @@ $mal = function (string $campo) use ($errores) {
   <?= $err('mapa_url') ?>
 </div>
 
-<div class="campo-fila">
-  <div class="campo<?= $mal('fecha_inicio') ?>">
-    <label for="fecha_inicio">Empieza</label>
-    <input id="fecha_inicio" name="fecha_inicio" type="datetime-local" required
+<div class="campo-fila" id="bloqueFechaUnica" <?= $esRecurrente ? 'style="display:none;"' : '' ?>>
+  <div class="campo<?= $esRecurrente ? '' : $mal('fecha_inicio') ?>">
+    <label <?= $esRecurrente ? '' : 'for="fecha_inicio"' ?>>Empieza</label>
+    <input <?= $esRecurrente ? '' : 'id="fecha_inicio"' ?> name="fecha_inicio" type="datetime-local" <?= $esRecurrente ? '' : 'required' ?>
            value="<?= e($fechaInput('fecha_inicio')) ?>">
-    <?= $err('fecha_inicio') ?>
+    <?= $esRecurrente ? '' : $err('fecha_inicio') ?>
   </div>
-  <div class="campo<?= $mal('fecha_fin') ?>">
-    <label for="fecha_fin">Termina <span class="opcional">opcional</span></label>
-    <input id="fecha_fin" name="fecha_fin" type="datetime-local"
+  <div class="campo<?= $esRecurrente ? '' : $mal('fecha_fin') ?>">
+    <label <?= $esRecurrente ? '' : 'for="fecha_fin"' ?>>Termina <span class="opcional">opcional</span></label>
+    <input <?= $esRecurrente ? '' : 'id="fecha_fin"' ?> name="fecha_fin" type="datetime-local"
            value="<?= e($fechaInput('fecha_fin')) ?>">
     <div class="pista">Para retiros de varios días.</div>
-    <?= $err('fecha_fin') ?>
+    <?= $esRecurrente ? '' : $err('fecha_fin') ?>
   </div>
 </div>
 
@@ -247,6 +338,45 @@ $mal = function (string $campo) use ($errores) {
     contador.classList.toggle('corto', n < MIN);
   }
   campo.addEventListener('input', sync);
+  sync();
+})();
+
+/* Contador del título. Solo tiene máximo, así que no hace falta el aviso de
+   "corto" que sí lleva la descripción. */
+(function(){
+  var campo    = document.getElementById('titulo');
+  var contador = document.getElementById('contadorTitulo');
+  if (!campo || !contador) return;
+
+  function sync(){ contador.textContent = campo.value.length + ' / 160'; }
+  campo.addEventListener('input', sync);
+  sync();
+})();
+
+/* De un día / recurrente cambian qué fechas se piden. Los campos del bloque
+   que queda oculto se marcan no-requeridos: si no, un navegador que sí valida
+   los "required" ocultos —la mayoría los ignora, pero no hay que confiar en
+   eso— bloquearía el envío por un campo que la persona ni ve. */
+(function(){
+  var radios = document.querySelectorAll('input[name="tipo_actividad"]');
+  var bloqueUnico      = document.getElementById('bloqueFechaUnica');
+  var bloqueRecurrente = document.getElementById('bloqueFechaRecurrente');
+  if (!radios.length || !bloqueUnico || !bloqueRecurrente) return;
+
+  var campoInicioUnico = bloqueUnico.querySelector('[name="fecha_inicio"]');
+  var camposRecurrente = bloqueRecurrente.querySelectorAll('[name="fecha_inicio_rec"], [name="fecha_fin_rec"], [name="frecuencia"], [name="hora_recurrente"]');
+
+  function sync(){
+    var recurrente = document.querySelector('input[name="tipo_actividad"]:checked').value === 'recurrente';
+
+    bloqueUnico.style.display      = recurrente ? 'none' : '';
+    bloqueRecurrente.style.display = recurrente ? '' : 'none';
+
+    if (campoInicioUnico) campoInicioUnico.required = !recurrente;
+    camposRecurrente.forEach(function(campo){ campo.required = recurrente; });
+  }
+
+  radios.forEach(function(r){ r.addEventListener('change', sync); });
   sync();
 })();
 </script>
