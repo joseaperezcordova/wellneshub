@@ -56,6 +56,15 @@ function enlaceMenu(string $ruta, string $texto, string $clave, string $seccion)
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<?= e(assetUrl('assets/css/app.css')) ?>">
 <link rel="stylesheet" href="<?= e(assetUrl('assets/css/portada.css')) ?>">
+<?php if (!empty($mapaInteractivo)): ?>
+<!-- El mapa arrastrable de alta/edición: Leaflet + OpenStreetMap, no la API
+     de Google (includes/mapa.php explica por qué). Solo entra en las dos
+     páginas que lo usan; el resto del sitio no paga por esta librería. -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<?php endif; ?>
 </head>
 <body>
 

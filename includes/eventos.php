@@ -109,46 +109,26 @@ function estadosMexico(): array
 }
 
 /**
- * estado => ciudades. Alimenta el <datalist> de "Ciudad", no un select: la
- * lista es una ayuda para llenar más rápido los destinos comunes, no un
- * catálogo cerrado —un pueblo que no está aquí se puede escribir igual—.
+ * estado => municipios oficiales. A diferencia del texto libre que tenía
+ * Ciudad antes, este es un catálogo cerrado —los ~2,478 municipios de
+ * México según el INEGI—: quien esté en una localidad pequeña que no
+ * aparece con su propio nombre elige el municipio al que pertenece, igual
+ * que ya hace con el "Estado".
+ *
+ * Vive en un JSON aparte y no en un array de PHP porque son casi 2,500
+ * líneas de datos, no de lógica: mezclarlas aquí habría hecho ilegible el
+ * resto del archivo.
  */
-function ciudadesSugeridasPorEstado(): array
+function municipiosPorEstado(): array
 {
-    return [
-        'Aguascalientes'       => ['Aguascalientes'],
-        'Baja California'      => ['Tijuana', 'Mexicali', 'Ensenada', 'Rosarito'],
-        'Baja California Sur'  => ['La Paz', 'Los Cabos', 'Todos Santos', 'Loreto'],
-        'Campeche'             => ['Campeche', 'Ciudad del Carmen'],
-        'Chiapas'              => ['Tuxtla Gutiérrez', 'San Cristóbal de las Casas', 'Palenque'],
-        'Chihuahua'            => ['Chihuahua', 'Ciudad Juárez', 'Creel'],
-        'Ciudad de México'     => ['Ciudad de México'],
-        'Coahuila'             => ['Saltillo', 'Torreón', 'Parras de la Fuente'],
-        'Colima'               => ['Colima', 'Manzanillo'],
-        'Durango'              => ['Durango'],
-        'Guanajuato'           => ['León', 'Guanajuato', 'San Miguel de Allende', 'Celaya'],
-        'Guerrero'             => ['Acapulco', 'Taxco', 'Zihuatanejo', 'Chilpancingo'],
-        'Hidalgo'              => ['Pachuca', 'Huasca de Ocampo'],
-        'Jalisco'              => ['Guadalajara', 'Puerto Vallarta', 'Sayulita', 'Chapala', 'Tequila'],
-        'México'               => ['Toluca', 'Valle de Bravo', 'Metepec'],
-        'Michoacán'            => ['Morelia', 'Pátzcuaro', 'Uruapan'],
-        'Morelos'              => ['Cuernavaca', 'Tepoztlán'],
-        'Nayarit'              => ['Tepic', 'San Pancho', 'Punta de Mita'],
-        'Nuevo León'           => ['Monterrey', 'San Pedro Garza García'],
-        'Oaxaca'               => ['Oaxaca de Juárez', 'Puerto Escondido', 'Huatulco', 'Mazunte'],
-        'Puebla'               => ['Puebla', 'Cholula', 'Atlixco'],
-        'Querétaro'            => ['Querétaro', 'Bernal'],
-        'Quintana Roo'         => ['Cancún', 'Playa del Carmen', 'Tulum', 'Bacalar', 'Cozumel', 'Isla Mujeres'],
-        'San Luis Potosí'      => ['San Luis Potosí', 'Real de Catorce'],
-        'Sinaloa'              => ['Culiacán', 'Mazatlán'],
-        'Sonora'               => ['Hermosillo', 'Guaymas', 'San Carlos'],
-        'Tabasco'              => ['Villahermosa'],
-        'Tamaulipas'           => ['Tampico', 'Ciudad Victoria'],
-        'Tlaxcala'             => ['Tlaxcala'],
-        'Veracruz'             => ['Veracruz', 'Xalapa', 'Coatepec'],
-        'Yucatán'              => ['Mérida', 'Valladolid', 'Izamal', 'Progreso'],
-        'Zacatecas'            => ['Zacatecas'],
-    ];
+    static $datos = null;
+
+    if ($datos === null) {
+        $json  = file_get_contents(__DIR__ . '/datos/municipios.json');
+        $datos = $json !== false ? (json_decode($json, true) ?: []) : [];
+    }
+
+    return $datos;
 }
 
 
@@ -373,47 +353,41 @@ function validarEvento(array $in): array
         $e['latitud']  = null;
         $e['longitud'] = null;
     } else {
-        $e['ciudad'] = trim((string) ($in['ciudad'] ?? ''));
-        if ($e['ciudad'] === '') $errores['ciudad'] = 'Falta la ciudad.';
-
         $e['entidad'] = trim((string) ($in['entidad'] ?? ''));
         if (!in_array($e['entidad'], estadosMexico(), true)) {
             $errores['entidad'] = 'Elige un estado de la lista.';
+        }
+
+        $e['ciudad'] = trim((string) ($in['ciudad'] ?? ''));
+        $municipiosDelEstado = municipiosPorEstado()[$e['entidad']] ?? [];
+        if (!in_array($e['ciudad'], $municipiosDelEstado, true)) {
+            $errores['ciudad'] = $e['entidad'] === ''
+                ? 'Elige primero el estado.'
+                : 'Elige una ciudad de la lista.';
         }
 
         $e['lugar'] = trim((string) ($in['lugar'] ?? ''));
         if ($e['lugar'] === '') $errores['lugar'] = 'Falta el lugar donde se realiza.';
 
         /*
-         * El punto en el mapa. Opcional, pero si se pone un enlace tiene que
-         * poder leerse: guardarlo sin coordenadas dejaría una ficha con un
-         * mapa vacío y nadie se enteraría hasta que alguien fuera a buscar el
-         * sitio.
-         *
-         * El mensaje de error explica el camino entero. Es más largo de lo
-         * normal a propósito: aquí falla justo quien no sabe de dónde sacar
-         * el enlace bueno, y un «enlace no válido» a secas le deja igual de
-         * perdido.
+         * El punto en el mapa ya no sale de un enlace pegado: sale del pin que
+         * se arrastra en el mapa interactivo, y esos hidden inputs son
+         * exactamente lo que ese JavaScript escribe. Opcional a propósito —no
+         * toda actividad necesita el pin exacto para publicarse—, pero si
+         * llega algo tiene que ser un punto real y no basura de un POST armado
+         * a mano.
          */
-        $mapa = trim((string) ($in['mapa_url'] ?? ''));
-
         $e['mapa_url'] = null;
         $e['latitud']  = null;
         $e['longitud'] = null;
 
-        if ($mapa !== '') {
-            if (mb_strlen($mapa) > 500) {
-                $errores['mapa_url'] = 'Ese enlace es larguísimo. Copia el que da el botón «Compartir» de Google Maps.';
-            } else {
-                $e['mapa_url'] = $mapa;
-                $punto = coordenadasDeEnlace($mapa);
+        $lat = trim((string) ($in['latitud'] ?? ''));
+        $lng = trim((string) ($in['longitud'] ?? ''));
 
-                if ($punto === null) {
-                    $errores['mapa_url'] = 'No pudimos sacar la ubicación de ahí. '
-                        . 'Abre Google Maps, busca el sitio, pulsa «Compartir» y pega el enlace que te dé.';
-                } else {
-                    [$e['latitud'], $e['longitud']] = $punto;
-                }
+        if ($lat !== '' && $lng !== '' && is_numeric($lat) && is_numeric($lng)) {
+            $punto = coordenadasValidas((float) $lat, (float) $lng);
+            if ($punto !== null) {
+                [$e['latitud'], $e['longitud']] = $punto;
             }
         }
     }

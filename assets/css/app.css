@@ -193,6 +193,7 @@ input,select{font-family:inherit; font-size:14px;}
 }
 .aviso-error{background:#FBEAE3; border-color:#E4B49C; color:#7C3A18;}
 .aviso-ok{background:#E7F0E9; border-color:#A9C4AF; color:#2C4A35;}
+.aviso-info{background:#E3EEF6; border-color:#A9C7DC; color:#2C4A6A;}
 
 /* Botón de publicar del topbar. En pantalla estrecha se queda en «Publicar» a
    secas en vez de desaparecer: es la acción que da de comer al directorio y la
@@ -325,6 +326,13 @@ input,select{font-family:inherit; font-size:14px;}
 .campo-fila > *{min-width:0;}
 @media(max-width:520px){ .campo-fila{grid-template-columns:1fr; gap:0;} }
 
+/* Lugar / Ciudad / Estado: tres columnas en vez de dos. Se parte a dos
+   columnas antes de llegar al ancho en el que .campo-fila corta a una sola,
+   porque tres campos de por sí más angostos aprietan antes que dos. */
+.campo-fila-3{grid-template-columns:1fr 1fr 1fr;}
+@media(max-width:680px){ .campo-fila-3{grid-template-columns:1fr 1fr;} }
+@media(max-width:520px){ .campo-fila-3{grid-template-columns:1fr;} }
+
 /* El campo que falló tiene que verse SIN leer nada. Antes el único indicio era
    la línea de texto de abajo, del mismo tamaño y color apagado que las pistas
    de ayuda de al lado: en un formulario de doce campos, invisible. */
@@ -454,16 +462,14 @@ input,select{font-family:inherit; font-size:14px;}
 }
 .btn-comollegar:hover{background:var(--petroleo);}
 
-/* El mismo mapa dentro del formulario, más pequeño: aquí solo sirve para
-   comprobar que el punto cayó donde tenía que caer. */
-.mapa-previo{margin-top:10px;}
-.mapa-previo iframe{
-  display:block; width:100%; height:180px; border:1px solid var(--linea);
-  border-radius:8px; background:var(--arena);
+/* El mapa arrastrable del formulario. El alto es fijo porque Leaflet no
+   sabe medirse solo: sin uno, el contenedor colapsa a 0px y el mapa no
+   llega ni a pintarse. */
+.mapa-interactivo{
+  height:280px; border-radius:12px; border:1px solid var(--linea);
+  background:var(--arena);
 }
-/* Verde y sin la opacidad de las demás pistas: es la confirmación de que el
-   enlace se entendió, y se lee de un vistazo o no sirve de nada. */
-.campo .pista.pista-ok{color:var(--verde); opacity:1; font-weight:500; margin-bottom:8px;}
+@media(max-width:520px){ .mapa-interactivo{height:220px;} }
 
 .ficha-media{
   position:relative; height:340px; border-radius:16px; overflow:hidden;

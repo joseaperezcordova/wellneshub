@@ -271,29 +271,30 @@ $mal = function (string $campo) use ($errores) {
   <h2>4. Ubicación</h2>
 </div>
 
-<div class="campo-fila">
-  <div class="campo<?= $mal('lugar') ?>" id="campoLugar">
-    <label for="lugar">Lugar</label>
-    <input id="lugar" name="lugar" type="text" maxlength="160"
-           value="<?= e($v('lugar')) ?>" placeholder="Ej. Centro Holístico Luz">
-    <?= $err('lugar') ?>
-  </div>
-  <div class="campo<?= $mal('enlace_acceso') ?>">
-    <label for="enlace_acceso">Enlace de acceso <span class="opcional">opcional</span></label>
-    <input id="enlace_acceso" name="enlace_acceso" type="url" maxlength="500"
-           value="<?= e($v('enlace_acceso')) ?>" placeholder="https://">
-    <div class="pista">Enlace privado que solo será visible para las personas registradas o confirmadas.</div>
-    <?= $err('enlace_acceso') ?>
-  </div>
+<div class="campo<?= $mal('enlace_acceso') ?>">
+  <label for="enlace_acceso">Enlace de acceso <span class="opcional">opcional</span></label>
+  <input id="enlace_acceso" name="enlace_acceso" type="url" maxlength="500"
+         value="<?= e($v('enlace_acceso')) ?>" placeholder="https://">
+  <div class="pista">Enlace privado que solo será visible para las personas registradas o confirmadas.</div>
+  <?= $err('enlace_acceso') ?>
 </div>
 
 <div id="bloqueUbicacionFisica">
-  <div class="campo-fila">
-    <div class="campo<?= $mal('ciudad') ?>">
+  <div class="campo-fila campo-fila-3">
+    <div class="campo<?= $mal('lugar') ?>" id="campoLugar">
+      <label for="lugar">Lugar</label>
+      <input id="lugar" name="lugar" type="text" maxlength="160"
+             value="<?= e($v('lugar')) ?>" placeholder="Ej. Centro Holístico Luz">
+      <?= $err('lugar') ?>
+    </div>
+    <div class="campo<?= $mal('ciudad') ?>" id="campoCiudad">
       <label for="ciudad">Ciudad</label>
-      <input id="ciudad" name="ciudad" type="text" maxlength="90" list="listaCiudades"
-             value="<?= e($v('ciudad')) ?>" placeholder="Tulum" autocomplete="off">
-      <datalist id="listaCiudades"></datalist>
+      <select id="ciudad" name="ciudad">
+        <option value="">Selecciona una ciudad</option>
+        <?php foreach (municipiosPorEstado()[$v('entidad')] ?? [] as $municipio): ?>
+          <option value="<?= e($municipio) ?>" <?= $v('ciudad') === $municipio ? 'selected' : '' ?>><?= e($municipio) ?></option>
+        <?php endforeach; ?>
+      </select>
       <?= $err('ciudad') ?>
     </div>
     <div class="campo<?= $mal('entidad') ?>">
@@ -308,37 +309,23 @@ $mal = function (string $campo) use ($errores) {
     </div>
   </div>
 
-  <div class="campo<?= $mal('mapa_url') ?>">
-    <label for="mapa_url">Ubicación en el mapa <span class="opcional">opcional</span></label>
-    <input id="mapa_url" name="mapa_url" type="text" maxlength="500"
-           value="<?= e($v('mapa_url')) ?>" placeholder="https://maps.app.goo.gl/…">
+  <div class="campo">
+    <div id="mapaInteractivo" class="mapa-interactivo" data-lat="<?= e($v('latitud')) ?>" data-lng="<?= e($v('longitud')) ?>"></div>
+    <div class="aviso aviso-info" style="margin:10px 0 0;">Arrastra el pin para ajustar la ubicación exacta del lugar.</div>
+  </div>
 
-    <?php /* Las instrucciones van antes del error y no después: quien las
-             necesita es justo quien acaba de equivocarse, y si están debajo del
-             mensaje rojo se leen tarde. */ ?>
-    <div class="pista">
-      Busca el sitio en Google Maps, pulsa <strong>Compartir</strong> y pega aquí el enlace.
-      En la ficha sale un mapa con el punto y un botón para llegar.
-      Si tienes las coordenadas a mano, también valen: <span class="mono">20.2114, -87.4654</span>.
+  <div class="campo">
+    <label>Coordenadas <span class="opcional">se obtienen automáticamente al mover el pin</span></label>
+  </div>
+  <div class="campo-fila">
+    <div class="campo">
+      <label for="latitud">Latitud</label>
+      <input id="latitud" name="latitud" type="text" readonly value="<?= e($v('latitud')) ?>">
     </div>
-
-    <?php
-    /*
-     * Si el enlace ya se leyó, se enseña el mapa aquí mismo. Es la única forma de
-     * que el organizador compruebe que el punto cayó donde tenía que caer antes
-     * de publicar: un enlace copiado de una búsqueda a medias apunta al centro de
-     * la ciudad, y desde el texto del enlace eso no se ve.
-     */
-    if (!empty($e['latitud']) && !empty($e['longitud'])):
-    ?>
-      <div class="mapa-previo">
-        <div class="pista pista-ok">Ubicación reconocida. Comprueba que el punto está donde debe.</div>
-        <iframe src="<?= e(urlMapaEmbebido((float) $e['latitud'], (float) $e['longitud'])) ?>"
-                title="Vista previa de la ubicación" loading="lazy" referrerpolicy="no-referrer"></iframe>
-      </div>
-    <?php endif; ?>
-
-    <?= $err('mapa_url') ?>
+    <div class="campo">
+      <label for="longitud">Longitud</label>
+      <input id="longitud" name="longitud" type="text" readonly value="<?= e($v('longitud')) ?>">
+    </div>
   </div>
 </div>
 
@@ -419,6 +406,14 @@ $mal = function (string $campo) use ($errores) {
 
 <button class="btn-principal" type="submit"><?= e($textoBoton) ?></button>
 
+<?php /* Va antes del script grande y no después: ese script comprueba
+         "typeof MUNICIPIOS_POR_ESTADO" al cargar, y si esta variable llegara
+         más tarde la comprobación siempre daría "undefined" y el selector de
+         ciudad se quedaría sin repoblarse al cambiar de estado. */ ?>
+<script>
+var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPED_UNICODE) ?>;
+</script>
+
 <script>
 /* El precio no pinta nada si el evento es gratuito. Ocultarlo evita la duda de
    si hay que poner 0 o dejarlo vacío. */
@@ -494,7 +489,6 @@ $mal = function (string $campo) use ($errores) {
 (function(){
   var radios = document.querySelectorAll('input[name="modalidad"]');
   var bloqueFisico = document.getElementById('bloqueUbicacionFisica');
-  var campoLugar   = document.getElementById('campoLugar');
   var lugar        = document.getElementById('lugar');
   var ciudad       = document.getElementById('ciudad');
   var entidad      = document.getElementById('entidad');
@@ -504,7 +498,6 @@ $mal = function (string $campo) use ($errores) {
     var esFisico = document.querySelector('input[name="modalidad"]:checked').value !== 'en_linea';
 
     bloqueFisico.style.display = esFisico ? '' : 'none';
-    if (campoLugar) campoLugar.style.display = esFisico ? '' : 'none';
 
     if (lugar)   lugar.required   = esFisico;
     if (ciudad)  ciudad.required  = esFisico;
@@ -515,26 +508,88 @@ $mal = function (string $campo) use ($errores) {
   sync();
 })();
 
-/* Sugerencias de ciudad según el estado elegido. Es un <datalist>, no un
-   select: sigue aceptando cualquier texto, así que un pueblo que no está en
-   la lista —la lista no pretende ser exhaustiva— se puede escribir igual. */
+/* Ciudad depende del Estado elegido: es un catálogo cerrado de municipios
+   —a diferencia de antes, ya no acepta cualquier texto—, así que sus
+   opciones se arman de nuevo cada vez que cambia el estado. El PHP ya deja
+   las correctas puestas si se llega aquí con un estado guardado (al editar,
+   o después de un error de validación); este script solo entra en acción
+   cuando la persona cambia el estado a mano. */
 (function(){
-  var entidad   = document.getElementById('entidad');
-  var ciudad    = document.getElementById('ciudad');
-  var datalist  = document.getElementById('listaCiudades');
-  if (!entidad || !ciudad || !datalist || typeof CIUDADES_POR_ESTADO === 'undefined') return;
+  var entidad = document.getElementById('entidad');
+  var ciudad  = document.getElementById('ciudad');
+  if (!entidad || !ciudad || typeof MUNICIPIOS_POR_ESTADO === 'undefined') return;
 
-  function sync(){
-    var lista = CIUDADES_POR_ESTADO[entidad.value] || [];
-    datalist.innerHTML = lista.map(function(c){
-      return '<option value="' + c.replace(/"/g, '&quot;') + '">';
+  entidad.addEventListener('change', function(){
+    var lista = MUNICIPIOS_POR_ESTADO[entidad.value] || [];
+    ciudad.innerHTML = '<option value="">Selecciona una ciudad</option>' + lista.map(function(m){
+      return '<option value="' + m.replace(/"/g, '&quot;') + '">' + m + '</option>';
     }).join('');
-  }
-  entidad.addEventListener('change', sync);
-  sync();
+  });
 })();
-</script>
 
-<script>
-var CIUDADES_POR_ESTADO = <?= json_encode(ciudadesSugeridasPorEstado(), JSON_UNESCAPED_UNICODE) ?>;
+/* El mapa interactivo: un pin que se arrastra o se coloca con un clic, y las
+   coordenadas se escriben solas en los campos de abajo. Leaflet + OpenStreet­Map
+   y no la API de Google: no pide clave ni tarjeta, que es el mismo criterio
+   que ya usa el mapa de la ficha (includes/mapa.php). */
+(function(){
+  var contenedor = document.getElementById('mapaInteractivo');
+  if (!contenedor || typeof L === 'undefined') return;
+
+  var latInput = document.getElementById('latitud');
+  var lngInput = document.getElementById('longitud');
+  var ciudadSel = document.getElementById('ciudad');
+  var entidadSel = document.getElementById('entidad');
+
+  var CENTRO_MEXICO = [23.6345, -102.5528];
+  var lat0 = parseFloat(contenedor.dataset.lat);
+  var lng0 = parseFloat(contenedor.dataset.lng);
+  var hayPunto = !isNaN(lat0) && !isNaN(lng0);
+
+  var mapa = L.map(contenedor).setView(hayPunto ? [lat0, lng0] : CENTRO_MEXICO, hayPunto ? 15 : 5);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',
+    maxZoom: 19
+  }).addTo(mapa);
+
+  var pin = L.marker(hayPunto ? [lat0, lng0] : CENTRO_MEXICO, {draggable: true}).addTo(mapa);
+
+  function fijarPunto(latlng){
+    latInput.value = latlng.lat.toFixed(6);
+    lngInput.value = latlng.lng.toFixed(6);
+  }
+
+  pin.on('dragend', function(){ fijarPunto(pin.getLatLng()); });
+  mapa.on('click', function(ev){ pin.setLatLng(ev.latlng); fijarPunto(ev.latlng); });
+
+  /*
+   * Al elegir ciudad se centra el mapa ahí —Nominatim, el buscador gratuito
+   * de OpenStreetMap—, para no obligar a nadie a encontrar su colonia a ojo
+   * en un mapa de todo México. Si ya había un pin puesto a mano, cambiar de
+   * ciudad no lo mueve: no tiene sentido borrar un ajuste fino que la
+   * persona ya hizo.
+   */
+  function centrarEnCiudad(){
+    if (!ciudadSel.value || !entidadSel.value) return;
+    var consulta = encodeURIComponent(ciudadSel.value + ', ' + entidadSel.value + ', México');
+
+    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + consulta)
+      .then(function(resp){ return resp.json(); })
+      .then(function(resultados){
+        if (!resultados.length) return;
+        var punto = {lat: parseFloat(resultados[0].lat), lng: parseFloat(resultados[0].lon)};
+        mapa.setView(punto, 13);
+
+        // setLatLng no dispara "dragend" —solo lo hace un arrastre de verdad—,
+        // así que sin fijarPunto() aquí el pin se vería en su sitio pero los
+        // campos de latitud/longitud se quedarían vacíos si nadie lo mueve.
+        if (!latInput.value) {
+          pin.setLatLng(punto);
+          fijarPunto(punto);
+        }
+      })
+      .catch(function(){});
+  }
+  ciudadSel.addEventListener('change', centrarEnCiudad);
+})();
 </script>

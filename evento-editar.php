@@ -90,6 +90,7 @@ if ($puede && postDesbordado()) {
 }
 
 $titulo = 'Editar actividad';
+$mapaInteractivo = true;
 require __DIR__ . '/includes/layout.php';
 ?>
 

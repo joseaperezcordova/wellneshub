@@ -67,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && random_int(1, 20) === 1) {
 }
 
 $titulo = 'Publicar una actividad';
+$mapaInteractivo = true;
 require __DIR__ . '/includes/layout.php';
 ?>
 
