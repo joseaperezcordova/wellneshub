@@ -93,9 +93,9 @@ $titulo = 'Editar actividad';
 require __DIR__ . '/includes/layout.php';
 ?>
 
-<div class="auth-caja caja-ancha">
-
 <?php if (!$puede): ?>
+
+<div class="auth-caja caja-ancha">
 
   <h1>Ya no se puede editar</h1>
   <p class="sub">«<?= e($ev['titulo']) ?>»</p>
@@ -123,52 +123,60 @@ require __DIR__ . '/includes/layout.php';
   <a class="btn-principal" style="text-decoration:none; display:block; text-align:center;"
      href="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>">Volver a la ficha</a>
 
+</div>
+
 <?php else: ?>
 
-  <?php $volverAdmin = ($_GET['volver'] ?? '') === 'admin' && esAdmin($u); ?>
-  <a class="volver" href="<?= $volverAdmin ? URL_BASE . '/admin.php' : URL_BASE . '/evento.php?id=' . (int) $ev['id'] ?>">← <?= $volverAdmin ? 'Volver al panel admin' : 'Volver a la ficha' ?></a>
+<div class="form-con-guia">
+  <div class="auth-caja caja-ancha">
 
-  <h1>Editar actividad</h1>
-  <?php if ($ev['situacion'] === 'borrador'): ?>
-    <p class="sub">Es un borrador: no la ve nadie más que tú hasta que la publiques.</p>
-  <?php elseif ($ev['situacion'] === 'oculto'): ?>
-    <p class="sub">Oculta. No aparece en el listado.</p>
-  <?php else: ?>
-    <?php $quedan = minutosRestantesEdicion($ev); ?>
-    <p class="sub">
-      Publicada. Te quedan
-      <strong><?= $quedan >= 60 ? intdiv($quedan, 60) . ' h ' . ($quedan % 60) . ' min' : $quedan . ' min' ?></strong>
-      de margen para corregirla<?= esAdmin($u) && (int) $ev['usuario_id'] !== (int) $u['id'] ? ' (tú eres administrador: puedes editarla siempre)' : '' ?>.
-    </p>
-  <?php endif; ?>
+    <?php $volverAdmin = ($_GET['volver'] ?? '') === 'admin' && esAdmin($u); ?>
+    <a class="volver" href="<?= $volverAdmin ? URL_BASE . '/admin.php' : URL_BASE . '/evento.php?id=' . (int) $ev['id'] ?>">← <?= $volverAdmin ? 'Volver al panel admin' : 'Volver a la ficha' ?></a>
 
-  <?php require __DIR__ . '/includes/aviso-errores.php'; ?>
-
-  <form method="post" enctype="multipart/form-data" novalidate>
-    <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-    <?php $textoBoton = 'Guardar cambios'; require __DIR__ . '/includes/form-evento.php'; ?>
-  </form>
-
-  <?php /* Mismas comprobaciones que ya hace evento.php al recibir el POST
-           —permiso de admin para republicar, plazo para borrar—: estos botones
-           mandan ahí en vez de duplicar esa lógica aquí. */ ?>
-  <div class="barra-acciones" style="margin-top:18px;">
-    <?php if ($ev['situacion'] === 'oculto' && esAdmin($u)): ?>
-      <form method="post" action="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>">
-        <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-        <button class="btn-barra destacado" type="submit" name="publicar" value="1">Volver a publicar</button>
-      </form>
+    <h1>Editar actividad</h1>
+    <?php if ($ev['situacion'] === 'borrador'): ?>
+      <p class="sub">Es un borrador: no la ve nadie más que tú hasta que la publiques.</p>
+    <?php elseif ($ev['situacion'] === 'oculto'): ?>
+      <p class="sub">Oculta. No aparece en el listado.</p>
+    <?php else: ?>
+      <?php $quedan = minutosRestantesEdicion($ev); ?>
+      <p class="sub">
+        Publicada. Te quedan
+        <strong><?= $quedan >= 60 ? intdiv($quedan, 60) . ' h ' . ($quedan % 60) . ' min' : $quedan . ' min' ?></strong>
+        de margen para corregirla<?= esAdmin($u) && (int) $ev['usuario_id'] !== (int) $u['id'] ? ' (tú eres administrador: puedes editarla siempre)' : '' ?>.
+      </p>
     <?php endif; ?>
 
-    <form method="post" action="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>"
-          onsubmit="return confirm('¿Eliminar «<?= e(addslashes($ev['titulo'])) ?>»? No se puede deshacer.');">
+    <?php require __DIR__ . '/includes/aviso-errores.php'; ?>
+
+    <form method="post" enctype="multipart/form-data" novalidate>
       <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-      <button class="btn-barra peligro" type="submit" name="eliminar" value="1">Eliminar actividad</button>
+      <?php $textoBoton = 'Guardar cambios'; require __DIR__ . '/includes/form-evento.php'; ?>
     </form>
+
+    <?php /* Mismas comprobaciones que ya hace evento.php al recibir el POST
+             —permiso de admin para republicar, plazo para borrar—: estos botones
+             mandan ahí en vez de duplicar esa lógica aquí. */ ?>
+    <div class="barra-acciones" style="margin-top:18px;">
+      <?php if ($ev['situacion'] === 'oculto' && esAdmin($u)): ?>
+        <form method="post" action="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>">
+          <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+          <button class="btn-barra destacado" type="submit" name="publicar" value="1">Volver a publicar</button>
+        </form>
+      <?php endif; ?>
+
+      <form method="post" action="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>"
+            onsubmit="return confirm('¿Eliminar «<?= e(addslashes($ev['titulo'])) ?>»? No se puede deshacer.');">
+        <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+        <button class="btn-barra peligro" type="submit" name="eliminar" value="1">Eliminar actividad</button>
+      </form>
+    </div>
+
   </div>
 
-<?php endif; ?>
-
+  <?php require __DIR__ . '/includes/guia-accion.php'; ?>
 </div>
+
+<?php endif; ?>
 
 <?php pie(); ?>

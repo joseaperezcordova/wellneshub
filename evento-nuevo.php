@@ -70,16 +70,20 @@ $titulo = 'Publicar una actividad';
 require __DIR__ . '/includes/layout.php';
 ?>
 
-<div class="auth-caja caja-ancha">
-  <h1>Publicar una actividad</h1>
-  <p class="sub">Rellena la ficha. Antes de publicarla la vas a ver tal como la verá la gente.</p>
+<div class="form-con-guia">
+  <div class="auth-caja caja-ancha">
+    <h1>Publicar una actividad</h1>
+    <p class="sub">Rellena la ficha. Antes de publicarla la vas a ver tal como la verá la gente.</p>
 
-  <?php require __DIR__ . '/includes/aviso-errores.php'; ?>
+    <?php require __DIR__ . '/includes/aviso-errores.php'; ?>
 
-  <form method="post" enctype="multipart/form-data" novalidate>
-    <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-    <?php $textoBoton = 'Ver la vista previa'; require __DIR__ . '/includes/form-evento.php'; ?>
-  </form>
+    <form method="post" enctype="multipart/form-data" novalidate>
+      <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+      <?php $textoBoton = 'Ver la vista previa'; require __DIR__ . '/includes/form-evento.php'; ?>
+    </form>
+  </div>
+
+  <?php require __DIR__ . '/includes/guia-accion.php'; ?>
 </div>
 
 <?php pie(); ?>

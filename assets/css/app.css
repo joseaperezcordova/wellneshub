@@ -205,6 +205,36 @@ input,select{font-family:inherit; font-size:14px;}
 /* ------------------------------------------------ formulario de evento --- */
 .caja-ancha{max-width:640px;}
 
+/* Panel con la guía rápida, a la derecha del formulario de alta/edición.
+   Es una tarjeta aparte y no una nota dentro de la caja del formulario:
+   así se puede leer entera sin perder de vista lo que se está rellenando. */
+.form-con-guia{display:flex; align-items:flex-start; justify-content:center; gap:28px;}
+.form-con-guia .caja-ancha{margin-left:0; margin-right:0;}
+
+.guia-lateral{
+  flex:0 0 300px; margin:56px 0 72px; background:var(--arena-suave);
+  border:1px solid var(--linea); border-radius:16px; padding:26px 24px;
+  position:sticky; top:24px;
+}
+.guia-lateral h2{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.04em;
+  text-transform:uppercase; opacity:.6; margin:0 0 18px;
+}
+.guia-item{margin-bottom:20px;}
+.guia-item:last-of-type{margin-bottom:0;}
+.guia-item h3{font-size:14px; margin:0 0 5px; color:var(--verde);}
+.guia-item p{font-size:12.5px; line-height:1.55; opacity:.8; margin:0 0 6px;}
+.guia-item .ejemplos{font-size:11.5px; line-height:1.5; opacity:.6;}
+.guia-nota{
+  margin-top:20px; padding-top:16px; border-top:1px solid var(--linea);
+  font-size:12px; line-height:1.55; opacity:.75;
+}
+
+@media(max-width:900px){
+  .form-con-guia{flex-direction:column; align-items:stretch;}
+  .guia-lateral{flex:1 1 auto; width:100%; margin:0 0 24px; position:static;}
+}
+
 .campo textarea, .campo select{
   width:100%; border:1px solid var(--linea); background:var(--arena-suave);
   border-radius:9px; padding:11px 13px; font-size:14.5px; color:var(--petroleo);
