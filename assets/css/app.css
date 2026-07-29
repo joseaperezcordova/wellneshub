@@ -239,6 +239,30 @@ input,select{font-family:inherit; font-size:14px;}
 .campo label.tipo-op:has(input:focus-visible){outline:2px solid var(--terracota-texto); outline-offset:2px;}
 @media(max-width:460px){ .tipo-actividad{grid-template-columns:1fr;} }
 
+/* Presencial / en línea / híbrida: mismas tarjetas que .tipo-op pero con
+   descripción debajo del título, así que llevan su propio bloque en vez de
+   reusar la clase —el texto extra no cabía sin ensanchar la tarjeta entera. */
+.modalidad-grupo{display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px;}
+.campo label.modalidad-op{
+  display:grid; grid-template-columns:auto 1fr; align-items:start; gap:4px 9px;
+  padding:12px 13px; border:1px solid var(--linea); border-radius:10px; cursor:pointer;
+  font-family:'Inter',sans-serif; letter-spacing:0; text-transform:none;
+  color:var(--petroleo); margin:0;
+}
+.campo label.modalidad-op input{position:absolute; opacity:0; width:0; height:0;}
+.campo label.modalidad-op .modalidad-icono{grid-row:1; opacity:.55;}
+.campo label.modalidad-op .modalidad-titulo{grid-row:1; font-size:13.5px; font-weight:600; align-self:center;}
+.campo label.modalidad-op .modalidad-desc{
+  grid-column:1 / -1; font-size:11.5px; line-height:1.45; opacity:.65; text-transform:none;
+  font-family:'Inter',sans-serif; letter-spacing:0;
+}
+.campo label.modalidad-op:has(input:checked){
+  border-color:var(--terracota); background:rgba(199,110,67,.08);
+}
+.campo label.modalidad-op:has(input:checked) .modalidad-icono{opacity:1; color:var(--terracota);}
+.campo label.modalidad-op:has(input:focus-visible){outline:2px solid var(--terracota-texto); outline-offset:2px;}
+@media(max-width:640px){ .modalidad-grupo{grid-template-columns:1fr;} }
+
 /* Panel con la guía rápida, a la derecha del formulario de alta/edición.
    Es una tarjeta aparte y no una nota dentro de la caja del formulario:
    así se puede leer entera sin perder de vista lo que se está rellenando. */

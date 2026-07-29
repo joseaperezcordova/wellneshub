@@ -94,6 +94,63 @@ function frecuenciasRecurrencia(): array
     ];
 }
 
+/** Las 32 entidades federativas. Para el select de "Estado": aquí no hace
+ * falta texto libre, la lista es corta y no cambia. */
+function estadosMexico(): array
+{
+    return [
+        'Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche',
+        'Chiapas', 'Chihuahua', 'Ciudad de México', 'Coahuila', 'Colima',
+        'Durango', 'Guanajuato', 'Guerrero', 'Hidalgo', 'Jalisco', 'México',
+        'Michoacán', 'Morelos', 'Nayarit', 'Nuevo León', 'Oaxaca', 'Puebla',
+        'Querétaro', 'Quintana Roo', 'San Luis Potosí', 'Sinaloa', 'Sonora',
+        'Tabasco', 'Tamaulipas', 'Tlaxcala', 'Veracruz', 'Yucatán', 'Zacatecas',
+    ];
+}
+
+/**
+ * estado => ciudades. Alimenta el <datalist> de "Ciudad", no un select: la
+ * lista es una ayuda para llenar más rápido los destinos comunes, no un
+ * catálogo cerrado —un pueblo que no está aquí se puede escribir igual—.
+ */
+function ciudadesSugeridasPorEstado(): array
+{
+    return [
+        'Aguascalientes'       => ['Aguascalientes'],
+        'Baja California'      => ['Tijuana', 'Mexicali', 'Ensenada', 'Rosarito'],
+        'Baja California Sur'  => ['La Paz', 'Los Cabos', 'Todos Santos', 'Loreto'],
+        'Campeche'             => ['Campeche', 'Ciudad del Carmen'],
+        'Chiapas'              => ['Tuxtla Gutiérrez', 'San Cristóbal de las Casas', 'Palenque'],
+        'Chihuahua'            => ['Chihuahua', 'Ciudad Juárez', 'Creel'],
+        'Ciudad de México'     => ['Ciudad de México'],
+        'Coahuila'             => ['Saltillo', 'Torreón', 'Parras de la Fuente'],
+        'Colima'               => ['Colima', 'Manzanillo'],
+        'Durango'              => ['Durango'],
+        'Guanajuato'           => ['León', 'Guanajuato', 'San Miguel de Allende', 'Celaya'],
+        'Guerrero'             => ['Acapulco', 'Taxco', 'Zihuatanejo', 'Chilpancingo'],
+        'Hidalgo'              => ['Pachuca', 'Huasca de Ocampo'],
+        'Jalisco'              => ['Guadalajara', 'Puerto Vallarta', 'Sayulita', 'Chapala', 'Tequila'],
+        'México'               => ['Toluca', 'Valle de Bravo', 'Metepec'],
+        'Michoacán'            => ['Morelia', 'Pátzcuaro', 'Uruapan'],
+        'Morelos'              => ['Cuernavaca', 'Tepoztlán'],
+        'Nayarit'              => ['Tepic', 'San Pancho', 'Punta de Mita'],
+        'Nuevo León'           => ['Monterrey', 'San Pedro Garza García'],
+        'Oaxaca'               => ['Oaxaca de Juárez', 'Puerto Escondido', 'Huatulco', 'Mazunte'],
+        'Puebla'               => ['Puebla', 'Cholula', 'Atlixco'],
+        'Querétaro'            => ['Querétaro', 'Bernal'],
+        'Quintana Roo'         => ['Cancún', 'Playa del Carmen', 'Tulum', 'Bacalar', 'Cozumel', 'Isla Mujeres'],
+        'San Luis Potosí'      => ['San Luis Potosí', 'Real de Catorce'],
+        'Sinaloa'              => ['Culiacán', 'Mazatlán'],
+        'Sonora'               => ['Hermosillo', 'Guaymas', 'San Carlos'],
+        'Tabasco'              => ['Villahermosa'],
+        'Tamaulipas'           => ['Tampico', 'Ciudad Victoria'],
+        'Tlaxcala'             => ['Tlaxcala'],
+        'Veracruz'             => ['Veracruz', 'Xalapa', 'Coatepec'],
+        'Yucatán'              => ['Mérida', 'Valladolid', 'Izamal', 'Progreso'],
+        'Zacatecas'            => ['Zacatecas'],
+    ];
+}
+
 
 // ------------------------------------------------------------- permisos ----
 
@@ -236,6 +293,8 @@ function etiquetasCampos(): array
         'descripcion'     => 'Descripción',
         'ciudad'          => 'Ciudad',
         'entidad'         => 'Estado',
+        'lugar'           => 'Lugar',
+        'enlace_acceso'   => 'Enlace de acceso',
         'mapa_url'        => 'Enlace de Google Maps',
         'fecha_inicio'    => 'Fecha de inicio',
         'fecha_fin'       => 'Fecha de fin',
@@ -276,41 +335,75 @@ function validarEvento(array $in): array
         $errores['categoria'] = 'Elige una categoría de la lista.';
     }
 
-    $e['ciudad'] = trim((string) ($in['ciudad'] ?? ''));
-    if ($e['ciudad'] === '') $errores['ciudad'] = 'Falta la ciudad.';
+    $e['modalidad'] = in_array(($in['modalidad'] ?? ''), ['presencial', 'en_linea', 'hibrida'], true)
+        ? $in['modalidad'] : 'presencial';
 
-    $e['entidad'] = trim((string) ($in['entidad'] ?? ''));
-    if ($e['entidad'] === '') $errores['entidad'] = 'Falta el estado.';
-
-    $e['lugar'] = trim((string) ($in['lugar'] ?? '')) ?: null;
+    // El enlace de acceso no depende de la modalidad —una actividad presencial
+    // también puede mandar un grupo de WhatsApp o una liga de la transmisión—,
+    // así que se valida igual que url_boletos y punto.
+    $e['enlace_acceso'] = urlValida((string) ($in['enlace_acceso'] ?? ''));
+    if ($e['enlace_acceso'] === false) {
+        $errores['enlace_acceso'] = 'Esa dirección no parece válida. Empieza por https://';
+        $e['enlace_acceso'] = null;
+    }
 
     /*
-     * El punto en el mapa. Opcional, pero si se pone un enlace tiene que poder
-     * leerse: guardarlo sin coordenadas dejaría una ficha con un mapa vacío y
-     * nadie se enteraría hasta que alguien fuera a buscar el sitio.
-     *
-     * El mensaje de error explica el camino entero. Es más largo de lo normal a
-     * propósito: aquí falla justo quien no sabe de dónde sacar el enlace bueno,
-     * y un «enlace no válido» a secas le deja igual de perdido.
+     * "En línea" no tiene lugar físico: no tiene sentido pedir ciudad, estado
+     * ni mapa, y guardarlos igual dejaría una ficha diciendo dónde ocurre algo
+     * que ocurre en internet. Se limpian aquí y no solo se ocultan en el
+     * formulario, porque el campo oculto de un navegador con JavaScript
+     * desactivado —o de alguien que edita el HTML a mano— llega igual en el
+     * POST, y no hay que confiar en lo que el cliente decidió no mandar.
      */
-    $mapa = trim((string) ($in['mapa_url'] ?? ''));
+    if ($e['modalidad'] === 'en_linea') {
+        $e['ciudad']   = '';
+        $e['entidad']  = '';
+        $e['lugar']    = null;
+        $e['mapa_url'] = null;
+        $e['latitud']  = null;
+        $e['longitud'] = null;
+    } else {
+        $e['ciudad'] = trim((string) ($in['ciudad'] ?? ''));
+        if ($e['ciudad'] === '') $errores['ciudad'] = 'Falta la ciudad.';
 
-    $e['mapa_url'] = null;
-    $e['latitud']  = null;
-    $e['longitud'] = null;
+        $e['entidad'] = trim((string) ($in['entidad'] ?? ''));
+        if (!in_array($e['entidad'], estadosMexico(), true)) {
+            $errores['entidad'] = 'Elige un estado de la lista.';
+        }
 
-    if ($mapa !== '') {
-        if (mb_strlen($mapa) > 500) {
-            $errores['mapa_url'] = 'Ese enlace es larguísimo. Copia el que da el botón «Compartir» de Google Maps.';
-        } else {
-            $e['mapa_url'] = $mapa;
-            $punto = coordenadasDeEnlace($mapa);
+        $e['lugar'] = trim((string) ($in['lugar'] ?? ''));
+        if ($e['lugar'] === '') $errores['lugar'] = 'Falta el lugar donde se realiza.';
 
-            if ($punto === null) {
-                $errores['mapa_url'] = 'No pudimos sacar la ubicación de ahí. '
-                    . 'Abre Google Maps, busca el sitio, pulsa «Compartir» y pega el enlace que te dé.';
+        /*
+         * El punto en el mapa. Opcional, pero si se pone un enlace tiene que
+         * poder leerse: guardarlo sin coordenadas dejaría una ficha con un
+         * mapa vacío y nadie se enteraría hasta que alguien fuera a buscar el
+         * sitio.
+         *
+         * El mensaje de error explica el camino entero. Es más largo de lo
+         * normal a propósito: aquí falla justo quien no sabe de dónde sacar
+         * el enlace bueno, y un «enlace no válido» a secas le deja igual de
+         * perdido.
+         */
+        $mapa = trim((string) ($in['mapa_url'] ?? ''));
+
+        $e['mapa_url'] = null;
+        $e['latitud']  = null;
+        $e['longitud'] = null;
+
+        if ($mapa !== '') {
+            if (mb_strlen($mapa) > 500) {
+                $errores['mapa_url'] = 'Ese enlace es larguísimo. Copia el que da el botón «Compartir» de Google Maps.';
             } else {
-                [$e['latitud'], $e['longitud']] = $punto;
+                $e['mapa_url'] = $mapa;
+                $punto = coordenadasDeEnlace($mapa);
+
+                if ($punto === null) {
+                    $errores['mapa_url'] = 'No pudimos sacar la ubicación de ahí. '
+                        . 'Abre Google Maps, busca el sitio, pulsa «Compartir» y pega el enlace que te dé.';
+                } else {
+                    [$e['latitud'], $e['longitud']] = $punto;
+                }
             }
         }
     }
@@ -478,14 +571,14 @@ function crearEvento(array $e, int $usuarioId): int
     $pdo->prepare(
         'INSERT INTO eventos
            (usuario_id, titulo, slug, descripcion, categoria, tipo_actividad,
-            frecuencia, hora_recurrente, ciudad, entidad,
+            frecuencia, hora_recurrente, modalidad, enlace_acceso, ciudad, entidad,
             lugar, mapa_url, latitud, longitud, fecha_inicio, fecha_fin,
             gratuito, precio, url_boletos, imagen_url, color, situacion)
-         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
+         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
     )->execute([
         $usuarioId, $e['titulo'], $e['descripcion'], $e['categoria'],
         $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'],
-        $e['ciudad'], $e['entidad'], $e['lugar'],
+        $e['modalidad'], $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
         $e['url_boletos'], $e['imagen_url'], $e['color'],
@@ -505,7 +598,8 @@ function actualizarEvento(array $e, int $id): void
     db()->prepare(
         'UPDATE eventos SET
             titulo = ?, slug = ?, descripcion = ?, categoria = ?,
-            tipo_actividad = ?, frecuencia = ?, hora_recurrente = ?, ciudad = ?,
+            tipo_actividad = ?, frecuencia = ?, hora_recurrente = ?,
+            modalidad = ?, enlace_acceso = ?, ciudad = ?,
             entidad = ?, lugar = ?, mapa_url = ?, latitud = ?, longitud = ?,
             fecha_inicio = ?, fecha_fin = ?,
             gratuito = ?, precio = ?, url_boletos = ?, imagen_url = ?, color = ?
@@ -513,7 +607,7 @@ function actualizarEvento(array $e, int $id): void
     )->execute([
         $e['titulo'], generarSlug($e['titulo'], $id), $e['descripcion'],
         $e['categoria'], $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'],
-        $e['ciudad'], $e['entidad'], $e['lugar'],
+        $e['modalidad'], $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
         $e['url_boletos'], $e['imagen_url'], $e['color'], $id,

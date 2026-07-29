@@ -155,6 +155,13 @@ CREATE TABLE IF NOT EXISTS eventos (
                                 NULL DEFAULT NULL,
   hora_recurrente TIME          NULL DEFAULT NULL,
 
+  -- Presencial, en línea o híbrida. "En línea" es la única que no lleva
+  -- ciudad/entidad/lugar/mapa —validarEvento() los deja vacíos aunque
+  -- lleguen del formulario—, así que una ficha en internet no dice que
+  -- ocurre en un sitio físico que no existe.
+  modalidad     ENUM('presencial','en_linea','hibrida')
+                              NOT NULL DEFAULT 'presencial',
+
   ciudad        VARCHAR(90)   NOT NULL,
   entidad       VARCHAR(90)   NOT NULL COMMENT 'Entidad federativa: Jalisco, Oaxaca…',
   lugar         VARCHAR(160)  NULL DEFAULT NULL,
@@ -166,6 +173,11 @@ CREATE TABLE IF NOT EXISTS eventos (
   mapa_url      VARCHAR(500)  NULL DEFAULT NULL COMMENT 'Enlace de Google Maps tal como lo pegó el organizador',
   latitud       DECIMAL(10,7) NULL DEFAULT NULL,
   longitud      DECIMAL(10,7) NULL DEFAULT NULL,
+
+  -- Aparte de url_boletos: ese es el enlace de compra/registro externo, este
+  -- es un acceso —videollamada, transmisión, grupo— que puede acompañar a
+  -- cualquier modalidad, incluida una actividad presencial.
+  enlace_acceso VARCHAR(500)  NULL DEFAULT NULL,
 
   fecha_inicio  DATETIME      NOT NULL,
   fecha_fin     DATETIME      NULL DEFAULT NULL,

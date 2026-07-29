@@ -120,6 +120,144 @@ $mal = function (string $campo) use ($errores) {
   </div>
 </div>
 
+<div class="campo<?= $mal('descripcion') ?>">
+  <div class="label-fila">
+    <label for="descripcion">Descripción</label>
+    <span class="contador" id="contadorDescripcion"></span>
+  </div>
+  <textarea id="descripcion" name="descripcion" rows="7" required minlength="50" maxlength="2000"
+            placeholder="Describe tu actividad. Incluye qué aprenderán los asistentes, a quién está dirigida, qué incluye y cualquier información importante."><?= e($v('descripcion')) ?></textarea>
+  <div class="pista">Se muestra tal cual en la ficha. Los saltos de línea se respetan.</div>
+  <?= $err('descripcion') ?>
+</div>
+
+<div class="form-seccion-titulo">
+  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/>
+    <circle cx="12" cy="9" r="2.5"/>
+  </svg>
+  <h2>2. Modalidad</h2>
+</div>
+
+<div class="campo">
+  <div class="modalidad-grupo">
+    <label class="modalidad-op">
+      <input type="radio" name="modalidad" value="presencial" id="modPresencial" <?= $v('modalidad', 'presencial') === 'presencial' ? 'checked' : '' ?>>
+      <svg class="modalidad-icono" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/>
+        <circle cx="12" cy="9" r="2.5"/>
+      </svg>
+      <span class="modalidad-titulo">Presencial</span>
+      <span class="modalidad-desc">La actividad se realiza en un lugar físico.</span>
+    </label>
+    <label class="modalidad-op">
+      <input type="radio" name="modalidad" value="en_linea" id="modEnLinea" <?= $v('modalidad', 'presencial') === 'en_linea' ? 'checked' : '' ?>>
+      <svg class="modalidad-icono" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M5 12.5a11 11 0 0 1 14 0"/>
+        <path d="M8 16a6.5 6.5 0 0 1 8 0"/>
+        <circle cx="12" cy="19.3" r="1" fill="currentColor" stroke="none"/>
+      </svg>
+      <span class="modalidad-titulo">En línea</span>
+      <span class="modalidad-desc">La actividad se realiza a través de internet.</span>
+    </label>
+    <label class="modalidad-op">
+      <input type="radio" name="modalidad" value="hibrida" id="modHibrida" <?= $v('modalidad', 'presencial') === 'hibrida' ? 'checked' : '' ?>>
+      <svg class="modalidad-icono" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="4.5" width="12" height="9" rx="1.3"/>
+        <path d="M3 16.5h12"/>
+        <rect x="17.3" y="9" width="4.2" height="8.5" rx="1"/>
+      </svg>
+      <span class="modalidad-titulo">Híbrida</span>
+      <span class="modalidad-desc">La actividad es presencial y en línea.</span>
+    </label>
+  </div>
+</div>
+
+<div class="campo-fila">
+  <div class="campo<?= $mal('lugar') ?>" id="campoLugar">
+    <label for="lugar">Lugar</label>
+    <input id="lugar" name="lugar" type="text" maxlength="160"
+           value="<?= e($v('lugar')) ?>" placeholder="Ej. Centro Holístico Luz">
+    <?= $err('lugar') ?>
+  </div>
+  <div class="campo<?= $mal('enlace_acceso') ?>">
+    <label for="enlace_acceso">Enlace de acceso <span class="opcional">opcional</span></label>
+    <input id="enlace_acceso" name="enlace_acceso" type="url" maxlength="500"
+           value="<?= e($v('enlace_acceso')) ?>" placeholder="https://">
+    <div class="pista">Enlace privado que solo será visible para las personas registradas o confirmadas.</div>
+    <?= $err('enlace_acceso') ?>
+  </div>
+</div>
+
+<div id="bloqueUbicacionFisica">
+  <div class="campo-fila">
+    <div class="campo<?= $mal('ciudad') ?>">
+      <label for="ciudad">Ciudad</label>
+      <input id="ciudad" name="ciudad" type="text" maxlength="90" list="listaCiudades"
+             value="<?= e($v('ciudad')) ?>" placeholder="Tulum" autocomplete="off">
+      <datalist id="listaCiudades"></datalist>
+      <?= $err('ciudad') ?>
+    </div>
+    <div class="campo<?= $mal('entidad') ?>">
+      <label for="entidad">Estado</label>
+      <select id="entidad" name="entidad">
+        <option value="">Selecciona un estado</option>
+        <?php foreach (estadosMexico() as $estado): ?>
+          <option value="<?= e($estado) ?>" <?= $v('entidad') === $estado ? 'selected' : '' ?>><?= e($estado) ?></option>
+        <?php endforeach; ?>
+      </select>
+      <?= $err('entidad') ?>
+    </div>
+  </div>
+
+  <div class="campo<?= $mal('mapa_url') ?>">
+    <label for="mapa_url">Ubicación en el mapa <span class="opcional">opcional</span></label>
+    <input id="mapa_url" name="mapa_url" type="text" maxlength="500"
+           value="<?= e($v('mapa_url')) ?>" placeholder="https://maps.app.goo.gl/…">
+
+    <?php /* Las instrucciones van antes del error y no después: quien las
+             necesita es justo quien acaba de equivocarse, y si están debajo del
+             mensaje rojo se leen tarde. */ ?>
+    <div class="pista">
+      Busca el sitio en Google Maps, pulsa <strong>Compartir</strong> y pega aquí el enlace.
+      En la ficha sale un mapa con el punto y un botón para llegar.
+      Si tienes las coordenadas a mano, también valen: <span class="mono">20.2114, -87.4654</span>.
+    </div>
+
+    <?php
+    /*
+     * Si el enlace ya se leyó, se enseña el mapa aquí mismo. Es la única forma de
+     * que el organizador compruebe que el punto cayó donde tenía que caer antes
+     * de publicar: un enlace copiado de una búsqueda a medias apunta al centro de
+     * la ciudad, y desde el texto del enlace eso no se ve.
+     */
+    if (!empty($e['latitud']) && !empty($e['longitud'])):
+    ?>
+      <div class="mapa-previo">
+        <div class="pista pista-ok">Ubicación reconocida. Comprueba que el punto está donde debe.</div>
+        <iframe src="<?= e(urlMapaEmbebido((float) $e['latitud'], (float) $e['longitud'])) ?>"
+                title="Vista previa de la ubicación" loading="lazy" referrerpolicy="no-referrer"></iframe>
+      </div>
+    <?php endif; ?>
+
+    <?= $err('mapa_url') ?>
+  </div>
+</div>
+
+<div class="form-seccion-titulo">
+  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <rect x="3.5" y="5" width="17" height="15" rx="2"/>
+    <path d="M3.5 9.5h17"/>
+    <path d="M8 3v4M16 3v4"/>
+  </svg>
+  <h2>3. Fecha y horario</h2>
+</div>
+
 <div class="campo-fila" id="bloqueFechaRecurrente" <?= $esRecurrente ? '' : 'style="display:none;"' ?>>
   <div class="campo<?= $mal('fecha_inicio') ?>">
     <?php // El id se lleva a "fecha_inicio" solo cuando este es el bloque activo:
@@ -152,71 +290,6 @@ $mal = function (string $campo) use ($errores) {
            value="<?= e($horaInput()) ?>">
     <?= $err('hora_recurrente') ?>
   </div>
-</div>
-
-<div class="campo<?= $mal('descripcion') ?>">
-  <div class="label-fila">
-    <label for="descripcion">Descripción</label>
-    <span class="contador" id="contadorDescripcion"></span>
-  </div>
-  <textarea id="descripcion" name="descripcion" rows="7" required minlength="50" maxlength="2000"
-            placeholder="Describe tu actividad. Incluye qué aprenderán los asistentes, a quién está dirigida, qué incluye y cualquier información importante."><?= e($v('descripcion')) ?></textarea>
-  <div class="pista">Se muestra tal cual en la ficha. Los saltos de línea se respetan.</div>
-  <?= $err('descripcion') ?>
-</div>
-
-<div class="campo-fila">
-  <div class="campo<?= $mal('ciudad') ?>">
-    <label for="ciudad">Ciudad</label>
-    <input id="ciudad" name="ciudad" type="text" required maxlength="90"
-           value="<?= e($v('ciudad')) ?>" placeholder="Tulum">
-    <?= $err('ciudad') ?>
-  </div>
-  <div class="campo<?= $mal('entidad') ?>">
-    <label for="entidad">Estado</label>
-    <input id="entidad" name="entidad" type="text" required maxlength="90"
-           value="<?= e($v('entidad')) ?>" placeholder="Quintana Roo">
-    <?= $err('entidad') ?>
-  </div>
-</div>
-
-<div class="campo">
-  <label for="lugar">Lugar <span class="opcional">opcional</span></label>
-  <input id="lugar" name="lugar" type="text" maxlength="160"
-         value="<?= e($v('lugar')) ?>" placeholder="Cenote Zacil-Ha">
-</div>
-
-<div class="campo<?= $mal('mapa_url') ?>">
-  <label for="mapa_url">Ubicación en el mapa <span class="opcional">opcional</span></label>
-  <input id="mapa_url" name="mapa_url" type="text" maxlength="500"
-         value="<?= e($v('mapa_url')) ?>" placeholder="https://maps.app.goo.gl/…">
-
-  <?php /* Las instrucciones van antes del error y no después: quien las
-           necesita es justo quien acaba de equivocarse, y si están debajo del
-           mensaje rojo se leen tarde. */ ?>
-  <div class="pista">
-    Busca el sitio en Google Maps, pulsa <strong>Compartir</strong> y pega aquí el enlace.
-    En la ficha sale un mapa con el punto y un botón para llegar.
-    Si tienes las coordenadas a mano, también valen: <span class="mono">20.2114, -87.4654</span>.
-  </div>
-
-  <?php
-  /*
-   * Si el enlace ya se leyó, se enseña el mapa aquí mismo. Es la única forma de
-   * que el organizador compruebe que el punto cayó donde tenía que caer antes
-   * de publicar: un enlace copiado de una búsqueda a medias apunta al centro de
-   * la ciudad, y desde el texto del enlace eso no se ve.
-   */
-  if (!empty($e['latitud']) && !empty($e['longitud'])):
-  ?>
-    <div class="mapa-previo">
-      <div class="pista pista-ok">Ubicación reconocida. Comprueba que el punto está donde debe.</div>
-      <iframe src="<?= e(urlMapaEmbebido((float) $e['latitud'], (float) $e['longitud'])) ?>"
-              title="Vista previa de la ubicación" loading="lazy" referrerpolicy="no-referrer"></iframe>
-    </div>
-  <?php endif; ?>
-
-  <?= $err('mapa_url') ?>
 </div>
 
 <div class="campo-fila" id="bloqueFechaUnica" <?= $esRecurrente ? 'style="display:none;"' : '' ?>>
@@ -379,4 +452,56 @@ $mal = function (string $campo) use ($errores) {
   radios.forEach(function(r){ r.addEventListener('change', sync); });
   sync();
 })();
+
+/* Presencial / en línea / híbrida deciden si hace falta un lugar físico.
+   "En línea" oculta lugar, ciudad, estado y el mapa; los otros dos modos los
+   piden igual que siempre. El enlace de acceso no depende de esto: sirve
+   también para una actividad presencial que además transmite o manda un
+   grupo de WhatsApp. */
+(function(){
+  var radios = document.querySelectorAll('input[name="modalidad"]');
+  var bloqueFisico = document.getElementById('bloqueUbicacionFisica');
+  var campoLugar   = document.getElementById('campoLugar');
+  var lugar        = document.getElementById('lugar');
+  var ciudad       = document.getElementById('ciudad');
+  var entidad      = document.getElementById('entidad');
+  if (!radios.length || !bloqueFisico) return;
+
+  function sync(){
+    var esFisico = document.querySelector('input[name="modalidad"]:checked').value !== 'en_linea';
+
+    bloqueFisico.style.display = esFisico ? '' : 'none';
+    if (campoLugar) campoLugar.style.display = esFisico ? '' : 'none';
+
+    if (lugar)   lugar.required   = esFisico;
+    if (ciudad)  ciudad.required  = esFisico;
+    if (entidad) entidad.required = esFisico;
+  }
+
+  radios.forEach(function(r){ r.addEventListener('change', sync); });
+  sync();
+})();
+
+/* Sugerencias de ciudad según el estado elegido. Es un <datalist>, no un
+   select: sigue aceptando cualquier texto, así que un pueblo que no está en
+   la lista —la lista no pretende ser exhaustiva— se puede escribir igual. */
+(function(){
+  var entidad   = document.getElementById('entidad');
+  var ciudad    = document.getElementById('ciudad');
+  var datalist  = document.getElementById('listaCiudades');
+  if (!entidad || !ciudad || !datalist || typeof CIUDADES_POR_ESTADO === 'undefined') return;
+
+  function sync(){
+    var lista = CIUDADES_POR_ESTADO[entidad.value] || [];
+    datalist.innerHTML = lista.map(function(c){
+      return '<option value="' + c.replace(/"/g, '&quot;') + '">';
+    }).join('');
+  }
+  entidad.addEventListener('change', sync);
+  sync();
+})();
+</script>
+
+<script>
+var CIUDADES_POR_ESTADO = <?= json_encode(ciudadesSugeridasPorEstado(), JSON_UNESCAPED_UNICODE) ?>;
 </script>
