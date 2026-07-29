@@ -94,6 +94,20 @@ function frecuenciasRecurrencia(): array
     ];
 }
 
+/**
+ * Qué se espera que haga quien ve la ficha, con el mismo texto que ya usa
+ * includes/guia-accion.php: los dos hablan de las mismas tres opciones y
+ * tienen que decir lo mismo con las mismas palabras.
+ */
+function accionesPrincipales(): array
+{
+    return [
+        'informacion' => 'Solicitar información',
+        'boletos'     => 'Comprar boletos',
+        'reservar'    => 'Reservar lugar',
+    ];
+}
+
 /** Las 32 entidades federativas. Para el select de "Estado": aquí no hace
  * falta texto libre, la lista es corta y no cambia. */
 function estadosMexico(): array
@@ -291,7 +305,11 @@ function etiquetasCampos(): array
         'hora_fin_recurrente' => 'Hora de fin',
 
         'precio'          => 'Precio',
+        'forma_pago'      => 'Forma de pago',
+        'cupo_maximo'     => 'Cupo máximo',
         'url_boletos'     => 'Enlace para comprar o reservar',
+        'sitio_web'       => 'Sitio web o enlace',
+        'accion_principal' => 'Acción principal',
         'imagen'          => 'Imagen',
     ];
 }
@@ -505,15 +523,16 @@ function validarEvento(array $in): array
         }
     }
 
-    $e['gratuito'] = !empty($in['gratuito']) ? 1 : 0;
+    $e['gratuito'] = ($in['precio_modo'] ?? '') === 'de_pago' ? 0 : 1;
 
     if ($e['gratuito']) {
-        $e['precio'] = null;
+        $e['precio']     = null;
+        $e['forma_pago'] = null;
     } else {
         $precio = str_replace([',', ' '], '', (string) ($in['precio'] ?? ''));
 
         if ($precio === '') {
-            $errores['precio'] = 'Pon el precio, o marca que es gratuito.';
+            $errores['precio'] = 'Pon el precio, o marca que es sin costo.';
             $e['precio'] = null;
         } elseif (!is_numeric($precio) || (float) $precio < 0) {
             $errores['precio'] = 'El precio tiene que ser un número.';
@@ -521,12 +540,44 @@ function validarEvento(array $in): array
         } else {
             $e['precio'] = round((float) $precio, 2);
         }
+
+        $e['forma_pago'] = (string) ($in['forma_pago'] ?? '');
+        if (!in_array($e['forma_pago'], ['completa', 'sesion'], true)) {
+            $errores['forma_pago'] = 'Elige si el precio es por toda la actividad o por sesión.';
+            $e['forma_pago'] = null;
+        }
+    }
+
+    // Cupo máximo: opcional, y solo tiene sentido como entero positivo. No se
+    // le pone techo —quién sabe cuánta gente cabe en un festival— más allá
+    // de lo que ya limita la columna (INT UNSIGNED).
+    $cupo = trim((string) ($in['cupo_maximo'] ?? ''));
+    $e['cupo_maximo'] = null;
+    if ($cupo !== '') {
+        if (!ctype_digit($cupo) || (int) $cupo < 1) {
+            $errores['cupo_maximo'] = 'El cupo tiene que ser un número entero mayor que cero.';
+        } else {
+            $e['cupo_maximo'] = (int) $cupo;
+        }
     }
 
     $e['url_boletos'] = urlValida((string) ($in['url_boletos'] ?? ''));
     if ($e['url_boletos'] === false) {
         $errores['url_boletos'] = 'Esa dirección no parece válida. Empieza por https://';
         $e['url_boletos'] = null;
+    }
+
+    // Igual que url_boletos, pero sin obligación ninguna de rellenarlo: es
+    // informativo y puede llevarse aunque url_boletos también esté lleno.
+    $e['sitio_web'] = urlValida((string) ($in['sitio_web'] ?? ''));
+    if ($e['sitio_web'] === false) {
+        $errores['sitio_web'] = 'Esa dirección no parece válida. Empieza por https://';
+        $e['sitio_web'] = null;
+    }
+
+    $e['accion_principal'] = (string) ($in['accion_principal'] ?? '');
+    if (!isset(accionesPrincipales()[$e['accion_principal']])) {
+        $errores['accion_principal'] = 'Elige qué esperas que haga quien vea la ficha.';
     }
 
     // imagen_url no se valida aquí: no viene del formulario de texto sino de la
@@ -600,15 +651,17 @@ function crearEvento(array $e, int $usuarioId): int
            (usuario_id, titulo, slug, descripcion, categoria, tipo_actividad,
             frecuencia, hora_recurrente, hora_fin_recurrente, modalidad, enlace_acceso,
             ciudad, entidad, lugar, mapa_url, latitud, longitud, fecha_inicio, fecha_fin,
-            gratuito, precio, url_boletos, imagen_url, color, situacion)
-         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
+            gratuito, precio, forma_pago, cupo_maximo,
+            url_boletos, sitio_web, accion_principal, imagen_url, color, situacion)
+         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
     )->execute([
         $usuarioId, $e['titulo'], $e['descripcion'], $e['categoria'],
         $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
         $e['modalidad'], $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
-        $e['url_boletos'], $e['imagen_url'], $e['color'],
+        $e['forma_pago'], $e['cupo_maximo'],
+        $e['url_boletos'], $e['sitio_web'], $e['accion_principal'], $e['imagen_url'], $e['color'],
     ]);
 
     // El slug lleva el id dentro, así que solo puede calcularse después de
@@ -629,7 +682,8 @@ function actualizarEvento(array $e, int $id): void
             modalidad = ?, enlace_acceso = ?, ciudad = ?,
             entidad = ?, lugar = ?, mapa_url = ?, latitud = ?, longitud = ?,
             fecha_inicio = ?, fecha_fin = ?,
-            gratuito = ?, precio = ?, url_boletos = ?, imagen_url = ?, color = ?
+            gratuito = ?, precio = ?, forma_pago = ?, cupo_maximo = ?,
+            url_boletos = ?, sitio_web = ?, accion_principal = ?, imagen_url = ?, color = ?
           WHERE id = ?'
     )->execute([
         $e['titulo'], generarSlug($e['titulo'], $id), $e['descripcion'],
@@ -637,7 +691,8 @@ function actualizarEvento(array $e, int $id): void
         $e['modalidad'], $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
-        $e['url_boletos'], $e['imagen_url'], $e['color'], $id,
+        $e['forma_pago'], $e['cupo_maximo'],
+        $e['url_boletos'], $e['sitio_web'], $e['accion_principal'], $e['imagen_url'], $e['color'], $id,
     ]);
 }
 

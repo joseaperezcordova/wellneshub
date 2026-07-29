@@ -244,9 +244,9 @@ input,select{font-family:inherit; font-size:14px;}
 .tipo-fecha-campos .campo:last-child{margin-bottom:0;}
 @media(max-width:640px){ .tipo-fecha-grupo{grid-template-columns:1fr;} }
 
-/* Presencial / en línea / híbrida: mismas tarjetas que .tipo-op pero con
-   descripción debajo del título, así que llevan su propio bloque en vez de
-   reusar la clase —el texto extra no cabía sin ensanchar la tarjeta entera. */
+/* Presencial / en línea / híbrida: tarjetas con descripción debajo del
+   título, así que llevan su propio bloque en vez de compartir uno genérico
+   —el texto extra no cabía sin ensanchar la tarjeta entera—. */
 .modalidad-grupo{display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px;}
 .campo label.modalidad-op{
   display:grid; grid-template-columns:auto 1fr; align-items:start; gap:4px 9px;
@@ -267,6 +267,45 @@ input,select{font-family:inherit; font-size:14px;}
 .campo label.modalidad-op:has(input:checked) .modalidad-icono{opacity:1; color:var(--terracota);}
 .campo label.modalidad-op:has(input:focus-visible){outline:2px solid var(--terracota-texto); outline-offset:2px;}
 @media(max-width:640px){ .modalidad-grupo{grid-template-columns:1fr;} }
+
+/* Sin costo / de pago: mismo patrón que .modalidad-op —icono, título,
+   descripción— pero a dos columnas en vez de tres. */
+.precio-grupo{display:grid; grid-template-columns:1fr 1fr; gap:9px;}
+.campo label.precio-op{
+  display:grid; grid-template-columns:auto 1fr; align-items:start; gap:4px 9px;
+  padding:12px 13px; border:1px solid var(--linea); border-radius:10px; cursor:pointer;
+  font-family:'Inter',sans-serif; letter-spacing:0; text-transform:none;
+  color:var(--petroleo); margin:0;
+}
+.campo label.precio-op input{position:absolute; opacity:0; width:0; height:0;}
+.campo label.precio-op .precio-icono{grid-row:1; opacity:.55;}
+.campo label.precio-op .precio-titulo{grid-row:1; font-size:13.5px; font-weight:600; align-self:center;}
+.campo label.precio-op .precio-desc{
+  grid-column:1 / -1; font-size:11.5px; line-height:1.45; opacity:.65; text-transform:none;
+  font-family:'Inter',sans-serif; letter-spacing:0;
+}
+.campo label.precio-op:has(input:checked){
+  border-color:var(--terracota); background:rgba(199,110,67,.08);
+}
+.campo label.precio-op:has(input:checked) .precio-icono{opacity:1; color:var(--terracota);}
+.campo label.precio-op:has(input:focus-visible){outline:2px solid var(--terracota-texto); outline-offset:2px;}
+@media(max-width:460px){ .precio-grupo{grid-template-columns:1fr;} }
+
+/* Acción principal: solo texto, sin descripción —la explicación completa ya
+   está en la guía rápida de al lado—, así que basta una píldora simple. */
+.accion-grupo{display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px;}
+.campo label.accion-op{
+  display:flex; align-items:center; justify-content:center; text-align:center;
+  padding:12px 10px; border:1px solid var(--linea); border-radius:10px; cursor:pointer;
+  font-family:'Inter',sans-serif; font-size:13px; letter-spacing:0; text-transform:none;
+  color:var(--petroleo); margin:0;
+}
+.campo label.accion-op input{position:absolute; opacity:0; width:0; height:0;}
+.campo label.accion-op:has(input:checked){
+  border-color:var(--terracota); background:rgba(199,110,67,.08); font-weight:600;
+}
+.campo label.accion-op:has(input:focus-visible){outline:2px solid var(--terracota-texto); outline-offset:2px;}
+@media(max-width:520px){ .accion-grupo{grid-template-columns:1fr;} }
 
 /* Panel con la guía rápida, a la derecha del formulario de alta/edición.
    Es una tarjeta aparte y no una nota dentro de la caja del formulario:
@@ -371,15 +410,24 @@ input,select{font-family:inherit; font-size:14px;}
 }
 .campo label.check input{width:auto; margin:0;}
 
-/* El input de archivo nativo es feo pero honesto: la gente lo reconoce, sabe
-   arrastrar encima y funciona en todos los navegadores sin JavaScript. Se le
-   ajusta el relleno y poco más. */
-.campo input[type="file"]{
-  width:100%; border:1px dashed var(--linea); background:var(--arena-suave);
-  border-radius:9px; padding:14px 13px; font-size:13.5px; color:var(--petroleo);
-  cursor:pointer;
+/* La zona de "Subir imagen": un <label> vestido de recuadro punteado, con el
+   <input type="file"> real escondido debajo pero seguía siendo el mismo
+   input de siempre —arrastrar y soltar, teclado, lector de pantalla, todo
+   sigue funcionando porque un <label for="imagen"> activa el input al que
+   apunta igual que si se hiciera clic en él directamente—. */
+.imagen-input-oculto{position:absolute; opacity:0; width:0; height:0; pointer-events:none;}
+.imagen-dropzone{
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  border:1.5px dashed var(--linea); border-radius:12px; padding:26px 16px;
+  background:var(--arena-suave); cursor:pointer; text-align:center;
+  transition:border-color .15s, background .15s;
 }
-.campo input[type="file"]:hover{border-color:var(--verde);}
+.imagen-dropzone:hover, .imagen-dropzone:focus-within{
+  border-color:var(--verde); background:var(--blanco);
+}
+.imagen-dropzone svg{color:var(--verde); opacity:.7;}
+.imagen-dropzone-texto{font-size:13.5px; font-weight:600; color:var(--petroleo);}
+.imagen-dropzone-nombre{font-size:12px; opacity:.65; word-break:break-all;}
 
 .imagen-actual{
   border:1px solid var(--linea); border-radius:10px; padding:10px;

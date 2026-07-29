@@ -329,31 +329,90 @@ $mal = function (string $campo) use ($errores) {
   </div>
 </div>
 
+<div class="form-seccion-titulo">
+  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12.5 3H20a1 1 0 0 1 1 1v7.5a1 1 0 0 1-.3.7l-9 9a1 1 0 0 1-1.4 0l-7.5-7.5a1 1 0 0 1 0-1.4l9-9a1 1 0 0 1 .7-.3z"/>
+    <circle cx="16.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>
+  </svg>
+  <h2>5. Precio</h2>
+</div>
+
+<?php $esDePago = isset($e['gratuito']) ? empty($e['gratuito']) : false; ?>
+
 <div class="campo">
-  <label class="check">
-    <input type="checkbox" name="gratuito" value="1" id="gratuito"
-           <?= !empty($e['gratuito']) ? 'checked' : '' ?>>
-    <span>Es gratuito</span>
-  </label>
+  <div class="precio-grupo">
+    <label class="precio-op">
+      <input type="radio" name="precio_modo" value="sin_costo" id="precioSinCosto" <?= $esDePago ? '' : 'checked' ?>>
+      <svg class="precio-icono" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M7 7l10 10"/>
+      </svg>
+      <span class="precio-titulo">Sin costo</span>
+      <span class="precio-desc">La actividad es gratuita para los participantes.</span>
+    </label>
+    <label class="precio-op">
+      <input type="radio" name="precio_modo" value="de_pago" id="precioDePago" <?= $esDePago ? 'checked' : '' ?>>
+      <svg class="precio-icono" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12.5 3H20a1 1 0 0 1 1 1v7.5a1 1 0 0 1-.3.7l-9 9a1 1 0 0 1-1.4 0l-7.5-7.5a1 1 0 0 1 0-1.4l9-9a1 1 0 0 1 .7-.3z"/>
+        <circle cx="16.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>
+      </svg>
+      <span class="precio-titulo">De pago</span>
+      <span class="precio-desc">La actividad tiene un costo.</span>
+    </label>
+  </div>
 </div>
 
-<div class="campo<?= $mal('precio') ?>" id="campoPrecio">
-  <label for="precio">Precio por persona (MXN)</label>
-  <input id="precio" name="precio" type="text" inputmode="decimal"
-         value="<?= e($v('precio')) ?>" placeholder="2450">
-  <?= $err('precio') ?>
+<div id="bloquePago">
+  <div class="campo<?= $mal('forma_pago') ?>">
+    <label for="forma_pago">Forma de pago</label>
+    <select id="forma_pago" name="forma_pago" <?= $esDePago ? 'required' : '' ?>>
+      <option value="">Selecciona una opción</option>
+      <option value="completa" <?= $v('forma_pago') === 'completa' ? 'selected' : '' ?>>Actividad completa</option>
+      <option value="sesion" <?= $v('forma_pago') === 'sesion' ? 'selected' : '' ?>>Por sesión</option>
+    </select>
+    <?= $err('forma_pago') ?>
+  </div>
+
+  <div class="campo<?= $mal('precio') ?>" id="campoPrecio">
+    <label for="precio">Precio por persona (MXN)</label>
+    <input id="precio" name="precio" type="text" inputmode="decimal"
+           value="<?= e($v('precio')) ?>" placeholder="2450">
+    <?= $err('precio') ?>
+  </div>
 </div>
 
-<div class="campo<?= $mal('url_boletos') ?>">
-  <label for="url_boletos">Enlace para comprar o reservar <span class="opcional">opcional</span></label>
-  <input id="url_boletos" name="url_boletos" type="url" maxlength="500"
-         value="<?= e($v('url_boletos')) ?>" placeholder="https://…">
-  <?= $err('url_boletos') ?>
+<div class="form-seccion-titulo">
+  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="9" cy="8" r="3.2"/>
+    <path d="M2.8 20c.6-3.6 3.3-5.7 6.2-5.7s5.6 2.1 6.2 5.7"/>
+    <circle cx="17" cy="9" r="2.6"/>
+    <path d="M15.2 14.6c2.2.4 3.9 2.2 4.3 5.4"/>
+  </svg>
+  <h2>6. Cupo máximo <span class="opcional">opcional</span></h2>
+</div>
+
+<div class="campo<?= $mal('cupo_maximo') ?>">
+  <label for="cupo_maximo">Número máximo de participantes</label>
+  <input id="cupo_maximo" name="cupo_maximo" type="text" inputmode="numeric" maxlength="6"
+         value="<?= e($v('cupo_maximo')) ?>" placeholder="Ej. 20">
+  <?= $err('cupo_maximo') ?>
+</div>
+
+<div class="form-seccion-titulo">
+  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <rect x="3" y="4" width="18" height="16" rx="2"/>
+    <circle cx="8.5" cy="9.5" r="1.6"/>
+    <path d="M21 16l-5.5-5.5a1.5 1.5 0 0 0-2.1 0L4 19"/>
+  </svg>
+  <h2>7. Imagen de la actividad <span class="opcional">opcional</span></h2>
 </div>
 
 <div class="campo<?= $mal('imagen') ?>">
-  <label for="imagen">Imagen <span class="opcional">opcional</span></label>
-
   <?php
   /*
    * El campo oculto es lo que hace que una foto ya elegida sobreviva a un
@@ -381,12 +440,71 @@ $mal = function (string $campo) use ($errores) {
     </div>
   <?php endif; ?>
 
-  <input id="imagen" name="imagen" type="file" accept="image/jpeg,image/png,image/webp">
+  <label class="imagen-dropzone" id="imagenDropzone" for="imagen">
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M7 18a4.5 4.5 0 0 1-.5-8.97A5.5 5.5 0 0 1 17.2 8.05 4 4 0 0 1 17 16"/>
+      <path d="M12 12v7M9 15l3-3 3 3"/>
+    </svg>
+    <span class="imagen-dropzone-texto">Subir imagen</span>
+    <span class="imagen-dropzone-nombre" id="imagenNombre"></span>
+  </label>
+  <input id="imagen" name="imagen" type="file" accept="image/jpeg,image/png,image/webp" class="imagen-input-oculto">
+
   <div class="pista">
-    JPG, PNG o WebP, hasta <?= round(IMAGEN_MAX_BYTES / 1048576) ?> MB. Si es muy grande se reduce sola.
-    <?= $imagenActual !== null ? 'Elige otra solo si quieres cambiarla.' : 'Sin imagen se usa el color de abajo, como en el diseño de la portada.' ?>
+    JPG, PNG o WebP. Máx. <?= round(IMAGEN_MAX_BYTES / 1048576) ?> MB. Recomendado: 1200 × 800 px.
+    <?= $imagenActual !== null ? 'Elige otra solo si quieres cambiarla.' : 'Si no agregas imagen, se muestra un color de fondo predeterminado en la tarjeta pública.' ?>
   </div>
   <?= $err('imagen') ?>
+</div>
+
+<div class="form-seccion-titulo">
+  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M9.5 14.5l5-5"/>
+    <path d="M11 7.5l1-1a3.5 3.5 0 0 1 5 5l-1 1"/>
+    <path d="M13 16.5l-1 1a3.5 3.5 0 0 1-5-5l1-1"/>
+  </svg>
+  <h2>8. Información adicional <span class="opcional">opcional</span></h2>
+</div>
+
+<div class="campo<?= $mal('sitio_web') ?>">
+  <label for="sitio_web">Sitio web o enlace</label>
+  <input id="sitio_web" name="sitio_web" type="url" maxlength="500"
+         value="<?= e($v('sitio_web')) ?>" placeholder="https://tusitio.com">
+  <div class="pista">Comparte un sitio web o perfil de redes sociales para que los interesados conozcan más sobre tu actividad.</div>
+  <?= $err('sitio_web') ?>
+</div>
+
+<div class="form-seccion-titulo">
+  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6l-5 4H4a1 1 0 0 0-1 1z"/>
+    <path d="M16 9a3.5 3.5 0 0 1 0 6"/>
+    <path d="M18.5 6.5a7 7 0 0 1 0 11"/>
+  </svg>
+  <h2>9. Acción principal</h2>
+</div>
+
+<div class="campo<?= $mal('accion_principal') ?>">
+  <div class="pista" style="margin:0 0 10px;">Elige la acción principal que verán las personas en tu actividad.</div>
+  <div class="accion-grupo">
+    <?php foreach (accionesPrincipales() as $clave => $etiqueta): ?>
+      <label class="accion-op">
+        <input type="radio" name="accion_principal" value="<?= e($clave) ?>" id="accion_<?= e($clave) ?>"
+               <?= $v('accion_principal', 'informacion') === $clave ? 'checked' : '' ?>>
+        <span><?= e($etiqueta) ?></span>
+      </label>
+    <?php endforeach; ?>
+  </div>
+  <?= $err('accion_principal') ?>
+</div>
+
+<div class="campo<?= $mal('url_boletos') ?>">
+  <label for="url_boletos" id="labelUrlBoletos">Enlace para comprar o reservar <span class="opcional">opcional</span></label>
+  <input id="url_boletos" name="url_boletos" type="url" maxlength="500"
+         value="<?= e($v('url_boletos')) ?>" placeholder="https://…">
+  <?= $err('url_boletos') ?>
 </div>
 
 <div class="campo">
@@ -415,14 +533,61 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
 </script>
 
 <script>
-/* El precio no pinta nada si el evento es gratuito. Ocultarlo evita la duda de
-   si hay que poner 0 o dejarlo vacío. */
+/* "Forma de pago" y "Precio" no pintan nada si la actividad es sin costo.
+   Ocultarlos evita la duda de si hay que poner 0 o dejarlos vacíos. */
 (function(){
-  var check  = document.getElementById('gratuito');
-  var precio = document.getElementById('campoPrecio');
-  function sync(){ precio.style.display = check.checked ? 'none' : ''; }
-  check.addEventListener('change', sync);
+  var radios      = document.querySelectorAll('input[name="precio_modo"]');
+  var bloquePago  = document.getElementById('bloquePago');
+  var formaPago   = document.getElementById('forma_pago');
+  var precio      = document.getElementById('precio');
+  if (!radios.length || !bloquePago) return;
+
+  function sync(){
+    var dePago = document.querySelector('input[name="precio_modo"]:checked').value === 'de_pago';
+    bloquePago.style.display = dePago ? '' : 'none';
+    if (formaPago) formaPago.required = dePago;
+  }
+
+  radios.forEach(function(r){ r.addEventListener('change', sync); });
   sync();
+})();
+
+/* La acción principal decide qué se espera de "Enlace para…": el campo es
+   el mismo de siempre (url_boletos), solo cambia cómo se llama según lo que
+   el organizador dijo que va a pasar ahí. */
+(function(){
+  var radios = document.querySelectorAll('input[name="accion_principal"]');
+  var etiqueta = document.getElementById('labelUrlBoletos');
+  if (!radios.length || !etiqueta) return;
+
+  var TEXTOS = {
+    informacion: 'Enlace para solicitar información',
+    boletos:     'Enlace para comprar boletos',
+    reservar:    'Enlace para reservar tu lugar'
+  };
+
+  function sync(){
+    var elegida = document.querySelector('input[name="accion_principal"]:checked');
+    var texto = TEXTOS[elegida ? elegida.value : ''] || 'Enlace para comprar o reservar';
+    etiqueta.firstChild.textContent = texto + ' ';
+  }
+
+  radios.forEach(function(r){ r.addEventListener('change', sync); });
+  sync();
+})();
+
+/* La zona de "Subir imagen" es un <label> disfrazado: el <input type="file">
+   real sigue ahí pero invisible, así que todo lo que ya sabe hacer un input
+   de archivo —arrastrar y soltar incluido, es soporte nativo del navegador—
+   sigue funcionando igual. Esto solo enseña el nombre del archivo elegido. */
+(function(){
+  var campo  = document.getElementById('imagen');
+  var nombre = document.getElementById('imagenNombre');
+  if (!campo || !nombre) return;
+
+  campo.addEventListener('change', function(){
+    nombre.textContent = campo.files.length ? campo.files[0].name : '';
+  });
 })();
 
 /* Contador de la descripción. El mínimo y máximo ya los exige el servidor

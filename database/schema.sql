@@ -189,8 +189,23 @@ CREATE TABLE IF NOT EXISTS eventos (
   -- confunden.
   gratuito      TINYINT(1)    NOT NULL DEFAULT 0,
   precio        DECIMAL(10,2) NULL DEFAULT NULL,
+  -- Si ese precio es por toda la actividad o por sesión —importa sobre todo
+  -- en una recurrente, donde "$400" solo, sin aclarar, es ambiguo—.
+  forma_pago    ENUM('completa','sesion') NULL DEFAULT NULL,
+
+  -- Cuántas personas caben. Opcional: no toda actividad tiene un límite real.
+  cupo_maximo   INT UNSIGNED  NULL DEFAULT NULL,
 
   url_boletos   VARCHAR(500)  NULL DEFAULT NULL,
+  -- Aparte de url_boletos: ese es el enlace de la acción principal (abajo);
+  -- este es un enlace informativo —sitio propio, redes— sin acción de por
+  -- medio, y puede llevarse aunque url_boletos también esté lleno.
+  sitio_web     VARCHAR(500)  NULL DEFAULT NULL,
+  -- Qué espera el organizador que haga quien vea la ficha con url_boletos.
+  -- Decide el texto del botón en la ficha y, en el formulario, la etiqueta
+  -- del campo "Enlace para…".
+  accion_principal ENUM('informacion','boletos','reservar')
+                                NOT NULL DEFAULT 'informacion',
   imagen_url    VARCHAR(500)  NULL DEFAULT NULL,
   color         CHAR(7)       NOT NULL DEFAULT '#89A67D',
 
