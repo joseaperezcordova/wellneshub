@@ -487,6 +487,11 @@
   }
   .filtros-limpiar:hover{background:var(--arena);}
   .checklist label{display:flex; align-items:center; gap:8px; font-size:13px; padding:4px 0;}
+  /* Solo la de categorias, que son veintitantas: entera empujaba el filtro de
+     precio y el boton de limpiar por debajo del borde de la pantalla, y desde
+     ahi no se usan. El alto corta a media fila a proposito, que es lo que
+     avisa de que la lista sigue. */
+  #fCats{max-height:238px; overflow-y:auto; padding-right:6px;}
   .results-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;}
   .results-head .count{font-size:13px; opacity:0.65;}
   .results-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:18px;}

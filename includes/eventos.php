@@ -31,20 +31,44 @@ function categoriasMenu(): array
     // lee en el menú, y va en plural porque ahí se está eligiendo un montón de
     // eventos, no uno. Guardar el plural sería peor: "Retiros" como categoría
     // de un solo evento chirría en la ficha.
+    // El orden no es alfabético a propósito: el carril de la portada se lee de
+    // izquierda a derecha y casi nadie llega al final, así que va agrupado por
+    // parentesco —práctica, ceremonia, aire libre, cuidado del cuerpo— y lo más
+    // buscado primero.
     return [
-        'Yoga'           => ['🧘',  'Yoga'],
-        'Meditación'     => ['🌿',  'Meditación'],
-        'Retiro'         => ['🏕️',  'Retiros'],
-        'Breathwork'     => ['🌬️',  'Breathwork'],
-        'Sound Healing'  => ['🎐',  'Sound Healing'],
-        'Ceremonia'      => ['🔥',  'Ceremonias'],
-        'Festival'       => ['☀️',  'Festivales'],
-        'Temazcal'       => ['♨️',  'Temazcal'],
-        'Cacao'          => ['🍫',  'Cacao'],
-        'Ecstatic Dance' => ['💃',  'Ecstatic Dance'],
-        'Ice Bath'       => ['🧊',  'Ice Bath'],
-        'Pilates'        => ['🌀',  'Pilates'],
-        'Biohacking'     => ['⚡',  'Biohacking'],
+        // Práctica
+        'Yoga'               => ['🧘',  'Yoga'],
+        'Meditación'         => ['🌿',  'Meditación'],
+        'Pilates'            => ['🌀',  'Pilates'],
+        'Breathwork'         => ['🌬️',  'Breathwork'],
+        'Sound Healing'      => ['🎐',  'Sound Healing'],
+        'Tai Chi'            => ['☯️',  'Tai Chi'],
+        'Qi Gong'            => ['🍃',  'Qi Gong'],
+
+        // Ceremonia
+        'Temazcal'           => ['♨️',  'Temazcal'],
+        'Ceremonia de Cacao' => ['🍫',  'Ceremonia de Cacao'],
+        'Ceremonia'          => ['🔥',  'Ceremonias'],
+        'Ecstatic Dance'     => ['💃',  'Ecstatic Dance'],
+
+        // Aire libre
+        'Senderismo'         => ['🥾',  'Senderismo'],
+        'Carreras'           => ['🏃',  'Carreras'],
+        'Ciclismo'           => ['🚴',  'Ciclismo'],
+        'Surf'               => ['🏄',  'Surf'],
+
+        // Cuidado del cuerpo
+        'Nutrición'          => ['🥗',  'Nutrición'],
+        'Ayurveda'           => ['🌱',  'Ayurveda'],
+        'Spa'                => ['💆',  'Spa'],
+        'Cold Plunge'        => ['🧊',  'Cold Plunge'],
+        'Biohacking'         => ['⚡',  'Biohacking'],
+        'Longevidad'         => ['⏳',  'Longevidad'],
+
+        // Formato, no disciplina: un retiro puede ser de yoga o de silencio.
+        // Van al final porque quien busca "retiro" lo escribe, no lo pasea.
+        'Retiro'             => ['🏕️',  'Retiros'],
+        'Festival'           => ['☀️',  'Festivales'],
     ];
 }
 

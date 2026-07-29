@@ -133,20 +133,15 @@ require __DIR__ . '/includes/layout.php';
         <input type="text" placeholder="Buscar categoría…">
         <button class="btn-add">+ Nueva categoría</button>
       </div>
+      <?php /* Los nombres salen de categoriasMenu() para que la maqueta no se
+               quede hablando de categorías que ya no existen —enseñaba Retreat,
+               Conferencia y Networking, que nunca estuvieron en la lista real—.
+               Los números siguen siendo de mentira: este panel no cuenta nada
+               todavía. */ ?>
       <div>
-        <span class="catchip-admin">Yoga <span class="n">38</span></span>
-        <span class="catchip-admin">Meditación <span class="n">21</span></span>
-        <span class="catchip-admin">Breathwork <span class="n">14</span></span>
-        <span class="catchip-admin">Pilates <span class="n">9</span></span>
-        <span class="catchip-admin">Retreat <span class="n">17</span></span>
-        <span class="catchip-admin">Festival <span class="n">6</span></span>
-        <span class="catchip-admin">Sound Healing <span class="n">12</span></span>
-        <span class="catchip-admin">Ice Bath <span class="n">5</span></span>
-        <span class="catchip-admin">Biohacking <span class="n">4</span></span>
-        <span class="catchip-admin">Nutrición <span class="n">8</span></span>
-        <span class="catchip-admin">Conferencia <span class="n">3</span></span>
-        <span class="catchip-admin">Networking <span class="n">2</span></span>
-        <span class="catchip-admin">Otro <span class="n">3</span></span>
+        <?php foreach (categoriasMenu() as $catNombre => $catDatos): ?>
+          <span class="catchip-admin"><?= e($catDatos[1]) ?> <span class="n">—</span></span>
+        <?php endforeach; ?>
       </div>
     </div>
 

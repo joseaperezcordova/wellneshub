@@ -54,7 +54,7 @@ VALUES
  'Círculo de Cacao y Luna Llena',
  'prueba-circulo-de-cacao',
  'Ceremonia abierta de cacao ceremonial de Tabasco, con círculo de palabra y meditación guiada bajo la luna llena. Sin costo: quien quiera puede dejar una aportación voluntaria para el cacao y el espacio.\n\nTrae algo cómodo para sentarte y una manta. Somos treinta personas como máximo, así que conviene llegar temprano.',
- 'Cacao', 'San Miguel de Allende', 'Guanajuato', 'Jardín de la Casa Naranja',
+ 'Ceremonia de Cacao', 'San Miguel de Allende', 'Guanajuato', 'Jardín de la Casa Naranja',
  DATE_ADD(CURDATE(), INTERVAL 13 DAY) + INTERVAL 19 HOUR, NULL,
  1, NULL, NULL, '#C76E43',
  'publicado', NOW()),
