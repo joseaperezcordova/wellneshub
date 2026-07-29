@@ -65,7 +65,7 @@ VALUES
  'Retiro de Silencio — Tres días en la sierra',
  'prueba-retiro-de-silencio',
  'Tres días sin teléfono y sin conversación, con meditación sentada y caminando, comida vegetariana y dos entrevistas personales con la facilitadora.\n\nEl silencio empieza el viernes por la noche y se rompe el domingo después de comer. No hace falta experiencia previa, pero sí venir con la idea clara de lo que es: no es un fin de semana de descanso, es trabajo interior.\n\nAlojamiento en cabañas compartidas. Cupo de doce personas.',
- 'Retiro', 'Oaxaca de Juárez', 'Oaxaca', 'Sierra Norte',
+ 'Meditación', 'Oaxaca de Juárez', 'Oaxaca', 'Sierra Norte',
  DATE_ADD(CURDATE(), INTERVAL 21 DAY) + INTERVAL 17 HOUR,
  DATE_ADD(CURDATE(), INTERVAL 23 DAY) + INTERVAL 15 HOUR,
  0, 4200.00, NULL, '#2F4E5D',

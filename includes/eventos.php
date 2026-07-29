@@ -27,10 +27,11 @@ const EVENTO_MARGEN_EDICION_H = 24;
  */
 function categoriasMenu(): array
 {
-    // La clave es el nombre que se guarda en la base. La etiqueta es lo que se
-    // lee en el menú, y va en plural porque ahí se está eligiendo un montón de
-    // eventos, no uno. Guardar el plural sería peor: "Retiros" como categoría
-    // de un solo evento chirría en la ficha.
+    // La clave es el nombre que se guarda en la base; la etiqueta es lo que se
+    // lee en el menú. Hoy coinciden todas, pero siguen separadas porque son dos
+    // cosas distintas: cambiar cómo se lee una categoría en pantalla no debería
+    // obligar a tocar lo que hay guardado en miles de filas.
+    //
     // El orden no es alfabético a propósito: el carril de la portada se lee de
     // izquierda a derecha y casi nadie llega al final, así que va agrupado por
     // parentesco —práctica, ceremonia, aire libre, cuidado del cuerpo— y lo más
@@ -48,7 +49,6 @@ function categoriasMenu(): array
         // Ceremonia
         'Temazcal'           => ['♨️',  'Temazcal'],
         'Ceremonia de Cacao' => ['🍫',  'Ceremonia de Cacao'],
-        'Ceremonia'          => ['🔥',  'Ceremonias'],
         'Ecstatic Dance'     => ['💃',  'Ecstatic Dance'],
 
         // Aire libre
@@ -64,11 +64,6 @@ function categoriasMenu(): array
         'Cold Plunge'        => ['🧊',  'Cold Plunge'],
         'Biohacking'         => ['⚡',  'Biohacking'],
         'Longevidad'         => ['⏳',  'Longevidad'],
-
-        // Formato, no disciplina: un retiro puede ser de yoga o de silencio.
-        // Van al final porque quien busca "retiro" lo escribe, no lo pasea.
-        'Retiro'             => ['🏕️',  'Retiros'],
-        'Festival'           => ['☀️',  'Festivales'],
     ];
 }
 
