@@ -8,7 +8,7 @@
  * HTML de las siete vistas se le mandaba entero a todo el mundo. Ahora es una
  * página con su puerta delante.
  *
- * ATENCIÓN: de las seis pestañas, solo «Eventos» tiene datos de verdad. Las
+ * ATENCIÓN: de las seis pestañas, solo «Actividades» tiene datos de verdad. Las
  * otras cinco —organizadores, categorías, ciudades, usuarios, newsletter— son
  * la maqueta del prototipo, con nombres y cifras inventados, igual que las seis
  * cifras de arriba. Se mantienen tal cual estaban al repartir el sitio en
@@ -50,10 +50,10 @@ require __DIR__ . '/includes/layout.php';
 
     <?php /* Cifras del prototipo: no salen de la base. Ver la nota de arriba. */ ?>
     <div class="stat-grid">
-      <div class="stat-card"><div class="num">142</div><div class="lbl">Eventos publicados</div></div>
+      <div class="stat-card"><div class="num">142</div><div class="lbl">Actividades publicadas</div></div>
       <div class="stat-card"><div class="num">19</div><div class="lbl">Próximos (7 días)</div></div>
       <div class="stat-card"><div class="num">6</div><div class="lbl">Pendientes de aprobación</div></div>
-      <div class="stat-card"><div class="num">31</div><div class="lbl">Eventos expirados</div></div>
+      <div class="stat-card"><div class="num">31</div><div class="lbl">Actividades expiradas</div></div>
       <div class="stat-card"><div class="num">58</div><div class="lbl">Organizadores</div></div>
       <div class="stat-card"><div class="num">1,207</div><div class="lbl">Suscriptores newsletter</div></div>
     </div>
@@ -66,7 +66,7 @@ require __DIR__ . '/includes/layout.php';
     </div>
 
     <div class="admin-tabs" id="adminTabs">
-      <button data-panel="eventos" class="active">Eventos</button>
+      <button data-panel="eventos" class="active">Actividades</button>
       <button data-panel="organizadores">Organizadores</button>
       <button data-panel="categorias">Categorías</button>
       <button data-panel="ciudades">Ciudades y estados</button>
@@ -74,16 +74,16 @@ require __DIR__ . '/includes/layout.php';
       <button data-panel="newsletter">Newsletter</button>
     </div>
 
-    <!-- EVENTOS — la única pestaña con datos de verdad -->
+    <!-- ACTIVIDADES — la única pestaña con datos de verdad -->
     <div class="admin-panel active" id="panel-eventos">
       <div class="panel-toolbar">
-        <a class="btn-add" href="<?= URL_BASE ?>/evento-nuevo.php">+ Nuevo evento</a>
+        <a class="btn-add" href="<?= URL_BASE ?>/evento-nuevo.php">+ Nueva actividad</a>
       </div>
       <table class="admtable">
         <thead><tr><th>Título</th><th>Organiza</th><th>Ciudad</th><th>Fecha</th><th>Situación</th><th></th></tr></thead>
         <tbody>
           <?php if (!$eventosAdmin): ?>
-            <tr><td colspan="6" style="opacity:.6;">Todavía no hay eventos.</td></tr>
+            <tr><td colspan="6" style="opacity:.6;">Todavía no hay actividades.</td></tr>
           <?php endif; ?>
           <?php foreach ($eventosAdmin as $ea): $p = fechaPartes($ea['fecha_inicio']); ?>
             <tr>
@@ -105,7 +105,7 @@ require __DIR__ . '/includes/layout.php';
         </tbody>
       </table>
       <div class="evergreen-note" style="margin-top:18px;">
-        Ocultar y eliminar se hacen desde la ficha del evento, con la confirmación delante.
+        Ocultar y eliminar se hacen desde la ficha de la actividad, con la confirmación delante.
         Un botón «Eliminar» en una fila de tabla se pulsa por error con demasiada facilidad.
       </div>
     </div>
@@ -117,7 +117,7 @@ require __DIR__ . '/includes/layout.php';
         <button class="btn-add">+ Nuevo organizador</button>
       </div>
       <table class="admtable">
-        <thead><tr><th>Nombre</th><th>Contacto</th><th>Eventos</th><th>Redes</th><th></th></tr></thead>
+        <thead><tr><th>Nombre</th><th>Contacto</th><th>Actividades</th><th>Redes</th><th></th></tr></thead>
         <tbody>
           <tr><td>Raíz Colectivo</td><td>hola@raizcolectivo.mx</td><td>12</td><td>IG · FB · WA</td><td><button class="actionbtn">Editar</button><button class="actionbtn">Eliminar</button></td></tr>
           <tr><td>Circulo Vivo</td><td>circulovivo@gmail.com</td><td>7</td><td>IG · Web</td><td><button class="actionbtn">Editar</button><button class="actionbtn">Eliminar</button></td></tr>
@@ -163,12 +163,12 @@ require __DIR__ . '/includes/layout.php';
         <div class="admin-card">
           <h4>Ciudades</h4>
           <ul>
-            <li>Tulum <span class="mono" style="opacity:.5;">24 eventos</span></li>
-            <li>CDMX <span class="mono" style="opacity:.5;">41 eventos</span></li>
-            <li>Oaxaca de Juárez <span class="mono" style="opacity:.5;">18 eventos</span></li>
-            <li>San Miguel de Allende <span class="mono" style="opacity:.5;">15 eventos</span></li>
-            <li>Guadalajara <span class="mono" style="opacity:.5;">12 eventos</span></li>
-            <li>Puerto Vallarta <span class="mono" style="opacity:.5;">9 eventos</span></li>
+            <li>Tulum <span class="mono" style="opacity:.5;">24 actividades</span></li>
+            <li>CDMX <span class="mono" style="opacity:.5;">41 actividades</span></li>
+            <li>Oaxaca de Juárez <span class="mono" style="opacity:.5;">18 actividades</span></li>
+            <li>San Miguel de Allende <span class="mono" style="opacity:.5;">15 actividades</span></li>
+            <li>Guadalajara <span class="mono" style="opacity:.5;">12 actividades</span></li>
+            <li>Puerto Vallarta <span class="mono" style="opacity:.5;">9 actividades</span></li>
           </ul>
           <button class="btn-add" style="margin-top:14px;">+ Nueva ciudad</button>
         </div>

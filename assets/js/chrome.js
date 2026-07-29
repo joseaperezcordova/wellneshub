@@ -49,11 +49,11 @@
   var i18n = {
     es: {
       h1:  'Encuentra tu próximo <em>retiro, festival o círculo</em> de bienestar',
-      tag: 'Directorio de eventos · México'
+      tag: 'Directorio de actividades · México'
     },
     en: {
       h1:  'Find your next <em>retreat, festival or wellness</em> circle',
-      tag: 'Event directory · Mexico'
+      tag: 'Activity directory · Mexico'
     }
   };
 

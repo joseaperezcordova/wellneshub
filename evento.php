@@ -1,6 +1,6 @@
 <?php
 /**
- * La ficha del evento. Es a la vez la página pública y la vista previa.
+ * La ficha de la actividad. Es a la vez la página pública y la vista previa.
  *
  * Que sean la misma página no es por ahorrar archivos: es la única forma de que
  * la vista previa sea de fiar. Una pantalla de previsualización aparte se
@@ -21,11 +21,11 @@ $ev = buscarEvento((int) ($_GET['id'] ?? 0));
 
 if (!$ev || !puedeVerEvento($ev, $u)) {
     http_response_code(404);
-    $titulo = 'Evento no encontrado';
+    $titulo = 'Actividad no encontrada';
     require __DIR__ . '/includes/layout.php';
-    echo '<div class="auth-caja"><h1>Ese evento no existe</h1>'
-       . '<p class="sub">Puede que se haya borrado o que todavía no esté publicado.</p>'
-       . '<a class="btn-principal" style="text-decoration:none; display:block; text-align:center;" href="' . URL_BASE . '/">Ver los que sí</a></div>';
+    echo '<div class="auth-caja"><h1>Esa actividad no existe</h1>'
+       . '<p class="sub">Puede que se haya borrado o que todavía no esté publicada.</p>'
+       . '<a class="btn-principal" style="text-decoration:none; display:block; text-align:center;" href="' . URL_BASE . '/">Ver las que sí</a></div>';
     pie();
     exit;
 }
@@ -34,7 +34,7 @@ $esDueno = $u !== null && (int) $ev['usuario_id'] === (int) $u['id'];
 $mando   = $esDueno || esAdmin($u);
 $error   = '';
 
-// ---- acciones sobre el evento ----------------------------------------------
+// ---- acciones sobre la actividad -------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValido($_POST['csrf'] ?? null)) {
         $error = 'La sesión caducó. Vuelve a intentarlo.';
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit('No puedes hacer eso.');
 
     } elseif (isset($_POST['publicar']) && ($ev['situacion'] !== 'oculto' || esAdmin($u))) {
-        // Volver a publicar un evento oculto deshace una decisión de moderación,
+        // Volver a publicar una actividad oculta deshace una decisión de moderación,
         // así que es cosa de un administrador. Sin esto, el dueño podría mandar
         // el POST a mano y saltarse por qué se ocultó en primer lugar.
         publicarEvento((int) $ev['id'], (int) $ev['usuario_id']);
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } elseif (isset($_POST['ocultar']) && esAdmin($u)) {
         cambiarSituacionEvento((int) $ev['id'], 'oculto');
-        $_SESSION['evento_aviso'] = 'Evento oculto. Ya no aparece en el listado.';
+        $_SESSION['evento_aviso'] = 'Actividad oculta. Ya no aparece en el listado.';
         redirigir('/evento.php?id=' . (int) $ev['id']);
 
     } elseif (isset($_POST['eliminar'])) {
@@ -67,10 +67,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // borrar sería la puerta de atrás para saltarse la regla de las 24
         // horas: quitar la ficha y volver a subirla cambiada.
         if (!puedeEditarEvento($ev, $u)) {
-            $error = 'Ya pasó el plazo para borrar este evento. Pídeselo al administrador.';
+            $error = 'Ya pasó el plazo para borrar esta actividad. Pídeselo al administrador.';
         } else {
             eliminarEvento((int) $ev['id']);
-            $_SESSION['evento_aviso'] = 'Evento eliminado.';
+            $_SESSION['evento_aviso'] = 'Actividad eliminada.';
             redirigir('/');
         }
     }
@@ -90,8 +90,8 @@ $partes     = fechaPartes($ev['fecha_inicio']);
  *
  * Si se llegó desde una búsqueda, la tarjeta trajo esa búsqueda pegada en el
  * parámetro «volver», y ahí se vuelve: con los mismos filtros puestos. Es lo
- * que evita el camino de siempre —filtrar, entrar a un evento, volver y tener
- * que filtrar otra vez.
+ * que evita el camino de siempre —filtrar, entrar a una actividad, volver y
+ * tener que filtrar otra vez.
  *
  * No se usa lo que llega tal cual: urlVolverABuscar() lo deshace, lo valida
  * contra las listas de verdad y arma la dirección de nuevo. Así lo que acaba en
@@ -102,7 +102,7 @@ $partes     = fechaPartes($ev['fecha_inicio']);
  *
  * Si se llegó desde el panel admin, «volver» no trae filtros de búsqueda sino
  * la palabra «admin»: no tendría sentido devolver ahí a alguien a la lista
- * pública de eventos cuando venía de gestionarlos.
+ * pública de actividades cuando venía de gestionarlas.
  */
 $volverAdmin = ($_GET['volver'] ?? '') === 'admin' && esAdmin($u);
 
@@ -119,7 +119,7 @@ require __DIR__ . '/includes/layout.php';
 ?>
 
 <div class="ficha-envoltorio">
-  <a class="volver" href="<?= e($volverA) ?>">← <?= $volverAdmin ? 'Volver al panel admin' : ($vieneDeBusqueda ? 'Volver a los resultados' : 'Ver todos los eventos') ?></a>
+  <a class="volver" href="<?= e($volverA) ?>">← <?= $volverAdmin ? 'Volver al panel admin' : ($vieneDeBusqueda ? 'Volver a los resultados' : 'Ver todas las actividades') ?></a>
 </div>
 
 <?php if ($aviso): ?>
@@ -136,16 +136,16 @@ require __DIR__ . '/includes/layout.php';
         <?php if ($esBorrador): ?>
           <strong>Vista previa.</strong> Así queda tu ficha. Todavía no la ve nadie más.
         <?php elseif ($ev['situacion'] === 'oculto'): ?>
-          <strong>Oculto.</strong> No aparece en el listado.
+          <strong>Oculta.</strong> No aparece en el listado.
         <?php else: ?>
           <?php $quedan = minutosRestantesEdicion($ev); ?>
           <?php if ($quedan > 0): ?>
-            <strong>Publicado.</strong> Puedes corregirlo durante
+            <strong>Publicada.</strong> Puedes corregirla durante
             <?= $quedan >= 60 ? intdiv($quedan, 60) . ' h ' . ($quedan % 60) . ' min' : $quedan . ' min' ?> más.
           <?php elseif (esAdmin($u)): ?>
-            <strong>Publicado.</strong> Eres administrador: puedes editarlo aunque pasara el plazo.
+            <strong>Publicada.</strong> Eres administrador: puedes editarla aunque pasara el plazo.
           <?php else: ?>
-            <strong>Publicado.</strong> Pasó el plazo de edición; pídele los cambios al administrador.
+            <strong>Publicada.</strong> Pasó el plazo de edición; pídele los cambios al administrador.
           <?php endif; ?>
         <?php endif; ?>
       </div>
@@ -255,7 +255,7 @@ require __DIR__ . '/includes/layout.php';
     /*
      * El mapa va DEBAJO de la descripción, no arriba con los demás datos.
      *
-     * Quien abre una ficha decide primero si le interesa el evento y solo
+     * Quien abre una ficha decide primero si le interesa la actividad y solo
      * después mira dónde cae. Un mapa entre el título y el texto se come el
      * sitio de lo que hay que leer para tomar esa decisión.
      *
@@ -280,7 +280,7 @@ require __DIR__ . '/includes/layout.php';
            Pedir cuenta aquí no filtra bots —esos sí se registran—, filtra
            personas. Discreto al pie, que es donde se busca cuando hace falta. -->
       <div class="ficha-reportar">
-        <a href="<?= URL_BASE ?>/reportar.php?id=<?= (int) $ev['id'] ?>">Reportar este evento</a>
+        <a href="<?= URL_BASE ?>/reportar.php?id=<?= (int) $ev['id'] ?>">Reportar esta actividad</a>
       </div>
     <?php endif; ?>
   </div>

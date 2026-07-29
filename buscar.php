@@ -1,12 +1,12 @@
 <?php
 /**
- * Buscar eventos.
+ * Buscar actividades.
  *
  * Era una de las vistas que vivían dentro de index.php y se conmutaban con
  * JavaScript. Ahora es una página con su propia dirección, y los filtros van
  * dentro de ella: buscar.php?ciudad=Tulum&cat=Yoga.
  *
- * Eso es lo que permite entrar a la ficha de un evento y volver a la misma
+ * Eso es lo que permite entrar a la ficha de una actividad y volver a la misma
  * búsqueda —el enlace de vuelta se lo lleva puesto—, y de paso que una
  * búsqueda se pueda compartir o guardar en marcadores.
  *
@@ -36,7 +36,7 @@ $ciudadesFiltro  = array_values(array_unique(array_column($eventosJs, 'ciudad'))
 sort($entidadesFiltro, SORT_NATURAL | SORT_FLAG_CASE);
 sort($ciudadesFiltro,  SORT_NATURAL | SORT_FLAG_CASE);
 
-$titulo        = 'Buscar eventos';
+$titulo        = 'Buscar actividades';
 $anchoLibre    = true;
 $scriptsPagina = ['assets/js/buscar.js'];
 
@@ -45,13 +45,13 @@ require __DIR__ . '/includes/layout.php';
 
 <section class="wrap block">
   <div class="results-heading">
-    <div class="eyebrow" id="resultsEyebrow">Buscar eventos</div>
-    <div class="block-head"><h2 id="resultsTitle">Todos los eventos</h2></div>
+    <div class="eyebrow" id="resultsEyebrow">Buscar actividades</div>
+    <div class="block-head"><h2 id="resultsTitle">Todas las actividades</h2></div>
   </div>
 
   <div class="results-layout">
     <?php /* «Modalidad: presencial / online» no está en el panel: no hay ningún
-             campo en la base que diga si un evento es en línea, así que la
+             campo en la base que diga si una actividad es en línea, así que la
              casilla no podía hacer otra cosa que mentir. Vuelve el día que el
              formulario de alta lo pregunte. */ ?>
     <aside class="filters">
@@ -100,7 +100,7 @@ require __DIR__ . '/includes/layout.php';
 
       <h4>Precio</h4>
       <div class="checklist">
-        <label><input type="checkbox" id="fGratis"<?= $filtros['gratis'] ? ' checked' : '' ?>> Solo gratuitos</label>
+        <label><input type="checkbox" id="fGratis"<?= $filtros['gratis'] ? ' checked' : '' ?>> Solo gratuitas</label>
       </div>
 
       <button type="button" class="filtros-limpiar" id="fLimpiar" hidden>Quitar filtros</button>
@@ -110,8 +110,8 @@ require __DIR__ . '/includes/layout.php';
       <div class="results-head">
         <div class="count" id="resultsCount"></div>
         <select class="sortsel" id="fOrden">
-          <?php foreach (['fecha' => 'Ordenar: más próximos', 'precio' => 'Precio: menor a mayor',
-                          'nuevos' => 'Recién publicados'] as $clave => $texto): ?>
+          <?php foreach (['fecha' => 'Ordenar: más próximas', 'precio' => 'Precio: menor a mayor',
+                          'nuevos' => 'Recién publicadas'] as $clave => $texto): ?>
             <option value="<?= e($clave) ?>"<?= $clave === $filtros['orden'] ? ' selected' : '' ?>><?= e($texto) ?></option>
           <?php endforeach; ?>
         </select>

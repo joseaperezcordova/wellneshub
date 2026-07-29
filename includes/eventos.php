@@ -220,7 +220,7 @@ function eventosTodos(int $limite = 200): array
 function etiquetasCampos(): array
 {
     return [
-        'titulo'       => 'Título del evento',
+        'titulo'       => 'Título de la actividad',
         'categoria'    => 'Categoría',
         'descripcion'  => 'Descripción',
         'ciudad'       => 'Ciudad',
@@ -325,7 +325,7 @@ function validarEvento(array $in): array
 
         if ($termina !== null && strtotime($termina) < time()) {
             $campo = $e['fecha_fin'] !== null ? 'fecha_fin' : 'fecha_inicio';
-            $errores[$campo] = 'Esa fecha ya pasó, así que el evento no aparecería en el listado.';
+            $errores[$campo] = 'Esa fecha ya pasó, así que la actividad no aparecería en el listado.';
         }
     }
 

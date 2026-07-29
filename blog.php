@@ -36,7 +36,7 @@ require __DIR__ . '/includes/layout.php';
     </div>
     <div class="card-blog">
       <div class="b-img" style="background-color:#89A67D;"></div>
-      <div class="b-body"><div class="eyebrow">Agenda</div><h3>Eventos wellness en CDMX este fin de semana</h3></div>
+      <div class="b-body"><div class="eyebrow">Agenda</div><h3>Actividades wellness en CDMX este fin de semana</h3></div>
     </div>
     <div class="card-blog">
       <div class="b-img" style="background-color:#2F4E5D;"></div>
@@ -59,7 +59,8 @@ require __DIR__ . '/includes/layout.php';
   <div class="evergreen-note">
     Todavía no hay artículos de verdad: estas seis tarjetas son un ejemplo de lo que iría aquí.
     Las páginas evergreen (guías por estado, calendario anual) se indexan aparte del listado de
-    eventos: siguen generando tráfico de búsqueda aunque no haya eventos nuevos publicados esa semana.
+    actividades: siguen generando tráfico de búsqueda aunque no haya actividades nuevas publicadas
+    esa semana.
   </div>
 </section>
 

@@ -5,8 +5,8 @@
 (function () {
   'use strict';
 
-  /* ---------- el carril de próximos eventos ---------- */
-  pintar('proximosRail', EVENTOS.map(evCardHTML), 'Todavía no hay eventos publicados.');
+  /* ---------- el carril de próximas actividades ---------- */
+  pintar('proximosRail', EVENTOS.map(evCardHTML), 'Todavía no hay actividades publicadas.');
 
   carril('catrail', 'catnext');
   carril('proximosRail', 'evnext');

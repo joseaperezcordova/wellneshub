@@ -1,6 +1,6 @@
 <?php
 /**
- * Alta de un evento.
+ * Alta de una actividad.
  *
  * Guarda como BORRADOR y manda a la vista previa. Nada se publica desde este
  * formulario: quien escribe una ficha larga quiere verla antes de enseñarla, y
@@ -66,12 +66,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && random_int(1, 20) === 1) {
     limpiarImagenesHuerfanas();
 }
 
-$titulo = 'Publicar un evento';
+$titulo = 'Publicar una actividad';
 require __DIR__ . '/includes/layout.php';
 ?>
 
 <div class="auth-caja caja-ancha">
-  <h1>Publicar un evento</h1>
+  <h1>Publicar una actividad</h1>
   <p class="sub">Rellena la ficha. Antes de publicarla la vas a ver tal como la verá la gente.</p>
 
   <?php require __DIR__ . '/includes/aviso-errores.php'; ?>

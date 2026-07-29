@@ -1,6 +1,6 @@
 <?php
 /**
- * El formulario del evento, compartido por el alta y la edición.
+ * El formulario de la actividad, compartido por el alta y la edición.
  *
  * Está en un solo archivo porque los dos formularios son el mismo. Cuando
  * estaban duplicados, cada campo nuevo había que añadirlo dos veces y la
@@ -44,7 +44,7 @@ $mal = function (string $campo) use ($errores) {
 ?>
 
 <div class="campo<?= $mal('titulo') ?>">
-  <label for="titulo">Título del evento</label>
+  <label for="titulo">Título de la actividad</label>
   <input id="titulo" name="titulo" type="text" required maxlength="160"
          value="<?= e($v('titulo')) ?>" placeholder="Amanecer en el Cenote — Yoga y Sonido">
   <?= $err('titulo') ?>
@@ -185,7 +185,7 @@ $mal = function (string $campo) use ($errores) {
   <?php if ($imagenActual !== null): ?>
     <input type="hidden" name="imagen_previa" value="<?= e((string) $imagenGuardada) ?>">
     <div class="imagen-actual">
-      <img src="<?= e($imagenActual) ?>" alt="Imagen del evento">
+      <img src="<?= e($imagenActual) ?>" alt="Imagen de la actividad">
       <?php if (esImagenEnVuelo($imagenGuardada)): ?>
         <div class="pista">Esta es la que acabas de elegir. Sigue puesta: no hace falta que la busques otra vez.</div>
       <?php endif; ?>

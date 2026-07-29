@@ -1,6 +1,6 @@
 <?php
 /**
- * Mis eventos — el panel de quien publica.
+ * Mis actividades — el panel de quien publica.
  *
  * Era la vista «panel-organizador» dentro de la portada, a la que se llegaba
  * por /#panel-organizador porque no tenía dirección propia. Ahora la tiene.
@@ -17,7 +17,7 @@ require __DIR__ . '/includes/eventos.php';
 $u          = exigirSesion();
 $misEventos = eventosDeUsuario((int) $u['id']);
 
-$titulo     = 'Mis eventos';
+$titulo     = 'Mis actividades';
 $anchoLibre = true;
 
 require __DIR__ . '/includes/layout.php';
@@ -39,13 +39,13 @@ require __DIR__ . '/includes/layout.php';
         </div>
       </div>
       <a class="btn-add" style="background:var(--terracota); color:var(--tinta-boton);"
-         href="<?= URL_BASE ?>/evento-nuevo.php">+ Nuevo evento</a>
+         href="<?= URL_BASE ?>/evento-nuevo.php">+ Nueva actividad</a>
     </div>
 
     <?php if (!$misEventos): ?>
       <div class="evergreen-note">
-        Todavía no has creado ningún evento. Con «+ Nuevo evento» escribes la ficha,
-        la ves como la verá la gente y decides si publicarla.
+        Todavía no has creado ninguna actividad. Con «+ Nueva actividad» escribes
+        la ficha, la ves como la verá la gente y decides si publicarla.
       </div>
     <?php else: ?>
       <table class="admtable" style="background:var(--paper); color:var(--ink);">
@@ -57,11 +57,11 @@ require __DIR__ . '/includes/layout.php';
               <td><?= e($p['d'] . ' ' . $p['m'] . ' ' . date('Y', strtotime($me['fecha_inicio']))) ?></td>
               <td>
                 <?php if ($me['situacion'] === 'publicado'): ?>
-                  <span class="badge on" style="color:var(--jungle); background:rgba(47,78,93,0.12);">Publicado</span>
+                  <span class="badge on" style="color:var(--jungle); background:rgba(47,78,93,0.12);">Publicada</span>
                 <?php elseif ($me['situacion'] === 'borrador'): ?>
                   <span class="badge-pending">Borrador · sin publicar</span>
                 <?php else: ?>
-                  <span class="badge off">Oculto</span>
+                  <span class="badge off">Oculta</span>
                 <?php endif; ?>
               </td>
               <td>
@@ -77,7 +77,7 @@ require __DIR__ . '/includes/layout.php';
         </tbody>
       </table>
       <div class="evergreen-note" style="margin-top:18px;">
-        Un evento publicado se puede corregir durante <?= EVENTO_MARGEN_EDICION_H ?> horas.
+        Una actividad publicada se puede corregir durante <?= EVENTO_MARGEN_EDICION_H ?> horas.
         Después, los cambios se le piden al administrador.
       </div>
     <?php endif; ?>

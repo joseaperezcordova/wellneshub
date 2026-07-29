@@ -38,7 +38,7 @@ $lugares = array_values(array_unique(array_merge(
 )));
 sort($lugares, SORT_NATURAL | SORT_FLAG_CASE);
 
-$titulo        = 'Directorio de eventos wellness en México';
+$titulo        = 'Directorio de actividades wellness en México';
 $seccion       = 'inicio';
 $anchoLibre    = true;
 $scriptsPagina = ['assets/js/inicio.js'];
@@ -55,7 +55,7 @@ require __DIR__ . '/includes/layout.php';
 
          El titulo de la pagina NO rota: vive fuera de las diapositivas, al
          pie del banner. Solo cambian la imagen y la etiqueta de arriba a la
-         izquierda, que nombra el evento que se esta viendo. Asi hay un
+         izquierda, que nombra la actividad que se esta viendo. Asi hay un
          unico h1 y el mensaje del sitio no depende de donde pare el giro. -->
     <div class="carrusel" id="carrusel">
       <div class="slide activa" aria-hidden="false">
@@ -92,7 +92,7 @@ require __DIR__ . '/includes/layout.php';
     </div>
 
     <div class="hero-content">
-      <div class="eyebrow">Directorio de eventos · México</div>
+      <div class="eyebrow">Directorio de actividades · México</div>
       <h1>Encuentra tu próximo <em>retiro, festival o círculo</em> de bienestar</h1>
       <p class="sub">Retiros de yoga, breathwork, sound healing y festivales holísticos, reunidos en un solo lugar — sin buscar por veinte cuentas de Instagram distintas.</p>
     </div>
@@ -144,7 +144,7 @@ require __DIR__ . '/includes/layout.php';
           <?php endforeach; ?>
         </select>
       </div>
-      <button type="submit" aria-label="Buscar eventos">
+      <button type="submit" aria-label="Buscar actividades">
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20.2 20.2l-4-4"/></svg>
       </button>
     </form>
@@ -153,7 +153,7 @@ require __DIR__ . '/includes/layout.php';
       <?php /* Sin sesión no tiene sentido llevarlo al panel: primero hay que
                saber quién es. Va al login, que ya trae la vía de entrada. */ ?>
       <a class="ghostlink" href="<?= URL_BASE ?><?= $u ? '/mis-eventos.php' : '/login.php' ?>">
-        ¿Organizas eventos? Publica el tuyo →
+        ¿Organizas actividades? Publica la tuya →
       </a>
     </div>
   </div>
@@ -182,17 +182,17 @@ require __DIR__ . '/includes/layout.php';
   </div>
 </section>
 
-<!-- Proximos eventos en carril horizontal. La lista de filas anterior daba
+<!-- Proximas actividades en carril horizontal. La lista de filas anterior daba
      mas densidad, pero la tarjeta con imagen es lo que deja ver de que va
-     cada evento antes de entrar — que es lo que se le pide a un directorio. -->
+     cada una antes de entrar — que es lo que se le pide a un directorio. -->
 <section class="block wrap">
   <div class="block-head">
-    <h2>Próximos eventos</h2>
-    <a class="more" href="<?= URL_BASE ?>/buscar.php">Ver todos los eventos →</a>
+    <h2>Próximas actividades</h2>
+    <a class="more" href="<?= URL_BASE ?>/buscar.php">Ver todas las actividades →</a>
   </div>
   <div class="evrail-wrap">
     <div class="evrail" id="proximosRail"></div>
-    <button type="button" class="evnext" id="evnext" aria-label="Ver más eventos">›</button>
+    <button type="button" class="evnext" id="evnext" aria-label="Ver más actividades">›</button>
   </div>
 </section>
 

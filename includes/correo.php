@@ -126,7 +126,7 @@ código deja de valer solo. Nadie de $marca te lo va a pedir por teléfono,
 por WhatsApp ni por correo.
 
 --
-$marca · Directorio de eventos wellness en México
+$marca · Directorio de actividades wellness en México
 TEXTO;
 
     return enviarCorreo($para, $asunto, $cuerpo);

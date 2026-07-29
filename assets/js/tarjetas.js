@@ -1,5 +1,5 @@
 /* ============================================================================
-   Las tarjetas de evento, en el navegador.
+   Las tarjetas de actividad, en el navegador.
 
    Las pinta el navegador y no PHP porque la lista se filtra y se reordena sin
    recargar: en buscar.php cada casilla que se marca vuelve a componer la
@@ -12,7 +12,7 @@
    ========================================================================== */
 
 /* Todo lo que sale de la base pasa por aquí antes de entrar en el HTML. Los
-   títulos y las descripciones los escribe cualquiera que publique un evento,
+   títulos y las descripciones los escribe cualquiera que publique una actividad,
    así que llegan sin depurar: sin esto, un título con etiquetas dentro se
    ejecutaría en la portada. */
 function esc(s) {
@@ -33,8 +33,8 @@ function precioTexto(e, prefijo) {
   return e.free ? 'Gratis' : (e.price ? prefijo + '$' + esc(e.price) + ' MXN' : 'Por confirmar');
 }
 
-/* Tarjeta grande del carril de próximos eventos: fecha sobre la imagen,
-   categoría, título, ubicación y, al pie, quién lo organiza y desde cuánto. */
+/* Tarjeta grande del carril de próximas actividades: fecha sobre la imagen,
+   categoría, título, ubicación y, al pie, quién la organiza y desde cuánto. */
 function evCardHTML(e) {
   return '<a class="ev-card" href="' + esc(e.url) + '">'
     + '<div class="ev-img" style="' + fondoTarjeta(e) + '">'
@@ -68,19 +68,19 @@ function cardHTML(e, cola) {
     +   '<div class="card-city">' + esc(e.city) + '</div>'
     +   '<div class="card-foot">'
     +     '<span class="price ' + (e.free ? 'free' : '') + '">' + precioTexto(e, '') + '</span>'
-    +     '<span style="font-size:12px; color:var(--jungle);">Ver evento →</span>'
+    +     '<span style="font-size:12px; color:var(--jungle);">Ver actividad →</span>'
     +   '</div>'
     + '</div>'
     + '</a>';
 }
 
 /* Con la base vacía, un carril sin nada parece la página rota. Se dice que no
-   hay eventos y se invita a publicar, que es justo lo que hace falta al
+   hay actividades y se invita a publicar, que es justo lo que hace falta al
    principio. */
 function vacioHTML(mensaje) {
   return '<div class="rail-vacio">'
     + '<p>' + esc(mensaje) + '</p>'
-    + '<a class="btn-vacio" href="' + RUEDA.base + '/evento-nuevo.php">Publicar el primero</a>'
+    + '<a class="btn-vacio" href="' + RUEDA.base + '/evento-nuevo.php">Publicar la primera</a>'
     + '</div>';
 }
 
@@ -91,7 +91,7 @@ function pintar(id, trozos, mensajeVacio) {
 }
 
 /* ---------- carriles horizontales ----------
-   El menú de categorías y el de eventos comparten comportamiento: avanzan una
+   El menú de categorías y el de actividades comparten comportamiento: avanzan una
    pantalla y, al llegar al final, vuelven al principio. Una flecha que se queda
    muerta al final parece rota; que cicle es lo que se espera. */
 function carril(idRail, idBoton) {

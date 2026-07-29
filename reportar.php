@@ -1,12 +1,12 @@
 <?php
 /**
- * Reportar un evento. Abierto a cualquiera, sin cuenta.
+ * Reportar una actividad. Abierto a cualquiera, sin cuenta.
  *
- * Sin cuenta a propósito: quien se topa con un evento que es una estafa no se
- * va a registrar para avisarnos. Pedir cuenta aquí no filtra bots —esos sí se
+ * Sin cuenta a propósito: quien se topa con una actividad que es una estafa no
+ * se va a registrar para avisarnos. Pedir cuenta aquí no filtra bots —esos sí se
  * registran—, filtra personas.
  *
- * Lo que se manda NO oculta nada. El evento sigue publicado hasta que un
+ * Lo que se manda NO oculta nada. La actividad sigue publicada hasta que un
  * administrador decide otra cosa.
  */
 
@@ -20,9 +20,9 @@ $ev = buscarEvento((int) ($_GET['id'] ?? 0));
 // dueño, así que no hay nada que denunciar.
 if (!$ev || $ev['situacion'] !== 'publicado') {
     http_response_code(404);
-    $titulo = 'Evento no encontrado';
+    $titulo = 'Actividad no encontrada';
     require __DIR__ . '/includes/layout.php';
-    echo '<div class="auth-caja"><h1>Ese evento no existe</h1>'
+    echo '<div class="auth-caja"><h1>Esa actividad no existe</h1>'
        . '<p class="sub">Puede que ya se haya retirado.</p></div>';
     pie();
     exit;
@@ -44,12 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = $captcha[1];
 
     } elseif (!isset(motivosReporte()[$motivo])) {
-        $error = 'Ayúdanos a mantener una comunidad segura. Selecciona el motivo por el que deseas reportar este evento.';
+        $error = 'Ayúdanos a mantener una comunidad segura. Selecciona el motivo por el que deseas reportar esta actividad.';
 
     } elseif (reporteRepetido((int) $ev['id'])) {
         // Se dice claramente en vez de fingir que se aceptó. Quien ya reportó de
         // buena fe merece saber que su aviso llegó y que no hace falta insistir.
-        $error = 'Ya reportaste este evento. Lo estamos revisando.';
+        $error = 'Ya reportaste esta actividad. La estamos revisando.';
 
     } else {
         crearReporte((int) $ev['id'], $motivo, $comento !== '' ? $comento : null);
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$titulo = 'Reportar evento';
+$titulo = 'Reportar actividad';
 require __DIR__ . '/includes/layout.php';
 ?>
 
@@ -70,18 +70,18 @@ require __DIR__ . '/includes/layout.php';
   <p class="sub">Lo revisaremos lo antes posible.</p>
 
   <div class="aviso aviso-ok">
-    El evento sigue publicado mientras tanto. No lo retiramos por un aviso
+    La actividad sigue publicada mientras tanto. No la retiramos por un aviso
     automático: lo revisa una persona.
   </div>
 
   <a class="btn-principal" style="display:block; text-align:center; text-decoration:none;"
-     href="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>">Volver al evento</a>
+     href="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>">Volver a la actividad</a>
 
 <?php else: ?>
 
-  <a class="volver" href="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>">← Volver al evento</a>
+  <a class="volver" href="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>">← Volver a la actividad</a>
 
-  <h1>Reportar evento</h1>
+  <h1>Reportar actividad</h1>
   <p class="sub">«<?= e($ev['titulo']) ?>»</p>
 
   <?php if ($error): ?>
@@ -93,7 +93,7 @@ require __DIR__ . '/includes/layout.php';
     <?= captchaCamposOcultos() ?>
 
     <div class="campo">
-      <label>¿Qué le pasa a este evento?</label>
+      <label>¿Qué le pasa a esta actividad?</label>
       <div class="motivos">
         <?php foreach (motivosReporte() as $clave => $etiqueta): ?>
           <label class="motivo">
@@ -117,7 +117,7 @@ require __DIR__ . '/includes/layout.php';
   </form>
 
   <div class="auth-pie">
-    Tu aviso no oculta el evento. Solo lo pone en la lista de lo que hay que revisar.
+    Tu aviso no oculta la actividad. Solo la pone en la lista de lo que hay que revisar.
   </div>
 
 <?php endif; ?>

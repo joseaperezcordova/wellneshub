@@ -1,12 +1,12 @@
 /* ============================================================================
-   El buscador de eventos.
+   El buscador de actividades.
 
    El panel de la izquierda manda, y la dirección del navegador va detrás: cada
    cambio la reescribe —buscar.php?ciudad=Tulum&cat=Yoga— sin recargar. De ahí
    salen tres cosas:
 
-     · Las tarjetas se llevan la búsqueda puesta, así que desde la ficha de un
-       evento se puede volver a estos mismos resultados.
+     · Las tarjetas se llevan la búsqueda puesta, así que desde la ficha de una
+       actividad se puede volver a estos mismos resultados.
      · Recargar, compartir o guardar la página conserva la búsqueda.
      · PHP deja los controles puestos al abrir, leyendo esos mismos parámetros,
        de modo que la página llega con la búsqueda hecha y no parpadea.
@@ -133,12 +133,13 @@
   }
 
   function vacioBusquedaHTML() {
-    /* Sin eventos en la base y sin eventos que casen son dos vacíos distintos,
-       y la salida de cada uno también: publicar el primero, o quitar filtros. */
-    if (!EVENTOS.length) return vacioHTML('Todavía no hay eventos publicados.');
+    /* Sin actividades en la base y sin actividades que casen son dos vacíos
+       distintos, y la salida de cada uno también: publicar la primera, o quitar
+       filtros. */
+    if (!EVENTOS.length) return vacioHTML('Todavía no hay actividades publicadas.');
 
     return '<div class="rail-vacio">'
-      + '<p>Ningún evento coincide con lo que buscas.</p>'
+      + '<p>Ninguna actividad coincide con lo que buscas.</p>'
       + '<button type="button" class="btn-vacio" id="vaciarFiltros">Quitar filtros</button>'
       + '</div>';
   }
@@ -162,9 +163,9 @@
     if (vaciar) vaciar.addEventListener('click', limpiar);
 
     $('resultsCount').textContent =
-      lista.length === 0 ? 'Ningún evento coincide'
-      : lista.length === 1 ? '1 evento encontrado'
-      : lista.length + ' eventos encontrados';
+      lista.length === 0 ? 'Ninguna actividad coincide'
+      : lista.length === 1 ? '1 actividad encontrada'
+      : lista.length + ' actividades encontradas';
 
     $('fLimpiar').hidden = !hayFiltros();
 
@@ -198,16 +199,16 @@
     });
   }
 
-  /* El título dice lo que se pidió. «Todos los eventos» encima de una lista que
-     no son todos es la clase de detalle que hace dudar de la página entera. */
+  /* El título dice lo que se pidió. «Todas las actividades» encima de una lista
+     que no son todas es la clase de detalle que hace dudar de la página entera. */
   function resumen() {
-    if (!hayFiltros()) return 'Todos los eventos';
+    if (!hayFiltros()) return 'Todas las actividades';
 
-    var que    = estado.cats.length === 1 ? estado.cats[0] : 'Eventos';
+    var que    = estado.cats.length === 1 ? estado.cats[0] : 'Actividades';
     var donde  = estado.ciudad || estado.entidad;
     var cuando = {finde: ' este fin de semana', '7dias': ' en los próximos 7 días', mes: ' este mes'};
 
-    return (estado.gratis && que === 'Eventos' ? 'Eventos gratuitos' : que)
+    return (estado.gratis && que === 'Actividades' ? 'Actividades gratuitas' : que)
          + (donde ? ' en ' + donde : '')
          + (cuando[estado.fecha] || '');
   }

@@ -3,12 +3,12 @@
  * Bandeja de moderación. Solo administradores.
  *
  * Aquí llega lo que alguien señaló: reportes de visitantes y los que crea solo
- * el filtro de palabras al publicar. Los eventos siguen publicados; en esta
- * página se decide qué hacer con ellos.
+ * el filtro de palabras al publicar. Las actividades siguen publicadas; en esta
+ * página se decide qué hacer con ellas.
  *
  * Tres salidas, y ninguna es automática:
  *
- *   · Descartar  — el aviso no tenía razón. El evento sigue igual.
+ *   · Descartar  — el aviso no tenía razón. La actividad sigue igual.
  *   · Ocultar    — desaparece del listado y se puede volver a publicar.
  *   · Eliminar   — se va del todo, con su confirmación delante.
  */
@@ -24,7 +24,7 @@ if (!esAdmin($u)) {
     $titulo = 'Sin permiso';
     require __DIR__ . '/includes/layout.php';
     echo '<div class="auth-caja"><h1>Esta página no es para ti</h1>'
-       . '<p class="sub">Solo los administradores moderan eventos.</p></div>';
+       . '<p class="sub">Solo los administradores moderan actividades.</p></div>';
     pie();
     exit;
 }
@@ -39,26 +39,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'La sesión caducó. Vuelve a intentarlo.';
 
     } elseif (!buscarEvento($eventoId)) {
-        $error = 'Ese evento ya no existe.';
+        $error = 'Esa actividad ya no existe.';
 
     } elseif (isset($_POST['descartar'])) {
         marcarReportesRevisados($eventoId, (int) $u['id']);
-        $aviso = 'Reportes descartados. El evento sigue publicado.';
+        $aviso = 'Reportes descartados. La actividad sigue publicada.';
 
     } elseif (isset($_POST['ocultar'])) {
         cambiarSituacionEvento($eventoId, 'oculto');
         marcarReportesRevisados($eventoId, (int) $u['id']);
-        $aviso = 'Evento oculto. Ya no aparece en el listado.';
+        $aviso = 'Actividad oculta. Ya no aparece en el listado.';
 
     } elseif (isset($_POST['publicar'])) {
         cambiarSituacionEvento($eventoId, 'publicado');
         marcarReportesRevisados($eventoId, (int) $u['id']);
-        $aviso = 'Evento publicado otra vez.';
+        $aviso = 'Actividad publicada otra vez.';
 
     } elseif (isset($_POST['eliminar'])) {
-        // Los reportes se van con él por la clave foránea en cascada.
+        // Los reportes se van con ella por la clave foránea en cascada.
         eliminarEvento($eventoId);
-        $aviso = 'Evento eliminado.';
+        $aviso = 'Actividad eliminada.';
     }
 }
 
@@ -85,7 +85,7 @@ require __DIR__ . '/includes/layout.php';
     <?php if ($sinTabla): ?>
       No se pudo leer la lista de avisos.
     <?php elseif ($pendientes): ?>
-      <?= count($pendientes) ?> evento<?= count($pendientes) === 1 ? '' : 's' ?> con avisos sin revisar.
+      <?= count($pendientes) ?> actividad<?= count($pendientes) === 1 ? '' : 'es' ?> con avisos sin revisar.
     <?php else: ?>
       Nada pendiente.
     <?php endif; ?>
@@ -100,14 +100,14 @@ require __DIR__ . '/includes/layout.php';
       <strong>Falta la tabla de reportes en la base de datos.</strong>
       Entra a phpMyAdmin, selecciona tu base y ejecuta
       <code>database/migracion-03-reportes.sql</code>. Hasta entonces nadie puede
-      reportar eventos y esta bandeja no funciona.
+      reportar actividades y esta bandeja no funciona.
     </div>
 
   <?php elseif (!$pendientes): ?>
 
     <div class="aviso aviso-ok" style="margin-bottom:0;">
-      No hay nada que revisar. Es lo normal: los eventos se publican solos y aquí
-      solo aparece lo que alguien señala.
+      No hay nada que revisar. Es lo normal: las actividades se publican solas y
+      aquí solo aparece lo que alguien señala.
     </div>
 
   <?php else: foreach ($pendientes as $p): ?>

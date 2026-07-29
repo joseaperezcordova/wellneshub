@@ -1,6 +1,6 @@
 <?php
 /**
- * Edición de un evento.
+ * Edición de una actividad.
  *
  * El permiso lo decide puedeEditarEvento(): el administrador siempre, y el
  * organizador mientras sea borrador o esté dentro de las 24 horas siguientes a
@@ -17,16 +17,16 @@ $ev = buscarEvento((int) ($_GET['id'] ?? 0));
 
 // Se comprueba VER antes que editar. Sin esto, quien abriera el editor de un
 // borrador ajeno recibía la pantalla de "ya no se puede editar" con el título
-// dentro, que es filtrar el contenido de un evento que nadie ha publicado.
+// dentro, que es filtrar el contenido de una actividad que nadie ha publicado.
 if ($ev && !puedeVerEvento($ev, $u)) {
     $ev = null;
 }
 
 if (!$ev) {
     http_response_code(404);
-    $titulo = 'Evento no encontrado';
+    $titulo = 'Actividad no encontrada';
     require __DIR__ . '/includes/layout.php';
-    echo '<div class="auth-caja"><h1>Ese evento no existe</h1>'
+    echo '<div class="auth-caja"><h1>Esa actividad no existe</h1>'
        . '<p class="sub">Puede que se haya borrado.</p>'
        . '<a class="btn-principal" style="text-decoration:none; display:block; text-align:center;" href="' . URL_BASE . '/">Volver al inicio</a></div>';
     pie();
@@ -84,12 +84,12 @@ if ($puede && postDesbordado()) {
          * antigua, con lo que el cambio de imagen se perdía sin avisar: parecía
          * que no se había llegado a elegir ninguna.
          *
-         * La guardada del evento no se toca hasta que el cambio esté escrito.
+         * La guardada de la actividad no se toca hasta que el cambio esté escrito.
          */
     }
 }
 
-$titulo = 'Editar evento';
+$titulo = 'Editar actividad';
 require __DIR__ . '/includes/layout.php';
 ?>
 
@@ -101,8 +101,8 @@ require __DIR__ . '/includes/layout.php';
   <p class="sub">«<?= e($ev['titulo']) ?>»</p>
 
   <div class="aviso aviso-error">
-    El plazo para corregir un evento es de <?= EVENTO_MARGEN_EDICION_H ?> horas desde que se publica<?php
-      // publicado_en puede ser NULL si el evento nunca llegó a publicarse; en
+    El plazo para corregir una actividad es de <?= EVENTO_MARGEN_EDICION_H ?> horas desde que se publica<?php
+      // publicado_en puede ser NULL si la actividad nunca llegó a publicarse; en
       // ese caso no hay fecha límite que enseñar.
       if (!empty($ev['publicado_en'])):
         $limite = date('Y-m-d H:i:s', strtotime($ev['publicado_en']) + EVENTO_MARGEN_EDICION_H * 3600);
@@ -117,7 +117,7 @@ require __DIR__ . '/includes/layout.php';
   </p>
 
   <p style="font-size:14px; line-height:1.6;">
-    Escríbele contando qué hay que cambiar y en qué evento.
+    Escríbele contando qué hay que cambiar y en qué actividad.
   </p>
 
   <a class="btn-principal" style="text-decoration:none; display:block; text-align:center;"
@@ -128,17 +128,17 @@ require __DIR__ . '/includes/layout.php';
   <?php $volverAdmin = ($_GET['volver'] ?? '') === 'admin' && esAdmin($u); ?>
   <a class="volver" href="<?= $volverAdmin ? URL_BASE . '/admin.php' : URL_BASE . '/evento.php?id=' . (int) $ev['id'] ?>">← <?= $volverAdmin ? 'Volver al panel admin' : 'Volver a la ficha' ?></a>
 
-  <h1>Editar evento</h1>
+  <h1>Editar actividad</h1>
   <?php if ($ev['situacion'] === 'borrador'): ?>
-    <p class="sub">Es un borrador: no lo ve nadie más que tú hasta que lo publiques.</p>
+    <p class="sub">Es un borrador: no la ve nadie más que tú hasta que la publiques.</p>
   <?php elseif ($ev['situacion'] === 'oculto'): ?>
-    <p class="sub">Oculto. No aparece en el listado.</p>
+    <p class="sub">Oculta. No aparece en el listado.</p>
   <?php else: ?>
     <?php $quedan = minutosRestantesEdicion($ev); ?>
     <p class="sub">
-      Publicado. Te quedan
+      Publicada. Te quedan
       <strong><?= $quedan >= 60 ? intdiv($quedan, 60) . ' h ' . ($quedan % 60) . ' min' : $quedan . ' min' ?></strong>
-      de margen para corregirlo<?= esAdmin($u) && (int) $ev['usuario_id'] !== (int) $u['id'] ? ' (tú eres administrador: puedes editarlo siempre)' : '' ?>.
+      de margen para corregirla<?= esAdmin($u) && (int) $ev['usuario_id'] !== (int) $u['id'] ? ' (tú eres administrador: puedes editarla siempre)' : '' ?>.
     </p>
   <?php endif; ?>
 
@@ -163,7 +163,7 @@ require __DIR__ . '/includes/layout.php';
     <form method="post" action="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>"
           onsubmit="return confirm('¿Eliminar «<?= e(addslashes($ev['titulo'])) ?>»? No se puede deshacer.');">
       <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-      <button class="btn-barra peligro" type="submit" name="eliminar" value="1">Eliminar evento</button>
+      <button class="btn-barra peligro" type="submit" name="eliminar" value="1">Eliminar actividad</button>
     </form>
   </div>
 

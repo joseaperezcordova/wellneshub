@@ -87,7 +87,7 @@ function exigirSesion(): array
 
     if (!$u) {
         // Se recuerda a dónde iba para devolverlo ahí al entrar. Sin esto, quien
-        // pulsa «Publicar evento» sin sesión aterriza en la portada después del
+        // pulsa «Publicar actividad» sin sesión aterriza en la portada después del
         // login y tiene que volver a buscar el botón.
         guardarDestinoLogin((string) ($_SERVER['REQUEST_URI'] ?? '/'));
         redirigir('/login.php');

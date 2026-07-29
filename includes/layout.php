@@ -11,7 +11,7 @@
  * Ahora hay una sola, la de la portada, y los enlaces van a páginas reales.
  *
  * Uso:
- *   $titulo = 'Buscar eventos';
+ *   $titulo = 'Buscar actividades';
  *   $seccion = 'buscar';          // opcional: marca el enlace del menú
  *   $anchoLibre = true;           // opcional: sin el contenedor estrecho
  *   require __DIR__ . '/includes/layout.php';
@@ -71,7 +71,7 @@ function enlaceMenu(string $ruta, string $texto, string $clave, string $seccion)
              las vistas se conmutaban en el navegador no había otra opción. */ ?>
     <nav class="mainnav" id="mainnav">
       <?= enlaceMenu('/',           'Inicio',         'inicio', $seccion) ?>
-      <?= enlaceMenu('/buscar.php', 'Buscar eventos', 'buscar', $seccion) ?>
+      <?= enlaceMenu('/buscar.php', 'Buscar actividades', 'buscar', $seccion) ?>
       <?= enlaceMenu('/blog.php',   'Blog',           'blog',   $seccion) ?>
     </nav>
 
@@ -81,13 +81,13 @@ function enlaceMenu(string $ruta, string $texto, string $clave, string $seccion)
         <button data-lang="en">EN</button>
       </div>
 
-      <!-- «Publicar evento» lo ve todo el mundo, con sesión o sin ella. Quien no
+      <!-- «Publicar actividad» lo ve todo el mundo, con sesión o sin ella. Quien no
            la tenga pasa por el login y vuelve aquí solo: esconder el botón a los
            visitantes es esconder justo lo que queremos que hagan, y un directorio
            sin organizadores nuevos no crece. La puerta la guarda el servidor
            —exigirSesion() en evento-nuevo.php—, no la ausencia del enlace. -->
       <a class="btn-publicar" href="<?= URL_BASE ?>/evento-nuevo.php">
-        Publicar<span class="btn-publicar-extra"> evento</span>
+        Publicar<span class="btn-publicar-extra"> actividad</span>
       </a>
 
       <?php if ($u): ?>
@@ -106,12 +106,12 @@ function enlaceMenu(string $ruta, string $texto, string $clave, string $seccion)
               <strong><?= e($u['nombre']) ?></strong>
               <span><?= e($u['email']) ?></span>
             </div>
-            <!-- «Mis eventos» y no «Publicar evento»: publicar ya está en el
-                 botón de al lado, y lo que hay detrás de este enlace es la lista
-                 de los eventos propios, que es otra cosa.
+            <!-- «Mis actividades» y no «Publicar actividad»: publicar ya está en
+                 el botón de al lado, y lo que hay detrás de este enlace es la
+                 lista de las actividades propias, que es otra cosa.
                  Antes iban a /#panel-organizador y /#admin porque los dos
                  paneles vivían dentro de la portada. Ahora son páginas. -->
-            <a href="<?= URL_BASE ?>/mis-eventos.php">Mis eventos</a>
+            <a href="<?= URL_BASE ?>/mis-eventos.php">Mis actividades</a>
             <?php if ($u['rol'] === 'admin'): ?>
               <a href="<?= URL_BASE ?>/admin.php">Panel admin</a>
               <?php $pend = contarReportesPendientes(); ?>
@@ -174,13 +174,13 @@ function pie(): void
   <div class="foot-inner">
     <div>
       <div class="logo-text" style="color:var(--blanco);">Rueda</div>
-      <p style="font-size:13px; opacity:.7; margin-top:10px; max-width:260px;">El directorio de eventos wellness más completo de México — retiros, festivales y círculos, curados a mano.</p>
+      <p style="font-size:13px; opacity:.7; margin-top:10px; max-width:260px;">El directorio de actividades wellness más completo de México — retiros, festivales y círculos, curados a mano.</p>
     </div>
     <div>
       <h5>Acerca de</h5>
       <a href="#">Nuestra misión</a>
-      <a href="#">Cómo curamos los eventos</a>
-      <a href="<?= URL_BASE ?>/evento-nuevo.php">Publica tu evento</a>
+      <a href="#">Cómo curamos las actividades</a>
+      <a href="<?= URL_BASE ?>/evento-nuevo.php">Publica tu actividad</a>
     </div>
     <div>
       <h5>Contacto</h5>
@@ -190,11 +190,11 @@ function pie(): void
     </div>
     <div>
       <h5>Explorar</h5>
-      <a href="<?= URL_BASE ?>/buscar.php">Buscar eventos</a>
+      <a href="<?= URL_BASE ?>/buscar.php">Buscar actividades</a>
       <a href="<?= URL_BASE ?>/blog.php">Blog</a>
     </div>
   </div>
-  <div class="foot-bottom">© <?= date('Y') ?> Rueda — Directorio de eventos wellness MX.</div>
+  <div class="foot-bottom">© <?= date('Y') ?> Rueda — Directorio de actividades wellness MX.</div>
 </footer>
 
 <?php /* La raíz del sitio, para el JavaScript. Los archivos .js son estáticos y

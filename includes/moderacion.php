@@ -25,7 +25,7 @@ function motivosReporte(): array
         'inapropiado'    => 'Contenido ofensivo o inapropiado',
         'enganoso'       => 'Información falsa o engañosa',
         'spam'           => 'Spam o publicidad',
-        'no_es_wellness' => 'No es un evento de bienestar',
+        'no_es_wellness' => 'No es una actividad de bienestar',
         'duplicado'      => 'Está publicado dos veces',
         'otro'           => 'Otro motivo',
     ];
@@ -276,14 +276,14 @@ function avisarAdministradores(int $eventoId): void
     }
 
     $enlace  = URL_BASE . '/moderacion.php';
-    $cuerpo  = "Han reportado un evento publicado en el directorio.\n\n"
-             . 'Evento:     ' . $ev['titulo'] . "\n"
+    $cuerpo  = "Han reportado una actividad publicada en el directorio.\n\n"
+             . 'Actividad:  ' . $ev['titulo'] . "\n"
              . 'Organiza:   ' . $ev['organizador'] . "\n"
              . 'Reportes:   ' . $ev['pendientes'] . " sin revisar\n\n"
-             . "El evento sigue publicado. Nadie lo ha ocultado: eso lo decides tú.\n\n"
+             . "La actividad sigue publicada. Nadie la ha ocultado: eso lo decides tú.\n\n"
              . $enlace . "\n";
 
     foreach ($admins as $a) {
-        enviarCorreo($a['email'], 'Evento reportado: ' . $ev['titulo'], $cuerpo);
+        enviarCorreo($a['email'], 'Actividad reportada: ' . $ev['titulo'], $cuerpo);
     }
 }
