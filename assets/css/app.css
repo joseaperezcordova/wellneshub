@@ -227,7 +227,7 @@ input,select{font-family:inherit; font-size:14px;}
    campo de fecha no compita con el clic que selecciona la tarjeta. */
 .tipo-fecha-grupo{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;}
 .tipo-fecha-tarjeta{
-  border:1px solid var(--linea); border-radius:12px; padding:16px;
+  min-width:0; border:1px solid var(--linea); border-radius:12px; padding:16px;
   transition:border-color .15s, background .15s;
 }
 .tipo-fecha-tarjeta:has(input:checked){border-color:var(--terracota); background:rgba(199,110,67,.04);}
@@ -271,7 +271,7 @@ input,select{font-family:inherit; font-size:14px;}
    Es una tarjeta aparte y no una nota dentro de la caja del formulario:
    así se puede leer entera sin perder de vista lo que se está rellenando. */
 .form-con-guia{display:flex; align-items:flex-start; justify-content:center; gap:28px;}
-.form-con-guia .caja-ancha{margin-left:0; margin-right:0;}
+.form-con-guia .caja-ancha{margin-left:0; margin-right:0; min-width:0;}
 
 .guia-lateral{
   flex:0 0 300px; margin:56px 0 72px; background:var(--arena-suave);
@@ -292,7 +292,15 @@ input,select{font-family:inherit; font-size:14px;}
   font-size:12px; line-height:1.55; opacity:.75;
 }
 
-@media(max-width:900px){
+/*
+ * El límite es 1060px y no un número más "redondo" como 900: 640px de
+ * .caja-ancha + 28px de gap + 300px de .guia-lateral piden 968px libres, y
+ * .contenido resta 56px de relleno a cada lado del viewport. Por debajo de
+ * ~1024px ya no cabe, así que el corte se pone con margen antes de ese punto
+ * y no después —quedarse corto aquí es lo que dejaba la tarjeta de la derecha
+ * encimada con el formulario en vez de bajar debajo.
+ */
+@media(max-width:1060px){
   .form-con-guia{flex-direction:column; align-items:stretch;}
   .guia-lateral{flex:1 1 auto; width:100%; margin:0 0 24px; position:static;}
 }
@@ -308,8 +316,13 @@ input,select{font-family:inherit; font-size:14px;}
 .campo textarea{resize:vertical; min-height:120px;}
 
 /* Dos campos por fila en pantalla ancha; uno debajo de otro en móvil, donde
-   partir "ciudad / estado" en dos columnas los deja ilegibles. */
+   partir "ciudad / estado" en dos columnas los deja ilegibles.
+   min-width:0 en los hijos: un <input type="date"/time"> tiene un ancho
+   mínimo propio que un navegador no reduce por su cuenta, y sin esto una
+   columna "1fr" no baja de ese mínimo aunque no quepa —el contenido se sale
+   de la tarjeta en vez de apretarse—. */
 .campo-fila{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.campo-fila > *{min-width:0;}
 @media(max-width:520px){ .campo-fila{grid-template-columns:1fr; gap:0;} }
 
 /* El campo que falló tiene que verse SIN leer nada. Antes el único indicio era
