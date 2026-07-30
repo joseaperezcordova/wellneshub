@@ -216,9 +216,17 @@ require __DIR__ . '/includes/layout.php';
       <div class="dato">
         <span class="k">Cuándo</span>
         <span class="val">
-          <?= e(fechaLarga($ev['fecha_inicio'])) ?>
-          <?php if (!empty($ev['fecha_fin'])): ?>
-            <br><span class="tenue">hasta el <?= e(fechaLarga($ev['fecha_fin'])) ?></span>
+          <?php if ($ev['tipo_actividad'] === 'recurrente'): ?>
+            <?= e(frecuenciasRecurrencia()[$ev['frecuencia']] ?? '') ?>
+            · <?= e(substr((string) $ev['hora_recurrente'], 0, 5)) ?>–<?= e(substr((string) $ev['hora_fin_recurrente'], 0, 5)) ?>
+            <br><span class="tenue">
+              Del <?= e(fechaCorta($ev['fecha_inicio'])) ?> al <?= e(fechaCorta($ev['fecha_fin'])) ?>
+            </span>
+          <?php else: ?>
+            <?= e(fechaLarga($ev['fecha_inicio'])) ?>
+            <?php if (!empty($ev['fecha_fin'])): ?>
+              <br><span class="tenue">hasta el <?= e(fechaLarga($ev['fecha_fin'])) ?></span>
+            <?php endif; ?>
           <?php endif; ?>
         </span>
       </div>

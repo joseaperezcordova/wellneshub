@@ -813,6 +813,23 @@ function fechaLarga(string $fecha): string
 }
 
 /**
+ * "16 de agosto de 2026", sin hora.
+ *
+ * Para una actividad recurrente: fecha_inicio/fecha_fin son la primera y
+ * última ocurrencia, y su hora es la de esa sesión —no la de todas—, así
+ * que mezclarla en el rango de fechas confundiría más de lo que aclara.
+ */
+function fechaCorta(string $fecha): string
+{
+    static $meses = ['enero','febrero','marzo','abril','mayo','junio','julio',
+                     'agosto','septiembre','octubre','noviembre','diciembre'];
+
+    $ts = strtotime($fecha);
+
+    return (int) date('j', $ts) . ' de ' . $meses[(int) date('n', $ts) - 1] . ' de ' . date('Y', $ts);
+}
+
+/**
  * La dirección con la que se pinta la imagen de un evento.
  *
  * En la base se guarda la ruta relativa ("assets/eventos/2607-ab12.jpg") y no
