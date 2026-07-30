@@ -196,16 +196,25 @@ CREATE TABLE IF NOT EXISTS eventos (
   -- Cuántas personas caben. Opcional: no toda actividad tiene un límite real.
   cupo_maximo   INT UNSIGNED  NULL DEFAULT NULL,
 
+  -- Cada acción principal tiene su propio enlace: url_boletos para "Comprar
+  -- boletos", url_reserva para "Reservar lugar". No se comparten porque el
+  -- organizador puede cambiar de acción sin perder lo que ya había puesto
+  -- en la otra.
   url_boletos   VARCHAR(500)  NULL DEFAULT NULL,
-  -- Aparte de url_boletos: ese es el enlace de la acción principal (abajo);
-  -- este es un enlace informativo —sitio propio, redes— sin acción de por
-  -- medio, y puede llevarse aunque url_boletos también esté lleno.
+  url_reserva   VARCHAR(500)  NULL DEFAULT NULL,
+  -- Aparte de los de arriba: este es un enlace informativo —sitio propio,
+  -- redes— sin acción de por medio, y puede llevarse aunque los otros
+  -- también estén llenos.
   sitio_web     VARCHAR(500)  NULL DEFAULT NULL,
-  -- Qué espera el organizador que haga quien vea la ficha con url_boletos.
-  -- Decide el texto del botón en la ficha y, en el formulario, la etiqueta
-  -- del campo "Enlace para…".
+  -- Qué espera el organizador que haga quien vea la ficha: pedirle
+  -- contacto, mandarlo a comprar boletos o a reservar lugar. Decide qué
+  -- botón se pinta en la ficha.
   accion_principal ENUM('informacion','boletos','reservar')
                                 NOT NULL DEFAULT 'informacion',
+  -- Número de WhatsApp del organizador para ESTE evento, solo dígitos (sin
+  -- +, espacios ni guiones) para armar el enlace wa.me directo. Opcional:
+  -- solo aplica a "Contactar al organizador", y ni ahí es obligatorio.
+  whatsapp_contacto VARCHAR(15) NULL DEFAULT NULL,
   imagen_url    VARCHAR(500)  NULL DEFAULT NULL,
   color         CHAR(7)       NOT NULL DEFAULT '#89A67D',
 
@@ -276,6 +285,31 @@ CREATE TABLE IF NOT EXISTS reportes (
   CONSTRAINT fk_reporte_revisor
     FOREIGN KEY (revisado_por) REFERENCES usuarios (id)
     ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Un renglón por cada mensaje enviado desde "Contactar al organizador" en la
+-- ficha pública. Sirve sobre todo para el límite de envíos repetidos por IP,
+-- igual que ya existe arriba para reportes.
+CREATE TABLE IF NOT EXISTS contactos (
+  id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  evento_id   INT UNSIGNED    NOT NULL,
+
+  nombre      VARCHAR(120)    NOT NULL,
+  email       VARCHAR(190)    NOT NULL,
+  mensaje     VARCHAR(1000)   NULL DEFAULT NULL,
+
+  ip          VARBINARY(16)   NOT NULL,
+
+  creado_en   DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+  KEY idx_contactos_evento (evento_id, creado_en),
+  KEY idx_contactos_ip (ip, evento_id, creado_en),
+
+  CONSTRAINT fk_contacto_evento
+    FOREIGN KEY (evento_id) REFERENCES eventos (id)
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 

@@ -483,28 +483,83 @@ $mal = function (string $campo) use ($errores) {
     <path d="M16 9a3.5 3.5 0 0 1 0 6"/>
     <path d="M18.5 6.5a7 7 0 0 1 0 11"/>
   </svg>
-  <h2>9. Acción principal</h2>
+  <h2>9. Acción principal *</h2>
 </div>
 
 <div class="campo<?= $mal('accion_principal') ?>">
   <div class="pista" style="margin:0 0 10px;">Elige la acción principal que verán las personas en tu actividad.</div>
-  <div class="accion-grupo">
-    <?php foreach (accionesPrincipales() as $clave => $etiqueta): ?>
-      <label class="accion-op">
-        <input type="radio" name="accion_principal" value="<?= e($clave) ?>" id="accion_<?= e($clave) ?>"
-               <?= $v('accion_principal', 'informacion') === $clave ? 'checked' : '' ?>>
-        <span><?= e($etiqueta) ?></span>
-      </label>
-    <?php endforeach; ?>
-  </div>
-  <?= $err('accion_principal') ?>
-</div>
 
-<div class="campo<?= $mal('url_boletos') ?>">
-  <label for="url_boletos" id="labelUrlBoletos">Enlace para comprar o reservar <span class="opcional">opcional</span></label>
-  <input id="url_boletos" name="url_boletos" type="url" maxlength="500"
-         value="<?= e($v('url_boletos')) ?>" placeholder="https://…">
-  <?= $err('url_boletos') ?>
+  <div class="accion-grupo">
+    <div class="accion-tarjeta">
+      <label class="accion-header">
+        <input type="radio" name="accion_principal" value="informacion" id="accion_informacion"
+               <?= $v('accion_principal', 'informacion') === 'informacion' ? 'checked' : '' ?>>
+        <svg class="accion-icono" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h15A1.5 1.5 0 0 1 21 6.5v11A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/>
+          <path d="M3.5 6.2l8.5 6.8 8.5-6.8"/>
+        </svg>
+        <span class="accion-titulo">Contactar al organizador</span>
+        <span class="accion-desc">Los interesados completarán un formulario y recibirás sus datos por correo.</span>
+      </label>
+      <div class="accion-campos">
+        <div class="campo<?= $mal('whatsapp_contacto') ?>">
+          <label for="whatsapp_contacto">WhatsApp de contacto <span class="opcional">opcional</span></label>
+          <input id="whatsapp_contacto" name="whatsapp_contacto" type="tel" maxlength="20"
+                 value="<?= e($v('whatsapp_contacto')) ?>" placeholder="55 1234 5678">
+          <div class="pista">Si lo agregas, en la ficha también aparece un botón para escribirte directo por WhatsApp.</div>
+          <?= $err('whatsapp_contacto') ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="accion-tarjeta">
+      <label class="accion-header">
+        <input type="radio" name="accion_principal" value="boletos" id="accion_boletos"
+               <?= $v('accion_principal', 'informacion') === 'boletos' ? 'checked' : '' ?>>
+        <svg class="accion-icono" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20.5 9.5a2 2 0 0 1 0-3.9V4.5a1 1 0 0 0-1-1h-15a1 1 0 0 0-1 1v1.1a2 2 0 0 1 0 3.9v1a2 2 0 0 1 0 3.9v1.1a1 1 0 0 0 1 1h15a1 1 0 0 0 1-1v-1.1a2 2 0 0 1 0-3.9z"/>
+          <path d="M9.5 4v16" stroke-dasharray="2 2"/>
+        </svg>
+        <span class="accion-titulo">Comprar boletos</span>
+        <span class="accion-desc">Agrega el enlace donde las personas pueden comprar sus boletos.</span>
+      </label>
+      <div class="accion-campos">
+        <div class="campo<?= $mal('url_boletos') ?>">
+          <label for="url_boletos">URL de compra <span class="obligatorio-si">*</span></label>
+          <input id="url_boletos" name="url_boletos" type="url" maxlength="500"
+                 value="<?= e($v('url_boletos')) ?>" placeholder="https://…">
+          <?= $err('url_boletos') ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="accion-tarjeta">
+      <label class="accion-header">
+        <input type="radio" name="accion_principal" value="reservar" id="accion_reservar"
+               <?= $v('accion_principal', 'informacion') === 'reservar' ? 'checked' : '' ?>>
+        <svg class="accion-icono" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3.5" y="5" width="17" height="15" rx="2"/>
+          <path d="M3.5 9.5h17"/>
+          <path d="M8 3v4M16 3v4"/>
+        </svg>
+        <span class="accion-titulo">Reservar lugar</span>
+        <span class="accion-desc">Agrega el enlace donde las personas pueden reservar su lugar.</span>
+      </label>
+      <div class="accion-campos">
+        <div class="campo<?= $mal('url_reserva') ?>">
+          <label for="url_reserva">URL de reserva <span class="obligatorio-si">*</span></label>
+          <input id="url_reserva" name="url_reserva" type="url" maxlength="500"
+                 value="<?= e($v('url_reserva')) ?>" placeholder="https://…">
+          <?= $err('url_reserva') ?>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <?= $err('accion_principal') ?>
 </div>
 
 <div class="campo">
@@ -552,24 +607,22 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
   sync();
 })();
 
-/* La acción principal decide qué se espera de "Enlace para…": el campo es
-   el mismo de siempre (url_boletos), solo cambia cómo se llama según lo que
-   el organizador dijo que va a pasar ahí. */
+/* Las tres tarjetas de "Acción principal" se ven completas a la vez —cada
+   una con su propio campo—, así que aquí no hay nada que mostrar u ocultar.
+   Lo único que cambia es cuál de los dos enlaces es obligatorio: el de la
+   tarjeta que no se eligió se marca no-requerido para que no bloquee el
+   envío con un campo que la persona decidió no usar. El WhatsApp nunca es
+   obligatorio, ni siquiera con "Contactar al organizador" elegida. */
 (function(){
   var radios = document.querySelectorAll('input[name="accion_principal"]');
-  var etiqueta = document.getElementById('labelUrlBoletos');
-  if (!radios.length || !etiqueta) return;
-
-  var TEXTOS = {
-    informacion: 'Enlace para solicitar información',
-    boletos:     'Enlace para comprar boletos',
-    reservar:    'Enlace para reservar tu lugar'
-  };
+  var urlBoletos = document.getElementById('url_boletos');
+  var urlReserva = document.getElementById('url_reserva');
+  if (!radios.length) return;
 
   function sync(){
-    var elegida = document.querySelector('input[name="accion_principal"]:checked');
-    var texto = TEXTOS[elegida ? elegida.value : ''] || 'Enlace para comprar o reservar';
-    etiqueta.firstChild.textContent = texto + ' ';
+    var elegida = document.querySelector('input[name="accion_principal"]:checked').value;
+    if (urlBoletos) urlBoletos.required = elegida === 'boletos';
+    if (urlReserva) urlReserva.required = elegida === 'reservar';
   }
 
   radios.forEach(function(r){ r.addEventListener('change', sync); });

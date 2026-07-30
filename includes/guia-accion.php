@@ -1,6 +1,6 @@
 <?php
 /**
- * Guía rápida para elegir qué poner en «Enlace para comprar o reservar».
+ * Guía rápida para elegir la acción principal del evento.
  *
  * Compartida entre alta y edición, igual que includes/form-evento.php: es el
  * mismo panel en los dos sitios y solo cambia el formulario que tiene al lado.
@@ -11,8 +11,8 @@ declare(strict_types=1);
   <h2>Guía rápida</h2>
 
   <div class="guia-item">
-    <h3>Solicitar información</h3>
-    <p>Ideal cuando los participantes pueden tener preguntas antes de decidir o necesitan más información.</p>
+    <h3>Contactar al organizador</h3>
+    <p>Ideal cuando no hay un enlace externo de compra o registro, o cuando los participantes pueden tener preguntas antes de decidir. Aparece un formulario de contacto en la ficha: lo que escriban llega directo a tu correo.</p>
     <div class="ejemplos">Ejemplos: certificaciones, programas, retiros, actividades gratuitas.</div>
   </div>
 
@@ -29,6 +29,6 @@ declare(strict_types=1);
   </div>
 
   <div class="guia-nota">
-    Con esto en mente, decide qué poner en <strong>«Enlace para comprar o reservar»</strong>: es el enlace que verán quienes quieran dar el siguiente paso.
+    Con esto en mente, elige la <strong>acción principal</strong> más abajo: decide qué verán quienes quieran dar el siguiente paso.
   </div>
 </aside>

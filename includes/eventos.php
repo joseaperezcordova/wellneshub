@@ -102,7 +102,7 @@ function frecuenciasRecurrencia(): array
 function accionesPrincipales(): array
 {
     return [
-        'informacion' => 'Solicitar información',
+        'informacion' => 'Contactar al organizador',
         'boletos'     => 'Comprar boletos',
         'reservar'    => 'Reservar lugar',
     ];
@@ -307,9 +307,11 @@ function etiquetasCampos(): array
         'precio'          => 'Precio',
         'forma_pago'      => 'Forma de pago',
         'cupo_maximo'     => 'Cupo máximo',
-        'url_boletos'     => 'Enlace para comprar o reservar',
+        'url_boletos'     => 'URL de compra',
+        'url_reserva'     => 'URL de reserva',
         'sitio_web'       => 'Sitio web o enlace',
         'accion_principal' => 'Acción principal',
+        'whatsapp_contacto' => 'WhatsApp de contacto',
         'imagen'          => 'Imagen',
     ];
 }
@@ -561,23 +563,49 @@ function validarEvento(array $in): array
         }
     }
 
+    $e['accion_principal'] = (string) ($in['accion_principal'] ?? '');
+    if (!isset(accionesPrincipales()[$e['accion_principal']])) {
+        $errores['accion_principal'] = 'Elige qué esperas que haga quien vea la ficha.';
+    }
+
+    // Cada acción principal pide su propio enlace. Solo es obligatorio el de
+    // la acción elegida: el otro puede quedar vacío sin que bloquee el envío.
     $e['url_boletos'] = urlValida((string) ($in['url_boletos'] ?? ''));
     if ($e['url_boletos'] === false) {
         $errores['url_boletos'] = 'Esa dirección no parece válida. Empieza por https://';
         $e['url_boletos'] = null;
+    } elseif ($e['url_boletos'] === null && $e['accion_principal'] === 'boletos') {
+        $errores['url_boletos'] = 'Agrega el enlace donde se compran los boletos.';
+    }
+
+    $e['url_reserva'] = urlValida((string) ($in['url_reserva'] ?? ''));
+    if ($e['url_reserva'] === false) {
+        $errores['url_reserva'] = 'Esa dirección no parece válida. Empieza por https://';
+        $e['url_reserva'] = null;
+    } elseif ($e['url_reserva'] === null && $e['accion_principal'] === 'reservar') {
+        $errores['url_reserva'] = 'Agrega el enlace donde se reserva el lugar.';
+    }
+
+    // El WhatsApp es opcional siempre, aunque la acción sea "Contactar al
+    // organizador": el correo ya llega solo, esto es un canal extra. Se
+    // guarda solo con dígitos para poder armar el enlace wa.me directo.
+    $wa = trim((string) ($in['whatsapp_contacto'] ?? ''));
+    $e['whatsapp_contacto'] = null;
+    if ($wa !== '') {
+        $soloDigitos = (string) preg_replace('/\D+/', '', $wa);
+        if (strlen($soloDigitos) < 10 || strlen($soloDigitos) > 15) {
+            $errores['whatsapp_contacto'] = 'Ese número no parece válido. Incluye la lada.';
+        } else {
+            $e['whatsapp_contacto'] = $soloDigitos;
+        }
     }
 
     // Igual que url_boletos, pero sin obligación ninguna de rellenarlo: es
-    // informativo y puede llevarse aunque url_boletos también esté lleno.
+    // informativo y puede llevarse aunque los otros enlaces también estén llenos.
     $e['sitio_web'] = urlValida((string) ($in['sitio_web'] ?? ''));
     if ($e['sitio_web'] === false) {
         $errores['sitio_web'] = 'Esa dirección no parece válida. Empieza por https://';
         $e['sitio_web'] = null;
-    }
-
-    $e['accion_principal'] = (string) ($in['accion_principal'] ?? '');
-    if (!isset(accionesPrincipales()[$e['accion_principal']])) {
-        $errores['accion_principal'] = 'Elige qué esperas que haga quien vea la ficha.';
     }
 
     // imagen_url no se valida aquí: no viene del formulario de texto sino de la
@@ -652,8 +680,9 @@ function crearEvento(array $e, int $usuarioId): int
             frecuencia, hora_recurrente, hora_fin_recurrente, modalidad, enlace_acceso,
             ciudad, entidad, lugar, mapa_url, latitud, longitud, fecha_inicio, fecha_fin,
             gratuito, precio, forma_pago, cupo_maximo,
-            url_boletos, sitio_web, accion_principal, imagen_url, color, situacion)
-         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
+            url_boletos, url_reserva, sitio_web, accion_principal, whatsapp_contacto,
+            imagen_url, color, situacion)
+         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
     )->execute([
         $usuarioId, $e['titulo'], $e['descripcion'], $e['categoria'],
         $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
@@ -661,7 +690,8 @@ function crearEvento(array $e, int $usuarioId): int
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
         $e['forma_pago'], $e['cupo_maximo'],
-        $e['url_boletos'], $e['sitio_web'], $e['accion_principal'], $e['imagen_url'], $e['color'],
+        $e['url_boletos'], $e['url_reserva'], $e['sitio_web'], $e['accion_principal'], $e['whatsapp_contacto'],
+        $e['imagen_url'], $e['color'],
     ]);
 
     // El slug lleva el id dentro, así que solo puede calcularse después de
@@ -683,7 +713,8 @@ function actualizarEvento(array $e, int $id): void
             entidad = ?, lugar = ?, mapa_url = ?, latitud = ?, longitud = ?,
             fecha_inicio = ?, fecha_fin = ?,
             gratuito = ?, precio = ?, forma_pago = ?, cupo_maximo = ?,
-            url_boletos = ?, sitio_web = ?, accion_principal = ?, imagen_url = ?, color = ?
+            url_boletos = ?, url_reserva = ?, sitio_web = ?, accion_principal = ?, whatsapp_contacto = ?,
+            imagen_url = ?, color = ?
           WHERE id = ?'
     )->execute([
         $e['titulo'], generarSlug($e['titulo'], $id), $e['descripcion'],
@@ -692,7 +723,8 @@ function actualizarEvento(array $e, int $id): void
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
         $e['forma_pago'], $e['cupo_maximo'],
-        $e['url_boletos'], $e['sitio_web'], $e['accion_principal'], $e['imagen_url'], $e['color'], $id,
+        $e['url_boletos'], $e['url_reserva'], $e['sitio_web'], $e['accion_principal'], $e['whatsapp_contacto'],
+        $e['imagen_url'], $e['color'], $id,
     ]);
 }
 

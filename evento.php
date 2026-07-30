@@ -244,9 +244,23 @@ require __DIR__ . '/includes/layout.php';
       </div>
     </div>
 
-    <?php if (!empty($ev['url_boletos'])): ?>
+    <?php if ($ev['accion_principal'] === 'boletos' && !empty($ev['url_boletos'])): ?>
       <a class="btn-principal btn-boletos" href="<?= e($ev['url_boletos']) ?>"
+         target="_blank" rel="noopener nofollow">Comprar boletos</a>
+
+    <?php elseif ($ev['accion_principal'] === 'reservar' && !empty($ev['url_reserva'])): ?>
+      <a class="btn-principal btn-boletos" href="<?= e($ev['url_reserva']) ?>"
          target="_blank" rel="noopener nofollow">Reservar mi lugar</a>
+
+    <?php elseif ($ev['accion_principal'] === 'informacion'): ?>
+      <div class="ficha-contacto">
+        <a class="btn-principal btn-boletos" href="<?= URL_BASE ?>/contactar.php?id=<?= (int) $ev['id'] ?>">Contactar al organizador</a>
+        <?php if (!empty($ev['whatsapp_contacto'])): ?>
+          <?php $textoWa = rawurlencode('Hola, vi tu actividad "' . $ev['titulo'] . '" en Rueda y quería preguntarte algo.'); ?>
+          <a class="btn-whatsapp" href="https://wa.me/<?= e($ev['whatsapp_contacto']) ?>?text=<?= e($textoWa) ?>"
+             target="_blank" rel="noopener nofollow">Escribir por WhatsApp</a>
+        <?php endif; ?>
+      </div>
     <?php endif; ?>
 
     <div class="ficha-desc"><?= nl2br(e($ev['descripcion'])) ?></div>

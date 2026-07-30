@@ -46,22 +46,31 @@ function correoRemitente(): array
  * pasa peor los filtros y aquí no aporta nada — el contenido es un número de
  * seis cifras.
  *
+ * $responderA cambia el Reply-To de $de (el remitente del sistema) a otra
+ * dirección. Sirve para que, por ejemplo, un organizador que recibe un aviso
+ * de contacto pueda simplemente darle "Responder" y llegarle a quien
+ * escribió, sin tener que copiar su correo a mano. Se valida aquí también
+ * —no solo en quien llama— porque una cabecera mal formada es la puerta de
+ * entrada clásica a la inyección de cabeceras de correo.
+ *
  * Ojo con lo que significa "true": mail() solo confirma que el servidor de
  * correo local aceptó el mensaje. No dice que llegara, ni que no acabara en
  * spam. Eso solo se comprueba mirando el buzón.
  */
-function enviarCorreo(string $para, string $asunto, string $cuerpo): bool
+function enviarCorreo(string $para, string $asunto, string $cuerpo, ?string $responderA = null): bool
 {
     global $CONFIG;
 
     [$de, $nombreDe] = correoRemitente();
+
+    $replyTo = ($responderA !== null && filter_var($responderA, FILTER_VALIDATE_EMAIL)) ? $responderA : $de;
 
     // En local no hay MTA: XAMPP en Windows no manda nada y mail() devolvería
     // false sin más. En vez de dejar el desarrollo bloqueado, el mensaje entero
     // va al log de errores de PHP, así que el código se lee ahí y el flujo se
     // puede probar de principio a fin sin servidor de correo.
     if (!empty($CONFIG['es_local'])) {
-        error_log("=== CORREO (no enviado, entorno local) ===\nPara: $para\nAsunto: $asunto\n\n$cuerpo\n===");
+        error_log("=== CORREO (no enviado, entorno local) ===\nPara: $para\nAsunto: $asunto\nReply-To: $replyTo\n\n$cuerpo\n===");
         return true;
     }
 
@@ -74,7 +83,7 @@ function enviarCorreo(string $para, string $asunto, string $cuerpo): bool
 
     $cabeceras = implode("\r\n", [
         'From: ' . $nombreCodificado . ' <' . $de . '>',
-        'Reply-To: ' . $de,
+        'Reply-To: ' . $replyTo,
         'MIME-Version: 1.0',
         'Content-Type: text/plain; charset=UTF-8',
         'Content-Transfer-Encoding: 8bit',
