@@ -267,6 +267,13 @@ require __DIR__ . '/includes/layout.php';
           </span>
         </div>
       <?php endif; ?>
+
+      <?php if (!empty($ev['cupo_maximo'])): ?>
+        <div class="dato">
+          <span class="k">Cupo</span>
+          <span class="val"><?= (int) $ev['cupo_maximo'] ?> personas</span>
+        </div>
+      <?php endif; ?>
     </div>
 
     <?php if ($ev['accion_principal'] === 'boletos' && !empty($ev['url_boletos'])): ?>
