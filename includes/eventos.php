@@ -345,10 +345,7 @@ function validarEvento(array $in): array
         $errores['categoria'] = 'Elige una categoría de la lista.';
     }
 
-    $e['modalidad'] = in_array(($in['modalidad'] ?? ''), ['presencial', 'en_linea', 'hibrida'], true)
-        ? $in['modalidad'] : 'presencial';
-
-    // El enlace de acceso no depende de la modalidad —una actividad presencial
+    // El enlace de acceso es aparte del lugar —una actividad presencial
     // también puede mandar un grupo de WhatsApp o una liga de la transmisión—,
     // así que se valida igual que url_boletos y punto.
     $e['enlace_acceso'] = urlValida((string) ($in['enlace_acceso'] ?? ''));
@@ -357,58 +354,41 @@ function validarEvento(array $in): array
         $e['enlace_acceso'] = null;
     }
 
+    $e['entidad'] = trim((string) ($in['entidad'] ?? ''));
+    if (!in_array($e['entidad'], estadosMexico(), true)) {
+        $errores['entidad'] = 'Elige un estado de la lista.';
+    }
+
+    $e['ciudad'] = trim((string) ($in['ciudad'] ?? ''));
+    $municipiosDelEstado = municipiosPorEstado()[$e['entidad']] ?? [];
+    if (!in_array($e['ciudad'], $municipiosDelEstado, true)) {
+        $errores['ciudad'] = $e['entidad'] === ''
+            ? 'Elige primero el estado.'
+            : 'Elige una ciudad de la lista.';
+    }
+
+    $e['lugar'] = trim((string) ($in['lugar'] ?? ''));
+    if ($e['lugar'] === '') $errores['lugar'] = 'Falta el lugar donde se realiza.';
+
     /*
-     * "En línea" no tiene lugar físico: no tiene sentido pedir ciudad, estado
-     * ni mapa, y guardarlos igual dejaría una ficha diciendo dónde ocurre algo
-     * que ocurre en internet. Se limpian aquí y no solo se ocultan en el
-     * formulario, porque el campo oculto de un navegador con JavaScript
-     * desactivado —o de alguien que edita el HTML a mano— llega igual en el
-     * POST, y no hay que confiar en lo que el cliente decidió no mandar.
+     * El punto en el mapa ya no sale de un enlace pegado: sale del pin que
+     * se arrastra en el mapa interactivo, y esos hidden inputs son
+     * exactamente lo que ese JavaScript escribe. Opcional a propósito —no
+     * toda actividad necesita el pin exacto para publicarse—, pero si
+     * llega algo tiene que ser un punto real y no basura de un POST armado
+     * a mano.
      */
-    if ($e['modalidad'] === 'en_linea') {
-        $e['ciudad']   = '';
-        $e['entidad']  = '';
-        $e['lugar']    = null;
-        $e['mapa_url'] = null;
-        $e['latitud']  = null;
-        $e['longitud'] = null;
-    } else {
-        $e['entidad'] = trim((string) ($in['entidad'] ?? ''));
-        if (!in_array($e['entidad'], estadosMexico(), true)) {
-            $errores['entidad'] = 'Elige un estado de la lista.';
-        }
+    $e['mapa_url'] = null;
+    $e['latitud']  = null;
+    $e['longitud'] = null;
 
-        $e['ciudad'] = trim((string) ($in['ciudad'] ?? ''));
-        $municipiosDelEstado = municipiosPorEstado()[$e['entidad']] ?? [];
-        if (!in_array($e['ciudad'], $municipiosDelEstado, true)) {
-            $errores['ciudad'] = $e['entidad'] === ''
-                ? 'Elige primero el estado.'
-                : 'Elige una ciudad de la lista.';
-        }
+    $lat = trim((string) ($in['latitud'] ?? ''));
+    $lng = trim((string) ($in['longitud'] ?? ''));
 
-        $e['lugar'] = trim((string) ($in['lugar'] ?? ''));
-        if ($e['lugar'] === '') $errores['lugar'] = 'Falta el lugar donde se realiza.';
-
-        /*
-         * El punto en el mapa ya no sale de un enlace pegado: sale del pin que
-         * se arrastra en el mapa interactivo, y esos hidden inputs son
-         * exactamente lo que ese JavaScript escribe. Opcional a propósito —no
-         * toda actividad necesita el pin exacto para publicarse—, pero si
-         * llega algo tiene que ser un punto real y no basura de un POST armado
-         * a mano.
-         */
-        $e['mapa_url'] = null;
-        $e['latitud']  = null;
-        $e['longitud'] = null;
-
-        $lat = trim((string) ($in['latitud'] ?? ''));
-        $lng = trim((string) ($in['longitud'] ?? ''));
-
-        if ($lat !== '' && $lng !== '' && is_numeric($lat) && is_numeric($lng)) {
-            $punto = coordenadasValidas((float) $lat, (float) $lng);
-            if ($punto !== null) {
-                [$e['latitud'], $e['longitud']] = $punto;
-            }
+    if ($lat !== '' && $lng !== '' && is_numeric($lat) && is_numeric($lng)) {
+        $punto = coordenadasValidas((float) $lat, (float) $lng);
+        if ($punto !== null) {
+            [$e['latitud'], $e['longitud']] = $punto;
         }
     }
 
@@ -677,16 +657,16 @@ function crearEvento(array $e, int $usuarioId): int
     $pdo->prepare(
         'INSERT INTO eventos
            (usuario_id, titulo, slug, descripcion, categoria, tipo_actividad,
-            frecuencia, hora_recurrente, hora_fin_recurrente, modalidad, enlace_acceso,
+            frecuencia, hora_recurrente, hora_fin_recurrente, enlace_acceso,
             ciudad, entidad, lugar, mapa_url, latitud, longitud, fecha_inicio, fecha_fin,
             gratuito, precio, forma_pago, cupo_maximo,
             url_boletos, url_reserva, sitio_web, accion_principal, whatsapp_contacto,
             imagen_url, color, situacion)
-         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
+         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
     )->execute([
         $usuarioId, $e['titulo'], $e['descripcion'], $e['categoria'],
         $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
-        $e['modalidad'], $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'],
+        $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
         $e['forma_pago'], $e['cupo_maximo'],
@@ -709,7 +689,7 @@ function actualizarEvento(array $e, int $id): void
         'UPDATE eventos SET
             titulo = ?, slug = ?, descripcion = ?, categoria = ?,
             tipo_actividad = ?, frecuencia = ?, hora_recurrente = ?, hora_fin_recurrente = ?,
-            modalidad = ?, enlace_acceso = ?, ciudad = ?,
+            enlace_acceso = ?, ciudad = ?,
             entidad = ?, lugar = ?, mapa_url = ?, latitud = ?, longitud = ?,
             fecha_inicio = ?, fecha_fin = ?,
             gratuito = ?, precio = ?, forma_pago = ?, cupo_maximo = ?,
@@ -719,7 +699,7 @@ function actualizarEvento(array $e, int $id): void
     )->execute([
         $e['titulo'], generarSlug($e['titulo'], $id), $e['descripcion'],
         $e['categoria'], $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
-        $e['modalidad'], $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'],
+        $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
         $e['forma_pago'], $e['cupo_maximo'],

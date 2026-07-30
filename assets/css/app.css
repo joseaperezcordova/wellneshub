@@ -244,32 +244,8 @@ input,select{font-family:inherit; font-size:14px;}
 .tipo-fecha-campos .campo:last-child{margin-bottom:0;}
 @media(max-width:640px){ .tipo-fecha-grupo{grid-template-columns:1fr;} }
 
-/* Presencial / en línea / híbrida: tarjetas con descripción debajo del
-   título, así que llevan su propio bloque en vez de compartir uno genérico
-   —el texto extra no cabía sin ensanchar la tarjeta entera—. */
-.modalidad-grupo{display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px;}
-.campo label.modalidad-op{
-  display:grid; grid-template-columns:auto 1fr; align-items:start; gap:4px 9px;
-  padding:12px 13px; border:1px solid var(--linea); border-radius:10px; cursor:pointer;
-  font-family:'Inter',sans-serif; letter-spacing:0; text-transform:none;
-  color:var(--petroleo); margin:0;
-}
-.campo label.modalidad-op input{position:absolute; opacity:0; width:0; height:0;}
-.campo label.modalidad-op .modalidad-icono{grid-row:1; opacity:.55;}
-.campo label.modalidad-op .modalidad-titulo{grid-row:1; font-size:13.5px; font-weight:600; align-self:center;}
-.campo label.modalidad-op .modalidad-desc{
-  grid-column:1 / -1; font-size:11.5px; line-height:1.45; opacity:.65; text-transform:none;
-  font-family:'Inter',sans-serif; letter-spacing:0;
-}
-.campo label.modalidad-op:has(input:checked){
-  border-color:var(--terracota); background:rgba(199,110,67,.08);
-}
-.campo label.modalidad-op:has(input:checked) .modalidad-icono{opacity:1; color:var(--terracota);}
-.campo label.modalidad-op:has(input:focus-visible){outline:2px solid var(--terracota-texto); outline-offset:2px;}
-@media(max-width:640px){ .modalidad-grupo{grid-template-columns:1fr;} }
-
-/* Sin costo / de pago: mismo patrón que .modalidad-op —icono, título,
-   descripción— pero a dos columnas en vez de tres. */
+/* Sin costo / de pago: tarjetas con icono, título y descripción debajo,
+   a dos columnas. */
 .precio-grupo{display:grid; grid-template-columns:1fr 1fr; gap:9px;}
 .campo label.precio-op{
   display:grid; grid-template-columns:auto 1fr; align-items:start; gap:4px 9px;
@@ -296,7 +272,7 @@ input,select{font-family:inherit; font-size:14px;}
    lugar"—, así que es el mismo patrón que .tipo-fecha-tarjeta (encabezado
    en un <label> chico, campos como hermano y no como hijo, para que el
    clic dentro de un campo no compita con el clic que elige la tarjeta) con
-   la descripción de .modalidad-op debajo del título. */
+   la descripción de .precio-op debajo del título. */
 .accion-grupo{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
 .accion-tarjeta{
   min-width:0; border:1px solid var(--linea); border-radius:12px; padding:14px;
@@ -533,6 +509,29 @@ input,select{font-family:inherit; font-size:14px;}
   background:var(--arena);
 }
 @media(max-width:520px){ .mapa-interactivo{height:220px;} }
+
+/* Pegar un enlace de Google Maps como atajo al pin. Vive dentro del mismo
+   campo que el mapa, no en uno propio: es un ayudante del pin, no un dato
+   que se guarde por su cuenta. */
+.enlace-maps-grupo{margin-top:14px;}
+.enlace-maps-grupo label{
+  display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--verde); margin-bottom:6px;
+}
+.enlace-maps-fila{display:flex; gap:8px;}
+.enlace-maps-fila input{
+  flex:1; min-width:0; border:1px solid var(--linea); background:var(--arena-suave);
+  border-radius:9px; padding:11px 13px; font-size:14.5px; color:var(--petroleo);
+}
+.enlace-maps-fila input:focus{outline:none; border-color:var(--verde); background:var(--blanco);}
+.enlace-maps-fila button{
+  flex-shrink:0; background:var(--blanco); border:1px solid var(--verde); color:var(--verde);
+  border-radius:9px; padding:0 16px; font-size:13.5px; font-weight:600; white-space:nowrap;
+  transition:background .15s, color .15s;
+}
+.enlace-maps-fila button:hover{background:var(--verde); color:var(--blanco);}
+.enlace-maps-fila button:disabled{opacity:.55; pointer-events:none;}
+.enlace-maps-grupo .aviso{margin:10px 0 0; padding:9px 13px; font-size:12.5px;}
 
 .ficha-media{
   position:relative; height:340px; border-radius:16px; overflow:hidden;

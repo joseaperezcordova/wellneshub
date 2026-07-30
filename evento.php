@@ -232,19 +232,11 @@ require __DIR__ . '/includes/layout.php';
       </div>
 
       <div class="dato">
-        <?php if ($ev['modalidad'] === 'en_linea'): ?>
-          <span class="k">Modalidad</span>
-          <span class="val">En línea</span>
-        <?php else: ?>
-          <span class="k">Dónde</span>
-          <span class="val">
-            <?php if (!empty($ev['lugar'])): ?><?= e($ev['lugar']) ?><br><?php endif; ?>
-            <?= e($ev['ciudad'] . ', ' . $ev['entidad']) ?>
-            <?php if ($ev['modalidad'] === 'hibrida'): ?>
-              <br><span class="tenue">También en línea</span>
-            <?php endif; ?>
-          </span>
-        <?php endif; ?>
+        <span class="k">Dónde</span>
+        <span class="val">
+          <?php if (!empty($ev['lugar'])): ?><?= e($ev['lugar']) ?><br><?php endif; ?>
+          <?= e($ev['ciudad'] . ', ' . $ev['entidad']) ?>
+        </span>
       </div>
 
       <div class="dato">

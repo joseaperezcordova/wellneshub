@@ -72,3 +72,102 @@ function eventoTienePunto(array $ev): bool
     return isset($ev['latitud'], $ev['longitud'])
         && $ev['latitud'] !== null && $ev['longitud'] !== null;
 }
+
+/**
+ * Lee una latitud/longitud a partir de un enlace de Google Maps pegado a mano.
+ *
+ * El pin del formulario no sabe nada de esto —sigue siendo la fuente de
+ * verdad—; esto solo lo coloca por quien llega con un enlace ya copiado del
+ * teléfono. Un enlace completo (con "@lat,lng", "!3d!4d" o "?q=lat,lng") ya
+ * trae las coordenadas escritas. El enlace corto que comparte la app
+ * (maps.app.goo.gl) no las trae: solo aparecen al seguir la redirección, así
+ * que aquí se sigue una a la vez —sin descargar la página entera, con la
+ * cabecera basta— hasta encontrarlas o quedarse sin saltos.
+ *
+ * Solo se siguen enlaces de dominios de Google: seguir redirecciones a
+ * cualquier URL convertiría esto en un proxy abierto hacia direcciones que,
+ * de otro modo, nadie desde fuera podría pedirle al servidor que visite.
+ */
+function resolverEnlaceMaps(string $url): ?array
+{
+    $url = trim($url);
+    if ($url === '' || !esDominioDeGoogleMaps($url)) return null;
+
+    for ($salto = 0; $salto < 5; $salto++) {
+        $punto = coordenadasDeUrlMaps($url);
+        if ($punto) return $punto;
+
+        $siguiente = siguienteRedireccion($url);
+        if ($siguiente === null || !esDominioDeGoogleMaps($siguiente)) return null;
+
+        $url = $siguiente;
+    }
+
+    return coordenadasDeUrlMaps($url);
+}
+
+function esDominioDeGoogleMaps(string $url): bool
+{
+    $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+    if ($host === '') return false;
+
+    if ($host === 'goo.gl' || $host === 'maps.app.goo.gl') return true;
+
+    return $host === 'google.com' || $host === 'google.com.mx'
+        || str_ends_with($host, '.google.com') || str_ends_with($host, '.google.com.mx');
+}
+
+function coordenadasDeUrlMaps(string $url): ?array
+{
+    // El pin exacto de un lugar: lo más preciso que trae un enlace.
+    if (preg_match('/!3d(-?\d{1,3}(?:\.\d+)?)!4d(-?\d{1,3}(?:\.\d+)?)/', $url, $m)) {
+        return coordenadasValidas((float) $m[1], (float) $m[2]);
+    }
+    if (preg_match('/[?&](?:q|query)=(-?\d{1,3}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)/', $url, $m)) {
+        return coordenadasValidas((float) $m[1], (float) $m[2]);
+    }
+    // El centro del mapa: puede ser donde alguien lo dejó tras moverlo, pero
+    // es lo único que traen muchos enlaces de "compartir ubicación".
+    if (preg_match('#/@(-?\d{1,3}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)#', $url, $m)) {
+        return coordenadasValidas((float) $m[1], (float) $m[2]);
+    }
+
+    return null;
+}
+
+/** La URL a la que redirige un enlace, sin descargar el cuerpo. Null si no redirige. */
+function siguienteRedireccion(string $url): ?string
+{
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_NOBODY         => true,
+            CURLOPT_FOLLOWLOCATION => false,
+            CURLOPT_TIMEOUT        => 8,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; Wellneshub/1.0)',
+        ]);
+        curl_exec($ch);
+        $codigo  = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $destino = (string) curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+        curl_close($ch);
+
+        return ($codigo >= 300 && $codigo < 400 && $destino !== '') ? $destino : null;
+    }
+
+    if (!ini_get('allow_url_fopen')) return null;
+
+    $contexto = stream_context_create(['http' => [
+        'method'          => 'HEAD',
+        'timeout'         => 8,
+        'follow_location' => 0,
+        'ignore_errors'   => true,
+        'user_agent'      => 'Mozilla/5.0 (compatible; Wellneshub/1.0)',
+    ]]);
+
+    $cabeceras = @get_headers($url, true, $contexto);
+    if (!$cabeceras || !isset($cabeceras['Location'])) return null;
+
+    return is_array($cabeceras['Location']) ? end($cabeceras['Location']) : $cabeceras['Location'];
+}

@@ -112,57 +112,11 @@ $mal = function (string $campo) use ($errores) {
 <div class="form-seccion-titulo">
   <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/>
-    <circle cx="12" cy="9" r="2.5"/>
-  </svg>
-  <h2>2. Modalidad</h2>
-</div>
-
-<div class="campo">
-  <div class="modalidad-grupo">
-    <label class="modalidad-op">
-      <input type="radio" name="modalidad" value="presencial" id="modPresencial" <?= $v('modalidad', 'presencial') === 'presencial' ? 'checked' : '' ?>>
-      <svg class="modalidad-icono" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor"
-           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/>
-        <circle cx="12" cy="9" r="2.5"/>
-      </svg>
-      <span class="modalidad-titulo">Presencial</span>
-      <span class="modalidad-desc">La actividad se realiza en un lugar físico.</span>
-    </label>
-    <label class="modalidad-op">
-      <input type="radio" name="modalidad" value="en_linea" id="modEnLinea" <?= $v('modalidad', 'presencial') === 'en_linea' ? 'checked' : '' ?>>
-      <svg class="modalidad-icono" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor"
-           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M5 12.5a11 11 0 0 1 14 0"/>
-        <path d="M8 16a6.5 6.5 0 0 1 8 0"/>
-        <circle cx="12" cy="19.3" r="1" fill="currentColor" stroke="none"/>
-      </svg>
-      <span class="modalidad-titulo">En línea</span>
-      <span class="modalidad-desc">La actividad se realiza a través de internet.</span>
-    </label>
-    <label class="modalidad-op">
-      <input type="radio" name="modalidad" value="hibrida" id="modHibrida" <?= $v('modalidad', 'presencial') === 'hibrida' ? 'checked' : '' ?>>
-      <svg class="modalidad-icono" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor"
-           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="3" y="4.5" width="12" height="9" rx="1.3"/>
-        <path d="M3 16.5h12"/>
-        <rect x="17.3" y="9" width="4.2" height="8.5" rx="1"/>
-      </svg>
-      <span class="modalidad-titulo">Híbrida</span>
-      <span class="modalidad-desc">La actividad es presencial y en línea.</span>
-    </label>
-  </div>
-</div>
-
-<div class="form-seccion-titulo">
-  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
-       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <rect x="3.5" y="5" width="17" height="15" rx="2"/>
     <path d="M3.5 9.5h17"/>
     <path d="M8 3v4M16 3v4"/>
   </svg>
-  <h2>3. Fecha y horario</h2>
+  <h2>2. Fecha y horario</h2>
 </div>
 
 <div class="tipo-fecha-grupo">
@@ -268,7 +222,7 @@ $mal = function (string $campo) use ($errores) {
     <path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/>
     <circle cx="12" cy="9" r="2.5"/>
   </svg>
-  <h2>4. Ubicación</h2>
+  <h2>3. Ubicación</h2>
 </div>
 
 <div class="campo<?= $mal('enlace_acceso') ?>">
@@ -279,53 +233,60 @@ $mal = function (string $campo) use ($errores) {
   <?= $err('enlace_acceso') ?>
 </div>
 
-<div id="bloqueUbicacionFisica">
-  <div class="campo-fila campo-fila-3">
-    <div class="campo<?= $mal('lugar') ?>" id="campoLugar">
-      <label for="lugar">Lugar</label>
-      <input id="lugar" name="lugar" type="text" maxlength="160"
-             value="<?= e($v('lugar')) ?>" placeholder="Ej. Centro Holístico Luz">
-      <?= $err('lugar') ?>
-    </div>
-    <div class="campo<?= $mal('ciudad') ?>" id="campoCiudad">
-      <label for="ciudad">Ciudad</label>
-      <select id="ciudad" name="ciudad">
-        <option value="">Selecciona una ciudad</option>
-        <?php foreach (municipiosPorEstado()[$v('entidad')] ?? [] as $municipio): ?>
-          <option value="<?= e($municipio) ?>" <?= $v('ciudad') === $municipio ? 'selected' : '' ?>><?= e($municipio) ?></option>
-        <?php endforeach; ?>
-      </select>
-      <?= $err('ciudad') ?>
-    </div>
-    <div class="campo<?= $mal('entidad') ?>">
-      <label for="entidad">Estado</label>
-      <select id="entidad" name="entidad">
-        <option value="">Selecciona un estado</option>
-        <?php foreach (estadosMexico() as $estado): ?>
-          <option value="<?= e($estado) ?>" <?= $v('entidad') === $estado ? 'selected' : '' ?>><?= e($estado) ?></option>
-        <?php endforeach; ?>
-      </select>
-      <?= $err('entidad') ?>
-    </div>
+<div class="campo-fila campo-fila-3">
+  <div class="campo<?= $mal('lugar') ?>" id="campoLugar">
+    <label for="lugar">Lugar</label>
+    <input id="lugar" name="lugar" type="text" required maxlength="160"
+           value="<?= e($v('lugar')) ?>" placeholder="Ej. Centro Holístico Luz">
+    <?= $err('lugar') ?>
   </div>
+  <div class="campo<?= $mal('ciudad') ?>" id="campoCiudad">
+    <label for="ciudad">Ciudad</label>
+    <select id="ciudad" name="ciudad" required>
+      <option value="">Selecciona una ciudad</option>
+      <?php foreach (municipiosPorEstado()[$v('entidad')] ?? [] as $municipio): ?>
+        <option value="<?= e($municipio) ?>" <?= $v('ciudad') === $municipio ? 'selected' : '' ?>><?= e($municipio) ?></option>
+      <?php endforeach; ?>
+    </select>
+    <?= $err('ciudad') ?>
+  </div>
+  <div class="campo<?= $mal('entidad') ?>">
+    <label for="entidad">Estado</label>
+    <select id="entidad" name="entidad" required>
+      <option value="">Selecciona un estado</option>
+      <?php foreach (estadosMexico() as $estado): ?>
+        <option value="<?= e($estado) ?>" <?= $v('entidad') === $estado ? 'selected' : '' ?>><?= e($estado) ?></option>
+      <?php endforeach; ?>
+    </select>
+    <?= $err('entidad') ?>
+  </div>
+</div>
 
-  <div class="campo">
-    <div id="mapaInteractivo" class="mapa-interactivo" data-lat="<?= e($v('latitud')) ?>" data-lng="<?= e($v('longitud')) ?>"></div>
-    <div class="aviso aviso-info" style="margin:10px 0 0;">Arrastra el pin para ajustar la ubicación exacta del lugar.</div>
-  </div>
+<div class="campo">
+  <div id="mapaInteractivo" class="mapa-interactivo" data-lat="<?= e($v('latitud')) ?>" data-lng="<?= e($v('longitud')) ?>"></div>
+  <div class="aviso aviso-info" style="margin:10px 0 0;">Arrastra el pin para ajustar la ubicación exacta del lugar.</div>
 
-  <div class="campo">
-    <label>Coordenadas <span class="opcional">se obtienen automáticamente al mover el pin</span></label>
+  <div class="enlace-maps-grupo">
+    <label for="enlaceMapsPegado">¿Tienes el enlace de Google Maps del lugar? Pégalo y movemos el pin por ti</label>
+    <div class="enlace-maps-fila">
+      <input type="text" id="enlaceMapsPegado" placeholder="https://maps.app.goo.gl/…">
+      <button type="button" id="enlaceMapsBoton">Usar enlace</button>
+    </div>
+    <div id="enlaceMapsMensaje" class="aviso" hidden></div>
   </div>
-  <div class="campo-fila">
-    <div class="campo">
-      <label for="latitud">Latitud</label>
-      <input id="latitud" name="latitud" type="text" readonly value="<?= e($v('latitud')) ?>">
-    </div>
-    <div class="campo">
-      <label for="longitud">Longitud</label>
-      <input id="longitud" name="longitud" type="text" readonly value="<?= e($v('longitud')) ?>">
-    </div>
+</div>
+
+<div class="campo">
+  <label>Coordenadas <span class="opcional">se obtienen automáticamente al mover el pin</span></label>
+</div>
+<div class="campo-fila">
+  <div class="campo">
+    <label for="latitud">Latitud</label>
+    <input id="latitud" name="latitud" type="text" readonly value="<?= e($v('latitud')) ?>">
+  </div>
+  <div class="campo">
+    <label for="longitud">Longitud</label>
+    <input id="longitud" name="longitud" type="text" readonly value="<?= e($v('longitud')) ?>">
   </div>
 </div>
 
@@ -335,7 +296,7 @@ $mal = function (string $campo) use ($errores) {
     <path d="M12.5 3H20a1 1 0 0 1 1 1v7.5a1 1 0 0 1-.3.7l-9 9a1 1 0 0 1-1.4 0l-7.5-7.5a1 1 0 0 1 0-1.4l9-9a1 1 0 0 1 .7-.3z"/>
     <circle cx="16.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>
   </svg>
-  <h2>5. Precio</h2>
+  <h2>4. Precio</h2>
 </div>
 
 <?php $esDePago = isset($e['gratuito']) ? empty($e['gratuito']) : false; ?>
@@ -392,7 +353,7 @@ $mal = function (string $campo) use ($errores) {
     <circle cx="17" cy="9" r="2.6"/>
     <path d="M15.2 14.6c2.2.4 3.9 2.2 4.3 5.4"/>
   </svg>
-  <h2>6. Cupo máximo <span class="opcional">opcional</span></h2>
+  <h2>5. Cupo máximo <span class="opcional">opcional</span></h2>
 </div>
 
 <div class="campo<?= $mal('cupo_maximo') ?>">
@@ -409,7 +370,7 @@ $mal = function (string $campo) use ($errores) {
     <circle cx="8.5" cy="9.5" r="1.6"/>
     <path d="M21 16l-5.5-5.5a1.5 1.5 0 0 0-2.1 0L4 19"/>
   </svg>
-  <h2>7. Imagen de la actividad <span class="opcional">opcional</span></h2>
+  <h2>6. Imagen de la actividad <span class="opcional">opcional</span></h2>
 </div>
 
 <div class="campo<?= $mal('imagen') ?>">
@@ -465,7 +426,7 @@ $mal = function (string $campo) use ($errores) {
     <path d="M11 7.5l1-1a3.5 3.5 0 0 1 5 5l-1 1"/>
     <path d="M13 16.5l-1 1a3.5 3.5 0 0 1-5-5l1-1"/>
   </svg>
-  <h2>8. Información adicional <span class="opcional">opcional</span></h2>
+  <h2>7. Información adicional <span class="opcional">opcional</span></h2>
 </div>
 
 <div class="campo<?= $mal('sitio_web') ?>">
@@ -483,7 +444,7 @@ $mal = function (string $campo) use ($errores) {
     <path d="M16 9a3.5 3.5 0 0 1 0 6"/>
     <path d="M18.5 6.5a7 7 0 0 1 0 11"/>
   </svg>
-  <h2>9. Acción principal *</h2>
+  <h2>8. Acción principal *</h2>
 </div>
 
 <div class="campo<?= $mal('accion_principal') ?>">
@@ -699,33 +660,6 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
   sync();
 })();
 
-/* Presencial / en línea / híbrida deciden si hace falta un lugar físico.
-   "En línea" oculta lugar, ciudad, estado y el mapa; los otros dos modos los
-   piden igual que siempre. El enlace de acceso no depende de esto: sirve
-   también para una actividad presencial que además transmite o manda un
-   grupo de WhatsApp. */
-(function(){
-  var radios = document.querySelectorAll('input[name="modalidad"]');
-  var bloqueFisico = document.getElementById('bloqueUbicacionFisica');
-  var lugar        = document.getElementById('lugar');
-  var ciudad       = document.getElementById('ciudad');
-  var entidad      = document.getElementById('entidad');
-  if (!radios.length || !bloqueFisico) return;
-
-  function sync(){
-    var esFisico = document.querySelector('input[name="modalidad"]:checked').value !== 'en_linea';
-
-    bloqueFisico.style.display = esFisico ? '' : 'none';
-
-    if (lugar)   lugar.required   = esFisico;
-    if (ciudad)  ciudad.required  = esFisico;
-    if (entidad) entidad.required = esFisico;
-  }
-
-  radios.forEach(function(r){ r.addEventListener('change', sync); });
-  sync();
-})();
-
 /* Ciudad depende del Estado elegido: es un catálogo cerrado de municipios
    —a diferencia de antes, ya no acepta cualquier texto—, así que sus
    opciones se arman de nuevo cada vez que cambia el estado. El PHP ya deja
@@ -809,5 +743,62 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
       .catch(function(){});
   }
   ciudadSel.addEventListener('change', centrarEnCiudad);
+
+  /*
+   * Pegar un enlace de Google Maps en vez de buscar el punto a mano. El
+   * enlace corto que comparte el celular (maps.app.goo.gl) no trae las
+   * coordenadas escritas: resolverEnlaceMaps(), en el servidor, sigue la
+   * redirección para encontrarlas —por eso esto pasa por un fetch propio y
+   * no se resuelve aquí mismo, en el navegador.
+   */
+  var enlaceInput   = document.getElementById('enlaceMapsPegado');
+  var enlaceBoton   = document.getElementById('enlaceMapsBoton');
+  var enlaceMensaje = document.getElementById('enlaceMapsMensaje');
+  var csrfInput     = document.querySelector('input[name="csrf"]');
+
+  function mostrarMensajeEnlace(texto, tipo){
+    enlaceMensaje.textContent = texto;
+    enlaceMensaje.className = 'aviso aviso-' + tipo;
+    enlaceMensaje.hidden = false;
+  }
+
+  if (enlaceBoton && enlaceInput) {
+    enlaceBoton.addEventListener('click', function(){
+      var url = enlaceInput.value.trim();
+      if (!url) {
+        mostrarMensajeEnlace('Pega primero un enlace de Google Maps.', 'error');
+        return;
+      }
+
+      enlaceBoton.disabled = true;
+      enlaceBoton.textContent = 'Buscando…';
+
+      var datos = new URLSearchParams();
+      datos.set('enlace', url);
+      datos.set('csrf', csrfInput ? csrfInput.value : '');
+
+      fetch('<?= URL_BASE ?>/resolver-mapa.php', { method: 'POST', body: datos })
+        .then(function(resp){ return resp.json(); })
+        .then(function(json){
+          if (!json.ok) {
+            mostrarMensajeEnlace(json.error || 'No se pudo leer ese enlace.', 'error');
+            return;
+          }
+
+          var punto = { lat: json.lat, lng: json.lng };
+          mapa.setView(punto, 16);
+          pin.setLatLng(punto);
+          fijarPunto(punto);
+          mostrarMensajeEnlace('Listo, movimos el pin a esa ubicación. Ajústalo si hace falta.', 'ok');
+        })
+        .catch(function(){
+          mostrarMensajeEnlace('No se pudo comprobar el enlace. Inténtalo de nuevo.', 'error');
+        })
+        .finally(function(){
+          enlaceBoton.disabled = false;
+          enlaceBoton.textContent = 'Usar enlace';
+        });
+    });
+  }
 })();
 </script>
