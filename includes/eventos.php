@@ -853,7 +853,15 @@ function precioTexto(array $ev): string
     if (!empty($ev['gratuito']))    return 'Gratis';
     if ($ev['precio'] === null)     return 'Por confirmar';
 
-    return '$' . number_format((float) $ev['precio'], 0, '.', ',') . ' MXN';
+    $texto = '$' . number_format((float) $ev['precio'], 0, '.', ',') . ' MXN';
+
+    // Importa sobre todo en una recurrente: "$400" solo, sin aclarar, no dice
+    // si es por toda la serie de sesiones o por cada una.
+    if ($ev['forma_pago'] === 'sesion') {
+        $texto .= ' / sesión';
+    }
+
+    return $texto;
 }
 
 /**
