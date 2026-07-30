@@ -274,6 +274,15 @@ require __DIR__ . '/includes/layout.php';
           <span class="val"><?= (int) $ev['cupo_maximo'] ?> personas</span>
         </div>
       <?php endif; ?>
+
+      <?php if (!empty($ev['sitio_web'])): ?>
+        <div class="dato">
+          <span class="k">Más información</span>
+          <span class="val">
+            <a href="<?= e($ev['sitio_web']) ?>" target="_blank" rel="noopener nofollow">Ver sitio o perfil →</a>
+          </span>
+        </div>
+      <?php endif; ?>
     </div>
 
     <?php if ($ev['accion_principal'] === 'boletos' && !empty($ev['url_boletos'])): ?>
