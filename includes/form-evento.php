@@ -275,7 +275,7 @@ $mal = function (string $campo) use ($errores) {
   <label for="enlace_acceso">Enlace de acceso <span class="opcional">opcional</span></label>
   <input id="enlace_acceso" name="enlace_acceso" type="url" maxlength="500"
          value="<?= e($v('enlace_acceso')) ?>" placeholder="https://">
-  <div class="pista">Enlace privado que solo será visible para las personas registradas o confirmadas.</div>
+  <div class="pista">Se muestra públicamente en la ficha, junto con el resto de la información.</div>
   <?= $err('enlace_acceso') ?>
 </div>
 
