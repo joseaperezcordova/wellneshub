@@ -224,11 +224,19 @@ require __DIR__ . '/includes/layout.php';
       </div>
 
       <div class="dato">
-        <span class="k">Dónde</span>
-        <span class="val">
-          <?php if (!empty($ev['lugar'])): ?><?= e($ev['lugar']) ?><br><?php endif; ?>
-          <?= e($ev['ciudad'] . ', ' . $ev['entidad']) ?>
-        </span>
+        <?php if ($ev['modalidad'] === 'en_linea'): ?>
+          <span class="k">Modalidad</span>
+          <span class="val">En línea</span>
+        <?php else: ?>
+          <span class="k">Dónde</span>
+          <span class="val">
+            <?php if (!empty($ev['lugar'])): ?><?= e($ev['lugar']) ?><br><?php endif; ?>
+            <?= e($ev['ciudad'] . ', ' . $ev['entidad']) ?>
+            <?php if ($ev['modalidad'] === 'hibrida'): ?>
+              <br><span class="tenue">También en línea</span>
+            <?php endif; ?>
+          </span>
+        <?php endif; ?>
       </div>
 
       <div class="dato">
@@ -242,6 +250,15 @@ require __DIR__ . '/includes/layout.php';
         <span class="k">Organiza</span>
         <span class="val"><?= e($ev['organizador']) ?></span>
       </div>
+
+      <?php if (!empty($ev['enlace_acceso'])): ?>
+        <div class="dato">
+          <span class="k">Acceso</span>
+          <span class="val">
+            <a href="<?= e($ev['enlace_acceso']) ?>" target="_blank" rel="noopener nofollow">Enlace de acceso →</a>
+          </span>
+        </div>
+      <?php endif; ?>
     </div>
 
     <?php if ($ev['accion_principal'] === 'boletos' && !empty($ev['url_boletos'])): ?>
