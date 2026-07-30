@@ -684,6 +684,81 @@
   .scope-list{display:flex; flex-wrap:wrap; gap:6px 10px; margin-top:8px;}
   .scope-list span{opacity:0.65;}
 
+  /* ---------- métricas ---------- */
+  /* Los tres colores categóricos del desglose de "acción principal": ajustados
+     desde los tonos de marca —terracota, azul, verde— para que se distingan
+     bien entre sí y contra el fondo oscuro del panel admin (validado con
+     scripts/validate_palette.js del skill de dataviz: banda de luminosidad,
+     separación CVD y contraste, sobre --ink como superficie). El contraste de
+     marca contra --ink queda en 2.6–2.9:1 —por debajo de 3:1—, así que el
+     valor SIEMPRE va etiquetado aparte en texto (--paper), nunca solo en el
+     color de la barra. */
+  :root{
+    --met-cat-1:#CD7850;
+    --met-cat-2:#4E8FCB;
+    --met-cat-3:#5CA36E;
+  }
+
+  .volver-admin{display:inline-block; color:rgba(255,255,255,0.6); font-size:13px; margin-bottom:18px;}
+  .volver-admin:hover{color:var(--terracota-palida);}
+
+  .rango-filtros{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:22px;}
+  .rango-label{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:rgba(255,255,255,0.45); margin-right:2px;}
+  .rango-btn{
+    display:inline-block; border:1px solid rgba(255,255,255,0.16); color:rgba(255,255,255,0.75);
+    font-size:13px; padding:7px 14px; border-radius:20px;
+  }
+  .rango-btn:hover{border-color:rgba(255,255,255,0.32);}
+  .rango-btn.activo{background:var(--marigold); border-color:var(--marigold); color:var(--tinta-boton); font-weight:600;}
+
+  .met-stat-grid{grid-template-columns:repeat(4,1fr);}
+  @media(max-width:700px){ .met-stat-grid{grid-template-columns:repeat(2,1fr);} }
+  .tenue-met{opacity:0.55; text-transform:none; letter-spacing:0;}
+
+  .met-card{background:var(--petroleo-suave); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:22px 24px; margin-bottom:20px;}
+  .met-card h3{font-family:'Fraunces',serif; color:var(--paper); font-size:17px; margin:0 0 4px;}
+  .met-card-sub{font-size:12.5px; color:rgba(255,255,255,0.55); margin:0 0 18px;}
+
+  /* -- gráfica de crecimiento -- */
+  .met-chart-wrap{position:relative;}
+  .met-chart{display:block; width:100%; height:auto; overflow:visible;}
+  .met-grid-line{stroke:rgba(255,255,255,0.1); stroke-width:1;}
+  .met-area-fill{fill:var(--terracota-palida); fill-opacity:0.12;}
+  .met-area-line{fill:none; stroke:var(--terracota-palida); stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .met-area-dot{fill:var(--terracota-palida); stroke:var(--petroleo-suave); stroke-width:2;}
+  .met-axis-label{font-family:'IBM Plex Mono',monospace; font-size:10.5px; fill:rgba(255,255,255,0.45);}
+  .met-end-label{font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; fill:var(--terracota-palida);}
+  .met-crosshair{stroke:rgba(255,255,255,0.3); stroke-width:1; pointer-events:none; opacity:0;}
+  .met-hover-dot{fill:var(--terracota-palida); stroke:var(--petroleo-suave); stroke-width:2; pointer-events:none; opacity:0;}
+  .met-hit-col{fill:transparent; cursor:crosshair;}
+  .met-tooltip{
+    position:absolute; pointer-events:none; background:var(--tinta-boton); color:var(--paper);
+    font-size:12.5px; padding:8px 11px; border-radius:8px; box-shadow:0 8px 20px -6px rgba(0,0,0,0.5);
+    opacity:0; transform:translate(-50%,-100%); transition:opacity .1s; white-space:nowrap; z-index:5;
+  }
+  .met-tooltip strong{font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13.5px;}
+
+  /* -- desglose de acción principal -- */
+  .met-hbars{display:flex; flex-direction:column; gap:14px;}
+  .met-hbar-row{display:grid; grid-template-columns:190px 1fr 60px; align-items:center; gap:12px;}
+  @media(max-width:640px){ .met-hbar-row{grid-template-columns:120px 1fr 46px; gap:8px;} }
+  .met-hbar-name{display:flex; align-items:center; gap:8px; font-size:13.5px; color:var(--paper);}
+  .met-hbar-key{width:10px; height:10px; border-radius:3px; flex-shrink:0;}
+  .met-hbar-track{position:relative; height:20px; background:rgba(255,255,255,0.08); border-radius:6px; overflow:hidden;}
+  .met-hbar-fill{position:absolute; left:0; top:0; bottom:0; border-radius:6px;}
+  .met-hbar-value{font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600; text-align:right; color:var(--paper); font-variant-numeric:tabular-nums;}
+  .met-vacio{margin-top:14px; font-size:12.5px; color:rgba(255,255,255,0.5);}
+
+  /* -- rankings de categorías / ciudades -- */
+  .met-rank-list{display:flex; flex-direction:column; gap:11px;}
+  .met-rank-row{display:grid; grid-template-columns:18px minmax(0,150px) 1fr 36px; align-items:center; gap:10px;}
+  @media(max-width:420px){ .met-rank-row{grid-template-columns:16px minmax(0,90px) 1fr 30px;} }
+  .met-rank-i{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:rgba(255,255,255,0.4); text-align:right;}
+  .met-rank-name{font-size:12.5px; font-weight:500; color:var(--paper); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .met-rank-track{position:relative; height:13px; background:rgba(255,255,255,0.08); border-radius:5px; overflow:hidden;}
+  .met-rank-fill{position:absolute; left:0; top:0; bottom:0; background:var(--terracota-palida); opacity:0.9; border-radius:5px;}
+  .met-rank-value{font-family:'IBM Plex Mono',monospace; font-size:12.5px; text-align:right; color:rgba(255,255,255,0.6); font-variant-numeric:tabular-nums;}
+
   /* ---------- panel organizador ---------- */
   .org-login{max-width:380px; margin:70px auto; background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:32px;}
   .org-login h2{font-size:22px; margin-bottom:6px;}

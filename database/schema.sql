@@ -313,6 +313,29 @@ CREATE TABLE IF NOT EXISTS contactos (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- Un renglón por cada clic en "Comprar boletos" / "Reservar lugar" desde la
+-- ficha. salida.php lo registra aquí y de inmediato redirige a la URL real
+-- del organizador: es la única forma de contar un enlace que apunta afuera.
+CREATE TABLE IF NOT EXISTS clics (
+  id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  evento_id   INT UNSIGNED    NOT NULL,
+
+  tipo        ENUM('boletos','reservar') NOT NULL,
+
+  ip          VARBINARY(16)   NOT NULL,
+
+  creado_en   DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+  KEY idx_clics_evento (evento_id, creado_en),
+  KEY idx_clics_tipo (tipo, creado_en),
+
+  CONSTRAINT fk_clic_evento
+    FOREIGN KEY (evento_id) REFERENCES eventos (id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 -- ============================================================================
 --  DESPUÉS DE ENTRAR LA PRIMERA VEZ: date permisos de administrador
 --

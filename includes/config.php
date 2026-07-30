@@ -119,6 +119,7 @@ require_once __DIR__ . '/mapa.php';
 require_once __DIR__ . '/captcha.php';
 require_once __DIR__ . '/moderacion.php';
 require_once __DIR__ . '/contacto.php';
+require_once __DIR__ . '/metricas.php';
 
 /** Escapa para HTML. Se usa en todas las plantillas, de ahí el nombre corto. */
 function e(?string $texto): string

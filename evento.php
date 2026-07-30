@@ -286,11 +286,11 @@ require __DIR__ . '/includes/layout.php';
     </div>
 
     <?php if ($ev['accion_principal'] === 'boletos' && !empty($ev['url_boletos'])): ?>
-      <a class="btn-principal btn-boletos" href="<?= e($ev['url_boletos']) ?>"
+      <a class="btn-principal btn-boletos" href="<?= URL_BASE ?>/salida.php?id=<?= (int) $ev['id'] ?>&tipo=boletos"
          target="_blank" rel="noopener nofollow">Comprar boletos</a>
 
     <?php elseif ($ev['accion_principal'] === 'reservar' && !empty($ev['url_reserva'])): ?>
-      <a class="btn-principal btn-boletos" href="<?= e($ev['url_reserva']) ?>"
+      <a class="btn-principal btn-boletos" href="<?= URL_BASE ?>/salida.php?id=<?= (int) $ev['id'] ?>&tipo=reservar"
          target="_blank" rel="noopener nofollow">Reservar mi lugar</a>
 
     <?php elseif ($ev['accion_principal'] === 'informacion'): ?>

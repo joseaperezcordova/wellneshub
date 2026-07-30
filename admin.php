@@ -10,10 +10,13 @@
  *
  * ATENCIÓN: de las seis pestañas, solo «Actividades» tiene datos de verdad. Las
  * otras cinco —organizadores, categorías, ciudades, usuarios, newsletter— son
- * la maqueta del prototipo, con nombres y cifras inventados, igual que las seis
- * cifras de arriba. Se mantienen tal cual estaban al repartir el sitio en
- * páginas: cambiarlas era otro trabajo, y mezclarlo con este habría hecho
- * imposible revisar ninguno de los dos.
+ * la maqueta del prototipo, con nombres y cifras inventados. Se mantienen tal
+ * cual estaban al repartir el sitio en páginas: cambiarlas era otro trabajo, y
+ * mezclarlo con este habría hecho imposible revisar ninguno de los dos.
+ *
+ * Las seis cifras de arriba SÍ son reales —ver includes/metricas.php—; el
+ * detalle completo, con gráfica de crecimiento y desglose por acción
+ * principal, vive en metricas.php.
  */
 
 declare(strict_types=1);
@@ -34,6 +37,15 @@ if (!esAdmin($u)) {
 
 $eventosAdmin = eventosTodos();
 
+$cifras = [
+    'publicadas'    => contarActividadesPublicadas(),
+    'proximas'      => contarActividadesProximas(7),
+    'reportes'      => contarReportesPendientes(),
+    'expiradas'     => contarActividadesExpiradas(),
+    'organizadores' => contarOrganizadoresActivos(),
+    'contactos30'   => contarMensajesContacto(30),
+];
+
 $titulo        = 'Panel admin';
 $anchoLibre    = true;
 $scriptsPagina = ['assets/js/admin.js'];
@@ -48,15 +60,16 @@ require __DIR__ . '/includes/layout.php';
       <h1>Dashboard</h1>
     </div>
 
-    <?php /* Cifras del prototipo: no salen de la base. Ver la nota de arriba. */ ?>
     <div class="stat-grid">
-      <div class="stat-card"><div class="num">142</div><div class="lbl">Actividades publicadas</div></div>
-      <div class="stat-card"><div class="num">19</div><div class="lbl">Próximos (7 días)</div></div>
-      <div class="stat-card"><div class="num">6</div><div class="lbl">Pendientes de aprobación</div></div>
-      <div class="stat-card"><div class="num">31</div><div class="lbl">Actividades expiradas</div></div>
-      <div class="stat-card"><div class="num">58</div><div class="lbl">Organizadores</div></div>
-      <div class="stat-card"><div class="num">1,207</div><div class="lbl">Suscriptores newsletter</div></div>
+      <div class="stat-card"><div class="num"><?= number_format($cifras['publicadas']) ?></div><div class="lbl">Actividades publicadas</div></div>
+      <div class="stat-card"><div class="num"><?= number_format($cifras['proximas']) ?></div><div class="lbl">Próximas (7 días)</div></div>
+      <div class="stat-card"><div class="num"><?= number_format($cifras['reportes']) ?></div><div class="lbl">Reportes pendientes</div></div>
+      <div class="stat-card"><div class="num"><?= number_format($cifras['expiradas']) ?></div><div class="lbl">Actividades expiradas</div></div>
+      <div class="stat-card"><div class="num"><?= number_format($cifras['organizadores']) ?></div><div class="lbl">Organizadores activos</div></div>
+      <div class="stat-card"><div class="num"><?= number_format($cifras['contactos30']) ?></div><div class="lbl">Mensajes (30 días)</div></div>
     </div>
+
+    <a class="actionbtn" href="<?= URL_BASE ?>/metricas.php" style="display:inline-block; margin-bottom:10px;">Ver métricas completas →</a>
 
     <div class="scope-banner">
       <b>Fuera de alcance del MVP</b> — se diseña la arquitectura para permitirlo después, no se construye ahora.
