@@ -234,11 +234,15 @@ $mal = function (string $campo) use ($errores) {
 </div>
 
 <div class="campo-fila campo-fila-3">
-  <div class="campo<?= $mal('lugar') ?>" id="campoLugar">
-    <label for="lugar">Nombre del lugar</label>
-    <input id="lugar" name="lugar" type="text" required maxlength="160"
-           value="<?= e($v('lugar')) ?>" placeholder="Ej. Centro Holístico Luz">
-    <?= $err('lugar') ?>
+  <div class="campo<?= $mal('entidad') ?>">
+    <label for="entidad">Estado</label>
+    <select id="entidad" name="entidad" required>
+      <option value="">Selecciona un estado</option>
+      <?php foreach (estadosMexico() as $estado): ?>
+        <option value="<?= e($estado) ?>" <?= $v('entidad') === $estado ? 'selected' : '' ?>><?= e($estado) ?></option>
+      <?php endforeach; ?>
+    </select>
+    <?= $err('entidad') ?>
   </div>
   <div class="campo<?= $mal('ciudad') ?>" id="campoCiudad">
     <label for="ciudad">Ciudad</label>
@@ -252,15 +256,11 @@ $mal = function (string $campo) use ($errores) {
     </datalist>
     <?= $err('ciudad') ?>
   </div>
-  <div class="campo<?= $mal('entidad') ?>">
-    <label for="entidad">Estado</label>
-    <select id="entidad" name="entidad" required>
-      <option value="">Selecciona un estado</option>
-      <?php foreach (estadosMexico() as $estado): ?>
-        <option value="<?= e($estado) ?>" <?= $v('entidad') === $estado ? 'selected' : '' ?>><?= e($estado) ?></option>
-      <?php endforeach; ?>
-    </select>
-    <?= $err('entidad') ?>
+  <div class="campo<?= $mal('lugar') ?>" id="campoLugar">
+    <label for="lugar">Nombre del lugar</label>
+    <input id="lugar" name="lugar" type="text" required maxlength="160"
+           value="<?= e($v('lugar')) ?>" placeholder="Ej. Centro Holístico Luz">
+    <?= $err('lugar') ?>
   </div>
 </div>
 
