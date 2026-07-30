@@ -287,7 +287,8 @@ function etiquetasCampos(): array
         'descripcion'     => 'Descripción',
         'ciudad'          => 'Ciudad',
         'entidad'         => 'Estado',
-        'lugar'           => 'Lugar',
+        'lugar'           => 'Nombre del lugar',
+        'direccion'       => 'Dirección',
         'enlace_acceso'   => 'Enlace de acceso',
         'mapa_url'        => 'Enlace de Google Maps',
 
@@ -369,6 +370,14 @@ function validarEvento(array $in): array
 
     $e['lugar'] = trim((string) ($in['lugar'] ?? ''));
     if ($e['lugar'] === '') $errores['lugar'] = 'Falta el lugar donde se realiza.';
+
+    // Aparte del nombre del lugar: la calle y número, para quien quiera
+    // corregir o completar lo que puso el geocoding automático.
+    $e['direccion'] = trim((string) ($in['direccion'] ?? ''));
+    if (mb_strlen($e['direccion']) > 255) {
+        $errores['direccion'] = 'La dirección no puede pasar de 255 caracteres.';
+    }
+    if ($e['direccion'] === '') $e['direccion'] = null;
 
     /*
      * El punto en el mapa ya no sale de un enlace pegado: sale del pin que
@@ -658,15 +667,15 @@ function crearEvento(array $e, int $usuarioId): int
         'INSERT INTO eventos
            (usuario_id, titulo, slug, descripcion, categoria, tipo_actividad,
             frecuencia, hora_recurrente, hora_fin_recurrente, enlace_acceso,
-            ciudad, entidad, lugar, mapa_url, latitud, longitud, fecha_inicio, fecha_fin,
+            ciudad, entidad, lugar, direccion, mapa_url, latitud, longitud, fecha_inicio, fecha_fin,
             gratuito, precio, forma_pago, cupo_maximo,
             url_boletos, url_reserva, sitio_web, accion_principal, whatsapp_contacto,
             imagen_url, color, situacion)
-         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
+         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
     )->execute([
         $usuarioId, $e['titulo'], $e['descripcion'], $e['categoria'],
         $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
-        $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'],
+        $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'], $e['direccion'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
         $e['forma_pago'], $e['cupo_maximo'],
@@ -690,7 +699,7 @@ function actualizarEvento(array $e, int $id): void
             titulo = ?, slug = ?, descripcion = ?, categoria = ?,
             tipo_actividad = ?, frecuencia = ?, hora_recurrente = ?, hora_fin_recurrente = ?,
             enlace_acceso = ?, ciudad = ?,
-            entidad = ?, lugar = ?, mapa_url = ?, latitud = ?, longitud = ?,
+            entidad = ?, lugar = ?, direccion = ?, mapa_url = ?, latitud = ?, longitud = ?,
             fecha_inicio = ?, fecha_fin = ?,
             gratuito = ?, precio = ?, forma_pago = ?, cupo_maximo = ?,
             url_boletos = ?, url_reserva = ?, sitio_web = ?, accion_principal = ?, whatsapp_contacto = ?,
@@ -699,7 +708,7 @@ function actualizarEvento(array $e, int $id): void
     )->execute([
         $e['titulo'], generarSlug($e['titulo'], $id), $e['descripcion'],
         $e['categoria'], $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
-        $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'],
+        $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'], $e['direccion'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
         $e['forma_pago'], $e['cupo_maximo'],

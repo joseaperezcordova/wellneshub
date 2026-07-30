@@ -235,19 +235,21 @@ $mal = function (string $campo) use ($errores) {
 
 <div class="campo-fila campo-fila-3">
   <div class="campo<?= $mal('lugar') ?>" id="campoLugar">
-    <label for="lugar">Lugar</label>
+    <label for="lugar">Nombre del lugar</label>
     <input id="lugar" name="lugar" type="text" required maxlength="160"
            value="<?= e($v('lugar')) ?>" placeholder="Ej. Centro Holístico Luz">
     <?= $err('lugar') ?>
   </div>
   <div class="campo<?= $mal('ciudad') ?>" id="campoCiudad">
     <label for="ciudad">Ciudad</label>
-    <select id="ciudad" name="ciudad" required>
-      <option value="">Selecciona una ciudad</option>
+    <input id="ciudad" name="ciudad" type="text" required autocomplete="off"
+           list="listaCiudades" placeholder="Escribe para buscar…"
+           value="<?= e($v('ciudad')) ?>">
+    <datalist id="listaCiudades">
       <?php foreach (municipiosPorEstado()[$v('entidad')] ?? [] as $municipio): ?>
-        <option value="<?= e($municipio) ?>" <?= $v('ciudad') === $municipio ? 'selected' : '' ?>><?= e($municipio) ?></option>
+        <option value="<?= e($municipio) ?>"></option>
       <?php endforeach; ?>
-    </select>
+    </datalist>
     <?= $err('ciudad') ?>
   </div>
   <div class="campo<?= $mal('entidad') ?>">
@@ -262,9 +264,17 @@ $mal = function (string $campo) use ($errores) {
   </div>
 </div>
 
+<div class="campo<?= $mal('direccion') ?>">
+  <label for="direccion">Dirección <span class="opcional">opcional</span></label>
+  <input id="direccion" name="direccion" type="text" maxlength="255"
+         value="<?= e($v('direccion')) ?>" placeholder="Calle, número, colonia">
+  <div class="pista">Se completa sola al mover el pin; corrígela si hace falta.</div>
+  <?= $err('direccion') ?>
+</div>
+
 <div class="campo">
   <div id="mapaInteractivo" class="mapa-interactivo" data-lat="<?= e($v('latitud')) ?>" data-lng="<?= e($v('longitud')) ?>"></div>
-  <div class="aviso aviso-info" style="margin:10px 0 0;">Arrastra el pin para ajustar la ubicación exacta del lugar.</div>
+  <div class="aviso aviso-info" style="margin:10px 0 0;">Arrastra el pin para ajustar la ubicación exacta del lugar. Ciudad, estado y dirección se completan solos.</div>
 
   <div class="enlace-maps-grupo">
     <label for="enlaceMapsPegado">¿Tienes el enlace de Google Maps del lugar? Pégalo y movemos el pin por ti</label>
@@ -274,21 +284,23 @@ $mal = function (string $campo) use ($errores) {
     </div>
     <div id="enlaceMapsMensaje" class="aviso" hidden></div>
   </div>
+
+  <div id="geocodingMensaje" class="aviso aviso-info" style="margin:10px 0 0;" hidden></div>
 </div>
 
-<div class="campo">
-  <label>Coordenadas <span class="opcional">se obtienen automáticamente al mover el pin</span></label>
-</div>
-<div class="campo-fila">
-  <div class="campo">
-    <label for="latitud">Latitud</label>
-    <input id="latitud" name="latitud" type="text" readonly value="<?= e($v('latitud')) ?>">
+<details class="campo-avanzado">
+  <summary>Coordenadas <span class="opcional">avanzado, se obtienen solas al mover el pin</span></summary>
+  <div class="campo-fila" style="margin-top:12px;">
+    <div class="campo">
+      <label for="latitud">Latitud</label>
+      <input id="latitud" name="latitud" type="text" readonly value="<?= e($v('latitud')) ?>">
+    </div>
+    <div class="campo">
+      <label for="longitud">Longitud</label>
+      <input id="longitud" name="longitud" type="text" readonly value="<?= e($v('longitud')) ?>">
+    </div>
   </div>
-  <div class="campo">
-    <label for="longitud">Longitud</label>
-    <input id="longitud" name="longitud" type="text" readonly value="<?= e($v('longitud')) ?>">
-  </div>
-</div>
+</details>
 
 <div class="form-seccion-titulo">
   <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
@@ -660,22 +672,27 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
   sync();
 })();
 
-/* Ciudad depende del Estado elegido: es un catálogo cerrado de municipios
-   —a diferencia de antes, ya no acepta cualquier texto—, así que sus
-   opciones se arman de nuevo cada vez que cambia el estado. El PHP ya deja
-   las correctas puestas si se llega aquí con un estado guardado (al editar,
-   o después de un error de validación); este script solo entra en acción
-   cuando la persona cambia el estado a mano. */
+/* Ciudad depende del Estado elegido: sigue siendo un catálogo cerrado de
+   municipios —el servidor solo acepta uno de la lista—, pero ahora se
+   escribe en vez de elegirse de un desplegable largo, con las sugerencias
+   de ese catálogo como datalist. Sus opciones se arman de nuevo cada vez
+   que cambia el estado. El PHP ya deja las correctas puestas si se llega
+   aquí con un estado guardado (al editar, o después de un error de
+   validación); este script solo entra en acción cuando la persona cambia
+   el estado a mano —y entonces sí vacía la ciudad, porque una de otro
+   estado ya no es válida—. */
 (function(){
-  var entidad = document.getElementById('entidad');
-  var ciudad  = document.getElementById('ciudad');
-  if (!entidad || !ciudad || typeof MUNICIPIOS_POR_ESTADO === 'undefined') return;
+  var entidad  = document.getElementById('entidad');
+  var ciudad   = document.getElementById('ciudad');
+  var datalist = document.getElementById('listaCiudades');
+  if (!entidad || !ciudad || !datalist || typeof MUNICIPIOS_POR_ESTADO === 'undefined') return;
 
   entidad.addEventListener('change', function(){
     var lista = MUNICIPIOS_POR_ESTADO[entidad.value] || [];
-    ciudad.innerHTML = '<option value="">Selecciona una ciudad</option>' + lista.map(function(m){
-      return '<option value="' + m.replace(/"/g, '&quot;') + '">' + m + '</option>';
+    datalist.innerHTML = lista.map(function(m){
+      return '<option value="' + m.replace(/"/g, '&quot;') + '"></option>';
     }).join('');
+    ciudad.value = '';
   });
 })();
 
@@ -691,6 +708,8 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
   var lngInput = document.getElementById('longitud');
   var ciudadSel = document.getElementById('ciudad');
   var entidadSel = document.getElementById('entidad');
+  var direccionInput = document.getElementById('direccion');
+  var geocodingMsg = document.getElementById('geocodingMensaje');
 
   var CENTRO_MEXICO = [23.6345, -102.5528];
   var lat0 = parseFloat(contenedor.dataset.lat);
@@ -711,8 +730,86 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
     lngInput.value = latlng.lng.toFixed(6);
   }
 
-  pin.on('dragend', function(){ fijarPunto(pin.getLatLng()); });
-  mapa.on('click', function(ev){ pin.setLatLng(ev.latlng); fijarPunto(ev.latlng); });
+  // Índice normalizado del catálogo cerrado —sin acentos ni mayúsculas—,
+  // para encajar lo que devuelve Nominatim aunque no venga escrito exacto
+  // como en el catálogo.
+  function normaliza(s){
+    return (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  }
+  var ESTADOS_NORM = {};
+  if (typeof MUNICIPIOS_POR_ESTADO !== 'undefined') {
+    Object.keys(MUNICIPIOS_POR_ESTADO).forEach(function(est){ ESTADOS_NORM[normaliza(est)] = est; });
+  }
+
+  /*
+   * Geocoding inverso: a partir del punto del pin, intenta adivinar ciudad,
+   * estado y dirección con Nominatim —el mismo buscador gratuito que ya usa
+   * centrarEnCiudad(), pero al revés—. Nunca es exacto, así que solo rellena
+   * lo que la persona no haya escrito ya a mano, y siempre deja un aviso
+   * para que se revise antes de publicar.
+   */
+  function geocodificarInverso(lat, lng){
+    var url = 'https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1'
+            + '&accept-language=es&lat=' + lat + '&lon=' + lng;
+
+    fetch(url)
+      .then(function(resp){ return resp.json(); })
+      .then(function(datos){
+        var dir = datos && datos.address;
+        if (!dir) return;
+
+        var estado  = ESTADOS_NORM[normaliza(dir.state)];
+        var completo = false;
+
+        if (estado && !entidadSel.value) {
+          entidadSel.value = estado;
+          var lista = MUNICIPIOS_POR_ESTADO[estado] || [];
+          var datalist = document.getElementById('listaCiudades');
+          if (datalist) {
+            datalist.innerHTML = lista.map(function(m){
+              return '<option value="' + m.replace(/"/g, '&quot;') + '"></option>';
+            }).join('');
+          }
+          completo = true;
+        }
+
+        var estadoActivo = estado || entidadSel.value;
+        if (estadoActivo && !ciudadSel.value) {
+          var municipios = MUNICIPIOS_POR_ESTADO[estadoActivo] || [];
+          var candidatos = [dir.city, dir.town, dir.village, dir.municipality, dir.county]
+            .filter(Boolean).map(normaliza);
+          var match = municipios.find(function(m){ return candidatos.indexOf(normaliza(m)) !== -1; });
+          if (match) { ciudadSel.value = match; completo = true; }
+        }
+
+        if (direccionInput && !direccionInput.value) {
+          var calle = [dir.road, dir.house_number].filter(Boolean).join(' ');
+          if (calle) {
+            direccionInput.value = calle + (dir.suburb ? ', ' + dir.suburb : '');
+            completo = true;
+          }
+        }
+
+        if (geocodingMsg) {
+          geocodingMsg.textContent = completo
+            ? 'Completamos ciudad, estado y/o dirección a partir del mapa. Revisa que estén bien.'
+            : 'No pudimos adivinar la ubicación exacta desde el mapa. Complétala a mano.';
+          geocodingMsg.hidden = false;
+        }
+      })
+      .catch(function(){});
+  }
+
+  pin.on('dragend', function(){
+    var p = pin.getLatLng();
+    fijarPunto(p);
+    geocodificarInverso(p.lat, p.lng);
+  });
+  mapa.on('click', function(ev){
+    pin.setLatLng(ev.latlng);
+    fijarPunto(ev.latlng);
+    geocodificarInverso(ev.latlng.lat, ev.latlng.lng);
+  });
 
   /*
    * Al elegir ciudad se centra el mapa ahí —Nominatim, el buscador gratuito
@@ -789,6 +886,7 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
           mapa.setView(punto, 16);
           pin.setLatLng(punto);
           fijarPunto(punto);
+          geocodificarInverso(punto.lat, punto.lng);
           mostrarMensajeEnlace('Listo, movimos el pin a esa ubicación. Ajústalo si hace falta.', 'ok');
         })
         .catch(function(){

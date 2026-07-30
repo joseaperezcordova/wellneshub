@@ -235,6 +235,7 @@ require __DIR__ . '/includes/layout.php';
         <span class="k">Dónde</span>
         <span class="val">
           <?php if (!empty($ev['lugar'])): ?><?= e($ev['lugar']) ?><br><?php endif; ?>
+          <?php if (!empty($ev['direccion'])): ?><span class="tenue"><?= e($ev['direccion']) ?></span><br><?php endif; ?>
           <?= e($ev['ciudad'] . ', ' . $ev['entidad']) ?>
         </span>
       </div>

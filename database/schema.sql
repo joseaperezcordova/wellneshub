@@ -161,6 +161,10 @@ CREATE TABLE IF NOT EXISTS eventos (
   entidad       VARCHAR(90)   NOT NULL COMMENT 'Entidad federativa: Jalisco, Oaxaca…',
   lugar         VARCHAR(160)  NULL DEFAULT NULL,
 
+  -- Aparte de "lugar" —que es el nombre del sitio, no su calle—. Opcional:
+  -- el pin del mapa y el geocoding inverso ya ubican la actividad sin esto.
+  direccion     VARCHAR(255)  NULL DEFAULT NULL,
+
   -- El punto en el mapa. El enlace se guarda solo para poder volver a
   -- enseñarlo en el formulario; quien manda son latitud y longitud, que es lo
   -- que pinta la ficha y lo que serviría para buscar por cercanía.

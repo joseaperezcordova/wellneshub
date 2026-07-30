@@ -533,6 +533,15 @@ input,select{font-family:inherit; font-size:14px;}
 .enlace-maps-fila button:disabled{opacity:.55; pointer-events:none;}
 .enlace-maps-grupo .aviso{margin:10px 0 0; padding:9px 13px; font-size:12.5px;}
 
+/* Coordenadas plegadas: nadie las edita a mano —las escribe el pin—, así
+   que no hace falta que ocupen sitio a la vista por defecto. */
+.campo-avanzado{margin-bottom:16px;}
+.campo-avanzado summary{
+  cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:10.5px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--verde);
+}
+.campo-avanzado[open] summary{margin-bottom:4px;}
+
 .ficha-media{
   position:relative; height:340px; border-radius:16px; overflow:hidden;
   border:1px solid var(--linea);
