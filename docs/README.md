@@ -4,6 +4,13 @@ Material interno del proyecto. **No se despliega**: el workflow de FTP excluye
 esta carpeta entera (ver `.github/workflows/deploy.yml`). Está aquí para que
 quede versionada junto al código que describe, no para publicarse.
 
+## pase-a-produccion.md
+
+Checklist de todas las cuentas —dominio, hosting, GitHub, Google, GA4,
+Clarity, Meta Pixel…— que hoy viven bajo cuentas personales de quien
+programa y que deben acabar bajo la identidad del dueño final antes de
+entregar el proyecto, para que no dependa de nadie más para administrarlas.
+
 ## pruebas.html
 
 La guía de pruebas del sitio: 100 comprobaciones repartidas en once secciones,
