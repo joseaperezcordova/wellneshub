@@ -269,6 +269,40 @@ function eventosTodos(int $limite = 200): array
     return $st->fetchAll();
 }
 
+/**
+ * Quienes ya publicaron al menos una actividad, con cuántas llevan.
+ *
+ * "Organizador" no es una etiqueta que alguien elija: es el rol que
+ * publicarEvento() pone solo la primera vez que a alguien se le publica algo
+ * (ver ahí el porqué). Esta lista es ese mismo criterio, para el panel.
+ */
+function organizadoresConConteo(): array
+{
+    $st = db()->query(
+        "SELECT u.id, u.nombre, u.email, u.estado, u.ultimo_acceso_en,
+                COUNT(e.id) AS publicadas
+           FROM usuarios u
+           JOIN eventos e ON e.usuario_id = u.id AND e.situacion = 'publicado'
+          WHERE u.rol = 'organizador'
+       GROUP BY u.id, u.nombre, u.email, u.estado, u.ultimo_acceso_en
+       ORDER BY publicadas DESC, u.nombre ASC"
+    );
+
+    return $st->fetchAll();
+}
+
+/** Todas las cuentas, para el panel de administración. */
+function usuariosTodos(): array
+{
+    $st = db()->query(
+        'SELECT id, nombre, email, rol, estado, ultimo_acceso_en, creado_en
+           FROM usuarios
+       ORDER BY COALESCE(ultimo_acceso_en, creado_en) DESC'
+    );
+
+    return $st->fetchAll();
+}
+
 
 // ------------------------------------------------------------ validación ----
 

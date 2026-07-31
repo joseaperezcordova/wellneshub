@@ -8,11 +8,11 @@
  * HTML de las siete vistas se le mandaba entero a todo el mundo. Ahora es una
  * página con su puerta delante.
  *
- * ATENCIÓN: de las seis pestañas, solo «Actividades» tiene datos de verdad. Las
- * otras cinco —organizadores, categorías, ciudades, usuarios, newsletter— son
- * la maqueta del prototipo, con nombres y cifras inventados. Se mantienen tal
- * cual estaban al repartir el sitio en páginas: cambiarlas era otro trabajo, y
- * mezclarlo con este habría hecho imposible revisar ninguno de los dos.
+ * Las cinco pestañas salen de la base de datos. Hubo una sexta, «Newsletter»,
+ * que enseñaba una cifra inventada de la maqueta del prototipo: se quitó
+ * entera en vez de dejarla a medias, porque no existe ningún mecanismo que
+ * capture correos todavía. Vuelve el día que haya una decisión real sobre esa
+ * funcionalidad —tabla de suscriptores, formulario público, etc.—.
  *
  * Las seis cifras de arriba SÍ son reales —ver includes/metricas.php—; el
  * detalle completo, con gráfica de crecimiento y desglose por acción
@@ -35,7 +35,12 @@ if (!esAdmin($u)) {
     exit;
 }
 
-$eventosAdmin = eventosTodos();
+$eventosAdmin      = eventosTodos();
+$organizadoresAdmin = organizadoresConConteo();
+$categoriasAdmin    = categoriasConConteo();
+$estadosAdmin       = estadosConConteo();
+$ciudadesAdmin      = ciudadesConConteo();
+$usuariosAdmin      = usuariosTodos();
 
 $cifras = [
     'publicadas'    => contarActividadesPublicadas(),
@@ -84,7 +89,6 @@ require __DIR__ . '/includes/layout.php';
       <button data-panel="categorias">Categorías</button>
       <button data-panel="ciudades">Ciudades y estados</button>
       <button data-panel="usuarios">Usuarios</button>
-      <button data-panel="newsletter">Newsletter</button>
     </div>
 
     <!-- ACTIVIDADES — la única pestaña con datos de verdad -->
@@ -123,93 +127,82 @@ require __DIR__ . '/includes/layout.php';
       </div>
     </div>
 
-    <!-- ORGANIZADORES — maqueta -->
+    <!-- ORGANIZADORES — quien ya publicó al menos una actividad (ver publicarEvento()) -->
     <div class="admin-panel" id="panel-organizadores">
-      <div class="panel-toolbar">
-        <input type="text" placeholder="Buscar organizador…">
-        <button class="btn-add">+ Nuevo organizador</button>
-      </div>
       <table class="admtable">
-        <thead><tr><th>Nombre</th><th>Contacto</th><th>Actividades</th><th>Redes</th><th></th></tr></thead>
+        <thead><tr><th>Nombre</th><th>Correo</th><th>Actividades publicadas</th><th>Último acceso</th><th>Cuenta</th></tr></thead>
         <tbody>
-          <tr><td>Raíz Colectivo</td><td>hola@raizcolectivo.mx</td><td>12</td><td>IG · FB · WA</td><td><button class="actionbtn">Editar</button><button class="actionbtn">Eliminar</button></td></tr>
-          <tr><td>Circulo Vivo</td><td>circulovivo@gmail.com</td><td>7</td><td>IG · Web</td><td><button class="actionbtn">Editar</button><button class="actionbtn">Eliminar</button></td></tr>
-          <tr><td>Sana Selva</td><td>contacto@sanaselva.mx</td><td>5</td><td>IG · FB</td><td><button class="actionbtn">Editar</button><button class="actionbtn">Eliminar</button></td></tr>
-          <tr><td>Amara Wellness</td><td>amara.wellness@gmail.com</td><td>9</td><td>IG · WA · Web</td><td><button class="actionbtn">Editar</button><button class="actionbtn">Eliminar</button></td></tr>
+          <?php if (!$organizadoresAdmin): ?>
+            <tr><td colspan="5" style="opacity:.6;">Todavía no hay organizadores con actividades publicadas.</td></tr>
+          <?php endif; ?>
+          <?php foreach ($organizadoresAdmin as $org): ?>
+            <tr>
+              <td><?= e($org['nombre']) ?></td>
+              <td><?= e($org['email']) ?></td>
+              <td><?= number_format((int) $org['publicadas']) ?></td>
+              <td><?= $org['ultimo_acceso_en'] ? e(date('d M Y', strtotime($org['ultimo_acceso_en']))) : '—' ?></td>
+              <td><span class="badge <?= $org['estado'] === 'activo' ? 'on' : 'off' ?>"><?= e(ucfirst($org['estado'])) ?></span></td>
+            </tr>
+          <?php endforeach; ?>
         </tbody>
       </table>
+      <div class="evergreen-note" style="margin-top:18px;">
+        No hay «editar» ni «eliminar» aquí todavía: suspender una cuenta o cambiar un rol es una acción con
+        consecuencias —le corta el acceso a alguien— y no existe aún la pantalla de confirmación que eso merece.
+      </div>
     </div>
 
-    <!-- CATEGORIAS — maqueta -->
+    <!-- CATEGORIAS — catálogo fijo de categoriasMenu(), con conteo real de actividades publicadas -->
     <div class="admin-panel" id="panel-categorias">
-      <div class="panel-toolbar">
-        <input type="text" placeholder="Buscar categoría…">
-        <button class="btn-add">+ Nueva categoría</button>
-      </div>
-      <?php /* Los nombres salen de categoriasMenu() para que la maqueta no se
-               quede hablando de categorías que ya no existen —enseñaba Retreat,
-               Conferencia y Networking, que nunca estuvieron en la lista real—.
-               Los números siguen siendo de mentira: este panel no cuenta nada
-               todavía. */ ?>
+      <?php /* No hay «+ Nueva categoría»: el catálogo es un array fijo en
+               includes/eventos.php (categoriasMenu()), no algo que se cree
+               desde aquí. Agregar una implica tocar código, no un formulario. */ ?>
       <div>
-        <?php foreach (categoriasMenu() as $catNombre => $catDatos): ?>
-          <span class="catchip-admin"><?= e($catDatos[1]) ?> <span class="n">—</span></span>
+        <?php foreach ($categoriasAdmin as $cat): ?>
+          <span class="catchip-admin"><?= e($cat['icono'] . ' ' . $cat['nombre']) ?> <span class="n"><?= number_format($cat['total']) ?></span></span>
         <?php endforeach; ?>
       </div>
     </div>
 
-    <!-- CIUDADES / ESTADOS — maqueta -->
+    <!-- CIUDADES / ESTADOS — agrupado real desde eventos publicados -->
     <div class="admin-panel" id="panel-ciudades">
       <div class="twocol-admin">
         <div class="admin-card">
           <h4>Estados</h4>
           <ul>
-            <li>Quintana Roo <span class="mono" style="opacity:.5;">2 ciudades</span></li>
-            <li>Ciudad de México <span class="mono" style="opacity:.5;">1 ciudad</span></li>
-            <li>Oaxaca <span class="mono" style="opacity:.5;">1 ciudad</span></li>
-            <li>Jalisco <span class="mono" style="opacity:.5;">2 ciudades</span></li>
-            <li>Guanajuato <span class="mono" style="opacity:.5;">1 ciudad</span></li>
-            <li>Nuevo León <span class="mono" style="opacity:.5;">1 ciudad</span></li>
+            <?php if (!$estadosAdmin): ?><li style="opacity:.6;">Sin actividades publicadas todavía.</li><?php endif; ?>
+            <?php foreach ($estadosAdmin as $est): ?>
+              <li><?= e($est['nombre']) ?> <span class="mono" style="opacity:.5;"><?= (int) $est['ciudades'] ?> <?= $est['ciudades'] === 1 ? 'ciudad' : 'ciudades' ?></span></li>
+            <?php endforeach; ?>
           </ul>
-          <button class="btn-add" style="margin-top:14px;">+ Nuevo estado</button>
         </div>
         <div class="admin-card">
           <h4>Ciudades</h4>
           <ul>
-            <li>Tulum <span class="mono" style="opacity:.5;">24 actividades</span></li>
-            <li>CDMX <span class="mono" style="opacity:.5;">41 actividades</span></li>
-            <li>Oaxaca de Juárez <span class="mono" style="opacity:.5;">18 actividades</span></li>
-            <li>San Miguel de Allende <span class="mono" style="opacity:.5;">15 actividades</span></li>
-            <li>Guadalajara <span class="mono" style="opacity:.5;">12 actividades</span></li>
-            <li>Puerto Vallarta <span class="mono" style="opacity:.5;">9 actividades</span></li>
+            <?php if (!$ciudadesAdmin): ?><li style="opacity:.6;">Sin actividades publicadas todavía.</li><?php endif; ?>
+            <?php foreach ($ciudadesAdmin as $ciu): ?>
+              <li><?= e($ciu['nombre']) ?> <span class="mono" style="opacity:.5;"><?= number_format($ciu['actividades']) ?> <?= $ciu['actividades'] === 1 ? 'actividad' : 'actividades' ?></span></li>
+            <?php endforeach; ?>
           </ul>
-          <button class="btn-add" style="margin-top:14px;">+ Nueva ciudad</button>
         </div>
       </div>
     </div>
 
-    <!-- USUARIOS — maqueta -->
+    <!-- USUARIOS — toda la tabla usuarios -->
     <div class="admin-panel" id="panel-usuarios">
-      <div class="panel-toolbar">
-        <input type="text" placeholder="Buscar usuario…">
-        <button class="btn-add">+ Nuevo usuario</button>
-      </div>
       <table class="admtable">
-        <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th></th></tr></thead>
+        <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Último acceso</th></tr></thead>
         <tbody>
-          <tr><td>José P.</td><td>jose@jpcorelab.com</td><td><span class="badge on">Administrador</span></td><td><button class="actionbtn">Editar</button></td></tr>
-          <tr><td>Mariana R.</td><td>mariana@directoriowellness.mx</td><td><span class="badge off">Editor</span></td><td><button class="actionbtn">Editar</button><button class="actionbtn">Eliminar</button></td></tr>
+          <?php foreach ($usuariosAdmin as $us): ?>
+            <tr>
+              <td><?= e($us['nombre']) ?></td>
+              <td><?= e($us['email']) ?></td>
+              <td><span class="badge <?= $us['rol'] === 'admin' ? 'on' : 'off' ?>"><?= e(ucfirst($us['rol'])) ?></span></td>
+              <td><?= $us['ultimo_acceso_en'] ? e(date('d M Y', strtotime($us['ultimo_acceso_en']))) : 'Nunca entró' ?></td>
+            </tr>
+          <?php endforeach; ?>
         </tbody>
       </table>
-    </div>
-
-    <!-- NEWSLETTER — maqueta -->
-    <div class="admin-panel" id="panel-newsletter">
-      <div class="admin-card" style="max-width:420px;">
-        <h4>Suscriptores</h4>
-        <div class="stat-card" style="margin-bottom:14px;"><div class="num">1,207</div><div class="lbl">Correos capturados</div></div>
-        <button class="btn-add">Exportar CSV</button>
-      </div>
     </div>
 
   </div>

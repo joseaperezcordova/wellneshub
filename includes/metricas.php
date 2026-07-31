@@ -171,3 +171,87 @@ function ciudadesTop(int $limite = 6): array
         $st->fetchAll()
     );
 }
+
+/**
+ * Las 20 categorías del catálogo, cada una con cuántas actividades
+ * publicadas tiene —incluidas las que tienen cero—. A diferencia de
+ * categoriasTop(), esto no es un ranking para una gráfica: es el catálogo
+ * completo para el panel de administración, así que nada se recorta.
+ *
+ * @return array<int, array{nombre:string, icono:string, total:int}>
+ */
+function categoriasConConteo(): array
+{
+    $st = db()->query(
+        "SELECT categoria, COUNT(*) AS total
+           FROM eventos
+          WHERE situacion = 'publicado'
+       GROUP BY categoria"
+    );
+    $conteos = array_column($st->fetchAll(), 'total', 'categoria');
+
+    $resultado = [];
+    foreach (categoriasMenu() as $nombre => $datos) {
+        $resultado[] = ['nombre' => $nombre, 'icono' => $datos[0], 'total' => (int) ($conteos[$nombre] ?? 0)];
+    }
+
+    usort($resultado, static fn(array $a, array $b): int => $b['total'] <=> $a['total']);
+
+    return $resultado;
+}
+
+/**
+ * Estados con actividad publicada, con cuántas ciudades distintas tienen
+ * cada uno. Solo los que ya tienen algo —a diferencia de categorías, aquí
+ * enumerar los 32 estados completos con la mayoría en cero no ayuda a
+ * nadie, y municipiosPorEstado() son casi 2,500 filas: no hay catálogo
+ * chico que recorrer para rellenar los que faltan.
+ *
+ * @return array<int, array{nombre:string, ciudades:int, actividades:int}>
+ */
+function estadosConConteo(): array
+{
+    $st = db()->query(
+        "SELECT entidad AS nombre, COUNT(DISTINCT ciudad) AS ciudades, COUNT(*) AS actividades
+           FROM eventos
+          WHERE situacion = 'publicado' AND entidad != ''
+       GROUP BY entidad
+       ORDER BY actividades DESC, nombre ASC"
+    );
+
+    return array_map(
+        static fn(array $f): array => [
+            'nombre'      => (string) $f['nombre'],
+            'ciudades'    => (int) $f['ciudades'],
+            'actividades' => (int) $f['actividades'],
+        ],
+        $st->fetchAll()
+    );
+}
+
+/**
+ * Ciudades con actividad publicada, sin el límite de ciudadesTop() —esa es
+ * para la gráfica de la portada de métricas; esta es el listado completo
+ * del panel de administración.
+ *
+ * @return array<int, array{nombre:string, entidad:string, actividades:int}>
+ */
+function ciudadesConConteo(): array
+{
+    $st = db()->query(
+        "SELECT ciudad AS nombre, entidad, COUNT(*) AS actividades
+           FROM eventos
+          WHERE situacion = 'publicado' AND ciudad != ''
+       GROUP BY ciudad, entidad
+       ORDER BY actividades DESC, ciudad ASC"
+    );
+
+    return array_map(
+        static fn(array $f): array => [
+            'nombre'      => (string) $f['nombre'],
+            'entidad'     => (string) $f['entidad'],
+            'actividades' => (int) $f['actividades'],
+        ],
+        $st->fetchAll()
+    );
+}
