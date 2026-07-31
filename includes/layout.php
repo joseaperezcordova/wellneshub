@@ -82,31 +82,71 @@ $urlActualMeta = URL_BASE . (string) ($_SERVER['REQUEST_URI'] ?? '/');
 <link rel="stylesheet" href="<?= e(assetUrl('assets/css/portada.css')) ?>">
 <?php
 /*
- * GA4. Solo se imprime con un ID puesto en config.local.php y fuera de
- * localhost/127.0.0.1: en local nunca hay analítica, ni con el ID puesto,
- * para que probar el sitio en la máquina de quien programa no ensucie los
- * datos reales. Ver includes/config.local.example.php para dónde se pone el
- * ID y por qué es seguro tenerlo ya, antes del dominio final.
+ * Analítica: GA4, Microsoft Clarity y Meta Pixel, cada una con su propia
+ * llave en config.local.php y su propio candado — solo se imprime si tiene
+ * ID puesto Y fuera de localhost/127.0.0.1. En local nunca hay analítica,
+ * ni con los IDs puestos, para que probar el sitio en la máquina de quien
+ * programa no ensucie los datos reales. Ver includes/config.local.example.php
+ * para dónde se ponen los IDs y por qué es seguro tenerlos ya, antes del
+ * dominio final.
  *
  * whTrack() es el único punto de entrada para los eventos propios del resto
- * del sitio (evento.php, buscar.js, etc.): si GA4 no está activo, gtag no
- * existe y whTrack() no hace nada, así que esas llamadas no necesitan
- * comprobar nada por su cuenta.
+ * del sitio (evento.php, buscar.js, etc.) y reparte a las tres a la vez. Cada
+ * comprobación typeof es independiente: si solo GA4 está activo, fbq y
+ * clarity() simplemente no existen y esas dos líneas no hacen nada, sin que
+ * whTrack() tenga que saber cuáles de las tres están encendidas.
  */
-$ga4Id = trim((string) ($CONFIG['analytics']['ga4_id'] ?? ''));
-if ($ga4Id !== '' && empty($CONFIG['es_local'])):
+$ga4Id       = trim((string) ($CONFIG['analytics']['ga4_id'] ?? ''));
+$clarityId   = trim((string) ($CONFIG['analytics']['clarity_id'] ?? ''));
+$metaPixelId = trim((string) ($CONFIG['analytics']['meta_pixel_id'] ?? ''));
+$scVerifica  = trim((string) ($CONFIG['analytics']['search_console_verificacion'] ?? ''));
+$analiticaActiva = empty($CONFIG['es_local']);
 ?>
+<?php if ($scVerifica !== ''): ?>
+<meta name="google-site-verification" content="<?= e($scVerifica) ?>">
+<?php endif; ?>
+<?php if ($ga4Id !== '' && $analiticaActiva): ?>
 <script async src="https://www.googletagmanager.com/gtag/js?id=<?= e($ga4Id) ?>"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){ dataLayer.push(arguments); }
   gtag('js', new Date());
   gtag('config', <?= json_encode($ga4Id) ?>);
-  window.whTrack = function (nombre, params) { gtag('event', nombre, params || {}); };
 </script>
-<?php else: ?>
-<script>window.whTrack = function () {};</script>
 <?php endif; ?>
+<?php if ($clarityId !== '' && $analiticaActiva): ?>
+<script>
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", <?= json_encode($clarityId) ?>);
+</script>
+<?php endif; ?>
+<?php if ($metaPixelId !== '' && $analiticaActiva): ?>
+<script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', <?= json_encode($metaPixelId) ?>);
+  fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=<?= e($metaPixelId) ?>&amp;ev=PageView&amp;noscript=1" alt=""></noscript>
+<?php endif; ?>
+<script>
+  window.whTrack = function (nombre, params) {
+    var p = params || {};
+    if (typeof gtag === 'function')    gtag('event', nombre, p);
+    if (typeof fbq === 'function')     fbq('trackCustom', nombre, p);
+    if (typeof clarity === 'function') clarity('event', nombre);
+  };
+</script>
 <?php if (!empty($mapaInteractivo)): ?>
 <!-- El mapa arrastrable de alta/edición: Leaflet + OpenStreetMap, no la API
      de Google (includes/mapa.php explica por qué). Solo entra en las dos

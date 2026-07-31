@@ -108,20 +108,43 @@ return [
         'pedir_perfil'  => false,
     ],
 
-    // ---- Analítica (GA4) ---------------------------------------------------
-    // analytics.google.com → Administrar → Flujos de datos → el flujo web →
-    // "ID de medición" (algo como "G-XXXXXXXXXX").
+    // ---- Analítica -----------------------------------------------------
+    // Las cuatro llaves de abajo son independientes: cada una enciende su
+    // propia herramienta si tiene algo puesto, y no hace nada si está vacía.
+    // includes/layout.php no imprime NINGÚN script de analítica en local
+    // —ni con los IDs puestos—, para que probar el sitio en la máquina de
+    // quien programa no ensucie los datos reales.
     //
-    // Vacío = sin analítica: includes/layout.php no imprime el snippet de GA4
-    // ni nada intenta llamar a gtag(). No hace falta quitar código para
-    // desactivarlo, solo vaciar esto.
-    //
-    // El ID no está atado al dominio: sigue funcionando igual el día que el
-    // sitio se mude del subdominio de pruebas al dominio final, sin tocar
-    // nada aquí. Lo que sí toca rehacer en ese momento es la verificación de
-    // Google Search Console, que es aparte y por dominio.
+    // Los IDs no están atados al dominio: siguen funcionando igual el día
+    // que el sitio se mude del subdominio de pruebas al dominio final, sin
+    // tocar nada aquí. Lo que sí toca rehacer en ese momento es la
+    // verificación de Search Console (es por dominio) y, si se usa
+    // Conversions API de Meta, la verificación de dominio del píxel —esas
+    // dos son aparte y no viven en este archivo.
     'analytics' => [
+        // analytics.google.com → Administrar → Flujos de datos → el flujo
+        // web → "ID de medición" (algo como "G-XXXXXXXXXX").
         'ga4_id' => '',
+
+        // clarity.microsoft.com → el proyecto → Configuración → "ID del
+        // proyecto de Clarity" (letras y números, sin prefijo).
+        'clarity_id' => '',
+
+        // business.facebook.com → Administrador de eventos → el píxel →
+        // "ID del píxel" (solo números).
+        'meta_pixel_id' => '',
+
+        // search.google.com/search-console → Agregar propiedad → tipo
+        // "Prefijo de URL" → método "Etiqueta HTML" → el valor del atributo
+        // content del <meta name="google-site-verification"> que te den
+        // (NO la etiqueta completa, solo el valor de content).
+        //
+        // Alternativa: verificar por DNS (registro TXT) en vez de con esto.
+        // Esa vía cubre el dominio entero de una sola vez —con y sin
+        // "www."—, que es justo el problema que ya tuvimos con el login de
+        // Google. Si tienes acceso al DNS del subdominio, es la mejor
+        // opción; si no, esta etiqueta funciona igual de bien.
+        'search_console_verificacion' => '',
     ],
 
 ];
