@@ -108,4 +108,20 @@ return [
         'pedir_perfil'  => false,
     ],
 
+    // ---- Analítica (GA4) ---------------------------------------------------
+    // analytics.google.com → Administrar → Flujos de datos → el flujo web →
+    // "ID de medición" (algo como "G-XXXXXXXXXX").
+    //
+    // Vacío = sin analítica: includes/layout.php no imprime el snippet de GA4
+    // ni nada intenta llamar a gtag(). No hace falta quitar código para
+    // desactivarlo, solo vaciar esto.
+    //
+    // El ID no está atado al dominio: sigue funcionando igual el día que el
+    // sitio se mude del subdominio de pruebas al dominio final, sin tocar
+    // nada aquí. Lo que sí toca rehacer en ese momento es la verificación de
+    // Google Search Console, que es aparte y por dominio.
+    'analytics' => [
+        'ga4_id' => '',
+    ],
+
 ];

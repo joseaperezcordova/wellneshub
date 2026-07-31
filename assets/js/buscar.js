@@ -206,18 +206,31 @@
   // ---- enganches
   var temporizadorTexto = null;
 
+  /* whTrack() la define includes/layout.php —de verdad si hay GA4, en blanco
+     si no—, así que aquí no hace falta comprobar si existe. */
   ['fEstado', 'fCiudad', 'fFecha', 'fGratis', 'fOrden'].forEach(function (id) {
-    $(id).addEventListener('change', refrescar);
+    $(id).addEventListener('change', function () {
+      whTrack('filtro_aplicado', {campo: id});
+      refrescar();
+    });
   });
-  $('fCats').addEventListener('change', refrescar);
+  $('fCats').addEventListener('change', function () {
+    whTrack('filtro_aplicado', {campo: 'categoria'});
+    refrescar();
+  });
 
   /* El texto sí espera: cada tecla ya dispara una consulta al servidor, y sin
      esto una palabra de ocho letras mandaría ocho peticiones para quedarse
      solo con la última. peticion (arriba) descarta las respuestas que de
-     todos modos lleguen fuera de orden. */
+     todos modos lleguen fuera de orden. El evento de búsqueda se manda
+     después de refrescar() —no en cada tecla— para no llenar GA4 de un
+     evento por letra mientras alguien todavía está escribiendo. */
   $('fTexto').addEventListener('input', function () {
     clearTimeout(temporizadorTexto);
-    temporizadorTexto = setTimeout(refrescar, 300);
+    temporizadorTexto = setTimeout(function () {
+      refrescar();
+      if (estado.texto) whTrack('buscar', {termino: estado.texto});
+    }, 300);
   });
 
   $('fLimpiar').addEventListener('click', limpiar);

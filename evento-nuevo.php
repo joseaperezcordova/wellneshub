@@ -77,6 +77,9 @@ require __DIR__ . '/includes/layout.php';
     <p class="sub">Rellena la ficha. Antes de publicarla la vas a ver tal como la verá la gente.</p>
 
     <?php require __DIR__ . '/includes/aviso-errores.php'; ?>
+    <?php if ($errores): ?>
+      <script>whTrack('error_formulario', <?= json_encode(['form' => 'evento_nuevo', 'campos' => array_keys($errores)]) ?>);</script>
+    <?php endif; ?>
 
     <form method="post" enctype="multipart/form-data" novalidate>
       <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">

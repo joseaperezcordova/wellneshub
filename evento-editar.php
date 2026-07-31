@@ -29,6 +29,7 @@ if (!$ev) {
     echo '<div class="auth-caja"><h1>Esa actividad no existe</h1>'
        . '<p class="sub">Puede que se haya borrado.</p>'
        . '<a class="btn-principal" style="text-decoration:none; display:block; text-align:center;" href="' . URL_BASE . '/">Volver al inicio</a></div>';
+    echo '<script>whTrack("404", ' . json_encode(['ruta' => (string) ($_SERVER['REQUEST_URI'] ?? '')]) . ');</script>';
     pie();
     exit;
 }
@@ -70,6 +71,9 @@ if ($puede && postDesbordado()) {
             }
 
             $_SESSION['evento_aviso'] = 'Cambios guardados.';
+            $_SESSION['eventos_ga'] = [
+                ['nombre' => 'editar_actividad', 'params' => ['id' => (int) $ev['id'], 'categoria' => $e['categoria']]],
+            ];
 
             // Si se llegó aquí desde el panel admin, esa procedencia se lleva
             // a la ficha para que su enlace de vuelta apunte al mismo sitio.
@@ -149,6 +153,9 @@ require __DIR__ . '/includes/layout.php';
     <?php endif; ?>
 
     <?php require __DIR__ . '/includes/aviso-errores.php'; ?>
+    <?php if ($errores): ?>
+      <script>whTrack('error_formulario', <?= json_encode(['form' => 'evento_editar', 'campos' => array_keys($errores)]) ?>);</script>
+    <?php endif; ?>
 
     <form method="post" enctype="multipart/form-data" novalidate>
       <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">

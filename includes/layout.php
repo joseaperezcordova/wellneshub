@@ -56,6 +56,33 @@ function enlaceMenu(string $ruta, string $texto, string $clave, string $seccion)
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<?= e(assetUrl('assets/css/app.css')) ?>">
 <link rel="stylesheet" href="<?= e(assetUrl('assets/css/portada.css')) ?>">
+<?php
+/*
+ * GA4. Solo se imprime con un ID puesto en config.local.php y fuera de
+ * localhost/127.0.0.1: en local nunca hay analítica, ni con el ID puesto,
+ * para que probar el sitio en la máquina de quien programa no ensucie los
+ * datos reales. Ver includes/config.local.example.php para dónde se pone el
+ * ID y por qué es seguro tenerlo ya, antes del dominio final.
+ *
+ * whTrack() es el único punto de entrada para los eventos propios del resto
+ * del sitio (evento.php, buscar.js, etc.): si GA4 no está activo, gtag no
+ * existe y whTrack() no hace nada, así que esas llamadas no necesitan
+ * comprobar nada por su cuenta.
+ */
+$ga4Id = trim((string) ($CONFIG['analytics']['ga4_id'] ?? ''));
+if ($ga4Id !== '' && empty($CONFIG['es_local'])):
+?>
+<script async src="https://www.googletagmanager.com/gtag/js?id=<?= e($ga4Id) ?>"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', <?= json_encode($ga4Id) ?>);
+  window.whTrack = function (nombre, params) { gtag('event', nombre, params || {}); };
+</script>
+<?php else: ?>
+<script>window.whTrack = function () {};</script>
+<?php endif; ?>
 <?php if (!empty($mapaInteractivo)): ?>
 <!-- El mapa arrastrable de alta/edición: Leaflet + OpenStreetMap, no la API
      de Google (includes/mapa.php explica por qué). Solo entra en las dos
@@ -162,6 +189,28 @@ if (!empty($_SESSION['evento_aviso'])):
     <div class="aviso-portada"><?= e($avisoLayout) ?></div>
   </div>
 <?php endif; ?>
+
+<?php
+/*
+ * Eventos propios que se disparan DESPUÉS de una redirección —publicar,
+ * editar, eliminar—: la página que hace el cambio no es la que se enseña al
+ * final, así que no puede llamar a whTrack() directamente. Se dejan en una
+ * lista en sesión (mismo patrón que evento_aviso, arriba) y aquí, en la
+ * página de destino, se disparan y se borran. Es una lista y no un solo
+ * evento porque una misma redirección puede encolar dos —publicar una
+ * actividad y, si es la primera del organizador, también su alta—. Como
+ * whTrack() no hace nada sin GA4 activo, esto es gratis sin analítica.
+ */
+if (!empty($_SESSION['eventos_ga'])):
+    $eventosGaLayout = $_SESSION['eventos_ga'];
+    unset($_SESSION['eventos_ga']);
+    foreach ($eventosGaLayout as $gaLayout):
+?>
+  <script>whTrack(<?= json_encode($gaLayout['nombre']) ?>, <?= json_encode((object) ($gaLayout['params'] ?? [])) ?>);</script>
+<?php
+    endforeach;
+endif;
+?>
 
 <?php
 $anchoLibre = $anchoLibre ?? false;

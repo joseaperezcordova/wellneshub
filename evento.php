@@ -26,6 +26,7 @@ if (!$ev || !puedeVerEvento($ev, $u)) {
     echo '<div class="auth-caja"><h1>Esa actividad no existe</h1>'
        . '<p class="sub">Puede que se haya borrado o que todavía no esté publicada.</p>'
        . '<a class="btn-principal" style="text-decoration:none; display:block; text-align:center;" href="' . URL_BASE . '/">Ver las que sí</a></div>';
+    echo '<script>whTrack("404", ' . json_encode(['ruta' => (string) ($_SERVER['REQUEST_URI'] ?? '')]) . ');</script>';
     pie();
     exit;
 }
@@ -44,6 +45,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit('No puedes hacer eso.');
 
     } elseif (isset($_POST['publicar']) && ($ev['situacion'] !== 'oculto' || esAdmin($u))) {
+        // Antes de publicar: si quien manda es todavía 'visitante', esto lo va a
+        // convertir en organizador (publicarEvento() hace ese ascenso). Se mira
+        // aquí, no después, porque después ya no hay forma de saber cuál era su
+        // rol un segundo antes.
+        $eraVisitante = $u['rol'] === 'visitante';
+
         // Volver a publicar una actividad oculta deshace una decisión de moderación,
         // así que es cosa de un administrador. Sin esto, el dueño podría mandar
         // el POST a mano y saltarse por qué se ocultó en primer lugar.
@@ -55,6 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         revisarAlPublicar($ev);
 
         $_SESSION['evento_aviso'] = '¡Publicado! Ya aparece en la portada.';
+        $_SESSION['eventos_ga'] = [
+            ['nombre' => 'publicar_actividad', 'params' => ['id' => (int) $ev['id'], 'categoria' => $ev['categoria']]],
+        ];
+        if ($eraVisitante && (int) $ev['usuario_id'] === (int) $u['id']) {
+            $_SESSION['eventos_ga'][] = ['nombre' => 'alta_organizador', 'params' => []];
+        }
         redirigir('/evento.php?id=' . (int) $ev['id']);
 
     } elseif (isset($_POST['ocultar']) && esAdmin($u)) {
@@ -71,6 +84,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             eliminarEvento((int) $ev['id']);
             $_SESSION['evento_aviso'] = 'Actividad eliminada.';
+            $_SESSION['eventos_ga'] = [
+                ['nombre' => 'eliminar_actividad', 'params' => ['id' => (int) $ev['id'], 'categoria' => $ev['categoria']]],
+            ];
             redirigir('/');
         }
     }
@@ -117,6 +133,13 @@ $titulo        = $ev['titulo'];
 $scriptsPagina = ['assets/js/evento.js'];
 require __DIR__ . '/includes/layout.php';
 ?>
+
+<?php if ($ev['situacion'] === 'publicado'): ?>
+  <!-- Solo la ficha ya publicada cuenta como "visualización de actividad": la
+       vista previa de un borrador la recarga una y otra vez quien la escribe
+       mientras la ajusta, y eso no es tráfico real. -->
+  <script>whTrack('ver_actividad', <?= json_encode(['id' => (int) $ev['id'], 'categoria' => $ev['categoria'], 'ciudad' => $ev['ciudad']]) ?>);</script>
+<?php endif; ?>
 
 <div class="ficha-envoltorio">
   <a class="volver" href="<?= e($volverA) ?>">← <?= $volverAdmin ? 'Volver al panel admin' : ($vieneDeBusqueda ? 'Volver a los resultados' : 'Ver todas las actividades') ?></a>
@@ -278,17 +301,26 @@ require __DIR__ . '/includes/layout.php';
       <?php endif; ?>
     </div>
 
+    <?php /* WhatsApp y el sitio del organizador son enlaces a otro dominio: los
+             cuenta solo el "seguimiento mejorado" de GA4 (clics salientes),
+             que se activa en la propia consola de GA4, no aquí en el código.
+             Boletos/reservar/contactar sí necesitan el whTrack() de abajo:
+             pasan primero por salida.php o contactar.php, un salto dentro del
+             propio sitio, y eso el seguimiento mejorado no lo ve como "salida". */ ?>
     <?php if ($ev['accion_principal'] === 'boletos' && !empty($ev['url_boletos'])): ?>
       <a class="btn-principal btn-boletos" href="<?= URL_BASE ?>/salida.php?id=<?= (int) $ev['id'] ?>&tipo=boletos"
-         target="_blank" rel="noopener nofollow">Comprar boletos</a>
+         target="_blank" rel="noopener nofollow"
+         onclick="whTrack('clic_boletos', <?= e(json_encode(['id' => (int) $ev['id']])) ?>)">Comprar boletos</a>
 
     <?php elseif ($ev['accion_principal'] === 'reservar' && !empty($ev['url_reserva'])): ?>
       <a class="btn-principal btn-boletos" href="<?= URL_BASE ?>/salida.php?id=<?= (int) $ev['id'] ?>&tipo=reservar"
-         target="_blank" rel="noopener nofollow">Reservar mi lugar</a>
+         target="_blank" rel="noopener nofollow"
+         onclick="whTrack('clic_reservar', <?= e(json_encode(['id' => (int) $ev['id']])) ?>)">Reservar mi lugar</a>
 
     <?php elseif ($ev['accion_principal'] === 'informacion'): ?>
       <div class="ficha-contacto">
-        <a class="btn-principal btn-boletos" href="<?= URL_BASE ?>/contactar.php?id=<?= (int) $ev['id'] ?>">Contactar al organizador</a>
+        <a class="btn-principal btn-boletos" href="<?= URL_BASE ?>/contactar.php?id=<?= (int) $ev['id'] ?>"
+           onclick="whTrack('clic_contactar', <?= e(json_encode(['id' => (int) $ev['id']])) ?>)">Contactar al organizador</a>
         <?php if (!empty($ev['whatsapp_contacto'])): ?>
           <?php $textoWa = rawurlencode('Hola, vi tu actividad "' . $ev['titulo'] . '" en Rueda y quería preguntarte algo.'); ?>
           <a class="btn-whatsapp" href="https://wa.me/<?= e($ev['whatsapp_contacto']) ?>?text=<?= e($textoWa) ?>"
