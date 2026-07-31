@@ -10,11 +10,13 @@
  * búsqueda —el enlace de vuelta se lo lleva puesto—, y de paso que una
  * búsqueda se pueda compartir o guardar en marcadores.
  *
- * El filtrado en sí lo hace el navegador, no esta página: los eventos ya vienen
- * todos aquí y volver al servidor por cada casilla que se marca se nota más que
- * cualquier ahorro. Lo que hace PHP es armar el panel con las opciones que
- * existen de verdad y dejar los controles puestos según la dirección, para que
- * la página ya llegue con la búsqueda hecha.
+ * El filtrado ya NO lo hace el navegador: buscar-datos.php resuelve cada
+ * búsqueda en SQL y trae solo una página de resultados. Antes los eventos
+ * publicados venían todos incrustados aquí (hasta 60) y se filtraban en el
+ * navegador; con más de 60 actividades esa lista ya no cabía entera. Esta
+ * página solo arma el panel con las opciones que existen de verdad y deja los
+ * controles puestos según la dirección —el JS pide la primera página nada más
+ * cargar, así que hay un único camino para "cargar" y para "cargar más".
  */
 
 declare(strict_types=1);
@@ -22,8 +24,7 @@ require __DIR__ . '/includes/config.php';
 require __DIR__ . '/includes/eventos.php';
 require __DIR__ . '/includes/busqueda.php';
 
-$eventosJs = array_map('eventoParaTarjeta', eventosPublicados());
-$filtros   = filtrosDesdePeticion($_GET);
+$filtros = filtrosDesdePeticion($_GET);
 
 /*
  * Los desplegables de estado y ciudad salen de los eventos que hay, no de una
@@ -31,10 +32,9 @@ $filtros   = filtrosDesdePeticion($_GET);
  * eventos solo llevaba a un resultado vacío, y una ciudad nueva —que cualquiera
  * puede teclear al publicar— no aparecía nunca.
  */
-$entidadesFiltro = array_values(array_unique(array_column($eventosJs, 'entidad')));
-$ciudadesFiltro  = array_values(array_unique(array_column($eventosJs, 'ciudad')));
-sort($entidadesFiltro, SORT_NATURAL | SORT_FLAG_CASE);
-sort($ciudadesFiltro,  SORT_NATURAL | SORT_FLAG_CASE);
+$ubicaciones      = ubicacionesConActividad();
+$entidadesFiltro  = $ubicaciones['entidades'];
+$ciudadesFiltro   = $ubicaciones['ciudades'];
 
 $titulo        = 'Buscar actividades';
 $anchoLibre    = true;
@@ -117,13 +117,9 @@ require __DIR__ . '/includes/layout.php';
         </select>
       </div>
       <div class="results-grid" id="resultsGrid"></div>
+      <button type="button" class="btn-cargar-mas" id="btnCargarMas" hidden>Cargar más actividades</button>
     </div>
   </div>
 </section>
-
-<script>
-  var EVENTOS = <?= json_encode($eventosJs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
-                                          | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-</script>
 
 <?php pie(); ?>

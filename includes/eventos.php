@@ -244,6 +244,134 @@ function eventosPublicados(?string $categoria = null, int $limite = 60): array
     return $st->fetchAll();
 }
 
+/**
+ * El tramo de fechas de cada opción de "Cuándo" del buscador.
+ *
+ * Tiene que dar exactamente el mismo resultado que rango() en
+ * assets/js/buscar.js —ahí decide qué tarjeta se pinta cuando el filtrado
+ * era en el navegador; aquí decide qué fila trae la consulta—. Si los dos se
+ * desincronizan, el número de "resultados encontrados" no cuadraría con lo
+ * que de verdad se está pidiendo.
+ *
+ * @return array{0:?string,1:?string} [desde, hasta] como DATETIME, o [null,null]
+ */
+function rangoFechaBusqueda(string $clave): array
+{
+    if ($clave === '') return [null, null];
+
+    $hoy = new DateTimeImmutable('today');
+
+    if ($clave === 'finde') {
+        // 0 domingo .. 6 sábado, igual que Date.getDay() en JS.
+        $dia    = (int) $hoy->format('w');
+        $inicio = ($dia !== 0 && $dia !== 6) ? $hoy->modify('+' . (6 - $dia) . ' days') : $hoy;
+        $fin    = ((int) $inicio->format('w') === 6) ? $inicio->modify('+1 day') : $inicio;
+
+        return [$inicio->format('Y-m-d 00:00:00'), $fin->format('Y-m-d 23:59:59')];
+    }
+
+    if ($clave === '7dias') {
+        return [$hoy->format('Y-m-d 00:00:00'), $hoy->modify('+6 days')->format('Y-m-d 23:59:59')];
+    }
+
+    // 'mes': lo que queda del mes. El día 0 del mes siguiente es el último de este.
+    $finMes = $hoy->modify('last day of this month');
+    return [$hoy->format('Y-m-d 00:00:00'), $finMes->format('Y-m-d 23:59:59')];
+}
+
+/**
+ * Busca actividades publicadas con los filtros de includes/busqueda.php,
+ * resueltos en SQL y no en el navegador —para que la lista no tenga techo—.
+ *
+ * @return array{total:int, eventos:array}
+ */
+function eventosBuscar(array $f, int $limite, int $offset): array
+{
+    // Igual que eventosPublicados(): una actividad ya terminada sigue
+    // "publicada" —la ficha se puede seguir viendo—, pero no aparece al
+    // buscar ni al explorar.
+    $where  = ["e.situacion = 'publicado'", "COALESCE(e.fecha_fin, e.fecha_inicio) >= NOW()"];
+    $params = [];
+
+    if ($f['entidad'] !== '') {
+        $where[]  = 'e.entidad = ?';
+        $params[] = $f['entidad'];
+    }
+    if ($f['ciudad'] !== '') {
+        $where[]  = 'e.ciudad = ?';
+        $params[] = $f['ciudad'];
+    }
+    if ($f['gratis']) {
+        $where[] = 'e.gratuito = 1';
+    }
+    if ($f['cats']) {
+        $marcadores = implode(',', array_fill(0, count($f['cats']), '?'));
+        $where[]    = "e.categoria IN ($marcadores)";
+        array_push($params, ...$f['cats']);
+    }
+    if ($f['texto'] !== '') {
+        $comodin = '%' . $f['texto'] . '%';
+        $where[] = '(e.titulo LIKE ? OR e.categoria LIKE ? OR e.ciudad LIKE ? OR u.nombre LIKE ?)';
+        array_push($params, $comodin, $comodin, $comodin, $comodin);
+    }
+
+    [$desde, $hasta] = rangoFechaBusqueda($f['fecha']);
+    if ($desde !== null) {
+        $where[]  = 'e.fecha_inicio <= ? AND COALESCE(e.fecha_fin, e.fecha_inicio) >= ?';
+        $params[] = $hasta;
+        $params[] = $desde;
+    }
+
+    $whereSql = implode(' AND ', $where);
+    $pdo      = db();
+
+    $stTotal = $pdo->prepare(
+        "SELECT COUNT(*) FROM eventos e JOIN usuarios u ON u.id = e.usuario_id WHERE $whereSql"
+    );
+    $stTotal->execute($params);
+    $total = (int) $stTotal->fetchColumn();
+
+    $ordenes = [
+        // gratuito primero deja las de precio 0 antes que "por confirmar"
+        // (precio NULL), igual que pnum=0 vence a pnum=null en el JS de antes.
+        'precio' => 'e.gratuito DESC, (e.precio IS NULL) ASC, e.precio ASC, e.fecha_inicio ASC',
+        'nuevos' => 'e.publicado_en DESC, e.fecha_inicio ASC',
+        'fecha'  => 'e.fecha_inicio ASC',
+    ];
+    $orderBy = $ordenes[$f['orden']] ?? $ordenes['fecha'];
+
+    $st = $pdo->prepare(
+        "SELECT e.*, u.nombre AS organizador
+           FROM eventos e
+           JOIN usuarios u ON u.id = e.usuario_id
+          WHERE $whereSql
+       ORDER BY $orderBy
+          LIMIT " . (int) $limite . ' OFFSET ' . (int) $offset
+    );
+    $st->execute($params);
+
+    return ['total' => $total, 'eventos' => $st->fetchAll()];
+}
+
+/** Estados y ciudades con al menos una actividad publicada, para el panel de filtros. */
+function ubicacionesConActividad(): array
+{
+    $vigente = "situacion = 'publicado' AND COALESCE(fecha_fin, fecha_inicio) >= NOW()";
+
+    $entidades = db()->query(
+        "SELECT DISTINCT entidad FROM eventos WHERE $vigente AND entidad != ''"
+    )->fetchAll(PDO::FETCH_COLUMN);
+
+    $ciudades = db()->query(
+        "SELECT DISTINCT ciudad FROM eventos WHERE $vigente AND ciudad != ''"
+    )->fetchAll(PDO::FETCH_COLUMN);
+
+    sort($entidades, SORT_NATURAL | SORT_FLAG_CASE);
+    sort($ciudades, SORT_NATURAL | SORT_FLAG_CASE);
+
+    return ['entidades' => $entidades, 'ciudades' => $ciudades];
+}
+
 /** Los eventos de una persona, incluidos borradores y pasados. */
 function eventosDeUsuario(int $usuarioId): array
 {

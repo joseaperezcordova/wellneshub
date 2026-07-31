@@ -9,12 +9,13 @@
        actividad se puede volver a estos mismos resultados.
      · Recargar, compartir o guardar la página conserva la búsqueda.
      · PHP deja los controles puestos al abrir, leyendo esos mismos parámetros,
-       de modo que la página llega con la búsqueda hecha y no parpadea.
+       de modo que la página llega con la búsqueda hecha.
 
-   Se filtra aquí y no en el servidor a propósito: los eventos ya están todos en
-   la página —eventosPublicados() trae hasta 60— y una recarga por cada casilla
-   que se marca se nota más que cualquier ahorro. El día que la lista no quepa,
-   esto se cambia por una consulta y el panel se queda igual.
+   El filtrado se resuelve en el servidor —buscar-datos.php—, no aquí: antes
+   los eventos publicados venían todos incrustados en la página (hasta 60) y
+   se filtraban en el navegador, y con más de 60 actividades esa lista dejaba
+   de caber entera. Cargar la primera página y "Cargar más" son la misma
+   función con distinto punto de partida, para que no se desincronicen.
    ========================================================================== */
 (function () {
   'use strict';
@@ -22,97 +23,27 @@
   var $ = function (id) { return document.getElementById(id); };
   if (!$('resultsGrid')) return;
 
-  var estado = {texto: '', entidad: '', ciudad: '', fecha: '', cats: [], gratis: false, orden: 'fecha'};
+  var PAGINA = 24;
 
-  /* Sin acentos y en minúsculas por los dos lados. Buscar «meditacion» tiene
-     que encontrar «Meditación»: nadie escribe el acento en un buscador. */
-  function llano(s) {
-    s = String(s == null ? '' : s).toLowerCase();
-    return s.normalize ? s.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : s;
-  }
+  var estado    = {texto: '', entidad: '', ciudad: '', fecha: '', cats: [], gratis: false, orden: 'fecha'};
+  var cargados  = 0;
+  var total     = 0;
+  var peticion  = 0; // se incrementa en cada cargar(): una respuesta vieja que
+                      // llega tarde se descarta comparando contra este número.
 
-  function finDeDia(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59); }
+  function vacioBusquedaHTML() {
+    /* Sin actividades en la base y sin actividades que casen son dos vacíos
+       distintos, y la salida de cada uno también: publicar la primera, o quitar
+       filtros. Antes esto se sabía mirando el tamaño de la lista completa que
+       ya estaba en el navegador; ahora lo dice hayFiltros(): sin ningún filtro
+       puesto, cero resultados solo puede significar que el directorio está
+       vacío. */
+    if (!hayFiltros()) return vacioHTML('Todavía no hay actividades publicadas.');
 
-  /* El tramo de días que cubre cada opción de «Fecha». */
-  function rango(clave) {
-    if (!clave) return null;
-
-    var ahora = new Date();
-    var hoy   = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
-
-    if (clave === 'finde') {
-      /* 0 es domingo y 6 sábado. En sábado o en domingo «este fin de semana» es
-         el de hoy, no el de dentro de una semana: quien lo pulsa un sábado por
-         la mañana está buscando planes para hoy. */
-      var dia    = hoy.getDay();
-      var inicio = new Date(hoy);
-      if (dia !== 0 && dia !== 6) inicio.setDate(hoy.getDate() + (6 - dia));
-      var fin = new Date(inicio);
-      if (inicio.getDay() === 6) fin.setDate(inicio.getDate() + 1);
-      return [inicio, finDeDia(fin)];
-    }
-
-    if (clave === '7dias') {
-      // Siete días contando hoy, de ahí el +6. Con +7 el tramo cubre ocho
-      // fechas distintas y el evento del final no cuadra con la etiqueta.
-      var semana = new Date(hoy);
-      semana.setDate(hoy.getDate() + 6);
-      return [hoy, finDeDia(semana)];
-    }
-
-    // Lo que queda de mes. El día 0 del mes siguiente es el último de este.
-    return [hoy, finDeDia(new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0))];
-  }
-
-  /* Un retiro de cinco días que cruza el sábado cuenta como «este fin de
-     semana», aunque empiece el miércoles. Por eso se comparan los dos extremos
-     y no solo la fecha de inicio. */
-  function enRango(ev, r) {
-    if (!r) return true;
-    var ini = ev.ini ? new Date(ev.ini) : null;
-    if (!ini || isNaN(ini)) return false;
-    var fin = ev.fin ? new Date(ev.fin) : ini;
-    if (isNaN(fin)) fin = ini;
-    return ini <= r[1] && fin >= r[0];
-  }
-
-  function pasa(ev, r) {
-    if (estado.entidad && ev.entidad !== estado.entidad) return false;
-    if (estado.ciudad  && ev.ciudad  !== estado.ciudad)  return false;
-    if (estado.gratis  && !ev.free)                      return false;
-    if (estado.cats.length && estado.cats.indexOf(ev.cat) === -1) return false;
-    if (!enRango(ev, r)) return false;
-
-    if (estado.texto) {
-      /* Mira también categoría, lugar y organizador. Es lo que hace que el
-         «Dónde» de la portada funcione: llega aquí como texto, y escribir
-         «Tulum» encuentra Tulum sin necesitar un campo aparte. */
-      var pajar = llano(ev.t + ' ' + ev.cat + ' ' + ev.city + ' ' + ev.org);
-      if (pajar.indexOf(llano(estado.texto)) === -1) return false;
-    }
-    return true;
-  }
-
-  function porFecha(a, b) { return String(a.ini || '').localeCompare(String(b.ini || '')); }
-
-  var ordenes = {
-    fecha: porFecha,
-    precio: function (a, b) {
-      /* «Por confirmar» es null y se va al final: no es ni caro ni barato, y
-         colarlo entre los precios reales rompe la lectura de la columna. */
-      if (a.pnum === null && b.pnum === null) return porFecha(a, b);
-      if (a.pnum === null) return 1;
-      if (b.pnum === null) return -1;
-      return a.pnum - b.pnum || porFecha(a, b);
-    },
-    nuevos: function (a, b) {
-      return String(b.pub || '').localeCompare(String(a.pub || '')) || porFecha(a, b);
-    }
-  };
-
-  function hayFiltros() {
-    return !!(estado.texto || estado.entidad || estado.ciudad || estado.fecha
-              || estado.cats.length || estado.gratis);
+    return '<div class="rail-vacio">'
+      + '<p>Ninguna actividad coincide con lo que buscas.</p>'
+      + '<button type="button" class="btn-vacio" id="vaciarFiltros">Quitar filtros</button>'
+      + '</div>';
   }
 
   /* La búsqueda como cadena de consulta. Tiene que dar lo mismo que
@@ -132,48 +63,88 @@
     return p.toString();
   }
 
-  function vacioBusquedaHTML() {
-    /* Sin actividades en la base y sin actividades que casen son dos vacíos
-       distintos, y la salida de cada uno también: publicar la primera, o quitar
-       filtros. */
-    if (!EVENTOS.length) return vacioHTML('Todavía no hay actividades publicadas.');
-
-    return '<div class="rail-vacio">'
-      + '<p>Ninguna actividad coincide con lo que buscas.</p>'
-      + '<button type="button" class="btn-vacio" id="vaciarFiltros">Quitar filtros</button>'
-      + '</div>';
+  function hayFiltros() {
+    return !!(estado.texto || estado.entidad || estado.ciudad || estado.fecha
+              || estado.cats.length || estado.gratis);
   }
 
-  function aplicar() {
-    var r     = rango(estado.fecha);
-    var lista = EVENTOS.filter(function (ev) { return pasa(ev, r); });
-    lista.sort(ordenes[estado.orden] || ordenes.fecha);
+  function pintarConteo() {
+    if (total === 0) {
+      $('resultsCount').textContent = 'Ninguna actividad coincide';
+    } else if (total === 1) {
+      $('resultsCount').textContent = '1 actividad encontrada';
+    } else if (cargados < total) {
+      $('resultsCount').textContent = cargados + ' de ' + total + ' actividades';
+    } else {
+      $('resultsCount').textContent = total + ' actividades encontradas';
+    }
 
-    /* Cada tarjeta se lleva la búsqueda pegada a su dirección. Es lo que hace
-       que la ficha sepa a dónde volver aunque se abra en otra pestaña, donde el
-       «atrás» del navegador no serviría de nada. */
-    var cola = consulta();
-    var ida  = cola ? 'volver=' + encodeURIComponent(cola) : '';
+    var boton = $('btnCargarMas');
+    boton.hidden = cargados >= total;
+  }
 
-    $('resultsGrid').innerHTML = lista.length
-      ? lista.map(function (ev) { return cardHTML(ev, ida); }).join('')
-      : vacioBusquedaHTML();
+  /**
+   * Pide una página de resultados al servidor.
+   * @param {boolean} reiniciar true para una búsqueda nueva (reemplaza la
+   *   grilla y vuelve a empezar en cero); false para "Cargar más" (añade).
+   */
+  function cargar(reiniciar) {
+    var miPeticion = ++peticion;
+    var offset     = reiniciar ? 0 : cargados;
+    var qs         = consulta();
+    var url        = 'buscar-datos.php' + (qs ? '?' + qs + '&' : '?') + 'offset=' + offset;
 
-    var vaciar = $('vaciarFiltros');
-    if (vaciar) vaciar.addEventListener('click', limpiar);
+    if (reiniciar) {
+      $('resultsGrid').innerHTML = '<div class="rail-cargando">Buscando…</div>';
+      $('btnCargarMas').hidden = true;
+    } else {
+      $('btnCargarMas').disabled = true;
+      $('btnCargarMas').textContent = 'Cargando…';
+    }
 
-    $('resultsCount').textContent =
-      lista.length === 0 ? 'Ninguna actividad coincide'
-      : lista.length === 1 ? '1 actividad encontrada'
-      : lista.length + ' actividades encontradas';
+    fetch(url)
+      .then(function (resp) { return resp.json(); })
+      .then(function (json) {
+        if (miPeticion !== peticion) return; // llegó tarde: ya no aplica
 
-    $('fLimpiar').hidden = !hayFiltros();
+        total = json.total;
+
+        /* Cada tarjeta se lleva la búsqueda pegada a su dirección. Es lo que
+           hace que la ficha sepa a dónde volver aunque se abra en otra
+           pestaña, donde el «atrás» del navegador no serviría de nada. */
+        var ida    = qs ? 'volver=' + encodeURIComponent(qs) : '';
+        var trozos = json.eventos.map(function (ev) { return cardHTML(ev, ida); });
+
+        if (reiniciar) {
+          cargados = json.eventos.length;
+          $('resultsGrid').innerHTML = trozos.length ? trozos.join('') : vacioBusquedaHTML();
+          var vaciar = $('vaciarFiltros');
+          if (vaciar) vaciar.addEventListener('click', limpiar);
+        } else {
+          cargados += json.eventos.length;
+          $('resultsGrid').insertAdjacentHTML('beforeend', trozos.join(''));
+        }
+
+        pintarConteo();
+
+        var boton = $('btnCargarMas');
+        boton.disabled = false;
+        boton.textContent = 'Cargar más actividades';
+      })
+      .catch(function () {
+        if (miPeticion !== peticion) return;
+        if (reiniciar) {
+          $('resultsGrid').innerHTML = '<div class="rail-vacio"><p>No se pudo cargar la búsqueda. Inténtalo de nuevo.</p></div>';
+        }
+      });
 
     /* replaceState y no pushState: con pushState cada casilla marcada dejaría
        una entrada en el historial y salir de la página costaría diez «atrás».
-       Lo que interesa guardar es la dirección, no el camino. */
-    var url = 'buscar.php' + (cola ? '?' + cola : '');
-    history.replaceState(null, '', url);
+       Lo que interesa guardar es la dirección, no el camino. El offset no
+       viaja en la URL: compartir una búsqueda tiene que empezar en la primera
+       página, no donde se quedó quien la mandó. */
+    var url2 = 'buscar.php' + (qs ? '?' + qs : '');
+    history.replaceState(null, '', url2);
   }
 
   function leer() {
@@ -221,19 +192,36 @@
     estado.gratis = false;
     escribir();
     encabezar();
-    aplicar();
+    $('fLimpiar').hidden = true;
+    cargar(true);
   }
 
-  function refrescar() { leer(); encabezar(); aplicar(); }
+  function refrescar() {
+    leer();
+    encabezar();
+    $('fLimpiar').hidden = !hayFiltros();
+    cargar(true);
+  }
 
   // ---- enganches
-  ['fTexto', 'fEstado', 'fCiudad', 'fFecha', 'fGratis', 'fOrden'].forEach(function (id) {
-    // «input» y no «change» en el texto: la lista se va estrechando al teclear.
-    $(id).addEventListener(id === 'fTexto' ? 'input' : 'change', refrescar);
+  var temporizadorTexto = null;
+
+  ['fEstado', 'fCiudad', 'fFecha', 'fGratis', 'fOrden'].forEach(function (id) {
+    $(id).addEventListener('change', refrescar);
+  });
+  $('fCats').addEventListener('change', refrescar);
+
+  /* El texto sí espera: cada tecla ya dispara una consulta al servidor, y sin
+     esto una palabra de ocho letras mandaría ocho peticiones para quedarse
+     solo con la última. peticion (arriba) descarta las respuestas que de
+     todos modos lleguen fuera de orden. */
+  $('fTexto').addEventListener('input', function () {
+    clearTimeout(temporizadorTexto);
+    temporizadorTexto = setTimeout(refrescar, 300);
   });
 
-  $('fCats').addEventListener('change', refrescar);
   $('fLimpiar').addEventListener('click', limpiar);
+  $('btnCargarMas').addEventListener('click', function () { cargar(false); });
 
   /* Al abrir, los controles ya vienen puestos desde PHP con lo que traía la
      dirección. Se leen de ahí en vez de volver a interpretar la dirección aquí:
@@ -241,5 +229,6 @@
      tampoco aparece. */
   leer();
   encabezar();
-  aplicar();
+  $('fLimpiar').hidden = !hayFiltros();
+  cargar(true);
 })();
