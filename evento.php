@@ -130,6 +130,8 @@ if ($volverAdmin) {
 $vieneDeBusqueda = !$volverAdmin && isset($_GET['volver']) && $_GET['volver'] !== '';
 
 $titulo        = $ev['titulo'];
+$descripcion   = resumenParaMeta($ev['descripcion']);
+$imagenOg      = urlImagen($ev['imagen_url']);
 $scriptsPagina = ['assets/js/evento.js'];
 require __DIR__ . '/includes/layout.php';
 ?>

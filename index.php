@@ -39,6 +39,7 @@ $lugares = array_values(array_unique(array_merge(
 sort($lugares, SORT_NATURAL | SORT_FLAG_CASE);
 
 $titulo        = 'Directorio de actividades wellness en México';
+$descripcion   = 'Encuentra retiros, festivales y círculos de bienestar en todo México: yoga, breathwork, sound healing, temazcal y más. Publica tu actividad gratis.';
 $seccion       = 'inicio';
 $anchoLibre    = true;
 $scriptsPagina = ['assets/js/inicio.js'];

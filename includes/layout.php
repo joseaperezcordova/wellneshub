@@ -52,6 +52,30 @@ function enlaceMenu(string $ruta, string $texto, string $clave, string $seccion)
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= e($titulo ?? 'Wellneshub') ?> · Wellneshub</title>
+<?php
+/*
+ * Meta description + Open Graph/Twitter Card. Cada página puede fijar
+ * $descripcion (y opcionalmente $imagenOg, una URL absoluta) antes de pedir
+ * este archivo —evento.php lo hace con el resumen de la actividad—; las que
+ * no lo hacen, paneles privados y formularios sobre todo, se quedan con la
+ * descripción general del sitio, que sigue siendo mejor que no tener nada.
+ */
+$descripcionMeta = trim((string) ($descripcion
+    ?? 'Wellneshub — directorio de retiros, festivales y círculos de bienestar en México. Encuentra actividades de yoga, breathwork, sound healing y más, o publica la tuya.'));
+$urlActualMeta = URL_BASE . (string) ($_SERVER['REQUEST_URI'] ?? '/');
+?>
+<meta name="description" content="<?= e($descripcionMeta) ?>">
+<meta property="og:site_name" content="Wellneshub">
+<meta property="og:type" content="website">
+<meta property="og:title" content="<?= e($titulo ?? 'Wellneshub') ?>">
+<meta property="og:description" content="<?= e($descripcionMeta) ?>">
+<meta property="og:url" content="<?= e($urlActualMeta) ?>">
+<?php if (!empty($imagenOg)): ?>
+<meta property="og:image" content="<?= e($imagenOg) ?>">
+<meta name="twitter:card" content="summary_large_image">
+<?php else: ?>
+<meta name="twitter:card" content="summary">
+<?php endif; ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<?= e(assetUrl('assets/css/app.css')) ?>">

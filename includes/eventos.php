@@ -245,6 +245,29 @@ function eventosPublicados(?string $categoria = null, int $limite = 60): array
 }
 
 /**
+ * Actividades publicadas y todavía vigentes, para sitemap.xml. Solo id y
+ * fecha de actualización: es lo único que necesita un mapa del sitio, y
+ * evita traer la ficha completa —descripción, imagen…— de cada una.
+ *
+ * @return array<int, array{id:int, actualizado_en:string}>
+ */
+function eventosPublicadosParaSitemap(): array
+{
+    $st = db()->query(
+        "SELECT id, actualizado_en
+           FROM eventos
+          WHERE situacion = 'publicado'
+            AND COALESCE(fecha_fin, fecha_inicio) >= NOW()
+       ORDER BY actualizado_en DESC"
+    );
+
+    return array_map(
+        static fn(array $f): array => ['id' => (int) $f['id'], 'actualizado_en' => (string) $f['actualizado_en']],
+        $st->fetchAll()
+    );
+}
+
+/**
  * El tramo de fechas de cada opción de "Cuándo" del buscador.
  *
  * Tiene que dar exactamente el mismo resultado que rango() en
@@ -997,6 +1020,23 @@ function urlImagen(?string $valor): ?string
     if (preg_match('#^https?://#i', $valor)) return $valor;
 
     return URL_BASE . '/' . ltrim($valor, '/');
+}
+
+/**
+ * La descripción de una actividad, recortada para meta description/Open
+ * Graph: sin saltos de línea, a un tamaño que Google y WhatsApp no cortan a
+ * media palabra.
+ */
+function resumenParaMeta(string $texto, int $limite = 160): string
+{
+    $plano = trim(preg_replace('/\s+/u', ' ', $texto) ?? '');
+    if (mb_strlen($plano) <= $limite) return $plano;
+
+    $corte = mb_substr($plano, 0, $limite);
+    $ultimoEspacio = mb_strrpos($corte, ' ');
+    if ($ultimoEspacio !== false) $corte = mb_substr($corte, 0, $ultimoEspacio);
+
+    return rtrim($corte, '.,;:') . '…';
 }
 
 function precioTexto(array $ev): string

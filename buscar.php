@@ -37,6 +37,7 @@ $entidadesFiltro  = $ubicaciones['entidades'];
 $ciudadesFiltro   = $ubicaciones['ciudades'];
 
 $titulo        = 'Buscar actividades';
+$descripcion   = 'Busca actividades de bienestar en México por ciudad, fecha y categoría: retiros, festivales, yoga, breathwork y más.';
 $anchoLibre    = true;
 $scriptsPagina = ['assets/js/buscar.js'];
 

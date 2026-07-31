@@ -1,0 +1,23 @@
+# Wellneshub. Actualizar la línea Sitemap si el dominio cambia (ver
+# includes/config.local.example.php sobre el subdominio de desarrollo).
+User-agent: *
+Disallow: /admin.php
+Disallow: /moderacion.php
+Disallow: /metricas.php
+Disallow: /mis-eventos.php
+Disallow: /login.php
+Disallow: /codigo.php
+Disallow: /logout.php
+Disallow: /google-redirect.php
+Disallow: /google-callback.php
+Disallow: /evento-nuevo.php
+Disallow: /evento-editar.php
+Disallow: /resolver-mapa.php
+Disallow: /salida.php
+Disallow: /contactar.php
+Disallow: /reportar.php
+Disallow: /buscar-datos.php
+Disallow: /diagnostico-correo.php
+Disallow: /includes/
+
+Sitemap: https://wellnesshubmx.jpcorelab.com/sitemap.php

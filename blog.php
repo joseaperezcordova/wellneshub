@@ -14,9 +14,10 @@
 declare(strict_types=1);
 require __DIR__ . '/includes/config.php';
 
-$titulo     = 'Blog';
-$seccion    = 'blog';
-$anchoLibre = true;
+$titulo      = 'Blog';
+$descripcion = 'Guías y agenda de bienestar en México: retiros de yoga, festivales holísticos y consejos para tu próxima actividad.';
+$seccion     = 'blog';
+$anchoLibre  = true;
 
 require __DIR__ . '/includes/layout.php';
 ?>
