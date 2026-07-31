@@ -51,7 +51,7 @@ function enlaceMenu(string $ruta, string $texto, string $clave, string $seccion)
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?= e($titulo ?? 'Rueda') ?> · Rueda</title>
+<title><?= e($titulo ?? 'Wellneshub') ?> · Wellneshub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<?= e(assetUrl('assets/css/app.css')) ?>">
@@ -72,7 +72,7 @@ function enlaceMenu(string $ruta, string $texto, string $clave, string $seccion)
   <div class="topbar-inner">
     <a class="logo" href="<?= URL_BASE ?>/">
       <div class="logo-mark"></div>
-      <div class="logo-text">Rueda<small>Directorio wellness MX</small></div>
+      <div class="logo-text">Wellneshub<small>Directorio wellness MX</small></div>
     </a>
 
     <?php /* Enlaces de verdad y no botones con JavaScript: así funcionan el clic
@@ -182,7 +182,7 @@ function pie(): void
 <footer>
   <div class="foot-inner">
     <div>
-      <div class="logo-text" style="color:var(--blanco);">Rueda</div>
+      <div class="logo-text" style="color:var(--blanco);">Wellneshub</div>
       <p style="font-size:13px; opacity:.7; margin-top:10px; max-width:260px;">El directorio de actividades wellness más completo de México — retiros, festivales y círculos, curados a mano.</p>
     </div>
     <div>
@@ -203,7 +203,7 @@ function pie(): void
       <a href="<?= URL_BASE ?>/blog.php">Blog</a>
     </div>
   </div>
-  <div class="foot-bottom">© <?= date('Y') ?> Rueda — Directorio de actividades wellness MX.</div>
+  <div class="foot-bottom">© <?= date('Y') ?> Wellneshub — Directorio de actividades wellness MX.</div>
 </footer>
 
 <?php /* La raíz del sitio, para el JavaScript. Los archivos .js son estáticos y
