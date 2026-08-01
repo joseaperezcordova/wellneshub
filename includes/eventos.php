@@ -53,6 +53,7 @@ function categoriasMenu(): array
 
         // Aire libre
         'Senderismo'         => ['🥾',  'Senderismo'],
+        'Running'            => ['👟',  'Running'],
         'Carreras'           => ['🏃',  'Carreras'],
         'Ciclismo'           => ['🚴',  'Ciclismo'],
         'Surf'               => ['🏄',  'Surf'],
