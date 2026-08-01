@@ -56,6 +56,7 @@ function categoriasMenu(): array
         'Running'            => ['👟',  'Running'],
         'Carreras'           => ['🏃',  'Carreras'],
         'Ciclismo'           => ['🚴',  'Ciclismo'],
+        'Triatlón'           => ['🏊',  'Triatlón'],
         'Surf'               => ['🏄',  'Surf'],
 
         // Cuidado del cuerpo
