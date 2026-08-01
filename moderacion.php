@@ -68,8 +68,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $pendientes = [];
 $sinTabla   = false;
 
+$reportesPorEvento = [];
+
 try {
     $pendientes = reportesPendientes();
+    $reportesPorEvento = reportesDeEventos(array_column($pendientes, 'id'));
 } catch (Throwable $ex) {
     error_log('Bandeja de moderación: ' . $ex->getMessage());
     $sinTabla = true;
@@ -136,7 +139,7 @@ require __DIR__ . '/includes/layout.php';
       <?php endif; ?>
 
       <ul class="caso-reportes">
-        <?php foreach (reportesDeEvento((int) $p['id']) as $r): ?>
+        <?php foreach ($reportesPorEvento[(int) $p['id']] ?? [] as $r): ?>
           <li>
             <span class="motivo-tag"><?= e(motivosReporte()[$r['motivo']] ?? $r['motivo']) ?></span>
             <?php if (!empty($r['comentario'])): ?>

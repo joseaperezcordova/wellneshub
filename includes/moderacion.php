@@ -174,15 +174,31 @@ function reportesPendientes(int $limite = 100): array
     return $st->fetchAll();
 }
 
-/** El detalle de los reportes de un evento. */
-function reportesDeEvento(int $eventoId): array
+/**
+ * El detalle de los reportes de varios eventos a la vez, agrupado por
+ * evento_id. Una sola consulta con IN (...) en vez de una por caso: la
+ * bandeja de moderación mostraba hasta 100 casos pendientes y llamaba a
+ * esto dentro del foreach, una consulta suelta por cada uno.
+ *
+ * @param int[] $eventoIds
+ * @return array<int, array> los reportes de cada evento, por su id
+ */
+function reportesDeEventos(array $eventoIds): array
 {
-    $st = db()->prepare(
-        'SELECT * FROM reportes WHERE evento_id = ? ORDER BY creado_en DESC LIMIT 60'
-    );
-    $st->execute([$eventoId]);
+    if (!$eventoIds) return [];
 
-    return $st->fetchAll();
+    $marcadores = implode(',', array_fill(0, count($eventoIds), '?'));
+    $st = db()->prepare(
+        "SELECT * FROM reportes WHERE evento_id IN ($marcadores) ORDER BY creado_en DESC"
+    );
+    $st->execute($eventoIds);
+
+    $porEvento = [];
+    foreach ($st->fetchAll() as $r) {
+        $porEvento[(int) $r['evento_id']][] = $r;
+    }
+
+    return $porEvento;
 }
 
 /**
