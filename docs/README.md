@@ -4,6 +4,26 @@ Material interno del proyecto. **No se despliega**: el workflow de FTP excluye
 esta carpeta entera (ver `.github/workflows/deploy.yml`). Está aquí para que
 quede versionada junto al código que describe, no para publicarse.
 
+## base-de-datos.md
+
+El modelo de datos: las ocho tablas, cómo se relacionan, qué índice existe
+para qué consulta real, y el histórico completo de las catorce migraciones
+—qué agregó cada una, en qué orden—.
+
+## integraciones.md
+
+Cada servicio externo del proyecto (login con Google, GA4/Clarity/Meta
+Pixel/Search Console, OpenStreetMap/Nominatim/Leaflet, Turnstile/reCAPTCHA,
+correo saliente, Google Fonts): para qué se usa, dónde se configura, y qué
+pasa si falla o no está configurado.
+
+## operacion.md
+
+Todo lo que no es código: el servidor (PHP, base de datos, el proxy nginx
+delante de Apache), qué falta tocar cuando se decida el dominio final, cómo
+respaldar y restaurar, cómo se actualiza el sitio en producción (deploy
+automático + migraciones a mano), y cómo dar acceso al repositorio.
+
 ## pase-a-produccion.md y pase-a-produccion.html
 
 Dos vistas de lo mismo. El `.md` es la guía completa: qué cuenta es cada
