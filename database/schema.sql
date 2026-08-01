@@ -310,6 +310,25 @@ CREATE TABLE IF NOT EXISTS contactos (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- Un renglón por cada mensaje del formulario de contacto general del sitio
+-- (contacto.php) — a diferencia de "contactos", este no está atado a ninguna
+-- actividad: es para quien escribe sin tener una en mente.
+CREATE TABLE IF NOT EXISTS mensajes_contacto (
+  id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  nombre      VARCHAR(120)    NOT NULL,
+  email       VARCHAR(190)    NOT NULL,
+  mensaje     VARCHAR(1000)   NOT NULL,
+
+  ip          VARBINARY(16)   NOT NULL,
+
+  creado_en   DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+  KEY idx_mensajes_contacto_ip (ip, creado_en)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 -- Un renglón por cada clic en "Comprar boletos" / "Reservar lugar" desde la
 -- ficha. salida.php lo registra aquí y de inmediato redirige a la URL real
 -- del organizador: es la única forma de contar un enlace que apunta afuera.

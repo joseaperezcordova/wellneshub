@@ -63,12 +63,20 @@ function contarOrganizadoresActivos(): int
     )->fetchColumn();
 }
 
+/**
+ * Mensajes de contacto, sumando las dos fuentes: a un organizador
+ * (contactos) y al sitio en general (mensajes_contacto, desde contacto.php).
+ * Antes solo existía la primera; desde que hay formulario general, contar
+ * nada más "contactos" se quedaría corto.
+ */
 function contarMensajesContacto(int $dias): int
 {
     $st = db()->prepare(
-        'SELECT COUNT(*) FROM contactos WHERE creado_en > DATE_SUB(NOW(), INTERVAL ? DAY)'
+        'SELECT
+            (SELECT COUNT(*) FROM contactos WHERE creado_en > DATE_SUB(NOW(), INTERVAL ? DAY)) +
+            (SELECT COUNT(*) FROM mensajes_contacto WHERE creado_en > DATE_SUB(NOW(), INTERVAL ? DAY))'
     );
-    $st->execute([$dias]);
+    $st->execute([$dias, $dias]);
 
     return (int) $st->fetchColumn();
 }

@@ -306,7 +306,7 @@ function pie(): void
     </div>
     <div>
       <h5>Contacto</h5>
-      <a href="#">hola@ruedawellness.mx</a>
+      <a href="<?= URL_BASE ?>/contacto.php">Escríbenos</a>
       <a href="#">WhatsApp</a>
       <a href="#">Instagram</a>
     </div>

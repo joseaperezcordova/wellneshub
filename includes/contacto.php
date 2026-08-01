@@ -50,7 +50,7 @@ function crearContacto(int $eventoId, string $nombre, string $email, ?string $me
  */
 function avisarOrganizador(array $ev, string $nombre, string $email, ?string $mensaje): void
 {
-    $cuerpo = "Alguien quiere contactarte por tu actividad publicada en Rueda.\n\n"
+    $cuerpo = "Alguien quiere contactarte por tu actividad publicada en Wellneshub.\n\n"
             . 'Actividad:  ' . $ev['titulo'] . "\n"
             . 'Nombre:     ' . $nombre . "\n"
             . 'Correo:     ' . $email . "\n"
@@ -64,4 +64,64 @@ function avisarOrganizador(array $ev, string $nombre, string $email, ?string $me
         $cuerpo,
         $email
     );
+}
+
+
+// -------------------------------------------- contacto general del sitio ---
+
+const CONTACTO_SITIO_ESPERA_MIN = 15; // entre dos mensajes de la misma IP
+
+/** ¿Ya escribió esta IP hace poco? Mismo criterio que contactoRepetido(). */
+function contactoSitioRepetido(): bool
+{
+    $st = db()->prepare(
+        'SELECT COUNT(*) FROM mensajes_contacto
+          WHERE ip = ? AND creado_en > DATE_SUB(NOW(), INTERVAL ' . CONTACTO_SITIO_ESPERA_MIN . ' MINUTE)'
+    );
+    $st->execute([ipBinaria()]);
+
+    return (int) $st->fetchColumn() > 0;
+}
+
+function crearContactoSitio(string $nombre, string $email, string $mensaje): void
+{
+    db()->prepare(
+        'INSERT INTO mensajes_contacto (nombre, email, mensaje, ip) VALUES (?, ?, ?, ?)'
+    )->execute([
+        mb_substr($nombre, 0, 120),
+        mb_substr($email, 0, 190),
+        mb_substr($mensaje, 0, 1000),
+        ipBinaria(),
+    ]);
+}
+
+/**
+ * Avisa a los administradores de un mensaje del contacto general.
+ *
+ * Sin el filtro de avisarAdministradores() —agrupar y espaciar—: ese existe
+ * porque muchas personas distintas pueden reportar el MISMO evento, y ahí
+ * agrupar tiene sentido. Aquí cada mensaje es una persona con un asunto
+ * propio; agruparlos sería perder el mensaje de alguien por llegar el mismo
+ * día que el de otro.
+ */
+function avisarAdminsContactoSitio(string $nombre, string $email, string $mensaje): void
+{
+    $admins = db()->query(
+        'SELECT email FROM usuarios WHERE rol = "admin" AND estado = "activo"'
+    )->fetchAll();
+
+    if (!$admins) {
+        error_log('Mensaje de contacto general recibido y no hay ningún administrador a quien avisar.');
+        return;
+    }
+
+    $cuerpo = "Alguien escribió desde el formulario de contacto de Wellneshub.\n\n"
+            . 'Nombre:  ' . $nombre . "\n"
+            . 'Correo:  ' . $email . "\n\n"
+            . "Mensaje:\n" . $mensaje . "\n\n"
+            . "Para responder, contesta directamente este correo: llega a $email.\n";
+
+    foreach ($admins as $a) {
+        enviarCorreo($a['email'], $nombre . ' te escribió desde Wellneshub', $cuerpo, $email);
+    }
 }
