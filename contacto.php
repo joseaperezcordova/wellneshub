@@ -57,6 +57,8 @@ require __DIR__ . '/includes/layout.php';
 
 <?php if ($enviado): ?>
 
+  <script>whTrack('mensaje_contacto', {});</script>
+
   <h1>Mensaje enviado</h1>
   <p class="sub">Nos llegó por correo, con tu dirección para poder responderte directo.</p>
 

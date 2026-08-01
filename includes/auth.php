@@ -68,6 +68,11 @@ function iniciarSesion(int $usuarioId): void
 
     db()->prepare('UPDATE usuarios SET ultimo_acceso_en = NOW() WHERE id = ?')
         ->execute([$usuarioId]);
+
+    // Se llega aquí justo antes de un redirect (código o Google), así que el
+    // evento no puede dispararse en esta misma respuesta: queda en cola para
+    // que layout.php lo dispare en la página de destino.
+    $_SESSION['eventos_ga'] = [['nombre' => 'login', 'params' => []]];
 }
 
 function cerrarSesion(): void
