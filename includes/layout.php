@@ -77,7 +77,22 @@ $urlActualMeta = URL_BASE . (string) ($_SERVER['REQUEST_URI'] ?? '/');
 <meta name="twitter:card" content="summary">
 <?php endif; ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<?php
+/*
+ * La hoja de Google Fonts es la única <link rel="stylesheet"> que de verdad
+ * bloquea el primer pintado —app.css y portada.css son propias y pesan menos
+ * que un viaje de ida y vuelta a otro dominio—. El truco de media="print" hace
+ * que el navegador la baje sin esperarla para pintar, y onload la reactiva
+ * para todos los medios en cuanto llega. display=swap (ya en la URL) cubre la
+ * otra mitad: mientras tanto se ve el texto con la tipografía de respaldo, no
+ * invisible. <noscript> es el respaldo de quien tiene JavaScript apagado,
+ * donde el truco de media no se revertiría solo.
+ */
+$fuentesUrl = 'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap';
+?>
+<link rel="stylesheet" href="<?= e($fuentesUrl) ?>" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= e($fuentesUrl) ?>"></noscript>
 <link rel="stylesheet" href="<?= e(assetUrl('assets/css/app.css')) ?>">
 <link rel="stylesheet" href="<?= e(assetUrl('assets/css/portada.css')) ?>">
 <?php

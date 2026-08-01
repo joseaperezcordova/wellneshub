@@ -148,9 +148,18 @@ function siguienteRedireccion(string $url): ?string
             CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; Wellneshub/1.0)',
         ]);
-        curl_exec($ch);
-        $codigo  = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $destino = (string) curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+        $resultado = curl_exec($ch);
+        $codigo    = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $destino   = (string) curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+
+        // Sin esto, un enlace que no se pudo seguir por un fallo de red se ve
+        // exactamente igual que uno que de verdad no redirige a ningún lado:
+        // mismo resultado (null) para quien lo llama, pero sin rastro de cuál
+        // de los dos pasó si hay que averiguarlo después.
+        if ($resultado === false) {
+            error_log('siguienteRedireccion() falló contra ' . $url . ': ' . curl_error($ch));
+        }
+
         curl_close($ch);
 
         return ($codigo >= 300 && $codigo < 400 && $destino !== '') ? $destino : null;
