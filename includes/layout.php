@@ -229,6 +229,7 @@ $analiticaActiva = empty($CONFIG['es_local']);
             <a href="<?= URL_BASE ?>/mis-eventos.php">Mis actividades</a>
             <?php if ($u['rol'] === 'admin'): ?>
               <a href="<?= URL_BASE ?>/admin.php">Panel admin</a>
+              <a href="<?= URL_BASE ?>/documentacion.php">Documentación</a>
               <?php $pend = contarReportesPendientes(); ?>
               <a href="<?= URL_BASE ?>/moderacion.php">
                 Moderación<?php if ($pend > 0): ?> <span class="pendientes"><?= $pend ?></span><?php endif; ?>

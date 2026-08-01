@@ -1,0 +1,15 @@
+# Nada de esta carpeta se sirve por HTTP directo.
+#
+# Algunos de estos documentos explican cómo darse permisos de administrador,
+# qué pantallas siguen siendo maqueta, o qué cuentas hay que transferir para
+# el pase a producción — no es material para encontrarse por accidente.
+# documentacion.php es la única puerta: exige sesión de administrador y lee
+# estos archivos del disco directamente, sin pasar por HTTP.
+
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>

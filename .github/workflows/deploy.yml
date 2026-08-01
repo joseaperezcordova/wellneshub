@@ -63,11 +63,10 @@ jobs:
             **/.ftp-deploy-sync-state.json
             **/.env
             **/config.local.php
-            **/README.md
-            **/*.md
-            # docs/ es material interno —la guía de pruebas— y se queda en el
-            # repositorio. Sin esta línea acabaría publicada en el sitio: la
-            # guía explica cómo darse permisos de administrador y cuáles son
-            # las pantallas que todavía son maqueta, que no es algo que tenga
-            # que encontrarse desde fuera.
-            **/docs/**
+            # README.md y docs/ SÍ se suben ahora —documentacion.php los enseña
+            # dentro del panel admin—, pero ninguno de los dos se sirve por HTTP
+            # directo: README.md tiene su propio bloque en el .htaccess de la
+            # raíz, y docs/ trae su propio .htaccess que corta la carpeta
+            # entera. Sin esos dos candados, subir estos archivos sí publicaría
+            # sin querer cómo darse permisos de administrador y qué cuentas hay
+            # que transferir en el pase a producción.
