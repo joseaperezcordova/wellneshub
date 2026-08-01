@@ -1,12 +1,13 @@
 <?php
 /**
  * Métricas de la plataforma: la versión con datos reales del panel que se
- * armó primero como maqueta para presentar Rueda a organizadores e
+ * armó primero como maqueta para presentar Wellneshub a organizadores e
  * inversionistas.
  *
  * Todo lo de aquí sale de las tablas propias —eventos, usuarios, contactos,
- * clics—. No hay tráfico ni fuentes de adquisición: eso requeriría conectar
- * Google Analytics (u otra herramienta), que hoy no está instalado. Ver
+ * clics—. Tráfico y fuentes de adquisición sí existen desde que se instaló
+ * GA4 (ver includes/layout.php), pero viven en Google Analytics, no aquí:
+ * este panel no llama a su API, solo lee la base de datos. Ver
  * includes/metricas.php para de dónde sale cada número.
  */
 
@@ -155,7 +156,7 @@ require __DIR__ . '/includes/layout.php';
     </div>
 
     <div class="scope-banner">
-      <b>Fuera de esta página</b> — tráfico y fuentes de adquisición requieren conectar Google Analytics (u otra herramienta de analítica); hoy no está instalado. Todo lo de arriba sale directo de la base de datos de Rueda.
+      <b>Fuera de esta página</b> — tráfico y fuentes de adquisición viven en Google Analytics (analytics.google.com): este panel no se conecta a GA4, solo lee la base de datos de Wellneshub. Todo lo de arriba sale directo de ahí.
     </div>
 
   </div>

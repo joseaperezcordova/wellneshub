@@ -1,0 +1,238 @@
+<title>Pase a producción · Wellneshub</title>
+<style>
+:root{
+  --fondo:#FAF8F4;
+  --verde:#496B52;
+  --verde-claro:#89A67D;
+  --arena:#E9DDC9;
+  --terracota:#C76E43;
+  --petroleo:#2F4E5D;
+  --blanco:#FFFFFF;
+  --arena-suave:#F4EDE1;
+  --terracota-viva:#D4805A;
+  --terracota-texto:#A0522D;
+  --tinta-boton:#0F1A21;
+  --linea:rgba(47,78,93,0.16);
+  --linea-suave:rgba(47,78,93,0.09);
+  --rojo:#B34A3C;
+  --rojo-texto:#8A392E;
+
+  --panel:var(--blanco);
+  --texto:var(--petroleo);
+  --texto-tenue:rgba(47,78,93,0.62);
+  --sombra:0 10px 28px rgba(47,78,93,.08);
+
+  --font-display:Georgia,'Iowan Old Style','Palatino Linotype','Times New Roman',serif;
+  --font-body:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Roboto,Arial,sans-serif;
+  --font-mono:ui-monospace,'SF Mono',Consolas,'Liberation Mono',monospace;
+}
+:root[data-theme="dark"]{
+  --fondo:#20302B;
+  --panel:#28382F;
+  --texto:#F1EEE6;
+  --texto-tenue:rgba(241,238,230,0.62);
+  --linea:rgba(241,238,230,0.14);
+  --linea-suave:rgba(241,238,230,0.08);
+  --arena-suave:#33463C;
+  --sombra:0 10px 28px rgba(0,0,0,.28);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --fondo:#20302B;
+    --panel:#28382F;
+    --texto:#F1EEE6;
+    --texto-tenue:rgba(241,238,230,0.62);
+    --linea:rgba(241,238,230,0.14);
+    --linea-suave:rgba(241,238,230,0.08);
+    --arena-suave:#33463C;
+    --sombra:0 10px 28px rgba(0,0,0,.28);
+  }
+}
+
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--fondo); color:var(--texto);
+  font-family:var(--font-body); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2{font-family:var(--font-display); font-weight:600; margin:0; letter-spacing:-0.01em;}
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--terracota-texto); outline-offset:2px;}
+
+.wrap{max-width:900px; margin:0 auto; padding:0 22px 90px;}
+
+header.top{
+  padding:38px 0 22px; border-bottom:1px solid var(--linea);
+}
+.eyebrow{
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--verde); margin-bottom:8px;
+}
+:root[data-theme="dark"] .eyebrow{color:var(--verde-claro);}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .eyebrow{color:var(--verde-claro);} }
+header.top h1{font-size:30px; margin-bottom:14px; text-wrap:balance;}
+header.top p{font-size:14.5px; color:var(--texto-tenue); max-width:620px; margin:0;}
+
+.leyenda{
+  display:flex; gap:18px; flex-wrap:wrap; margin-top:22px; padding:16px 18px;
+  background:var(--panel); border:1px solid var(--linea); border-radius:12px;
+  box-shadow:var(--sombra);
+}
+.leyenda-item{display:flex; align-items:center; gap:8px; font-size:12.5px;}
+.pastilla{
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.02em;
+  padding:2px 8px; border-radius:99px; white-space:nowrap; font-weight:600;
+}
+.p-cambiar{background:rgba(179,74,60,0.14); color:var(--rojo-texto);}
+:root[data-theme="dark"] .p-cambiar{color:#E19487;}
+.p-libre{background:rgba(73,107,82,0.14); color:var(--verde);}
+:root[data-theme="dark"] .p-libre{color:var(--verde-claro);}
+.p-opcional{background:var(--linea-suave); color:var(--texto-tenue);}
+
+section{margin-top:44px;}
+h2{font-size:20px; margin-bottom:6px; scroll-margin-top:24px;}
+.section-sub{font-size:13.5px; color:var(--texto-tenue); margin:0 0 18px; max-width:640px;}
+
+.codebox{
+  background:var(--panel); border:1px solid var(--linea); border-radius:14px;
+  box-shadow:var(--sombra); overflow:hidden; margin-top:8px;
+}
+.codebox-head{
+  display:flex; align-items:center; gap:8px; padding:11px 16px;
+  border-bottom:1px solid var(--linea); font-family:var(--font-mono);
+  font-size:12px; color:var(--texto-tenue);
+}
+.codebox-dots{display:flex; gap:5px;}
+.codebox-dots span{width:9px; height:9px; border-radius:50%; background:var(--linea);}
+pre{
+  margin:0; padding:20px 22px; overflow-x:auto;
+  font-family:var(--font-mono); font-size:12.8px; line-height:1.85;
+  tab-size:4;
+}
+code{font-family:inherit;}
+.tok-key{color:var(--terracota-texto);}
+:root[data-theme="dark"] .tok-key{color:var(--terracota-viva);}
+.tok-str{color:var(--verde);}
+:root[data-theme="dark"] .tok-str{color:var(--verde-claro);}
+.tok-punct{color:var(--texto-tenue);}
+.tok-com{color:var(--texto-tenue); font-style:italic;}
+.tok-cambiar{color:var(--rojo-texto); font-style:italic; font-weight:600;}
+:root[data-theme="dark"] .tok-cambiar{color:#E19487;}
+.tok-libre{color:var(--verde); font-style:italic;}
+:root[data-theme="dark"] .tok-libre{color:var(--verde-claro);}
+.tok-opc{color:var(--texto-tenue); font-style:italic;}
+.tok-bool{color:var(--petroleo); font-weight:600;}
+:root[data-theme="dark"] .tok-bool{color:var(--texto);}
+
+ul.fuera{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0;}
+li.fitem{
+  display:flex; gap:14px; align-items:flex-start; padding:16px 0;
+  border-top:1px solid var(--linea-suave);
+}
+li.fitem:first-child{border-top:none;}
+.fitem .pastilla{flex-shrink:0; margin-top:2px;}
+.fitem-body b{font-size:14px;}
+.fitem-body p{margin:4px 0 0; font-size:13px; color:var(--texto-tenue); line-height:1.5;}
+
+.pie-doc{
+  margin-top:52px; padding-top:22px; border-top:1px solid var(--linea);
+  font-size:12.5px; color:var(--texto-tenue); max-width:640px;
+}
+.pie-doc a{color:var(--verde); text-decoration:underline;}
+:root[data-theme="dark"] .pie-doc a{color:var(--verde-claro);}
+
+@media(max-width:640px){
+  .wrap{padding:0 16px 70px;}
+  pre{font-size:11.5px; padding:16px;}
+  header.top{padding:26px 0 18px;}
+  header.top h1{font-size:24px;}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Wellneshub · pase a producción</div>
+    <h1>Qué cambia para que esto sea tuyo</h1>
+    <p>El <code>config.local.php</code> real vive solo en el servidor —nunca en este repositorio—, pero su forma es esta. Cada línea marcada en rojo es un token creado con una cuenta de quien programó el sitio: hay que reemplazarlo antes de considerar el proyecto entregado. El detalle de cómo transferir o recrear cada uno está en <code>docs/pase-a-produccion.md</code>, junto a este archivo.</p>
+
+    <div class="leyenda">
+      <div class="leyenda-item"><span class="pastilla p-cambiar">cambiar</span> Token de una cuenta que no es la tuya</div>
+      <div class="leyenda-item"><span class="pastilla p-libre">no depende de nadie</span> Config normal, no es una identidad</div>
+      <div class="leyenda-item"><span class="pastilla p-opcional">opcional</span> Vacío hoy; solo aplica si se activa</div>
+    </div>
+  </header>
+
+  <section id="config">
+    <h2>includes/config.local.php</h2>
+    <p class="section-sub">Tal como quedaría en el servidor de producción, con la analítica ya dada de alta. Los valores de ejemplo son ilustrativos.</p>
+
+    <div class="codebox">
+      <div class="codebox-head"><div class="codebox-dots"><span></span><span></span><span></span></div>config.local.php</div>
+      <pre><code>return [
+
+    <span class="tok-com">// ---- Base de datos ------------------------------------</span>
+    <span class="tok-key">'db'</span> <span class="tok-punct">=&gt;</span> [
+        <span class="tok-key">'host'</span>     <span class="tok-punct">=&gt;</span> <span class="tok-str">'localhost'</span>,
+        <span class="tok-key">'nombre'</span>   <span class="tok-punct">=&gt;</span> <span class="tok-str">'jpcore_wellnes'</span>,
+        <span class="tok-key">'usuario'</span>  <span class="tok-punct">=&gt;</span> <span class="tok-str">'jpcore_wellnes'</span>,
+        <span class="tok-key">'password'</span> <span class="tok-punct">=&gt;</span> <span class="tok-str">'••••••••'</span>,
+        <span class="tok-key">'charset'</span>  <span class="tok-punct">=&gt;</span> <span class="tok-str">'utf8mb4'</span>,
+    ],  <span class="tok-libre">// viene solo del hosting nuevo — no hay cuenta que transferir aquí</span>
+
+    <span class="tok-key">'url_base'</span> <span class="tok-punct">=&gt;</span> <span class="tok-str">''</span>,  <span class="tok-libre">// déjalo vacío siempre, no aplica</span>
+
+    <span class="tok-com">// ---- Correo saliente -----------------------------------</span>
+    <span class="tok-key">'correo'</span> <span class="tok-punct">=&gt;</span> [
+        <span class="tok-key">'remitente'</span> <span class="tok-punct">=&gt;</span> <span class="tok-str">'no-responder@dominio-final.com'</span>,  <span class="tok-cambiar">// buzón real, creado en TU cPanel</span>
+        <span class="tok-key">'nombre'</span>    <span class="tok-punct">=&gt;</span> <span class="tok-str">'Wellneshub'</span>,
+    ],
+
+    <span class="tok-com">// ---- Captcha (opcional) ---------------------------------</span>
+    <span class="tok-key">'captcha'</span> <span class="tok-punct">=&gt;</span> [
+        <span class="tok-key">'turnstile'</span> <span class="tok-punct">=&gt;</span> [<span class="tok-key">'site_key'</span> <span class="tok-punct">=&gt;</span> <span class="tok-str">''</span>, <span class="tok-key">'secret'</span> <span class="tok-punct">=&gt;</span> <span class="tok-str">''</span>],
+        <span class="tok-key">'recaptcha'</span> <span class="tok-punct">=&gt;</span> [<span class="tok-key">'site_key'</span> <span class="tok-punct">=&gt;</span> <span class="tok-str">''</span>, <span class="tok-key">'secret'</span> <span class="tok-punct">=&gt;</span> <span class="tok-str">''</span>],
+    ],  <span class="tok-com">// si algún día se activa: créalas ya con tu cuenta, no la transfieras después</span>
+
+    <span class="tok-com">// ---- Login con Google -----------------------------------</span>
+    <span class="tok-key">'google'</span> <span class="tok-punct">=&gt;</span> [
+        <span class="tok-key">'client_id'</span>     <span class="tok-punct">=&gt;</span> <span class="tok-str">'...apps.googleusercontent.com'</span>,  <span class="tok-cambiar">// proyecto de Google Cloud: transferir o recrear</span>
+        <span class="tok-key">'client_secret'</span> <span class="tok-punct">=&gt;</span> <span class="tok-str">'GOCSPX-••••••••'</span>,               <span class="tok-cambiar">// mismo proyecto, y es secreto de verdad</span>
+        <span class="tok-key">'pedir_perfil'</span>  <span class="tok-punct">=&gt;</span> <span class="tok-bool">false</span>,
+    ],
+
+    <span class="tok-com">// ---- Analítica -------------------------------------------</span>
+    <span class="tok-key">'analytics'</span> <span class="tok-punct">=&gt;</span> [
+        <span class="tok-key">'ga4_id'</span>                       <span class="tok-punct">=&gt;</span> <span class="tok-str">'G-8TCGG730MN'</span>,  <span class="tok-cambiar">// propiedad de GA4: agrégate como Admin y quítame</span>
+        <span class="tok-key">'clarity_id'</span>                   <span class="tok-punct">=&gt;</span> <span class="tok-str">''</span>,              <span class="tok-opc">// vacío — créalo ya con tu cuenta si lo vas a usar</span>
+        <span class="tok-key">'meta_pixel_id'</span>                <span class="tok-punct">=&gt;</span> <span class="tok-str">''</span>,              <span class="tok-opc">// vacío — igual, mejor crearlo con tu Business Manager</span>
+        <span class="tok-key">'search_console_verificacion'</span> <span class="tok-punct">=&gt;</span> <span class="tok-str">''</span>,              <span class="tok-opc">// vacío — este NO se transfiere, verifica ya con el dominio final</span>
+    ],
+
+];</code></pre>
+    </div>
+  </section>
+
+  <section id="fuera">
+    <h2>Lo que no vive en este archivo</h2>
+    <p class="section-sub">Cuentas y accesos que también quedaron bajo la identidad de quien programó el sitio, pero que no son una línea de config.local.php.</p>
+
+    <ul class="fuera">
+      <li class="fitem">
+        <span class="pastilla p-cambiar">cambiar</span>
+        <div class="fitem-body"><b>Dominio y hosting (cPanel)</b><p>El sitio vive hoy en infraestructura de quien programó. Producción necesita tu propio dominio y tu propia cuenta de hosting.</p></div>
+      </li>
+      <li class="fitem">
+        <span class="pastilla p-cambiar">cambiar</span>
+        <div class="fitem-body"><b>Repositorio en GitHub</b><p>Hoy está en una cuenta personal. Transferirlo (Settings → Transfer ownership) o tenerte como administrador con la propiedad real a tu nombre.</p></div>
+      </li>
+      <li class="fitem">
+        <span class="pastilla p-cambiar">cambiar</span>
+        <div class="fitem-body"><b>Secretos de despliegue (GitHub Actions)</b><p><code>FTP_SERVER</code>, <code>FTP_USERNAME</code>, <code>FTP_PASSWORD</code>, <code>FTP_SERVER_DIR</code> — apuntan al hosting actual. Se actualizan solos con las credenciales del hosting nuevo en cuanto se migre.</p></div>
+      </li>
+    </ul>
+  </section>
+
+  <div class="pie-doc">
+    Ninguna credencial de verdad está escrita aquí, solo la forma del archivo. El paso a paso de cómo transferir o recrear cada cuenta —con los clics exactos en cada consola— está en <a href="pase-a-produccion.md">pase-a-produccion.md</a>, en esta misma carpeta.
+  </div>
+</div>

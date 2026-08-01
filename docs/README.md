@@ -4,12 +4,22 @@ Material interno del proyecto. **No se despliega**: el workflow de FTP excluye
 esta carpeta entera (ver `.github/workflows/deploy.yml`). Está aquí para que
 quede versionada junto al código que describe, no para publicarse.
 
-## pase-a-produccion.md
+## pase-a-produccion.md y pase-a-produccion.html
 
-Checklist de todas las cuentas —dominio, hosting, GitHub, Google, GA4,
-Clarity, Meta Pixel…— que hoy viven bajo cuentas personales de quien
-programa y que deben acabar bajo la identidad del dueño final antes de
-entregar el proyecto, para que no dependa de nadie más para administrarlas.
+Dos vistas de lo mismo. El `.md` es la guía completa: qué cuenta es cada
+cosa, por qué importa, y cómo transferirla o recrearla, paso a paso por
+consola. El `.html` es la referencia rápida: el propio `config.local.php`
+tal como quedaría en producción, con cada línea marcada en rojo cuando es
+un token creado con una cuenta de quien programó el sitio (y qué no lo es).
+
+El `.html` se abre con doble clic, no necesita servidor. También está
+publicado como Artifact:
+
+<https://claude.ai/code/artifact/2cd5266a-0ec9-4a4f-8776-c037750d1ed7>
+
+Igual que con `pruebas.html`: si cambia una llave de `config.local.php`
+—se agrega una integración, se quita otra—, hay que actualizar el `.html`
+(y su Artifact) para que no quede desactualizado.
 
 ## pruebas.html
 
