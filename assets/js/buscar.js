@@ -126,6 +126,7 @@
         }
 
         pintarConteo();
+        activarLazyBg($('resultsGrid'));
 
         var boton = $('btnCargarMas');
         boton.disabled = false;

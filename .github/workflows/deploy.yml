@@ -23,6 +23,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # El CSS y el JS se escriben comentados y legibles a propósito —así se
+      # editan—; esto no toca esos archivos en el repositorio, solo reescribe
+      # la copia que ya está en el runner justo antes de subirla por FTP.
+      # Versiones fijas para que un deploy no cambie de un día a otro sin que
+      # nadie haya tocado el código.
+      - name: Minify CSS and JS before deploy
+        run: |
+          for f in assets/css/*.css; do
+            npx --yes clean-css-cli@5.6.3 -o "$f.min" "$f" && mv "$f.min" "$f"
+          done
+          for f in assets/js/*.js; do
+            npx --yes terser@5.49.0 "$f" -c -m -o "$f.min" && mv "$f.min" "$f"
+          done
+
       - name: Deploy to FTP server
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:

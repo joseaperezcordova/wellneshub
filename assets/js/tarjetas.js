@@ -22,11 +22,19 @@ function esc(s) {
 }
 
 /* El fondo de la tarjeta: la foto si la hay, y si no el color de la paleta que
-   eligió quien publicó. */
+   eligió quien publicó.
+   La foto no entra aquí como background-image directo: eso la descarga de
+   inmediato, esté o no a la vista, y una rejilla de resultados puede traer
+   veinticuatro. Se deja en data-bg y arranca() la pone cuando la tarjeta se
+   acerca a la pantalla —ver activarLazyBg(), más abajo—. Mientras tanto se ve
+   el color de la actividad, que ya hace de fondo cuando no hay foto. */
 function fondoTarjeta(e) {
-  return e.img
-    ? "background-image:url('" + esc(e.img) + "'); background-size:cover; background-position:center;"
-    : 'background-color:' + esc(e.color) + ';';
+  var base = 'background-color:' + esc(e.color) + ';';
+  return e.img ? base + ' background-size:cover; background-position:center;' : base;
+}
+
+function atributoLazyBg(e) {
+  return e.img ? ' data-bg="' + esc(e.img) + '"' : '';
 }
 
 function precioTexto(e, prefijo) {
@@ -37,7 +45,7 @@ function precioTexto(e, prefijo) {
    categoría, título, ubicación y, al pie, quién la organiza y desde cuánto. */
 function evCardHTML(e) {
   return '<a class="ev-card" href="' + esc(e.url) + '">'
-    + '<div class="ev-img" style="' + fondoTarjeta(e) + '">'
+    + '<div class="ev-img" style="' + fondoTarjeta(e) + '"' + atributoLazyBg(e) + '>'
     +   '<div class="ev-date"><span class="d">' + esc(e.d) + '</span><span class="m">' + esc(e.m) + '</span></div>'
     + '</div>'
     + '<div class="ev-body">'
@@ -59,7 +67,7 @@ function cardHTML(e, cola) {
   var url = esc(e.url) + (cola ? '&amp;' + cola : '');
 
   return '<a class="card-event" href="' + url + '">'
-    + '<div class="card-img" style="' + fondoTarjeta(e) + '">'
+    + '<div class="card-img" style="' + fondoTarjeta(e) + '"' + atributoLazyBg(e) + '>'
     +   '<span class="cat-tag">' + esc(e.cat) + '</span>'
     + '</div>'
     + '<div class="card-body">'
@@ -84,10 +92,41 @@ function vacioHTML(mensaje) {
     + '</div>';
 }
 
+/* Pone la foto real cuando la tarjeta se acerca a la pantalla —350px antes,
+   para que ya esté lista al llegar y no se vea aparecer de golpe—. Un solo
+   observer para todo el sitio: cada pintar() solo agrega tarjetas a lo que ya
+   está mirando, no crea uno nuevo por carril o por página de resultados. */
+var lazyBgObserver = ('IntersectionObserver' in window)
+  ? new IntersectionObserver(function (entradas) {
+      entradas.forEach(function (entrada) {
+        if (!entrada.isIntersecting) return;
+        var el = entrada.target;
+        el.style.backgroundImage = "url('" + el.dataset.bg + "')";
+        el.removeAttribute('data-bg');
+        lazyBgObserver.unobserve(el);
+      });
+    }, {rootMargin: '350px'})
+  : null;
+
+function activarLazyBg(caja) {
+  var tarjetas = caja.querySelectorAll('[data-bg]');
+  if (!lazyBgObserver) {
+    // Sin soporte para IntersectionObserver: mejor la foto de una vez que
+    // ninguna, así que se pone directo.
+    tarjetas.forEach(function (el) {
+      el.style.backgroundImage = "url('" + el.dataset.bg + "')";
+      el.removeAttribute('data-bg');
+    });
+    return;
+  }
+  tarjetas.forEach(function (el) { lazyBgObserver.observe(el); });
+}
+
 function pintar(id, trozos, mensajeVacio) {
   var caja = document.getElementById(id);
   if (!caja) return;
   caja.innerHTML = trozos.length ? trozos.join('') : (mensajeVacio ? vacioHTML(mensajeVacio) : '');
+  activarLazyBg(caja);
 }
 
 /* ---------- carriles horizontales ----------
