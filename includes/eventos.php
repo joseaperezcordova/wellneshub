@@ -843,6 +843,38 @@ function generarSlug(string $titulo, int $id): string
 
 // -------------------------------------------------------------- escritura ----
 
+/**
+ * ¿Ya tiene este organizador otra actividad de la misma categoría, en el
+ * mismo estado y ciudad, el mismo día? No compara por título —dos nombres
+ * distintos para lo mismo no se detectarían, y dos actividades reales que
+ * coincidan en nombre por casualidad sí deberían poder coexistir— así que
+ * se usa la combinación que de verdad describe "es la misma actividad
+ * repetida sin querer": dónde, cuándo y de qué tipo.
+ */
+function eventoDuplicado(
+    int $usuarioId,
+    string $entidad,
+    string $ciudad,
+    string $categoria,
+    string $fechaInicio,
+    ?int $excluirId = null
+): bool {
+    $sql = 'SELECT COUNT(*) FROM eventos
+             WHERE usuario_id = ? AND entidad = ? AND ciudad = ? AND categoria = ?
+               AND DATE(fecha_inicio) = DATE(?)';
+    $params = [$usuarioId, $entidad, $ciudad, $categoria, $fechaInicio];
+
+    if ($excluirId !== null) {
+        $sql .= ' AND id != ?';
+        $params[] = $excluirId;
+    }
+
+    $st = db()->prepare($sql);
+    $st->execute($params);
+
+    return (int) $st->fetchColumn() > 0;
+}
+
 /** Crea el evento como borrador y devuelve su id. */
 function crearEvento(array $e, int $usuarioId): int
 {

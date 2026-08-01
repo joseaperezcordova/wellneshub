@@ -35,6 +35,10 @@ if (postDesbordado()) {
             $errores['imagen'] = $errorImagen;
         }
 
+        if (!$errores && eventoDuplicado((int) $u['id'], $e['entidad'], $e['ciudad'], $e['categoria'], $e['fecha_inicio'])) {
+            $errores['general'] = 'Ya tienes otra actividad de "' . $e['categoria'] . '" en ' . $e['ciudad'] . ', ' . $e['entidad'] . ' para ese mismo día. Si es una repetición sin querer, revisa tus actividades; si es otra cosa, cambia la fecha, la ciudad o la categoría.';
+        }
+
         if (!$errores) {
             $id = crearEvento($e, (int) $u['id']);
             olvidarImagenEnVuelo($e['imagen_url']);   // ya tiene dueño
