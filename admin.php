@@ -100,7 +100,7 @@ require __DIR__ . '/includes/layout.php';
         <thead><tr><th>Título</th><th>Organiza</th><th>Ciudad</th><th>Fecha</th><th>Situación</th><th></th></tr></thead>
         <tbody>
           <?php if (!$eventosAdmin): ?>
-            <tr><td colspan="6" style="opacity:.6;">Todavía no hay actividades.</td></tr>
+            <tr><td colspan="6" style="opacity:.8;">Todavía no hay actividades.</td></tr>
           <?php endif; ?>
           <?php foreach ($eventosAdmin as $ea): $p = fechaPartes($ea['fecha_inicio']); ?>
             <tr>
@@ -133,7 +133,7 @@ require __DIR__ . '/includes/layout.php';
         <thead><tr><th>Nombre</th><th>Correo</th><th>Actividades publicadas</th><th>Último acceso</th><th>Cuenta</th></tr></thead>
         <tbody>
           <?php if (!$organizadoresAdmin): ?>
-            <tr><td colspan="5" style="opacity:.6;">Todavía no hay organizadores con actividades publicadas.</td></tr>
+            <tr><td colspan="5" style="opacity:.8;">Todavía no hay organizadores con actividades publicadas.</td></tr>
           <?php endif; ?>
           <?php foreach ($organizadoresAdmin as $org): ?>
             <tr>
@@ -170,18 +170,18 @@ require __DIR__ . '/includes/layout.php';
         <div class="admin-card">
           <h4>Estados</h4>
           <ul>
-            <?php if (!$estadosAdmin): ?><li style="opacity:.6;">Sin actividades publicadas todavía.</li><?php endif; ?>
+            <?php if (!$estadosAdmin): ?><li style="opacity:.8;">Sin actividades publicadas todavía.</li><?php endif; ?>
             <?php foreach ($estadosAdmin as $est): ?>
-              <li><?= e($est['nombre']) ?> <span class="mono" style="opacity:.5;"><?= (int) $est['ciudades'] ?> <?= $est['ciudades'] === 1 ? 'ciudad' : 'ciudades' ?></span></li>
+              <li><?= e($est['nombre']) ?> <span class="mono" style="opacity:.8;"><?= (int) $est['ciudades'] ?> <?= $est['ciudades'] === 1 ? 'ciudad' : 'ciudades' ?></span></li>
             <?php endforeach; ?>
           </ul>
         </div>
         <div class="admin-card">
           <h4>Ciudades</h4>
           <ul>
-            <?php if (!$ciudadesAdmin): ?><li style="opacity:.6;">Sin actividades publicadas todavía.</li><?php endif; ?>
+            <?php if (!$ciudadesAdmin): ?><li style="opacity:.8;">Sin actividades publicadas todavía.</li><?php endif; ?>
             <?php foreach ($ciudadesAdmin as $ciu): ?>
-              <li><?= e($ciu['nombre']) ?> <span class="mono" style="opacity:.5;"><?= number_format($ciu['actividades']) ?> <?= $ciu['actividades'] === 1 ? 'actividad' : 'actividades' ?></span></li>
+              <li><?= e($ciu['nombre']) ?> <span class="mono" style="opacity:.8;"><?= number_format($ciu['actividades']) ?> <?= $ciu['actividades'] === 1 ? 'actividad' : 'actividades' ?></span></li>
             <?php endforeach; ?>
           </ul>
         </div>

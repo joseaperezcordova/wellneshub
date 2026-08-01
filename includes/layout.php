@@ -311,7 +311,7 @@ function pie(): void
   <div class="foot-inner">
     <div>
       <div class="logo-text" style="color:var(--blanco);">Wellneshub</div>
-      <p style="font-size:13px; opacity:.7; margin-top:10px; max-width:260px;">El directorio de actividades wellness más completo de México — retiros, festivales y círculos, curados a mano.</p>
+      <p style="font-size:13px; opacity:.85; margin-top:10px; max-width:260px;">El directorio de actividades wellness más completo de México — retiros, festivales y círculos, curados a mano.</p>
     </div>
     <div>
       <h5>Acerca de</h5>

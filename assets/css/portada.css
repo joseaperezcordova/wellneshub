@@ -77,7 +77,7 @@
   input,select,textarea{font-family:inherit; font-size:14px;}
   :focus-visible{outline:2px solid var(--marigold-deep); outline-offset:2px;}
   .mono{font-family:'IBM Plex Mono',monospace; letter-spacing:0.02em;}
-  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--jungle); opacity:0.7;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--jungle); opacity:0.92;}
   .wrap{max-width:1180px; margin:0 auto; padding:0 28px;}
   @media(max-width:640px){.wrap{padding:0 18px;}}
 
@@ -94,7 +94,7 @@
      vez de dos tonos del mismo caramelo. */
   .logo-mark{width:30px; height:30px; border-radius:50%; background:conic-gradient(var(--terracota) 0deg 90deg, var(--petroleo) 90deg 180deg, var(--verde-claro) 180deg 270deg, var(--arena) 270deg 360deg); flex-shrink:0;}
   .logo-text{font-family:'Fraunces',serif; font-weight:600; font-size:19px;}
-  .logo-text small{display:block; font-family:'IBM Plex Mono',monospace; font-weight:400; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--jungle); opacity:0.65; margin-top:1px;}
+  .logo-text small{display:block; font-family:'IBM Plex Mono',monospace; font-weight:400; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--jungle); opacity:0.92; margin-top:1px;}
   /* Eran <button> mientras las vistas se conmutaban con JavaScript. Ahora son
      enlaces a páginas de verdad, y las dos formas se estilan igual para que el
      menú no cambie de aspecto. */
@@ -318,7 +318,7 @@
     width:100%; padding:34px 22px; text-align:center; background:var(--paper);
     border:1px dashed var(--line); border-radius:14px;
   }
-  .rail-vacio p{margin:0 0 14px; font-size:14px; opacity:.7;}
+  .rail-vacio p{margin:0 0 14px; font-size:14px; opacity:.8;}
   /* Sirve a un enlace («Publicar el primero») y a un boton («Quitar filtros»),
      asi que anula el borde que el navegador le pone al segundo. */
   .btn-vacio{
@@ -390,12 +390,12 @@
     text-transform:uppercase; color:var(--terracota-texto);
   }
   .ev-body h3{font-size:19px; line-height:1.25;}
-  .ev-loc{font-size:12.5px; color:var(--ink); opacity:.7;}
+  .ev-loc{font-size:12.5px; color:var(--ink); opacity:.8;}
   .ev-foot{
     margin-top:auto; padding-top:12px; border-top:1px solid var(--line-soft);
     display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:11.5px;
   }
-  .ev-org{color:var(--ink); opacity:.65; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .ev-org{color:var(--ink); opacity:.8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .ev-price{font-family:'IBM Plex Mono',monospace; color:var(--jungle); white-space:nowrap;}
   .ev-price.free{color:var(--terracota-texto);}
   .evnext{
@@ -430,7 +430,7 @@
   .card-body{padding:14px 16px 16px; display:flex; flex-direction:column; gap:6px; flex:1;}
   .card-date{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--clay); letter-spacing:0.04em;}
   .card-body h3{font-size:16.5px; line-height:1.3;}
-  .card-city{font-size:12.5px; color:var(--ink); opacity:0.65;}
+  .card-city{font-size:12.5px; color:var(--ink); opacity:0.8;}
   .card-foot{margin-top:auto; padding-top:10px; border-top:1px solid var(--line-soft); display:flex; justify-content:space-between; align-items:center;}
   .price{font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:500;}
   .price.free{color:var(--jungle);}
@@ -447,7 +447,7 @@
      texto de al lado le imponia un piso que .nform heredaba igual. */
   .newsletter > div{min-width:0;}
   .newsletter h3{font-size:22px; color:var(--paper); max-width:360px;}
-  .newsletter p{font-size:13px; opacity:0.75; margin-top:6px;}
+  .newsletter p{font-size:13px; opacity:0.85; margin-top:6px;}
   .nform{display:flex; gap:8px; flex:1; min-width:260px; max-width:400px;}
   /* min-width:260px es para que en desktop el input no se aplaste dentro de la
      fila; en un telefono angosto no hay «fila» que compartir con el texto de
@@ -493,7 +493,7 @@
      avisa de que la lista sigue. */
   #fCats{max-height:238px; overflow-y:auto; padding-right:6px;}
   .results-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;}
-  .results-head .count{font-size:13px; opacity:0.65;}
+  .results-head .count{font-size:13px; opacity:0.8;}
   .results-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:18px;}
   @media(max-width:1000px){.results-grid{grid-template-columns:1fr;}}
   .sortsel{border:1px solid var(--line); background:var(--paper); border-radius:5px; padding:7px 10px; font-size:13px;}
@@ -502,7 +502,7 @@
      rejilla —no una tarjeta más— para que no salte el layout cuando llegan
      los resultados de verdad. */
   .rail-cargando{
-    grid-column:1 / -1; padding:34px 22px; text-align:center; font-size:13.5px; opacity:.6;
+    grid-column:1 / -1; padding:34px 22px; text-align:center; font-size:13.5px; opacity:.8;
   }
 
   /* "Cargar más": centrado y aparte, no dentro de la rejilla —así no compite
@@ -525,7 +525,7 @@
   .evento-meta-box .cat-tag{display:inline-block; background:var(--arena); font-size:11px; padding:4px 10px; border-radius:20px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.05em; color:var(--jungle); margin-bottom:12px;}
   .evento-meta-box h1{font-size:26px; margin-bottom:14px;}
   .metaline{display:flex; gap:10px; font-size:13.5px; padding:8px 0; border-top:1px solid var(--line-soft);}
-  .metaline .k{width:78px; flex-shrink:0; opacity:0.55; font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.05em; padding-top:2px;}
+  .metaline .k{width:78px; flex-shrink:0; opacity:0.8; font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.05em; padding-top:2px;}
   .price-big{font-family:'IBM Plex Mono',monospace; font-size:22px; margin:14px 0 4px;}
   .btn-primary{display:block; text-align:center; width:100%; background:var(--marigold); color:var(--tinta-boton); border:none; padding:14px; border-radius:6px; font-weight:600; font-size:14.5px; margin-top:14px;}
   .btn-primary:hover{background:var(--marigold-deep);}
@@ -539,7 +539,7 @@
   .desc p{font-size:14.5px; opacity:0.85; margin-bottom:14px;}
   .infolist{list-style:none; padding:0; margin:0; display:grid; grid-template-columns:1fr 1fr; gap:8px 18px; font-size:13px;}
   .infolist li{display:flex; justify-content:space-between; border-bottom:1px dashed var(--line); padding-bottom:6px;}
-  .infolist li span:first-child{opacity:0.55;}
+  .infolist li span:first-child{opacity:0.8;}
   .mapbox{height:220px; border-radius:8px; border:1px solid var(--line); background:
       repeating-linear-gradient(45deg, var(--blanco) 0 10px, var(--arena) 10px 20px);
     display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--jungle); text-align:center; padding:16px; margin-top:16px;}
@@ -547,13 +547,13 @@
   .orgcard:hover{border-color:var(--jungle);}
   .avatar{width:52px; height:52px; border-radius:50%; background-size:cover; background-position:center; flex-shrink:0;}
   .orgcard .oname{font-size:14.5px; font-weight:600; font-family:'Fraunces',serif;}
-  .orgcard .osub{font-size:12px; opacity:0.6;}
+  .orgcard .osub{font-size:12px; opacity:0.8;}
 
   /* ---------- organizador ---------- */
   .org-hero{display:flex; gap:22px; align-items:center; flex-wrap:wrap; padding:44px 0 8px;}
   .org-hero .avatar{width:96px; height:96px;}
   .org-hero h1{font-size:28px;}
-  .org-hero .desc-sm{font-size:13.5px; opacity:0.7; max-width:520px; margin-top:8px;}
+  .org-hero .desc-sm{font-size:13.5px; opacity:0.8; max-width:520px; margin-top:8px;}
 
   /* ---------- blog ---------- */
   .grid-blog{display:grid; grid-template-columns:repeat(3,1fr); gap:22px;}
@@ -572,7 +572,7 @@
   footer h5{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--terracota-palida); margin-bottom:12px;}
   footer a{display:block; font-size:13px; padding:4px 0; opacity:0.75;}
   footer a:hover{opacity:1;}
-  .foot-bottom{border-top:1px solid rgba(255,255,255,0.12); text-align:center; font-size:11.5px; opacity:0.5; padding:16px; font-family:'IBM Plex Mono',monospace;}
+  .foot-bottom{border-top:1px solid rgba(255,255,255,0.12); text-align:center; font-size:11.5px; opacity:0.76; padding:16px; font-family:'IBM Plex Mono',monospace;}
 
   /* ---------- ADMIN ---------- */
   .admin-shell{background:var(--ink); min-height:100vh; padding-bottom:60px;}
@@ -583,10 +583,10 @@
   @media(max-width:900px){.stat-grid{grid-template-columns:repeat(2,1fr);}}
   .stat-card{background:var(--petroleo-suave); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:16px;}
   .stat-card .num{font-family:'Fraunces',serif; font-size:26px; color:var(--terracota-palida);}
-  .stat-card .lbl{font-size:11.5px; color:rgba(255,255,255,0.6); margin-top:4px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.04em;}
+  .stat-card .lbl{font-size:11.5px; color:rgba(255,255,255,0.8); margin-top:4px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.04em;}
 
   .admin-tabs{display:flex; gap:4px; border-bottom:1px solid rgba(255,255,255,0.12); margin-bottom:22px; overflow-x:auto;}
-  .admin-tabs button{background:none; border:none; color:rgba(255,255,255,0.6); padding:11px 14px; font-size:13px; white-space:nowrap; border-bottom:2px solid transparent;}
+  .admin-tabs button{background:none; border:none; color:rgba(255,255,255,0.8); padding:11px 14px; font-size:13px; white-space:nowrap; border-bottom:2px solid transparent;}
   .admin-tabs button.active{color:var(--paper); border-bottom-color:var(--terracota-palida);}
 
   .admin-panel{display:none;}
@@ -597,23 +597,23 @@
   .btn-add:hover{background:var(--marigold-deep);}
 
   table.admtable{width:100%; border-collapse:collapse; background:var(--petroleo-suave); border-radius:8px; overflow:hidden; font-size:13px; color:var(--paper);}
-  table.admtable th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:rgba(255,255,255,0.5); padding:11px 14px; border-bottom:1px solid rgba(255,255,255,0.1);}
+  table.admtable th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:rgba(255,255,255,0.8); padding:11px 14px; border-bottom:1px solid rgba(255,255,255,0.1);}
   table.admtable td{padding:11px 14px; border-bottom:1px solid rgba(255,255,255,0.06); vertical-align:middle;}
   table.admtable tr:last-child td{border-bottom:none;}
   .badge{font-family:'IBM Plex Mono',monospace; font-size:10.5px; padding:3px 9px; border-radius:20px; text-transform:uppercase; letter-spacing:0.04em;}
   .badge.on{background:rgba(199,110,67,0.20); color:var(--terracota-palida);}
-  .badge.off{background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.5);}
+  .badge.off{background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.8);}
   .badge.star{background:rgba(233,221,201,0.18); color:var(--arena);}
-  .actionbtn{background:none; border:1px solid rgba(255,255,255,0.16); color:rgba(255,255,255,0.75); font-size:11px; padding:5px 9px; border-radius:4px; margin-right:4px;}
+  .actionbtn{background:none; border:1px solid rgba(255,255,255,0.16); color:rgba(255,255,255,0.8); font-size:11px; padding:5px 9px; border-radius:4px; margin-right:4px;}
   .actionbtn:hover{border-color:var(--terracota-palida); color:var(--terracota-palida);}
 
   .catchip-admin{display:inline-flex; align-items:center; gap:8px; background:var(--petroleo-suave); border:1px solid rgba(255,255,255,0.12); color:var(--paper); padding:8px 14px; border-radius:20px; font-size:12.5px; margin:0 8px 8px 0;}
-  .catchip-admin .n{font-family:'IBM Plex Mono',monospace; opacity:0.5; font-size:11px;}
+  .catchip-admin .n{font-family:'IBM Plex Mono',monospace; opacity:0.8; font-size:11px;}
 
   .twocol-admin{display:grid; grid-template-columns:1fr 1fr; gap:22px;}
   @media(max-width:760px){.twocol-admin{grid-template-columns:1fr;}}
   .admin-card{background:var(--petroleo-suave); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:18px; color:var(--paper);}
-  .admin-card h4{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:rgba(255,255,255,0.55); margin-bottom:10px;}
+  .admin-card h4{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:rgba(255,255,255,0.8); margin-bottom:10px;}
   .admin-card ul{list-style:none; padding:0; margin:0;}
   .admin-card li{display:flex; justify-content:space-between; font-size:13px; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.06);}
 
@@ -628,7 +628,7 @@
   .fgrid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
   @media(max-width:560px){.fgrid{grid-template-columns:1fr;}}
   .fgrid .full{grid-column:1/-1;}
-  .field label{display:block; font-size:11.5px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.04em; opacity:0.6; margin-bottom:5px;}
+  .field label{display:block; font-size:11.5px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.04em; opacity:0.8; margin-bottom:5px;}
   .field input, .field select, .field textarea{width:100%; border:1px solid var(--line); background:var(--arena); border-radius:5px; padding:9px 10px; font-size:13px;}
   .field textarea{resize:vertical; min-height:64px;}
   .switchrow{display:flex; gap:18px; margin-top:4px; flex-wrap:wrap;}
@@ -685,7 +685,7 @@
   }
   .cuenta-quien{padding:10px 12px 12px; border-bottom:1px solid var(--line-soft); margin-bottom:6px;}
   .cuenta-quien strong{display:block; font-size:14px;}
-  .cuenta-quien span{display:block; font-size:12px; opacity:.65; overflow:hidden; text-overflow:ellipsis;}
+  .cuenta-quien span{display:block; font-size:12px; opacity:.8; overflow:hidden; text-overflow:ellipsis;}
   .cuenta-menu a{display:block; padding:9px 12px; border-radius:8px; font-size:13.5px;}
   .cuenta-menu a:hover{background:var(--arena-suave);}
   /* Antes vivia dentro del hero oscuro y por eso era blanco. Ahora cae debajo
@@ -699,7 +699,7 @@
   .scope-banner{background:#2A4453; border:1px dashed rgba(255,255,255,0.25); color:rgba(255,255,255,0.75); border-radius:8px; padding:16px 18px; font-size:12.5px; margin:26px 0;}
   .scope-banner b{color:var(--terracota-palida);}
   .scope-list{display:flex; flex-wrap:wrap; gap:6px 10px; margin-top:8px;}
-  .scope-list span{opacity:0.65;}
+  .scope-list span{opacity:0.9;}
 
   /* ---------- métricas ---------- */
   /* Los tres colores categóricos del desglose de "acción principal": ajustados
@@ -716,11 +716,11 @@
     --met-cat-3:#5CA36E;
   }
 
-  .volver-admin{display:inline-block; color:rgba(255,255,255,0.6); font-size:13px; margin-bottom:18px;}
+  .volver-admin{display:inline-block; color:rgba(255,255,255,0.8); font-size:13px; margin-bottom:18px;}
   .volver-admin:hover{color:var(--terracota-palida);}
 
   .rango-filtros{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:22px;}
-  .rango-label{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:rgba(255,255,255,0.45); margin-right:2px;}
+  .rango-label{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:rgba(255,255,255,0.8); margin-right:2px;}
   .rango-btn{
     display:inline-block; border:1px solid rgba(255,255,255,0.16); color:rgba(255,255,255,0.75);
     font-size:13px; padding:7px 14px; border-radius:20px;
@@ -730,11 +730,14 @@
 
   .met-stat-grid{grid-template-columns:repeat(4,1fr);}
   @media(max-width:700px){ .met-stat-grid{grid-template-columns:repeat(2,1fr);} }
-  .tenue-met{opacity:0.55; text-transform:none; letter-spacing:0;}
+  /* Antes bajaba más el opacity encima del que ya trae .lbl (su contenedor):
+     la combinación de los dos nunca llegaba a 4.5:1. Total ya lo hace notarse
+     más chico que el número de al lado; no hacía falta apagarlo también. */
+  .tenue-met{opacity:1; text-transform:none; letter-spacing:0;}
 
   .met-card{background:var(--petroleo-suave); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:22px 24px; margin-bottom:20px;}
   .met-card h3{font-family:'Fraunces',serif; color:var(--paper); font-size:17px; margin:0 0 4px;}
-  .met-card-sub{font-size:12.5px; color:rgba(255,255,255,0.55); margin:0 0 18px;}
+  .met-card-sub{font-size:12.5px; color:rgba(255,255,255,0.8); margin:0 0 18px;}
 
   /* -- gráfica de crecimiento -- */
   .met-chart-wrap{position:relative;}
@@ -743,7 +746,7 @@
   .met-area-fill{fill:var(--terracota-palida); fill-opacity:0.12;}
   .met-area-line{fill:none; stroke:var(--terracota-palida); stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
   .met-area-dot{fill:var(--terracota-palida); stroke:var(--petroleo-suave); stroke-width:2;}
-  .met-axis-label{font-family:'IBM Plex Mono',monospace; font-size:10.5px; fill:rgba(255,255,255,0.45);}
+  .met-axis-label{font-family:'IBM Plex Mono',monospace; font-size:10.5px; fill:rgba(255,255,255,0.8);}
   .met-end-label{font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; fill:var(--terracota-palida);}
   .met-crosshair{stroke:rgba(255,255,255,0.3); stroke-width:1; pointer-events:none; opacity:0;}
   .met-hover-dot{fill:var(--terracota-palida); stroke:var(--petroleo-suave); stroke-width:2; pointer-events:none; opacity:0;}
@@ -764,24 +767,24 @@
   .met-hbar-track{position:relative; height:20px; background:rgba(255,255,255,0.08); border-radius:6px; overflow:hidden;}
   .met-hbar-fill{position:absolute; left:0; top:0; bottom:0; border-radius:6px;}
   .met-hbar-value{font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600; text-align:right; color:var(--paper); font-variant-numeric:tabular-nums;}
-  .met-vacio{margin-top:14px; font-size:12.5px; color:rgba(255,255,255,0.5);}
+  .met-vacio{margin-top:14px; font-size:12.5px; color:rgba(255,255,255,0.8);}
 
   /* -- rankings de categorías / ciudades -- */
   .met-rank-list{display:flex; flex-direction:column; gap:11px;}
   .met-rank-row{display:grid; grid-template-columns:18px minmax(0,150px) 1fr 36px; align-items:center; gap:10px;}
   @media(max-width:420px){ .met-rank-row{grid-template-columns:16px minmax(0,90px) 1fr 30px;} }
-  .met-rank-i{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:rgba(255,255,255,0.4); text-align:right;}
+  .met-rank-i{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:rgba(255,255,255,0.8); text-align:right;}
   .met-rank-name{font-size:12.5px; font-weight:500; color:var(--paper); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .met-rank-track{position:relative; height:13px; background:rgba(255,255,255,0.08); border-radius:5px; overflow:hidden;}
   .met-rank-fill{position:absolute; left:0; top:0; bottom:0; background:var(--terracota-palida); opacity:0.9; border-radius:5px;}
-  .met-rank-value{font-family:'IBM Plex Mono',monospace; font-size:12.5px; text-align:right; color:rgba(255,255,255,0.6); font-variant-numeric:tabular-nums;}
+  .met-rank-value{font-family:'IBM Plex Mono',monospace; font-size:12.5px; text-align:right; color:rgba(255,255,255,0.8); font-variant-numeric:tabular-nums;}
 
   /* ---------- panel organizador ---------- */
   .org-login{max-width:380px; margin:70px auto; background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:32px;}
   .org-login h2{font-size:22px; margin-bottom:6px;}
-  .org-login p{font-size:13px; opacity:.65; margin-bottom:20px;}
+  .org-login p{font-size:13px; opacity:.8; margin-bottom:20px;}
   .org-login .field{margin-bottom:14px;}
-  .org-login .field label{display:block; font-size:11.5px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; opacity:.6; margin-bottom:5px;}
+  .org-login .field label{display:block; font-size:11.5px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; opacity:.8; margin-bottom:5px;}
   .org-login .field input{width:100%; border:1px solid var(--line); background:var(--arena); border-radius:5px; padding:10px 12px; font-size:13.5px;}
   .org-login .btn-primary{margin-top:6px;}
   .org-login .swap{text-align:center; font-size:12.5px; margin-top:16px; color:var(--jungle);}
@@ -794,7 +797,7 @@
   .op-header .who{display:flex; align-items:center; gap:12px;}
   .op-header .avatar{width:44px; height:44px; background-color:var(--verde);}
   .op-tabs{display:flex; gap:4px; border-bottom:1px solid var(--line); margin:24px 0 20px; overflow-x:auto;}
-  .op-tabs button{background:none; border:none; padding:10px 14px; font-size:13px; color:var(--ink); opacity:.55; border-bottom:2px solid transparent; white-space:nowrap;}
+  .op-tabs button{background:none; border:none; padding:10px 14px; font-size:13px; color:var(--ink); opacity:.8; border-bottom:2px solid transparent; white-space:nowrap;}
   .op-tabs button.active{opacity:1; border-bottom-color:var(--terracota); font-weight:600;}
   .op-panel{display:none;}
   .op-panel.active{display:block;}

@@ -75,26 +75,26 @@ require __DIR__ . '/includes/layout.php';
 
   <h2 style="font-size:16px; margin:22px 0 10px;">PHP</h2>
   <table style="width:100%; border-collapse:collapse; font-size:13.5px;">
-    <tr><td style="padding:7px 0; opacity:.7;">Versión</td>
+    <tr><td style="padding:7px 0; opacity:.8;">Versión</td>
         <td><?= e(PHP_VERSION) ?></td></tr>
 
-    <tr><td style="padding:7px 0; opacity:.7;">¿Existe mail()?</td>
+    <tr><td style="padding:7px 0; opacity:.8;">¿Existe mail()?</td>
         <td><?= function_exists('mail') ? 'Sí' : '<strong>NO — está desactivada</strong>' ?></td></tr>
 
-    <tr><td style="padding:7px 0; opacity:.7;">disable_functions</td>
+    <tr><td style="padding:7px 0; opacity:.8;">disable_functions</td>
         <td><?= e(ini_get('disable_functions') ?: '(ninguna)') ?></td></tr>
 
-    <tr><td style="padding:7px 0; opacity:.7;">sendmail_path</td>
+    <tr><td style="padding:7px 0; opacity:.8;">sendmail_path</td>
         <td><?= e(ini_get('sendmail_path') ?: '(vacío)') ?></td></tr>
   </table>
 
   <h2 style="font-size:16px; margin:22px 0 10px;">Remitente</h2>
   <table style="width:100%; border-collapse:collapse; font-size:13.5px;">
-    <tr><td style="padding:7px 0; opacity:.7;">Dirección</td>
+    <tr><td style="padding:7px 0; opacity:.8;">Dirección</td>
         <td><?= e($remitente) ?></td></tr>
-    <tr><td style="padding:7px 0; opacity:.7;">Nombre</td>
+    <tr><td style="padding:7px 0; opacity:.8;">Nombre</td>
         <td><?= e($nombreRemitente) ?></td></tr>
-    <tr><td style="padding:7px 0; opacity:.7;">Dominio que se comprueba</td>
+    <tr><td style="padding:7px 0; opacity:.8;">Dominio que se comprueba</td>
         <td><strong><?= e($dominioEnvio) ?></strong></td></tr>
   </table>
 
@@ -105,7 +105,7 @@ require __DIR__ . '/includes/layout.php';
 
   if ($txt === null):
   ?>
-    <p style="font-size:13.5px; opacity:.7;">No se puede consultar el DNS desde aquí
+    <p style="font-size:13.5px; opacity:.8;">No se puede consultar el DNS desde aquí
       (<code>dns_get_record</code> no está disponible). Compruébalo en cPanel → Editor de zona.</p>
   <?php else:
       $spf = '';
@@ -114,11 +114,11 @@ require __DIR__ . '/includes/layout.php';
       }
   ?>
     <table style="width:100%; border-collapse:collapse; font-size:13.5px;">
-      <tr><td style="padding:7px 0; opacity:.7; width:120px;">SPF</td>
+      <tr><td style="padding:7px 0; opacity:.8; width:120px;">SPF</td>
           <td><?= $spf !== ''
                 ? '<code>' . e($spf) . '</code>'
                 : '<strong>No hay registro SPF en este dominio.</strong>' ?></td></tr>
-      <tr><td style="padding:7px 0; opacity:.7;">MX</td>
+      <tr><td style="padding:7px 0; opacity:.8;">MX</td>
           <td><?= $mx ? e(implode(', ', array_column($mx, 'target'))) : '<strong>(ninguno)</strong>' ?></td></tr>
     </table>
 
