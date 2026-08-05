@@ -298,9 +298,9 @@ require __DIR__ . '/includes/layout.php';
       <?php endif; ?>
     </div>
 
-    <?php /* WhatsApp y el sitio del organizador son enlaces a otro dominio: los
-             cuenta solo el "seguimiento mejorado" de GA4 (clics salientes),
-             que se activa en la propia consola de GA4, no aquí en el código.
+    <?php /* El sitio del organizador es un enlace a otro dominio: lo cuenta
+             solo el "seguimiento mejorado" de GA4 (clics salientes), que se
+             activa en la propia consola de GA4, no aquí en el código.
              Boletos/reservar/contactar sí necesitan el whTrack() de abajo:
              pasan primero por salida.php o contactar.php, un salto dentro del
              propio sitio, y eso el seguimiento mejorado no lo ve como "salida". */ ?>
@@ -315,15 +315,8 @@ require __DIR__ . '/includes/layout.php';
          onclick="whTrack('clic_reservar', <?= e(json_encode(['id' => (int) $ev['id']])) ?>)">Reservar mi lugar</a>
 
     <?php elseif ($ev['accion_principal'] === 'informacion'): ?>
-      <div class="ficha-contacto">
-        <a class="btn-principal btn-boletos" href="<?= URL_BASE ?>/contactar.php?id=<?= (int) $ev['id'] ?>"
-           onclick="whTrack('clic_contactar', <?= e(json_encode(['id' => (int) $ev['id']])) ?>)">Contactar al organizador</a>
-        <?php if (!empty($ev['whatsapp_contacto'])): ?>
-          <?php $textoWa = rawurlencode('Hola, vi tu actividad "' . $ev['titulo'] . '" en Rueda y quería preguntarte algo.'); ?>
-          <a class="btn-whatsapp" href="https://wa.me/<?= e($ev['whatsapp_contacto']) ?>?text=<?= e($textoWa) ?>"
-             target="_blank" rel="noopener nofollow">Escribir por WhatsApp</a>
-        <?php endif; ?>
-      </div>
+      <a class="btn-principal btn-boletos" href="<?= URL_BASE ?>/contactar.php?id=<?= (int) $ev['id'] ?>"
+         onclick="whTrack('clic_contactar', <?= e(json_encode(['id' => (int) $ev['id']])) ?>)">Contactar al organizador</a>
     <?php endif; ?>
 
     <div class="ficha-desc"><?= nl2br(e($ev['descripcion'])) ?></div>

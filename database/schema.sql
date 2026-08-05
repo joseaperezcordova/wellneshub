@@ -210,9 +210,15 @@ CREATE TABLE IF NOT EXISTS eventos (
   -- botón se pinta en la ficha.
   accion_principal ENUM('informacion','boletos','reservar')
                                 NOT NULL DEFAULT 'informacion',
-  -- Número de WhatsApp del organizador para ESTE evento, solo dígitos (sin
-  -- +, espacios ni guiones) para armar el enlace wa.me directo. Opcional:
-  -- solo aplica a "Contactar al organizador", y ni ahí es obligatorio.
+  -- YA NO SE USA. El formulario dejó de pedir el WhatsApp del organizador y
+  -- la ficha dejó de pintar su botón, así que en las filas nuevas siempre
+  -- viene NULL. La columna se queda porque las fichas anteriores tienen su
+  -- número guardado aquí; el día que se decida que ese dato ya no hace falta,
+  -- se tira con un ALTER y no antes.
+  --
+  -- Si alguna vez vuelve: se guardaba solo con dígitos y sin el código de
+  -- país, y por eso el enlace wa.me nunca llegó a funcionar —wa.me lee los
+  -- dos primeros dígitos como país, y "55" es Brasil, no la Ciudad de México—.
   whatsapp_contacto VARCHAR(15) NULL DEFAULT NULL,
   imagen_url    VARCHAR(500)  NULL DEFAULT NULL,
   color         CHAR(7)       NOT NULL DEFAULT '#89A67D',

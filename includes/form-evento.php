@@ -468,15 +468,6 @@ $mal = function (string $campo) use ($errores) {
         <span class="accion-titulo">Contactar al organizador</span>
         <span class="accion-desc">Los interesados completarán un formulario y recibirás sus datos por correo.</span>
       </label>
-      <div class="accion-campos">
-        <div class="campo<?= $mal('whatsapp_contacto') ?>">
-          <label for="whatsapp_contacto">WhatsApp de contacto <span class="opcional">opcional</span></label>
-          <input id="whatsapp_contacto" name="whatsapp_contacto" type="tel" maxlength="20"
-                 value="<?= e($v('whatsapp_contacto')) ?>" placeholder="55 1234 5678">
-          <div class="pista">Si lo agregas, en la ficha también aparece un botón para escribirte directo por WhatsApp.</div>
-          <?= $err('whatsapp_contacto') ?>
-        </div>
-      </div>
     </div>
 
     <div class="accion-tarjeta">
@@ -573,12 +564,12 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
   sync();
 })();
 
-/* Las tres tarjetas de "Acción principal" se ven completas a la vez —cada
-   una con su propio campo—, así que aquí no hay nada que mostrar u ocultar.
-   Lo único que cambia es cuál de los dos enlaces es obligatorio: el de la
-   tarjeta que no se eligió se marca no-requerido para que no bloquee el
-   envío con un campo que la persona decidió no usar. El WhatsApp nunca es
-   obligatorio, ni siquiera con "Contactar al organizador" elegida. */
+/* Las tres tarjetas de "Acción principal" se ven completas a la vez, así que
+   aquí no hay nada que mostrar u ocultar. Lo único que cambia es cuál de los
+   dos enlaces es obligatorio: el de la tarjeta que no se eligió se marca
+   no-requerido para que no bloquee el envío con un campo que la persona
+   decidió no usar. "Contactar al organizador" no pide nada: el formulario de
+   contacto ya vive en contactar.php. */
 (function(){
   var radios = document.querySelectorAll('input[name="accion_principal"]');
   var urlBoletos = document.getElementById('url_boletos');

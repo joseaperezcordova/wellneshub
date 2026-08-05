@@ -264,13 +264,13 @@ input,select{font-family:inherit; font-size:14px;}
 .campo label.precio-op:has(input:focus-visible){outline:2px solid var(--terracota-texto); outline-offset:2px;}
 @media(max-width:460px){ .precio-grupo{grid-template-columns:1fr;} }
 
-/* Acción principal: cada tarjeta trae su propio campo —el WhatsApp de
-   "Contactar al organizador", la URL de "Comprar boletos"/"Reservar
-   lugar"—, así que es el mismo patrón que .tipo-fecha-tarjeta (encabezado
-   en un <label> chico, campos como hermano y no como hijo, para que el
-   clic dentro de un campo no compita con el clic que elige la tarjeta), más
-   una descripción debajo del título: aquí sí hace falta, porque de las tres
-   opciones no se deduce a ojo qué pasa al elegirlas. */
+/* Acción principal: "Comprar boletos" y "Reservar lugar" traen cada una su
+   URL dentro de la tarjeta, así que es el mismo patrón que
+   .tipo-fecha-tarjeta (encabezado en un <label> chico, campos como hermano y
+   no como hijo, para que el clic dentro de un campo no compita con el clic
+   que elige la tarjeta), más una descripción debajo del título: aquí sí hace
+   falta, porque de las tres opciones no se deduce a ojo qué pasa al
+   elegirlas. "Contactar al organizador" no lleva campo ninguno. */
 .accion-grupo{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
 .accion-tarjeta{
   min-width:0; border:1px solid var(--linea); border-radius:12px; padding:14px;
@@ -576,16 +576,6 @@ input,select{font-family:inherit; font-size:14px;}
 .precio-grande.gratis{color:var(--verde);}
 
 .btn-boletos{display:block; text-align:center; text-decoration:none; max-width:320px;}
-
-.ficha-contacto{display:flex; flex-wrap:wrap; gap:10px;}
-.ficha-contacto .btn-boletos{flex:1 1 220px;}
-.btn-whatsapp{
-  display:flex; align-items:center; justify-content:center; flex:1 1 220px;
-  max-width:320px; padding:13px 18px; border:1.5px solid #25D366; border-radius:10px;
-  color:#128C4A; font-family:'Inter',sans-serif; font-weight:600; font-size:14.5px;
-  text-decoration:none; text-align:center; transition:background .15s;
-}
-.btn-whatsapp:hover{background:rgba(37,211,102,.1);}
 
 .ficha-desc{margin-top:30px; font-size:15.5px; line-height:1.75; overflow-wrap:break-word;}
 

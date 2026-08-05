@@ -498,7 +498,6 @@ function etiquetasCampos(): array
         'url_reserva'     => 'URL de reserva',
         'sitio_web'       => 'Sitio web o enlace',
         'accion_principal' => 'Acción principal',
-        'whatsapp_contacto' => 'WhatsApp de contacto',
         'imagen'          => 'Imagen',
     ];
 }
@@ -752,20 +751,6 @@ function validarEvento(array $in): array
         $errores['url_reserva'] = 'Agrega el enlace donde se reserva el lugar.';
     }
 
-    // El WhatsApp es opcional siempre, aunque la acción sea "Contactar al
-    // organizador": el correo ya llega solo, esto es un canal extra. Se
-    // guarda solo con dígitos para poder armar el enlace wa.me directo.
-    $wa = trim((string) ($in['whatsapp_contacto'] ?? ''));
-    $e['whatsapp_contacto'] = null;
-    if ($wa !== '') {
-        $soloDigitos = (string) preg_replace('/\D+/', '', $wa);
-        if (strlen($soloDigitos) < 10 || strlen($soloDigitos) > 15) {
-            $errores['whatsapp_contacto'] = 'Ese número no parece válido. Incluye la lada.';
-        } else {
-            $e['whatsapp_contacto'] = $soloDigitos;
-        }
-    }
-
     // Igual que url_boletos, pero sin obligación ninguna de rellenarlo: es
     // informativo y puede llevarse aunque los otros enlaces también estén llenos.
     $e['sitio_web'] = urlValida((string) ($in['sitio_web'] ?? ''));
@@ -878,9 +863,9 @@ function crearEvento(array $e, int $usuarioId): int
             frecuencia, hora_recurrente, hora_fin_recurrente,
             ciudad, entidad, lugar, direccion, mapa_url, latitud, longitud, fecha_inicio, fecha_fin,
             gratuito, precio, forma_pago, cupo_maximo,
-            url_boletos, url_reserva, sitio_web, accion_principal, whatsapp_contacto,
+            url_boletos, url_reserva, sitio_web, accion_principal,
             imagen_url, color, situacion)
-         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
+         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
     )->execute([
         $usuarioId, $e['titulo'], $e['descripcion'], $e['categoria'],
         $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
@@ -888,7 +873,7 @@ function crearEvento(array $e, int $usuarioId): int
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
         $e['forma_pago'], $e['cupo_maximo'],
-        $e['url_boletos'], $e['url_reserva'], $e['sitio_web'], $e['accion_principal'], $e['whatsapp_contacto'],
+        $e['url_boletos'], $e['url_reserva'], $e['sitio_web'], $e['accion_principal'],
         $e['imagen_url'], $e['color'],
     ]);
 
@@ -911,7 +896,7 @@ function actualizarEvento(array $e, int $id): void
             entidad = ?, lugar = ?, direccion = ?, mapa_url = ?, latitud = ?, longitud = ?,
             fecha_inicio = ?, fecha_fin = ?,
             gratuito = ?, precio = ?, forma_pago = ?, cupo_maximo = ?,
-            url_boletos = ?, url_reserva = ?, sitio_web = ?, accion_principal = ?, whatsapp_contacto = ?,
+            url_boletos = ?, url_reserva = ?, sitio_web = ?, accion_principal = ?,
             imagen_url = ?, color = ?
           WHERE id = ?'
     )->execute([
@@ -921,7 +906,7 @@ function actualizarEvento(array $e, int $id): void
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
         $e['forma_pago'], $e['cupo_maximo'],
-        $e['url_boletos'], $e['url_reserva'], $e['sitio_web'], $e['accion_principal'], $e['whatsapp_contacto'],
+        $e['url_boletos'], $e['url_reserva'], $e['sitio_web'], $e['accion_principal'],
         $e['imagen_url'], $e['color'], $id,
     ]);
 }
