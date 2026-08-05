@@ -476,7 +476,6 @@ function etiquetasCampos(): array
         'entidad'         => 'Estado',
         'lugar'           => 'Nombre del lugar',
         'direccion'       => 'Dirección',
-        'enlace_acceso'   => 'Enlace de acceso',
         'mapa_url'        => 'Enlace de Google Maps',
 
         // Actividad de un día.
@@ -531,15 +530,6 @@ function validarEvento(array $in): array
     $e['categoria'] = (string) ($in['categoria'] ?? '');
     if (!isset(categorias()[$e['categoria']])) {
         $errores['categoria'] = 'Elige una categoría de la lista.';
-    }
-
-    // El enlace de acceso es aparte del lugar —una actividad presencial
-    // también puede mandar un grupo de WhatsApp o una liga de la transmisión—,
-    // así que se valida igual que url_boletos y punto.
-    $e['enlace_acceso'] = urlValida((string) ($in['enlace_acceso'] ?? ''));
-    if ($e['enlace_acceso'] === false) {
-        $errores['enlace_acceso'] = 'Esa dirección no parece válida. Empieza por https://';
-        $e['enlace_acceso'] = null;
     }
 
     $e['entidad'] = trim((string) ($in['entidad'] ?? ''));
@@ -885,16 +875,16 @@ function crearEvento(array $e, int $usuarioId): int
     $pdo->prepare(
         'INSERT INTO eventos
            (usuario_id, titulo, slug, descripcion, categoria, tipo_actividad,
-            frecuencia, hora_recurrente, hora_fin_recurrente, enlace_acceso,
+            frecuencia, hora_recurrente, hora_fin_recurrente,
             ciudad, entidad, lugar, direccion, mapa_url, latitud, longitud, fecha_inicio, fecha_fin,
             gratuito, precio, forma_pago, cupo_maximo,
             url_boletos, url_reserva, sitio_web, accion_principal, whatsapp_contacto,
             imagen_url, color, situacion)
-         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
+         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
     )->execute([
         $usuarioId, $e['titulo'], $e['descripcion'], $e['categoria'],
         $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
-        $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'], $e['direccion'],
+        $e['ciudad'], $e['entidad'], $e['lugar'], $e['direccion'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
         $e['forma_pago'], $e['cupo_maximo'],
@@ -917,7 +907,7 @@ function actualizarEvento(array $e, int $id): void
         'UPDATE eventos SET
             titulo = ?, slug = ?, descripcion = ?, categoria = ?,
             tipo_actividad = ?, frecuencia = ?, hora_recurrente = ?, hora_fin_recurrente = ?,
-            enlace_acceso = ?, ciudad = ?,
+            ciudad = ?,
             entidad = ?, lugar = ?, direccion = ?, mapa_url = ?, latitud = ?, longitud = ?,
             fecha_inicio = ?, fecha_fin = ?,
             gratuito = ?, precio = ?, forma_pago = ?, cupo_maximo = ?,
@@ -927,7 +917,7 @@ function actualizarEvento(array $e, int $id): void
     )->execute([
         $e['titulo'], generarSlug($e['titulo'], $id), $e['descripcion'],
         $e['categoria'], $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
-        $e['enlace_acceso'], $e['ciudad'], $e['entidad'], $e['lugar'], $e['direccion'],
+        $e['ciudad'], $e['entidad'], $e['lugar'], $e['direccion'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
         $e['forma_pago'], $e['cupo_maximo'],
@@ -1035,6 +1025,48 @@ function fechaCorta(string $fecha): string
     $ts = strtotime($fecha);
 
     return (int) date('j', $ts) . ' de ' . $meses[(int) date('n', $ts) - 1] . ' de ' . date('Y', $ts);
+}
+
+/**
+ * ¿Termina esta actividad en un día distinto del que empieza?
+ *
+ * NO vale preguntar si fecha_fin está puesta, que es lo que hacía la ficha.
+ * Esa pregunta fue fiable mientras la hora de fin no existía: entonces
+ * fecha_fin solo se llenaba al marcar "Termina otro día", así que tenerla
+ * puesta y durar varios días eran lo mismo.
+ *
+ * Desde migracion-08 la hora de fin es obligatoria y validarEvento() cae por
+ * defecto al día de inicio cuando no se marca "Termina otro día", de modo que
+ * fecha_fin viene llena SIEMPRE. La condición no cambió, cambió lo que mide: la
+ * ficha pasó a anunciar «16 de agosto de 2026, 19:30 / hasta el 16 de agosto de
+ * 2026, 21:00» —la misma fecha dos veces, presentada con un "hasta el" que
+ * promete otro día—.
+ *
+ * Lo que separa un retiro de una clase de tarde es el día del calendario, no
+ * que el dato esté relleno.
+ */
+function terminaOtroDia(array $ev): bool
+{
+    if (empty($ev['fecha_fin'])) return false;
+
+    return date('Y-m-d', (int) strtotime((string) $ev['fecha_inicio']))
+        !== date('Y-m-d', (int) strtotime((string) $ev['fecha_fin']));
+}
+
+/**
+ * "de 19:30 a 21:00" para una actividad que empieza y acaba el mismo día.
+ *
+ * Devuelve solo la hora de inicio en las fichas anteriores a migracion-08, que
+ * se guardaron sin hora de fin y tienen fecha_fin en NULL. Siguen teniendo que
+ * poder leerse.
+ */
+function horarioDelDia(array $ev): string
+{
+    $desde = date('H:i', (int) strtotime((string) $ev['fecha_inicio']));
+
+    if (empty($ev['fecha_fin'])) return $desde;
+
+    return 'de ' . $desde . ' a ' . date('H:i', (int) strtotime((string) $ev['fecha_fin']));
 }
 
 /**

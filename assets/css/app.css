@@ -244,22 +244,19 @@ input,select{font-family:inherit; font-size:14px;}
 .tipo-fecha-campos .campo:last-child{margin-bottom:0;}
 @media(max-width:640px){ .tipo-fecha-grupo{grid-template-columns:1fr;} }
 
-/* Sin costo / de pago: tarjetas con icono, título y descripción debajo,
-   a dos columnas. */
+/* Sin costo / de pago: dos tarjetas a la par, cada una con su icono y su
+   título en una sola línea. Sin descripción debajo: "Sin costo" y "De pago"
+   no necesitan que nadie los explique. */
 .precio-grupo{display:grid; grid-template-columns:1fr 1fr; gap:9px;}
 .campo label.precio-op{
-  display:grid; grid-template-columns:auto 1fr; align-items:start; gap:4px 9px;
+  display:grid; grid-template-columns:auto 1fr; align-items:center; gap:9px;
   padding:12px 13px; border:1px solid var(--linea); border-radius:10px; cursor:pointer;
   font-family:'Inter',sans-serif; letter-spacing:0; text-transform:none;
   color:var(--petroleo); margin:0;
 }
 .campo label.precio-op input{position:absolute; opacity:0; width:0; height:0;}
-.campo label.precio-op .precio-icono{grid-row:1; opacity:.55;}
-.campo label.precio-op .precio-titulo{grid-row:1; font-size:13.5px; font-weight:600; align-self:center;}
-.campo label.precio-op .precio-desc{
-  grid-column:1 / -1; font-size:11.5px; line-height:1.45; opacity:.8; text-transform:none;
-  font-family:'Inter',sans-serif; letter-spacing:0;
-}
+.campo label.precio-op .precio-icono{opacity:.55;}
+.campo label.precio-op .precio-titulo{font-size:13.5px; font-weight:600;}
 .campo label.precio-op:has(input:checked){
   border-color:var(--terracota); background:rgba(199,110,67,.08);
 }
@@ -271,8 +268,9 @@ input,select{font-family:inherit; font-size:14px;}
    "Contactar al organizador", la URL de "Comprar boletos"/"Reservar
    lugar"—, así que es el mismo patrón que .tipo-fecha-tarjeta (encabezado
    en un <label> chico, campos como hermano y no como hijo, para que el
-   clic dentro de un campo no compita con el clic que elige la tarjeta) con
-   la descripción de .precio-op debajo del título. */
+   clic dentro de un campo no compita con el clic que elige la tarjeta), más
+   una descripción debajo del título: aquí sí hace falta, porque de las tres
+   opciones no se deduce a ojo qué pasa al elegirlas. */
 .accion-grupo{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
 .accion-tarjeta{
   min-width:0; border:1px solid var(--linea); border-radius:12px; padding:14px;
@@ -532,15 +530,6 @@ input,select{font-family:inherit; font-size:14px;}
 .enlace-maps-fila button:hover{background:var(--verde); color:var(--blanco);}
 .enlace-maps-fila button:disabled{opacity:.55; pointer-events:none;}
 .enlace-maps-grupo .aviso{margin:10px 0 0; padding:9px 13px; font-size:12.5px;}
-
-/* Coordenadas plegadas: nadie las edita a mano —las escribe el pin—, así
-   que no hace falta que ocupen sitio a la vista por defecto. */
-.campo-avanzado{margin-bottom:16px;}
-.campo-avanzado summary{
-  cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:10.5px;
-  letter-spacing:.1em; text-transform:uppercase; color:var(--verde);
-}
-.campo-avanzado[open] summary{margin-bottom:4px;}
 
 .ficha-media{
   position:relative; height:340px; border-radius:16px; overflow:hidden;

@@ -247,11 +247,15 @@ require __DIR__ . '/includes/layout.php';
             <br><span class="tenue">
               Del <?= e(fechaCorta($ev['fecha_inicio'])) ?> al <?= e(fechaCorta($ev['fecha_fin'])) ?>
             </span>
-          <?php else: ?>
+          <?php elseif (terminaOtroDia($ev)): ?>
+            <?php /* Un retiro: aquí las dos fechas completas sí hacen falta. */ ?>
             <?= e(fechaLarga($ev['fecha_inicio'])) ?>
-            <?php if (!empty($ev['fecha_fin'])): ?>
-              <br><span class="tenue">hasta el <?= e(fechaLarga($ev['fecha_fin'])) ?></span>
-            <?php endif; ?>
+            <br><span class="tenue">hasta el <?= e(fechaLarga($ev['fecha_fin'])) ?></span>
+          <?php else: ?>
+            <?php /* De un día: la fecha una vez y el horario debajo. Ver
+                     terminaOtroDia() para por qué no se pregunta por fecha_fin. */ ?>
+            <?= e(fechaCorta($ev['fecha_inicio'])) ?>
+            <br><span class="tenue"><?= e(horarioDelDia($ev)) ?></span>
           <?php endif; ?>
         </span>
       </div>
@@ -276,15 +280,6 @@ require __DIR__ . '/includes/layout.php';
         <span class="k">Organiza</span>
         <span class="val"><?= e($ev['organizador']) ?></span>
       </div>
-
-      <?php if (!empty($ev['enlace_acceso'])): ?>
-        <div class="dato">
-          <span class="k">Acceso</span>
-          <span class="val">
-            <a href="<?= e($ev['enlace_acceso']) ?>" target="_blank" rel="noopener nofollow">Enlace de acceso →</a>
-          </span>
-        </div>
-      <?php endif; ?>
 
       <?php if (!empty($ev['cupo_maximo'])): ?>
         <div class="dato">

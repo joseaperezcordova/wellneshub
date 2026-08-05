@@ -173,9 +173,11 @@ CREATE TABLE IF NOT EXISTS eventos (
   latitud       DECIMAL(10,7) NULL DEFAULT NULL,
   longitud      DECIMAL(10,7) NULL DEFAULT NULL,
 
-  -- Aparte de url_boletos: ese es el enlace de compra/registro externo, este
-  -- es un acceso —videollamada, transmisión, grupo— que puede acompañar a
-  -- una actividad presencial que además transmite.
+  -- YA NO SE USA. El formulario dejó de pedir "Enlace de acceso" y la ficha
+  -- dejó de pintarlo, así que en las filas nuevas siempre viene NULL. La
+  -- columna se queda porque las fichas anteriores tienen su enlace guardado
+  -- aquí y borrarla lo perdería; el día que se decida que ese dato ya no hace
+  -- falta, se tira con un ALTER y no antes.
   enlace_acceso VARCHAR(500)  NULL DEFAULT NULL,
 
   fecha_inicio  DATETIME      NOT NULL,

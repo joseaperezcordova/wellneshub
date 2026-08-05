@@ -225,14 +225,6 @@ $mal = function (string $campo) use ($errores) {
   <h2>3. Ubicación</h2>
 </div>
 
-<div class="campo<?= $mal('enlace_acceso') ?>">
-  <label for="enlace_acceso">Enlace de acceso <span class="opcional">opcional</span></label>
-  <input id="enlace_acceso" name="enlace_acceso" type="url" maxlength="500"
-         value="<?= e($v('enlace_acceso')) ?>" placeholder="https://">
-  <div class="pista">Se muestra públicamente en la ficha, junto con el resto de la información.</div>
-  <?= $err('enlace_acceso') ?>
-</div>
-
 <div class="campo-fila campo-fila-3">
   <div class="campo<?= $mal('entidad') ?>">
     <label for="entidad">Estado</label>
@@ -288,19 +280,22 @@ $mal = function (string $campo) use ($errores) {
   <div id="geocodingMensaje" class="aviso aviso-info" style="margin:10px 0 0;" hidden></div>
 </div>
 
-<details class="campo-avanzado">
-  <summary>Coordenadas <span class="opcional">avanzado, se obtienen solas al mover el pin</span></summary>
-  <div class="campo-fila" style="margin-top:12px;">
-    <div class="campo">
-      <label for="latitud">Latitud</label>
-      <input id="latitud" name="latitud" type="text" readonly value="<?= e($v('latitud')) ?>">
-    </div>
-    <div class="campo">
-      <label for="longitud">Longitud</label>
-      <input id="longitud" name="longitud" type="text" readonly value="<?= e($v('longitud')) ?>">
-    </div>
-  </div>
-</details>
+<?php
+/*
+ * Las coordenadas ya no se enseñan: salen solas al mover el pin y no hay nada
+ * que hacer con ellas a mano —eran de solo lectura—, así que enseñar dos
+ * campos con quince decimales solo daba de qué preocuparse.
+ *
+ * Pero los campos siguen aquí, ocultos, y no se pueden borrar: son estos —no
+ * el mapa— los que viajan en el POST. El JavaScript de abajo les escribe la
+ * latitud y la longitud cada vez que el pin se mueve, y validarEvento() lee
+ * exactamente estos dos nombres. Sin ellos el pin se podría arrastrar, se
+ * vería moverse, y al guardar no quedaría ninguna coordenada: la ficha se
+ * publicaría sin mapa y sin que nada avisara de por qué.
+ */
+?>
+<input id="latitud"  name="latitud"  type="hidden" value="<?= e($v('latitud')) ?>">
+<input id="longitud" name="longitud" type="hidden" value="<?= e($v('longitud')) ?>">
 
 <div class="form-seccion-titulo">
   <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
@@ -323,7 +318,6 @@ $mal = function (string $campo) use ($errores) {
         <path d="M7 7l10 10"/>
       </svg>
       <span class="precio-titulo">Sin costo</span>
-      <span class="precio-desc">La actividad es gratuita para los participantes.</span>
     </label>
     <label class="precio-op">
       <input type="radio" name="precio_modo" value="de_pago" id="precioDePago" <?= $esDePago ? 'checked' : '' ?>>
@@ -333,7 +327,6 @@ $mal = function (string $campo) use ($errores) {
         <circle cx="16.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>
       </svg>
       <span class="precio-titulo">De pago</span>
-      <span class="precio-desc">La actividad tiene un costo.</span>
     </label>
   </div>
 </div>
