@@ -53,35 +53,47 @@
   .wrap{max-width:1180px; margin:0 auto; padding:0 28px;}
   @media(max-width:640px){.wrap{padding:0 18px;}}
 
-  /* ---------- topbar ---------- */
+  /* ---------- topbar ----------
+     Cabecera en verde bosque con todo el texto en blanco. Al ser oscura, el
+     borde inferior ya no puede ser --line (un gris pensado para fondo claro,
+     que aqui no se ve): se sustituye por un blanco muy diluido, que es el
+     mismo recurso que usa el footer. El azul no entra en el menu; lo dice la
+     especificacion y tiene sentido, porque el unico azul de la cabecera debe
+     ser el boton de publicar. */
   .topbar{
-    position:sticky; top:0; z-index:40; background:var(--paper);
-    border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:40; background:var(--jungle);
+    border-bottom:1px solid rgba(255,255,255,0.14);
+    color:var(--paper);
   }
   .topbar-inner{display:flex; align-items:center; justify-content:space-between; padding:16px 28px; max-width:1180px; margin:0 auto;}
   @media(max-width:640px){ .topbar-inner{padding:14px 18px;} }
   .logo{display:flex; align-items:center; gap:10px;}
-  /* La marca es una rueda de cuatro cuartos: es el sitio donde la paleta se
-     presenta entera, asi que lleva los cuatro colores con caracter propio en
-     vez de dos tonos del mismo caramelo. */
-  .logo-mark{width:30px; height:30px; border-radius:50%; background:conic-gradient(var(--terracota) 0deg 90deg, var(--petroleo) 90deg 180deg, var(--verde-claro) 180deg 270deg, var(--arena) 270deg 360deg); flex-shrink:0;}
-  .logo-text{font-family:'Fraunces',serif; font-weight:600; font-size:19px;}
-  .logo-text small{display:block; font-family:'IBM Plex Mono',monospace; font-weight:400; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--jungle); opacity:0.92; margin-top:1px;}
+  /* La marca sigue siendo una rueda de cuatro cuartos, pero sobre fondo verde
+     bosque el cuarto de --petroleo (texto, casi negro) desaparecia contra el
+     fondo. Los cuatro cuartos pasan a colores que si despegan de la cabecera:
+     salvia, verde natural, azul y blanco. */
+  .logo-mark{width:30px; height:30px; border-radius:50%; background:conic-gradient(var(--terracota) 0deg 90deg, var(--blanco) 90deg 180deg, var(--verde-claro) 180deg 270deg, var(--arena) 270deg 360deg); flex-shrink:0;}
+  .logo-text{font-family:'Fraunces',serif; font-weight:600; font-size:19px; color:var(--paper);}
+  .logo-text small{display:block; font-family:'IBM Plex Mono',monospace; font-weight:400; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--arena); opacity:0.92; margin-top:1px;}
   /* Eran <button> mientras las vistas se conmutaban con JavaScript. Ahora son
      enlaces a páginas de verdad, y las dos formas se estilan igual para que el
      menú no cambie de aspecto. */
   nav.mainnav{display:flex; align-items:center; gap:4px;}
   nav.mainnav button, nav.mainnav a{
-    background:none; border:none; padding:8px 14px; font-size:13.5px; color:var(--ink);
-    border-radius:20px; transition:background .15s;
+    background:none; border:none; padding:8px 14px; font-size:13.5px; color:var(--paper);
+    border-radius:20px; transition:background .15s, color .15s;
   }
-  nav.mainnav button:hover, nav.mainnav a:hover{background:var(--line-soft);}
-  nav.mainnav button.active, nav.mainnav a.active{background:var(--jungle); color:var(--paper);}
+  /* Hover y seccion actual comparten aspecto —salvia de fondo, bosque de
+     texto— porque sobre una cabecera ya verde, un fondo verde no marcaria
+     nada. El texto tiene que oscurecerse con el fondo: blanco sobre salvia
+     no se lee. */
+  nav.mainnav button:hover, nav.mainnav a:hover,
+  nav.mainnav button.active, nav.mainnav a.active{background:var(--arena); color:var(--jungle);}
   /* .admin-toggle se fue con el boton de «Panel admin» del menu publico. */
   .navburger{display:none; background:none;border:none;padding:6px;}
-  .navburger span{display:block; width:20px; height:2px; background:var(--ink); margin:4px 0;}
+  .navburger span{display:block; width:20px; height:2px; background:var(--paper); margin:4px 0;}
   @media(max-width:900px){
-    nav.mainnav{position:fixed; top:64px; left:0; right:0; background:var(--paper); flex-direction:column; align-items:stretch; padding:8px 18px 16px; border-bottom:1px solid var(--line); display:none; gap:2px;}
+    nav.mainnav{position:fixed; top:64px; left:0; right:0; background:var(--jungle); flex-direction:column; align-items:stretch; padding:8px 18px 16px; border-bottom:1px solid rgba(255,255,255,0.14); display:none; gap:2px;}
     nav.mainnav.open{display:flex;}
     nav.mainnav button{text-align:left;}
     .navburger{display:block;}
@@ -538,12 +550,15 @@
   .evergreen-note{margin-top:30px; border-left:3px solid var(--marigold); padding:14px 18px; background:var(--paper); font-size:13px; opacity:0.85; border-radius:0 6px 6px 0;}
 
   /* ---------- footer ---------- */
-  footer{background:var(--jungle-deep); color:rgba(255,255,255,0.85); margin-top:20px;}
+  /* Verde bosque, igual que la cabecera: la especificacion los quiere del
+     mismo color de marca. No --jungle-deep, que hoy vale el verde carbon del
+     texto y dejaria el pie casi negro. */
+  footer{background:var(--jungle); color:rgba(255,255,255,0.85); margin-top:20px;}
   .foot-inner{max-width:1180px; margin:0 auto; padding:48px 28px 30px; display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:30px;}
   @media(max-width:760px){.foot-inner{grid-template-columns:1fr 1fr;}}
   footer h5{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--terracota-palida); margin-bottom:12px;}
-  footer a{display:block; font-size:13px; padding:4px 0; opacity:0.75;}
-  footer a:hover{opacity:1;}
+  footer a{display:block; font-size:13px; padding:4px 0; opacity:0.75; transition:opacity .15s, color .15s;}
+  footer a:hover{opacity:1; color:var(--arena);}
   .foot-bottom{border-top:1px solid rgba(255,255,255,0.12); text-align:center; font-size:11.5px; opacity:0.76; padding:16px; font-family:'IBM Plex Mono',monospace;}
 
   /* ---------- ADMIN ---------- */

@@ -1,6 +1,5 @@
 /* ============================================================================
-   Wellneshub · estilos de la aplicación
-   Paleta y tipografías heredadas de la v6 del prototipo.
+   OMDARA · estilos de la aplicación
    ========================================================================== */
 
 /*
@@ -12,61 +11,84 @@
  * hacia nada, y quien lo intentara habria concluido que el token no se usa.
  * Ahora portada.css solo declara sus nombres de rol (--ink, --paper,
  * --marigold...) apuntando a estos, asi que la paleta se cambia en un sitio.
+ *
+ * LOS NOMBRES SON DE LA PALETA VIEJA Y NO MIENTEN POR CAPRICHO
+ *
+ * --terracota vale hoy azul, y --petroleo vale verde carbon. Renombrar los
+ * ocho tokens obliga a tocar ~400 reglas de portada.css y este archivo, y
+ * mezclaria "cambiar los colores" con "cambiar como se llaman": dos revisiones
+ * distintas en un solo diff, donde un error de color se esconde detras de mil
+ * lineas de renombrado. El renombrado va aparte; el comentario de cada token
+ * dice que papel cumple ahora.
  */
 :root{
-  /* Paleta */
-  --fondo:#FAF8F4;
-  --verde:#496B52;
-  --verde-claro:#89A67D;
-  --arena:#E9DDC9;
-  --terracota:#C76E43;
-  --petroleo:#2F4E5D;
+  /* ---- Paleta OMDARA ----
+     Proporcion buscada: 60% crema/blanco, 20% verde bosque, 10% salvia,
+     5% verde natural, 5% azul. El azul no debe volverse un segundo color
+     dominante: es interaccion y conversion, no identidad. */
+  --fondo:#F7F5EF;        /* CREAM  · fondo general, nunca blanco puro     */
+  --verde:#1F4639;        /* FOREST · color principal de marca             */
+  --verde-claro:#4F7D4A;  /* GREEN  · acciones secundarias, estados buenos */
+  --arena:#DCE8DD;        /* SAGE   · fondos suaves y bloques              */
+  --terracota:#2878D7;    /* BLUE   · destacados e interaccion             */
+  --petroleo:#20332D;     /* TEXT   · texto principal                      */
+  --gris:#65736D;         /* MUTED  · texto secundario                     */
 
-  /* Derivados (mismo criterio que el prototipo: contraste, no capricho) */
-  --blanco:#FFFFFF;
-  --arena-suave:#F4EDE1;
-  /* Las tarjetas del panel admin, sobre el fondo petroleo. */
-  --petroleo-suave:#3E6375;
+  --blanco:#FFFFFF;       /* WHITE  · cards, formularios, superficies      */
 
-  /* Terracota tiene un problema de contraste en las dos direcciones, y por eso
-     necesita tres variantes:
-     · como fondo de boton funciona, pero el texto encima tiene que ser casi
-       negro (--tinta-boton): con blanco da 3.6:1 y no llega a AA;
-     · como texto sobre blanco da 3.6:1, tampoco llega → --terracota-texto;
-     · como texto sobre los fondos oscuros (hero, footer, admin) da 2.4:1,
-       que es peor → --terracota-palida. */
-  --terracota-viva:#D4805A;   /* hover del boton: aclara en vez de oscurecer,
-                                 porque oscurecer hunde el contraste del texto */
-  --terracota-texto:#A0522D;  /* terracota legible sobre fondo claro   5.6:1 */
-  --terracota-palida:#F8D6C0; /* terracota legible sobre fondo oscuro  4.8:1 */
-  --tinta-boton:#0F1A21;      /* texto sobre terracota, los dos estados      */
+  /* Salvia aclarada para el bloque informativo del modal de contacto. */
+  --arena-suave:#F0F5F0;
+  /* Las tarjetas del panel admin, sobre el fondo verde bosque. DERIVADO:
+     no esta en la especificacion, es bosque aclarado para despegar la tarjeta
+     del fondo sin salirse del verde. */
+  --petroleo-suave:#2A5A48;
 
-  /* Los degradados de las tarjetas de la portada. */
-  --verde-agua:#547B6A;
-  --verde-hondo:#35513C;
-  --petroleo-hondo:#2A4453;
+  /* El azul, en sus tres papeles.
+     Como fondo de boton lleva texto blanco (4.5:1, cumple AA). Como TEXTO
+     sobre blanco se queda en 4.46:1 y no llega, asi que ahi se usa el tono
+     oscuro —el mismo que la especificacion da para el hover— que sube a
+     5.6:1. Sobre fondos oscuros (hero, footer, cabecera) ninguno de los dos
+     azules es legible: ahi manda la salvia. */
+  --terracota-viva:#2068BE;   /* hover del boton azul                      */
+  --terracota-texto:#2068BE;  /* azul legible sobre fondo claro     5.6:1  */
+  --terracota-palida:#DCE8DD; /* sobre fondo oscuro: salvia        11.5:1  */
+  --tinta-boton:#FFFFFF;      /* texto sobre el boton azul                 */
 
-  --linea:rgba(47,78,93,0.18);
-  --linea-suave:rgba(47,78,93,0.10);
+  /* Los degradados de las tarjetas de la portada. DERIVADOS: la
+     especificacion no cubre el hero, y un degradado necesita pasos
+     intermedios que no existen en una paleta de ocho colores. Salen de
+     interpolar entre bosque, verde natural y salvia. */
+  --verde-agua:#356B57;
+  --verde-hondo:#17352B;
+  --petroleo-hondo:#152A22;
 
-  /* Estados.
-     Estos nueve colores ya existian, pero escritos a mano en .aviso-*,
-     .campo.con-error y .btn-barra.peligro. Repartidos asi no habia forma de
-     ver que iban juntos, ni de cambiar "el rojo de error" sin ir a buscarlo
-     regla por regla. Los valores son exactamente los que ya se veian. */
-  --error:#7C3A18;             /* texto de error sobre fondo claro */
-  --error-fuerte:#C0563A;      /* bordes y la marca "!": piden mas presencia */
-  --error-fondo:#FBEAE3;
-  --error-fondo-suave:#FDF3EF; /* relleno del campo que fallo */
-  --error-linea:#E4B49C;
+  /* Divisores y bordes. La especificacion los da como color solido y no como
+     transparencia: #E3E8E4 para divisores del buscador, #D5DED7 para bordes
+     de filtro. --linea es la del borde y --linea-suave la del divisor. */
+  --linea:#D5DED7;
+  --linea-suave:#E3E8E4;
 
-  --exito:#2C4A35;
-  --exito-fondo:#E7F0E9;
-  --exito-linea:#A9C4AF;
+  /* ---- Estados ----
+     Los cuatro de la especificacion. El de advertencia todavia no lo usa
+     ninguna regla; se deja definido para no volver a inventarlo a mano el dia
+     que haga falta, que es como llegaron aqui los otros nueve. */
+  --error:#B85450;
+  --error-fuerte:#B85450;      /* bordes y la marca "!" */
+  --error-fondo:#F8E9E7;
+  --error-fondo-suave:#FCF4F3; /* relleno del campo que fallo. DERIVADO */
+  --error-linea:#E8C4C1;       /* DERIVADO: entre el fondo y el primario */
 
-  --info:#2C4A6A;
-  --info-fondo:#E3EEF6;
-  --info-linea:#A9C7DC;
+  --exito:#4F7D4A;
+  --exito-fondo:#E8F1E8;
+  --exito-linea:#BFD6BF;       /* DERIVADO */
+
+  --aviso:#B78335;
+  --aviso-fondo:#F7EEDB;
+  --aviso-linea:#E3CFA3;       /* DERIVADO */
+
+  --info:#2878D7;
+  --info-fondo:#E8EFF7;
+  --info-linea:#B9CFEC;        /* DERIVADO */
 }
 
 *{box-sizing:border-box;}
@@ -82,25 +104,32 @@ input,select{font-family:inherit; font-size:14px;}
 :focus-visible{outline:2px solid var(--terracota-texto); outline-offset:2px;}
 
 /* ---------------------------------------------------------------- topbar -- */
-.topbar{background:var(--blanco); border-bottom:1px solid var(--linea); position:sticky; top:0; z-index:40;}
+/* Cabecera en verde bosque, texto en blanco. El borde inferior no puede ser
+   --linea: ese gris esta pensado para fondo claro y sobre el bosque no se ve. */
+.topbar{
+  background:var(--verde); border-bottom:1px solid rgba(255,255,255,0.14);
+  position:sticky; top:0; z-index:40; color:var(--blanco);
+}
 .topbar-inner{
   display:flex; align-items:center; justify-content:space-between; gap:16px;
   padding:14px 28px; max-width:1180px; margin:0 auto;
 }
 .logo{display:flex; align-items:center; gap:10px;}
+/* Sobre fondo verde bosque el cuarto de --petroleo (texto, casi negro) se
+   perdia contra el fondo; pasa a blanco. */
 .logo-mark{
   width:30px; height:30px; border-radius:50%; flex-shrink:0;
-  background:conic-gradient(var(--terracota) 0deg 90deg, var(--petroleo) 90deg 180deg,
+  background:conic-gradient(var(--terracota) 0deg 90deg, var(--blanco) 90deg 180deg,
                             var(--verde-claro) 180deg 270deg, var(--arena) 270deg 360deg);
 }
-.logo-text{font-family:'Fraunces',serif; font-weight:600; font-size:19px; line-height:1.1;}
+.logo-text{font-family:'Fraunces',serif; font-weight:600; font-size:19px; line-height:1.1; color:var(--blanco);}
 .logo-text small{
   display:block; font-family:'IBM Plex Mono',monospace; font-weight:400; font-size:10px;
-  letter-spacing:0.12em; text-transform:uppercase; color:var(--verde); margin-top:2px;
+  letter-spacing:0.12em; text-transform:uppercase; color:var(--arena); margin-top:2px;
 }
 .mainnav{display:flex; gap:4px;}
-.mainnav a{padding:8px 14px; font-size:13.5px; border-radius:20px;}
-.mainnav a:hover{background:var(--linea-suave);}
+.mainnav a{padding:8px 14px; font-size:13.5px; border-radius:20px; color:var(--blanco); transition:background .15s, color .15s;}
+.mainnav a:hover{background:var(--arena); color:var(--verde);}
 @media(max-width:820px){ .mainnav{display:none;} .topbar-inner{padding:12px 18px;} }
 
 .topbar-right{display:flex; align-items:center; gap:10px;}
@@ -125,9 +154,11 @@ input,select{font-family:inherit; font-size:14px;}
   width:36px; height:36px; border-radius:50%; object-fit:cover;
   border:1px solid var(--linea); display:block;
 }
+/* Va dentro de la cabecera, que ahora es verde bosque: con --verde de fondo
+   el circulo desaparecia contra ella. El verde natural si despega. */
 .avatar-letra{
   display:flex; align-items:center; justify-content:center;
-  background:var(--verde); color:var(--blanco);
+  background:var(--verde-claro); color:var(--blanco);
   font-family:'Fraunces',serif; font-size:16px;
 }
 .cuenta-menu{

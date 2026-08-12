@@ -79,10 +79,26 @@ function categorias(): array
     return $r;
 }
 
-/** Los colores de la paleta que puede llevar la tarjeta sin imagen. */
+/**
+ * Los colores de la paleta que puede llevar la tarjeta sin imagen.
+ *
+ * Van escritos y no como var(--x) porque el valor elegido se guarda en la
+ * columna eventos.color y se pinta con style="background-color:…": ahí no hay
+ * hoja de estilos que resuelva una variable.
+ *
+ * SIN AZUL, a diferencia del resto de la interfaz. El azul de OMDARA es para
+ * interacción y conversión, y debe rondar el 5% de la superficie; un carril de
+ * tarjetas en la portada es de lo más grande que se ve de una vez, y bastaría
+ * con que tres organizadores lo eligieran para convertirlo en el color
+ * dominante del sitio.
+ *
+ * Las fichas publicadas antes del cambio de marca conservan su hex viejo hasta
+ * que alguien las vuelva a guardar: validarEvento() solo acepta valores de esta
+ * lista, así que al reeditarlas caen al primero.
+ */
 function coloresEvento(): array
 {
-    return ['#89A67D', '#C76E43', '#2F4E5D', '#496B52', '#E9DDC9', '#3E6375'];
+    return ['#1F4639', '#4F7D4A', '#356B57', '#2A5A48', '#DCE8DD', '#20332D'];
 }
 
 /** clave => etiqueta. Con qué frecuencia se repite una actividad recurrente. */

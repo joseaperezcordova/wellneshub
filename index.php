@@ -207,21 +207,21 @@ require __DIR__ . '/includes/layout.php';
              escribirlos. Los tres enlaces llevan al índice del blog, que dice
              lo mismo. Cuando haya artículos de verdad, cada uno irá al suyo. */ ?>
     <a class="card-blog" href="<?= URL_BASE ?>/blog.php">
-      <div class="b-img" style="background-color:#496B52;"></div>
+      <div class="b-img" style="background-color:var(--verde-claro);"></div>
       <div class="b-body">
         <div class="eyebrow">Guía</div>
         <h3>Cómo elegir tu primer retiro de silencio</h3>
       </div>
     </a>
     <a class="card-blog" href="<?= URL_BASE ?>/blog.php">
-      <div class="b-img" style="background-color:#C76E43;"></div>
+      <div class="b-img" style="background-color:var(--terracota);"></div>
       <div class="b-body">
         <div class="eyebrow">Ciudades</div>
         <h3>Tulum más allá de la playa: dónde se practica de verdad</h3>
       </div>
     </a>
     <a class="card-blog" href="<?= URL_BASE ?>/blog.php">
-      <div class="b-img" style="background-color:#3E6375;"></div>
+      <div class="b-img" style="background-color:var(--petroleo-suave);"></div>
       <div class="b-body">
         <div class="eyebrow">Prácticas</div>
         <h3>Qué esperar de tu primera ceremonia de cacao</h3>

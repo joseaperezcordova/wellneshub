@@ -32,27 +32,27 @@ require __DIR__ . '/includes/layout.php';
 
   <div class="grid-blog">
     <div class="card-blog">
-      <div class="b-img" style="background-color:#3E6375;"></div>
+      <div class="b-img" style="background-color:var(--petroleo-suave);"></div>
       <div class="b-body"><div class="eyebrow">Guía</div><h3>Los mejores retiros de yoga en Oaxaca</h3></div>
     </div>
     <div class="card-blog">
-      <div class="b-img" style="background-color:#89A67D;"></div>
+      <div class="b-img" style="background-color:var(--verde-claro);"></div>
       <div class="b-body"><div class="eyebrow">Agenda</div><h3>Actividades wellness en CDMX este fin de semana</h3></div>
     </div>
     <div class="card-blog">
-      <div class="b-img" style="background-color:#2F4E5D;"></div>
+      <div class="b-img" style="background-color:var(--verde);"></div>
       <div class="b-body"><div class="eyebrow">Guía</div><h3>Festivales holísticos en México</h3></div>
     </div>
     <div class="card-blog">
-      <div class="b-img" style="background-color:#496B52;"></div>
+      <div class="b-img" style="background-color:var(--verde-claro);"></div>
       <div class="b-body"><div class="eyebrow">Evergreen</div><h3>Centros de bienestar por estado</h3></div>
     </div>
     <div class="card-blog">
-      <div class="b-img" style="background-color:#C76E43;"></div>
+      <div class="b-img" style="background-color:var(--terracota);"></div>
       <div class="b-body"><div class="eyebrow">Evergreen</div><h3>Calendario wellness 2026</h3></div>
     </div>
     <div class="card-blog">
-      <div class="b-img" style="background-color:#E9DDC9;"></div>
+      <div class="b-img" style="background-color:var(--arena);"></div>
       <div class="b-body"><div class="eyebrow">Guía</div><h3>Qué llevar a tu primer retiro de silencio</h3></div>
     </div>
   </div>
