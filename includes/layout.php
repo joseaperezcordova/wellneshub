@@ -51,7 +51,7 @@ function enlaceMenu(string $ruta, string $texto, string $clave, string $seccion)
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?= e($titulo ?? 'Wellneshub') ?> · Wellneshub</title>
+<title><?= e($titulo ?? 'OMDARA') ?> · OMDARA</title>
 <?php
 /*
  * Meta description + Open Graph/Twitter Card. Cada página puede fijar
@@ -61,13 +61,13 @@ function enlaceMenu(string $ruta, string $texto, string $clave, string $seccion)
  * descripción general del sitio, que sigue siendo mejor que no tener nada.
  */
 $descripcionMeta = trim((string) ($descripcion
-    ?? 'Wellneshub — directorio de retiros, festivales y círculos de bienestar en México. Encuentra actividades de yoga, breathwork, sound healing y más, o publica la tuya.'));
+    ?? 'OMDARA — directorio de retiros, festivales y círculos de bienestar en México. Encuentra actividades de yoga, breathwork, sound healing y más, o publica la tuya.'));
 $urlActualMeta = URL_BASE . (string) ($_SERVER['REQUEST_URI'] ?? '/');
 ?>
 <meta name="description" content="<?= e($descripcionMeta) ?>">
-<meta property="og:site_name" content="Wellneshub">
+<meta property="og:site_name" content="OMDARA">
 <meta property="og:type" content="website">
-<meta property="og:title" content="<?= e($titulo ?? 'Wellneshub') ?>">
+<meta property="og:title" content="<?= e($titulo ?? 'OMDARA') ?>">
 <meta property="og:description" content="<?= e($descripcionMeta) ?>">
 <meta property="og:url" content="<?= e($urlActualMeta) ?>">
 <?php if (!empty($imagenOg)): ?>
@@ -178,7 +178,7 @@ $analiticaActiva = empty($CONFIG['es_local']);
   <div class="topbar-inner">
     <a class="logo" href="<?= URL_BASE ?>/">
       <div class="logo-mark"></div>
-      <div class="logo-text">Wellneshub<small>Directorio wellness MX</small></div>
+      <div class="logo-text">OMDARA<small>Directorio wellness MX</small></div>
     </a>
 
     <?php /* Enlaces de verdad y no botones con JavaScript: así funcionan el clic
@@ -311,7 +311,7 @@ function pie(): void
 <footer>
   <div class="foot-inner">
     <div>
-      <div class="logo-text" style="color:var(--blanco);">Wellneshub</div>
+      <div class="logo-text" style="color:var(--blanco);">OMDARA</div>
       <p style="font-size:13px; opacity:.85; margin-top:10px; max-width:260px;">El directorio de actividades wellness más completo de México — retiros, festivales y círculos, curados a mano.</p>
     </div>
     <div>
@@ -332,7 +332,7 @@ function pie(): void
       <a href="<?= URL_BASE ?>/blog.php">Blog</a>
     </div>
   </div>
-  <div class="foot-bottom">© <?= date('Y') ?> Wellneshub — Directorio de actividades wellness MX.</div>
+  <div class="foot-bottom">© <?= date('Y') ?> OMDARA — Directorio de actividades wellness MX.</div>
 </footer>
 
 <?php /* La raíz del sitio, para el JavaScript. Los archivos .js son estáticos y

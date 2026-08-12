@@ -1,5 +1,5 @@
 -- ============================================================================
---  Wellneshub · Esquema de autenticación
+--  OMDARA · Esquema de autenticación
 --  MySQL / MariaDB · InnoDB · utf8mb4
 --
 --  CÓMO EJECUTARLO (hosting sin SSH):

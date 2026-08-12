@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrfValido($_POST['csrf'] ?? null))
     // cualquiera desde nuestro dominio.
     $ok = enviarCorreo(
         $destino,
-        'Prueba de envío de Rueda',
+        'Prueba de envío de OMDARA',
         "Si lees esto, el correo saliente funciona.\n\nEnviado el " . date('d/m/Y H:i:s') . "."
     );
 

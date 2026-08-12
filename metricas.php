@@ -1,7 +1,7 @@
 <?php
 /**
  * Métricas de la plataforma: la versión con datos reales del panel que se
- * armó primero como maqueta para presentar Wellneshub a organizadores e
+ * armó primero como maqueta para presentar OMDARA a organizadores e
  * inversionistas.
  *
  * Todo lo de aquí sale de las tablas propias —eventos, usuarios, contactos,
@@ -156,7 +156,7 @@ require __DIR__ . '/includes/layout.php';
     </div>
 
     <div class="scope-banner">
-      <b>Fuera de esta página</b> — tráfico y fuentes de adquisición viven en Google Analytics (analytics.google.com): este panel no se conecta a GA4, solo lee la base de datos de Wellneshub. Todo lo de arriba sale directo de ahí.
+      <b>Fuera de esta página</b> — tráfico y fuentes de adquisición viven en Google Analytics (analytics.google.com): este panel no se conecta a GA4, solo lee la base de datos de OMDARA. Todo lo de arriba sale directo de ahí.
     </div>
 
   </div>

@@ -1,5 +1,5 @@
 -- ============================================================================
---  Wellneshub · Cuatro eventos de prueba
+--  OMDARA · Cuatro eventos de prueba
 --
 --  Para ver la portada con contenido sin tener que escribir cuatro fichas a
 --  mano. NO es parte del esquema: esto se ejecuta solo si lo quieres, y al

@@ -146,7 +146,7 @@ function siguienteRedireccion(string $url): ?string
             CURLOPT_TIMEOUT        => 8,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; Wellneshub/1.0)',
+            CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; OMDARA/1.0)',
         ]);
         $resultado = curl_exec($ch);
         $codigo    = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -172,7 +172,7 @@ function siguienteRedireccion(string $url): ?string
         'timeout'         => 8,
         'follow_location' => 0,
         'ignore_errors'   => true,
-        'user_agent'      => 'Mozilla/5.0 (compatible; Wellneshub/1.0)',
+        'user_agent'      => 'Mozilla/5.0 (compatible; OMDARA/1.0)',
     ]]);
 
     $cabeceras = @get_headers($url, true, $contexto);

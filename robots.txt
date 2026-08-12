@@ -1,4 +1,4 @@
-# Wellneshub. Actualizar la línea Sitemap si el dominio cambia (ver
+# OMDARA. Actualizar la línea Sitemap si el dominio cambia (ver
 # includes/config.local.example.php sobre el subdominio de desarrollo).
 User-agent: *
 Disallow: /admin.php

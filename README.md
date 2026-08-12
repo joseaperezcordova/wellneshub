@@ -1,4 +1,4 @@
-# Wellneshub · Directorio de eventos wellness MX
+# OMDARA · Directorio de eventos wellness MX
 
 Directorio de retiros, festivales y círculos de bienestar en México: quien
 organiza publica su actividad, quien busca filtra por ciudad, fecha o

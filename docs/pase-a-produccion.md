@@ -1,6 +1,6 @@
 # Pase a producción: cuentas que deben quedar en manos del dueño final
 
-Todo lo que se ha ido dando de alta para Wellneshub —Google, GA4, y lo que
+Todo lo que se ha ido dando de alta para OMDARA —Google, GA4, y lo que
 falta de Clarity, Meta y Search Console— se creó con cuentas personales de
 quien programa, porque es lo natural mientras el proyecto se está armando.
 El problema aparece después: si el dueño final necesita cambiar algo —un

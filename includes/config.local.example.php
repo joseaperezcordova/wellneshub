@@ -72,7 +72,7 @@ return [
     // que ya está en la lista negra.
     'correo' => [
         'remitente' => 'no-responder@tudominio.com',
-        'nombre'    => 'Rueda',
+        'nombre'    => 'OMDARA',
     ],
 
     // ---- Captcha del formulario de reportes -------------------------------

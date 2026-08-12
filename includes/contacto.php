@@ -50,7 +50,7 @@ function crearContacto(int $eventoId, string $nombre, string $email, ?string $me
  */
 function avisarOrganizador(array $ev, string $nombre, string $email, ?string $mensaje): void
 {
-    $cuerpo = "Alguien quiere contactarte por tu actividad publicada en Wellneshub.\n\n"
+    $cuerpo = "Alguien quiere contactarte por tu actividad publicada en OMDARA.\n\n"
             . 'Actividad:  ' . $ev['titulo'] . "\n"
             . 'Nombre:     ' . $nombre . "\n"
             . 'Correo:     ' . $email . "\n"
@@ -115,13 +115,13 @@ function avisarAdminsContactoSitio(string $nombre, string $email, string $mensaj
         return;
     }
 
-    $cuerpo = "Alguien escribió desde el formulario de contacto de Wellneshub.\n\n"
+    $cuerpo = "Alguien escribió desde el formulario de contacto de OMDARA.\n\n"
             . 'Nombre:  ' . $nombre . "\n"
             . 'Correo:  ' . $email . "\n\n"
             . "Mensaje:\n" . $mensaje . "\n\n"
             . "Para responder, contesta directamente este correo: llega a $email.\n";
 
     foreach ($admins as $a) {
-        enviarCorreo($a['email'], $nombre . ' te escribió desde Wellneshub', $cuerpo, $email);
+        enviarCorreo($a['email'], $nombre . ' te escribió desde OMDARA', $cuerpo, $email);
     }
 }
