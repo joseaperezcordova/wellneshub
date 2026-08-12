@@ -3,6 +3,16 @@
    Paleta y tipografías heredadas de la v6 del prototipo.
    ========================================================================== */
 
+/*
+ * LA PALETA VIVE AQUI, Y SOLO AQUI.
+ *
+ * Antes estaba escrita dos veces —este :root y el de portada.css— con los
+ * mismos valores. Como las custom properties son globales y portada.css se
+ * carga despues, la copia de alla ganaba siempre: cambiar un color aqui no
+ * hacia nada, y quien lo intentara habria concluido que el token no se usa.
+ * Ahora portada.css solo declara sus nombres de rol (--ink, --paper,
+ * --marigold...) apuntando a estos, asi que la paleta se cambia en un sitio.
+ */
 :root{
   /* Paleta */
   --fondo:#FAF8F4;
@@ -15,12 +25,48 @@
   /* Derivados (mismo criterio que el prototipo: contraste, no capricho) */
   --blanco:#FFFFFF;
   --arena-suave:#F4EDE1;
-  --terracota-viva:#D4805A;
-  --terracota-texto:#A0522D;
-  --tinta-boton:#0F1A21;
+  /* Las tarjetas del panel admin, sobre el fondo petroleo. */
+  --petroleo-suave:#3E6375;
+
+  /* Terracota tiene un problema de contraste en las dos direcciones, y por eso
+     necesita tres variantes:
+     · como fondo de boton funciona, pero el texto encima tiene que ser casi
+       negro (--tinta-boton): con blanco da 3.6:1 y no llega a AA;
+     · como texto sobre blanco da 3.6:1, tampoco llega → --terracota-texto;
+     · como texto sobre los fondos oscuros (hero, footer, admin) da 2.4:1,
+       que es peor → --terracota-palida. */
+  --terracota-viva:#D4805A;   /* hover del boton: aclara en vez de oscurecer,
+                                 porque oscurecer hunde el contraste del texto */
+  --terracota-texto:#A0522D;  /* terracota legible sobre fondo claro   5.6:1 */
+  --terracota-palida:#F8D6C0; /* terracota legible sobre fondo oscuro  4.8:1 */
+  --tinta-boton:#0F1A21;      /* texto sobre terracota, los dos estados      */
+
+  /* Los degradados de las tarjetas de la portada. */
+  --verde-agua:#547B6A;
+  --verde-hondo:#35513C;
+  --petroleo-hondo:#2A4453;
 
   --linea:rgba(47,78,93,0.18);
   --linea-suave:rgba(47,78,93,0.10);
+
+  /* Estados.
+     Estos nueve colores ya existian, pero escritos a mano en .aviso-*,
+     .campo.con-error y .btn-barra.peligro. Repartidos asi no habia forma de
+     ver que iban juntos, ni de cambiar "el rojo de error" sin ir a buscarlo
+     regla por regla. Los valores son exactamente los que ya se veian. */
+  --error:#7C3A18;             /* texto de error sobre fondo claro */
+  --error-fuerte:#C0563A;      /* bordes y la marca "!": piden mas presencia */
+  --error-fondo:#FBEAE3;
+  --error-fondo-suave:#FDF3EF; /* relleno del campo que fallo */
+  --error-linea:#E4B49C;
+
+  --exito:#2C4A35;
+  --exito-fondo:#E7F0E9;
+  --exito-linea:#A9C4AF;
+
+  --info:#2C4A6A;
+  --info-fondo:#E3EEF6;
+  --info-linea:#A9C7DC;
 }
 
 *{box-sizing:border-box;}
@@ -130,7 +176,7 @@ input,select{font-family:inherit; font-size:14px;}
   letter-spacing:.05em; color:var(--verde); opacity:.92;
   font-variant-numeric:tabular-nums; white-space:nowrap;
 }
-.campo .label-fila .contador.corto{color:#A0522D; opacity:1;}
+.campo .label-fila .contador.corto{color:var(--terracota-texto); opacity:1;}
 
 .btn-principal{
   width:100%; background:var(--terracota); color:var(--tinta-boton);
@@ -191,15 +237,15 @@ input,select{font-family:inherit; font-size:14px;}
   border-radius:10px; padding:12px 15px; font-size:13.5px; margin-bottom:20px;
   border:1px solid transparent;
 }
-.aviso-error{background:#FBEAE3; border-color:#E4B49C; color:#7C3A18;}
-.aviso-ok{background:#E7F0E9; border-color:#A9C4AF; color:#2C4A35;}
-.aviso-info{background:#E3EEF6; border-color:#A9C7DC; color:#2C4A6A;}
+.aviso-error{background:var(--error-fondo); border-color:var(--error-linea); color:var(--error);}
+.aviso-ok{background:var(--exito-fondo); border-color:var(--exito-linea); color:var(--exito);}
+.aviso-info{background:var(--info-fondo); border-color:var(--info-linea); color:var(--info);}
 
 /* Botón de publicar del topbar. En pantalla estrecha se queda en «Publicar» a
    secas en vez de desaparecer: es la acción que da de comer al directorio y la
    mitad del tráfico llega desde el móvil.
-   El texto va en #0F1A21 y no en blanco porque sobre terracota el blanco se
-   queda en 3.6:1 y no llega a AA. */
+   El texto va en --tinta-boton y no en blanco porque sobre terracota el blanco
+   se queda en 3.6:1 y no llega a AA. */
 .btn-publicar{
   background:var(--terracota); color:var(--tinta-boton); border-radius:999px;
   padding:9px 18px; font-size:13.5px; font-weight:600; white-space:nowrap;
@@ -367,22 +413,22 @@ input,select{font-family:inherit; font-size:14px;}
 .campo.con-error input,
 .campo.con-error textarea,
 .campo.con-error select{
-  border-color:#C0563A; background:#FDF3EF;
+  border-color:var(--error-fuerte); background:var(--error-fondo-suave);
 }
 .campo.con-error input:focus,
 .campo.con-error textarea:focus,
-.campo.con-error select:focus{border-color:#A0522D;}
-.campo.con-error > label{color:#A0522D;}
+.campo.con-error select:focus{border-color:var(--terracota-texto);}
+.campo.con-error > label{color:var(--terracota-texto);}
 
 .campo-error{
-  font-size:12.5px; color:#7C3A18; margin-top:6px; font-weight:600;
+  font-size:12.5px; color:var(--error); margin-top:6px; font-weight:600;
   display:flex; align-items:flex-start; gap:6px;
 }
 /* La marca va por CSS y no en el HTML para que los lectores de pantalla no la
    lean como si fuera parte del mensaje. */
 .campo-error::before{content:"!";
   flex-shrink:0; width:15px; height:15px; border-radius:50%;
-  background:#C0563A; color:#fff; font-size:11px; line-height:15px;
+  background:var(--error-fuerte); color:var(--blanco); font-size:11px; line-height:15px;
   text-align:center; font-weight:700;
 }
 
@@ -468,8 +514,8 @@ input,select{font-family:inherit; font-size:14px;}
 .btn-barra:hover{border-color:var(--verde);}
 .btn-barra.destacado{background:var(--terracota); border-color:var(--terracota); color:var(--tinta-boton);}
 .btn-barra.destacado:hover{background:var(--terracota-viva);}
-.btn-barra.peligro{color:#7C3A18;}
-.btn-barra.peligro:hover{border-color:#C0563A;}
+.btn-barra.peligro{color:var(--error);}
+.btn-barra.peligro:hover{border-color:var(--error-fuerte);}
 
 /* ---------------------------------------------------- ficha del evento --- */
 .ficha-envoltorio{max-width:900px; margin:22px auto 0; padding:0 22px;}
@@ -587,7 +633,7 @@ input,select{font-family:inherit; font-size:14px;}
 .trampa{position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;}
 
 .captcha-fallo{
-  background:#FBEAE3; border:1px solid #E4B49C; color:#7C3A18;
+  background:var(--error-fondo); border:1px solid var(--error-linea); color:var(--error);
   border-radius:9px; padding:10px 13px; font-size:13px; margin-bottom:14px;
 }
 

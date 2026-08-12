@@ -15,43 +15,15 @@
    conviene poder revisar por separado.
    ========================================================================== */
 
+  /* ---- Roles ----
+     Los nombres vienen del diseño original y los usan ~400 reglas mas abajo.
+     Cambiar la paleta es reasignar aqui, no tocar cada regla.
+
+     La paleta en si NO se declara aqui: vive en el :root de app.css y este
+     archivo solo le pone nombres. Antes estaba escrita en los dos sitios con
+     los mismos valores, y como portada.css se carga despues, esta copia
+     ganaba — cambiar un color en app.css no surtia ningun efecto. */
   :root{
-    /* ---- La paleta, los seis tal cual ---- */
-    --fondo:#FAF8F4;        /* Fondo         */
-    --verde:#496B52;        /* Verde         */
-    --verde-claro:#89A67D;  /* Verde claro   */
-    --arena:#E9DDC9;        /* Arena         */
-    --terracota:#C76E43;    /* Terracota     */
-    --petroleo:#2F4E5D;     /* Azul petroleo */
-
-    /* ---- Derivados ----
-       Cada uno existe por un motivo concreto, casi siempre de legibilidad. */
-
-    /* El fondo ya no es blanco puro, asi que las tarjetas se despegan subiendo
-       hacia el blanco en vez de bajando hacia el gris. */
-    --blanco:#FFFFFF;
-    /* Arena a plena saturacion como fondo de fila al pasar el raton pesa
-       demasiado; esta version aclarada marca el hover sin gritar. */
-    --arena-suave:#F4EDE1;
-    /* Las tarjetas del panel admin, sobre el fondo petroleo. */
-    --petroleo-suave:#3E6375;
-
-    /* Terracota tiene un problema de contraste en las dos direcciones, y por
-       eso necesita tres variantes:
-       · como fondo de boton funciona, pero el texto encima tiene que ser casi
-         negro (--tinta-boton): con blanco da 3.6:1 y no llega a AA;
-       · como texto sobre blanco da 3.6:1, tampoco llega → --terracota-texto;
-       · como texto sobre los fondos oscuros (hero, footer, admin) da 2.4:1,
-         que es peor → --terracota-palida. */
-    --terracota-viva:#D4805A;   /* hover del boton: aclara en vez de oscurecer,
-                                   porque oscurecer hunde el contraste del texto */
-    --terracota-texto:#A0522D;  /* terracota legible sobre fondo claro   5.6:1 */
-    --terracota-palida:#F8D6C0; /* terracota legible sobre fondo oscuro  4.8:1 */
-    --tinta-boton:#0F1A21;      /* texto sobre terracota, los dos estados      */
-
-    /* ---- Roles ----
-       Los nombres vienen del diseño original y los usan ~400 reglas mas abajo.
-       Cambiar la paleta es reasignar aqui, no tocar cada regla. */
     --ink:var(--petroleo);
     --jungle:var(--verde);
     --jungle-deep:var(--petroleo);
@@ -60,8 +32,8 @@
     --marigold:var(--terracota);
     --marigold-deep:var(--terracota-viva);
     --clay:var(--verde);
-    --line: rgba(47,78,93,0.18);
-    --line-soft: rgba(47,78,93,0.10);
+    --line:var(--linea);
+    --line-soft:var(--linea-suave);
     --radius: 3px;
   }
   *{box-sizing:border-box;}
@@ -164,7 +136,7 @@
     position:absolute; top:20px; left:max(28px, calc((100% - 1180px) / 2 + 28px)); z-index:2;
     display:inline-flex; align-items:center; gap:9px; max-width:calc(100% - 200px);
     background:rgba(21,33,40,.45); border:1px solid rgba(255,255,255,.28);
-    color:#fff; border-radius:999px; padding:6px 15px; font-size:12.5px;
+    color:var(--paper); border-radius:999px; padding:6px 15px; font-size:12.5px;
     backdrop-filter:blur(3px);
   }
   .slide-chip .cat{
@@ -183,14 +155,14 @@
     width:8px; height:8px; padding:0; border:none; border-radius:50%;
     background:rgba(255,255,255,.45); transition:width .2s, background .2s;
   }
-  .cdots button[aria-current="true"]{background:#fff; width:22px; border-radius:999px;}
+  .cdots button[aria-current="true"]{background:var(--paper); width:22px; border-radius:999px;}
   .cnav{
     width:32px; height:32px; border-radius:50%; border:1px solid rgba(255,255,255,.5);
-    background:rgba(21,33,40,.38); color:#fff; font-size:16px; line-height:1;
+    background:rgba(21,33,40,.38); color:var(--paper); font-size:16px; line-height:1;
     display:flex; align-items:center; justify-content:center;
   }
   .cnav:hover{background:rgba(21,33,40,.65);}
-  .cctrl :focus-visible{outline:2px solid #fff; outline-offset:2px;}
+  .cctrl :focus-visible{outline:2px solid var(--paper); outline-offset:2px;}
 
   /* Pseudo-imagen: la fotografia todavia no existe, asi que cada escena se
      compone con gradientes —cielo, sol, dos lineas de colinas—. Cuando haya
@@ -198,12 +170,12 @@
   .hero-media{position:absolute; inset:0;}
   .m1{background:
       radial-gradient(circle at 78% 24%, rgba(233,221,201,.95) 0 52px, rgba(233,221,201,0) 53px),
-      linear-gradient(178deg, #2F4E5D 0%, #3E6375 44%, #547B6A 72%, #496B52 100%);}
-  .m2{background:linear-gradient(176deg, #3E6375 0%, #496B52 46%, #35513C 100%);}
+      linear-gradient(178deg, var(--petroleo) 0%, var(--petroleo-suave) 44%, var(--verde-agua) 72%, var(--verde) 100%);}
+  .m2{background:linear-gradient(176deg, var(--petroleo-suave) 0%, var(--verde) 46%, var(--verde-hondo) 100%);}
   .m3{background:
       radial-gradient(circle at 24% 30%, rgba(199,110,67,.9) 0 66px, rgba(199,110,67,0) 67px),
-      linear-gradient(180deg, #E9DDC9 0%, #C76E43 40%, #2F4E5D 100%);}
-  .m4{background:linear-gradient(180deg, #2F4E5D 0%, #547B6A 58%, #89A67D 100%);}
+      linear-gradient(180deg, var(--arena) 0%, var(--terracota) 40%, var(--petroleo) 100%);}
+  .m4{background:linear-gradient(180deg, var(--petroleo) 0%, var(--verde-agua) 58%, var(--verde-claro) 100%);}
   .hero-media::before{
     content:""; position:absolute; left:-8%; right:-8%; bottom:0; height:46%;
     background:var(--verde); border-radius:50% 50% 0 0 / 26% 26% 0 0; opacity:.92;
@@ -230,7 +202,7 @@
   @media(max-width:640px){ .hero-content{padding:26px 18px 56px;} }
   @media(max-height:500px){ .hero-content{padding:20px 24px 34px;} }
   .hero .eyebrow{color:var(--terracota-palida); opacity:1;}
-  .hero h1{font-size:44px; margin-top:10px; color:#fff; text-shadow:0 2px 18px rgba(21,33,40,.4);}
+  .hero h1{font-size:44px; margin-top:10px; color:var(--paper); text-shadow:0 2px 18px rgba(21,33,40,.4);}
   .hero h1 em{font-style:italic; color:var(--terracota-palida);}
   .hero p.sub{max-width:520px; color:rgba(255,255,255,0.88); margin-top:12px; font-size:15.5px;}
   @media(max-width:640px){.hero h1{font-size:30px;}}
@@ -326,7 +298,7 @@
     border:none; border-radius:999px; padding:10px 20px; font-size:13.5px; font-weight:600;
   }
   .aviso-portada{
-    background:#E7F0E9; border:1px solid #A9C4AF; color:#2C4A35;
+    background:var(--exito-fondo); border:1px solid var(--exito-linea); color:var(--exito);
     border-radius:10px; padding:12px 15px; font-size:13.5px;
   }
 
@@ -383,7 +355,7 @@
     border:none; background:rgba(255,255,255,.92); color:var(--jungle); font-size:15px;
     display:flex; align-items:center; justify-content:center;
   }
-  .ev-fav:hover{background:#fff;}
+  .ev-fav:hover{background:var(--paper);}
   .ev-body{padding:16px 18px 18px; display:flex; flex-direction:column; gap:5px; flex:1;}
   .ev-cat{
     font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.12em;
@@ -426,7 +398,7 @@
   .card-event:hover{transform:translateY(-3px); box-shadow:0 14px 28px rgba(47,78,93,0.16);}
   .card-img{height:150px; position:relative; background-size:cover; background-position:center;}
   .card-img .cat-tag{position:absolute; top:10px; left:10px; background:rgba(255,255,255,0.92); color:var(--jungle-deep); font-size:10.5px; padding:4px 9px; border-radius:20px; font-family:'IBM Plex Mono',monospace; letter-spacing:0.05em; text-transform:uppercase;}
-  .card-img .fav{position:absolute; top:10px; right:10px; width:28px; height:28px; border-radius:50%; background:rgba(47,78,93,0.55); color:#fff; border:none; display:flex; align-items:center; justify-content:center; font-size:14px;}
+  .card-img .fav{position:absolute; top:10px; right:10px; width:28px; height:28px; border-radius:50%; background:rgba(47,78,93,0.55); color:var(--paper); border:none; display:flex; align-items:center; justify-content:center; font-size:14px;}
   .card-body{padding:14px 16px 16px; display:flex; flex-direction:column; gap:6px; flex:1;}
   .card-date{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--clay); letter-spacing:0.04em;}
   .card-body h3{font-size:16.5px; line-height:1.3;}
@@ -740,7 +712,7 @@
   .hero-actions .ghostlink:hover{color:var(--terracota-texto); border-bottom-color:var(--terracota-texto);}
 
   /* ---------- fuera de alcance ---------- */
-  .scope-banner{background:#2A4453; border:1px dashed rgba(255,255,255,0.25); color:rgba(255,255,255,0.75); border-radius:8px; padding:16px 18px; font-size:12.5px; margin:26px 0;}
+  .scope-banner{background:var(--petroleo-hondo); border:1px dashed rgba(255,255,255,0.25); color:rgba(255,255,255,0.75); border-radius:8px; padding:16px 18px; font-size:12.5px; margin:26px 0;}
   .scope-banner b{color:var(--terracota-palida);}
   .scope-list{display:flex; flex-wrap:wrap; gap:6px 10px; margin-top:8px;}
   .scope-list span{opacity:0.9;}
