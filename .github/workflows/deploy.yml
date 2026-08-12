@@ -3,22 +3,69 @@ name: Deploy via FTP
 # El hosting no tiene SSH, asi que el deploy va por FTPS desde GitHub Actions:
 # se hace push a main y la accion sincroniza los archivos contra public_html.
 # Mismo esquema que los proyectos mate y friotrack.
+#
+# DOS ENTORNOS, UN SOLO ARCHIVO
+#
+# Hay dos hostings con el mismo sitio: uno de pruebas y uno de produccion. El
+# reparto es deliberado:
+#
+#   · push a main  -> pruebas, solo.
+#   · produccion   -> nunca sola. Se lanza a mano desde la pestana Actions
+#                     ("Run workflow") eligiendo "produccion".
+#
+# Produccion no va en el push porque ahi hay gente usando el sitio: un push es
+# para guardar trabajo, no para decidir que ese trabajo ya puede verlo todo el
+# mundo. Separarlos convierte publicar en un acto aparte y consciente, y deja
+# el sitio de pruebas como lo que es: donde se mira si algo quedo bien.
+#
+# Las credenciales de cada hosting viven en Environments de GitHub (Settings ->
+# Environments), no como secretos sueltos del repositorio: dos entornos con los
+# MISMOS cuatro nombres (FTP_SERVER, FTP_USERNAME, FTP_PASSWORD,
+# FTP_SERVER_DIR) y valores distintos. De ahi sale ademas el historial de que
+# se desplego y cuando, y ahi se activa —si se quiere— la aprobacion manual
+# antes de que produccion corra (Environments -> produccion -> Required
+# reviewers). Eso se configura en la web de GitHub, no aqui.
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      entorno:
+        description: 'A donde desplegar'
+        required: true
+        default: pruebas
+        type: choice
+        options:
+          - pruebas
+          - produccion
 
 # Varias conexiones FTP simultaneas a un hosting compartido provocan
-# "Timeout (control socket)". Los deploys se encolan en vez de solaparse.
+# "Timeout (control socket)".
+#
+# Un grupo por entorno: un deploy a pruebas no tiene por que esperar —ni
+# cancelar— a uno de produccion, que van a hostings distintos.
 concurrency:
-  group: ftp-deploy
-  cancel-in-progress: true
+  group: ftp-deploy-${{ inputs.entorno || 'pruebas' }}
+  # En pruebas se cancela lo que este a medias: si llegan tres push seguidos
+  # solo interesa el ultimo, y volver a empezar no cuesta nada.
+  #
+  # En produccion NO. Cortar una sincronizacion FTP por la mitad deja el sitio
+  # con unos archivos nuevos y otros viejos, y el .ftp-deploy-sync-state.json
+  # apuntando a un estado que no es el real —el problema que obliga a borrarlo
+  # a mano—. Aqui los deploys se encolan y cada uno termina lo que empezo.
+  cancel-in-progress: ${{ (inputs.entorno || 'pruebas') == 'pruebas' }}
 
 jobs:
   ftp-deploy:
-    name: Sync files to server
+    name: Sync files to ${{ inputs.entorno || 'pruebas' }}
     runs-on: ubuntu-latest
+
+    # De aqui salen los cuatro secretos FTP_*: los del entorno elegido, no los
+    # del repositorio. Sin esta linea los dos hostings compartirian
+    # credenciales y "desplegar a produccion" subiria a pruebas sin avisar.
+    environment: ${{ inputs.entorno || 'pruebas' }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -53,7 +100,25 @@ jobs:
           # push vuelve a subir todo.
           # config.local.php se sube a mano por FTP una sola vez y se queda.
           # Si el deploy lo sincronizara, cada push pisaría las credenciales de
-          # producción con las de XAMPP y la aplicación dejaría de conectar.
+          # produccion con las de XAMPP y la aplicación dejaría de conectar.
+          # Con dos hostings esto importa el doble: cada uno tiene su base de
+          # datos, su remitente de correo y sus claves de analitica, y son
+          # justo las diferencias que hacen que pruebas no ensucie produccion.
+          #
+          # Lo que NO aparece en esta lista: README.md y docs/ SI se suben
+          # —documentacion.php los enseña dentro del panel admin—, pero ninguno
+          # de los dos se sirve por HTTP directo: README.md tiene su propio
+          # bloque en el .htaccess de la raiz, y docs/ trae su propio .htaccess
+          # que corta la carpeta entera. Sin esos dos candados, subir estos
+          # archivos si publicaria sin querer como darse permisos de
+          # administrador y que cuentas hay que transferir en el pase a
+          # produccion.
+          #
+          # (Este texto iba dentro del bloque "exclude" de abajo, donde la "#"
+          # no es un comentario: en un bloque literal de YAML cada linea es
+          # contenido, asi que cada frase se estaba pasando a la accion como si
+          # fuera un patron de exclusion. No hacia dano —ninguna ruta se llama
+          # asi— pero tampoco era lo que parecia.)
           exclude: |
             **/.git*
             **/.git*/**
@@ -63,10 +128,3 @@ jobs:
             **/.ftp-deploy-sync-state.json
             **/.env
             **/config.local.php
-            # README.md y docs/ SÍ se suben ahora —documentacion.php los enseña
-            # dentro del panel admin—, pero ninguno de los dos se sirve por HTTP
-            # directo: README.md tiene su propio bloque en el .htaccess de la
-            # raíz, y docs/ trae su propio .htaccess que corta la carpeta
-            # entera. Sin esos dos candados, subir estos archivos sí publicaría
-            # sin querer cómo darse permisos de administrador y qué cuentas hay
-            # que transferir en el pase a producción.
