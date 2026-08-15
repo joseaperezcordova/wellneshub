@@ -687,13 +687,13 @@
         <label class="prueba">
           <input type="checkbox">
           <span class="qué">Recorre las once cláusulas y baja hasta el final.</span>
-          <span class="esperado">Van numeradas del 1 al 11, sin saltos ni repeticiones, y abajo dice <b>«Última actualización: 14 Agosto, 2026»</b>. Al pie hay enlaces a los otros dos documentos.</span>
+          <span class="esperado">Van numeradas del 1 al 11, sin saltos ni repeticiones. Debajo del título dice <b>«Última actualización: 14 Agosto, 2026»</b>, y al pie hay enlaces a los otros dos documentos.</span>
         </label>
 
         <label class="prueba">
           <input type="checkbox">
           <span class="qué">Abre el Aviso de Privacidad, también <b>sin sesión</b>, y recórrelo entero.</span>
-          <span class="esperado">Empieza con un párrafo de presentación <b>sin número</b>, y debajo van ocho cláusulas numeradas del 1 al 8. Abajo dice <b>«Última actualización: 13 de agosto de 2026»</b>.</span>
+          <span class="esperado">Bajo el título dice <b>«Última actualización: 13 de agosto de 2026»</b>. Sigue un párrafo de presentación <b>sin número</b>, y debajo ocho cláusulas numeradas del 1 al 8.</span>
         </label>
 
         <label class="prueba">
@@ -710,8 +710,38 @@
 
         <label class="prueba">
           <input type="checkbox">
+          <span class="qué">Abre la Política de Cookies y recórrela entera.</span>
+          <span class="esperado">Nueve cláusulas numeradas del 1 al 9. Dentro de la segunda hay tres subapartados numerados <b>2.1, 2.2 y 2.3</b> —necesarias, analíticas y marketing—, y bajo ellos aparecen por su nombre <b>Google Analytics 4, Microsoft Clarity y Meta Pixel</b>: las tres herramientas que el sitio usa de verdad.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Busca dentro de la cláusula 6, «¿Cómo puedo gestionar las cookies?», y pulsa el botón que hay ahí.</span>
+          <span class="esperado">Se abre el <b>panel de preferencias</b>, con las tres categorías y las casillas marcadas según lo que hayas elegido antes. Cambia una y guarda: la página se recarga y respeta lo elegido.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Si estás en un entorno <b>sin IDs de analítica puestos</b>, mira ese mismo sitio.</span>
+          <span class="esperado">No hay botón: hay un párrafo que dice que no hay ninguna tecnología no esencial activa. <b>Es lo correcto</b>, no un fallo — un botón que no abre nada es peor que no tenerlo.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Sigue bajando, por debajo de la cláusula 9.</span>
+          <span class="esperado">Hay un <b>anexo separado por una línea</b> que avisa de que no forma parte de la Política. Trae dos tablas: las dos cookies de OMDARA, que son seguras, y las de Google, Microsoft y Meta con un aviso de <b>«pendiente de comprobar»</b> delante.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Mira la última cláusula, «Contacto».</span>
+          <span class="esperado">Sale el sitio web de OMDARA y un enlace al formulario de contacto. <b>No hay ninguna dirección de correo inventada</b>: mientras no exista un buzón público de verdad, no se publica ninguno.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
           <span class="qué">Abre las tres páginas legales seguidas: Términos, Aviso de Privacidad y Política de Cookies.</span>
-          <span class="esperado">Las tres tienen <b>la misma cabecera y el mismo ancho</b>. Solo cambia el contenido. Y las tres traen al pie <b>los enlaces a las otras dos</b>, así que se pueden recorrer sin volver al pie de página.</span>
+          <span class="esperado">Las tres tienen <b>la misma cabecera y el mismo ancho</b>, y la fecha de última actualización <b>debajo del título</b>, no al final. Solo cambia el contenido. Y las tres traen al pie <b>los enlaces a las otras dos</b>, así que se pueden recorrer sin volver al pie de página.</span>
         </label>
 
         <label class="prueba">

@@ -30,46 +30,77 @@ iconos están puestos y maquetados, con `aria-label` y `rel="nofollow"`; solo el
 
 ---
 
-### 2. Texto legal: la Política de Cookies
+### 2. El correo público de OMDARA
 
-**Qué falta:** el texto de **una** de las tres páginas legales.
+**Qué falta:** una dirección de correo que lea alguien, para publicarla en las
+páginas legales.
 
-**Las otras dos ya están.** Los Términos y Condiciones (REQ-00014): once
-cláusulas, con jurisdicción en La Paz, Baja California Sur. El Aviso de
-Privacidad (REQ-00015): ocho cláusulas, fechado el 13 de agosto de 2026 — con
-la salvedad de 2m, que hay que leer. Queda `politica-de-cookies.php`, la única
-que sigue con el aviso de contenido pendiente.
+**Los tres textos legales ya están escritos**, y con eso cae el bloqueo que
+encabezaba esta lista desde REQ-00001. Términos y Condiciones (REQ-00014, once
+cláusulas), Aviso de Privacidad (REQ-00015, ocho cláusulas — con la salvedad de
+2m) y Política de Cookies (REQ-00016, nueve cláusulas). Lo que queda es un dato
+suelto que **dos de los tres documentos aprobados piden y ninguno da**:
 
-> **Dos cosas que los Términos no dicen y el sitio sí hace.** No es un error del
-> documento —puede ser deliberado—, pero conviene que lo mire quien asesora:
-> el plazo de **24 horas** para corregir una actividad publicada, pasado el cual
-> se congela; y que la moderación es **posterior**, no previa. Las dos son reglas
-> que obligan a los organizadores y que hoy solo constan en las preguntas
-> frecuentes y en «¿Cómo funciona?».
+- El **Aviso de Privacidad**, cláusula 5, manda ejercer los derechos ARCO
+  «enviando una solicitud al correo electrónico de contacto de omdara».
+- La **Política de Cookies**, cláusula 9, deja un hueco literal donde va:
+  `[correo de omdara]`.
 
-**Dónde:** `politica-de-cookies.php`.
+**Qué hace el sitio mientras tanto:** `correoContacto()` nace vacía y, mientras
+lo esté, la Política ofrece el formulario de `/contacto`, que sí llega a los
+administradores. Lo que **no** hace es publicar el `no-responder@`: un buzón que
+nadie lee, impreso en un documento que promete atender consultas, es peor que no
+poner ninguno.
 
-**No lo redacta quien programa.** Obliga a la empresa frente a organizadores y
-asistentes, y un texto copiado de otra web describe un servicio que no es este.
+**Para cerrarlo:** crear el buzón en cPanel → Email Accounts y ponerlo en
+`includes/config.local.php`, en **los dos entornos**:
 
-**Lo que sí aporta el código, y está ya escrito en la página:** el inventario de
-las catorce cookies que el sitio pone de verdad, con proveedor, finalidad y
-duración. Es la parte que se pierde cuando se copia una plantilla, y aquí ya
-está hecha: solo falta la redacción legal que la envuelve.
+```php
+'correo' => ['contacto' => 'hola@…'],
+```
 
-**Para cerrarlo:** sustituir el bloque provisional por el texto definitivo y
-borrar el `require` de `includes/aviso-pendiente.php`.
+No hace falta tocar código: en cuanto tenga valor, la cláusula 9 lo imprime y el
+enlace al formulario desaparece solo.
 
-> **Ya no es el pendiente más urgente.** Lo era mientras el Aviso de Privacidad
-> estaba en blanco: la LFPDPPP lo exige a quien trate datos personales, dos
-> casillas obligatorias enlazaban a él —la del formulario de contacto (REQ-00007)
-> y la del alta de cuenta (REQ-00008)—, y ambas pedían aceptar una página que
-> decía que su texto estaba pendiente. Eso ya está resuelto.
->
-> Lo que queda es que la Política de Cookies **sí se enlaza desde el banner de
-> consentimiento** (REQ-00003), que aparece en la primera visita de todo el
-> mundo. Es la página legal que más gente va a abrir, y hoy abre con un aviso de
-> que no está escrita.
+> **Ojo:** tiene que ser un buzón del dominio principal. El subdominio de
+> pruebas no tiene MX, así que ninguna dirección suya recibe correo — es el
+> mismo problema que ya se documentó para el remitente.
+
+---
+
+### 2n. La Política de Cookies ya no lleva la tabla dentro
+
+**Qué cambió:** hasta REQ-00016 la página publicaba catorce cookies con nombre,
+proveedor y duración, y afirmaba que ese inventario era definitivo. **No lo
+era**, y ahora ya no lo dice.
+
+**Por qué se movió:** el propio texto aprobado lo resuelve por su cuenta. La
+cláusula 7 remite el detalle «al mecanismo de gestión de cookies implementado en
+el sitio», así que la tabla no tiene por qué vivir dentro del documento legal.
+Bajó a un **anexo informativo**, separado y rotulado como tal, partido en dos:
+
+- **Las que pone OMDARA** (`wh_sesion`, `omdara_cookies`): seguras. Salen del
+  código de la plataforma.
+- **Las que pueden poner Google, Microsoft y Meta**: de la documentación de cada
+  proveedor, con la salvedad delante. Sigue abierto en el punto 6.
+
+**Para cerrarlo:** ver el punto 6. Cuando esa lista esté comprobada contra la
+instalación real, decidir si se confirma en el anexo o si se lleva al panel de
+preferencias, que es donde la cláusula 7 dice que está.
+
+---
+
+### 2ñ. Dos cosas que los Términos no dicen y el sitio sí hace
+
+**Qué pasa:** no es un error del documento —puede ser deliberado—, pero conviene
+que lo mire quien asesora.
+
+- El plazo de **24 horas** para corregir una actividad publicada, pasado el cual
+  se congela.
+- Que la moderación es **posterior**, no previa.
+
+Las dos son reglas que obligan a los organizadores y que hoy solo constan en las
+preguntas frecuentes y en «¿Cómo funciona?». Ver también 2l.
 
 ---
 
@@ -437,12 +468,19 @@ líneas de renombrado, sin forma de revisar una cosa sin la otra.
 **Qué falta:** ver con las tres herramientas encendidas en producción qué
 cookies ponen de verdad, y con qué duración.
 
-**Dónde:** `politica-de-cookies.php`, las tres tablas.
+**Dónde:** `politica-de-cookies.php`, la segunda tabla del anexo — «Las que
+pueden poner Google, Microsoft y Meta». La primera, la de las dos cookies de
+OMDARA, sí es segura: sale del código.
 
 **De dónde sale lo que hay hoy:** de la documentación de Google, Microsoft y
 Meta. Es lo más honesto que se puede afirmar antes de tener las tres activas con
 tráfico real, y cubre el criterio de REQ-00003 —nombre, proveedor, finalidad,
 duración y categoría— pero no es todavía «las cookies efectivamente generadas».
+
+**Desde REQ-00016 ya no compromete al documento legal.** La tabla vive en un
+anexo separado, con la salvedad escrita encima, y el texto de la Política remite
+el detalle al panel de preferencias (ver 2n). Lo que antes era una afirmación
+del documento ahora es información de apoyo etiquetada como provisional.
 
 **Para cerrarlo:** en producción, con las tres configuradas, aceptar todo y
 abrir las herramientas de desarrollo → Application → Cookies. Comparar nombre y
@@ -468,6 +506,11 @@ que no hace falta nada más.
 **Por qué no se puso ya:** REQ-00001 fija la estructura del pie columna por
 columna, y añadir una entrada que no está en ese requerimiento es cambiar algo
 que ya se aprobó. Es una línea el día que producto lo pida.
+
+> **Si se lleva al pie, hay que copiar la condición.** Desde REQ-00016 el botón
+> de la Política solo se pinta cuando `hayQueConsentir()`: sin herramientas
+> configuradas no se pinta el diálogo, y el botón no abriría nada. Un botón
+> muerto en el pie de todas las páginas es peor que uno en una sola.
 
 ---
 

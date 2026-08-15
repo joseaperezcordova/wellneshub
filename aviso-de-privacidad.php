@@ -158,8 +158,6 @@ require __DIR__ . '/includes/layout.php';
     <a href="<?= e(url('terminos')) ?>">Términos y Condiciones</a>
     <a href="<?= e(url('cookies')) ?>">Política de Cookies</a>
   </div>
-
-  <?php require __DIR__ . '/includes/legal-pie.php'; ?>
 </section>
 
 <?php pie(); ?>

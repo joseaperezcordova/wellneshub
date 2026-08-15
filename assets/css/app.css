@@ -1224,13 +1224,22 @@ form .btn-principal + .casilla-legal{
 .legal-cab h1{font-size:30px; line-height:1.2; margin-top:7px;}
 @media(max-width:640px){ .legal-cab h1{font-size:25px;} }
 
+/* La fecha, debajo del titulo. Estuvo al pie hasta REQ-00016 y la movio el
+   propio texto aprobado: la clausula 8 de la Politica de Cookies dice que la
+   fecha esta «al inicio», asi que con la fecha al final el documento mentia
+   sobre si mismo. */
+.legal-fecha{
+  margin:12px 0 0; font-family:'IBM Plex Mono',monospace; font-size:11.5px;
+  letter-spacing:.04em; color:var(--gris);
+}
+
 /* Las clausulas numeradas. El numero sale del contador de CSS y no escrito en
    el texto: insertar una clausula no deberia obligar a renumerar las de abajo,
    y en un documento legal dos clausulas con el mismo numero no son un detalle
    estetico. */
 .legal-clausulas{list-style:none; counter-reset:clausula; padding:0; margin:0;}
 .legal-clausulas > li{
-  counter-increment:clausula; position:relative;
+  counter-increment:clausula; counter-reset:apartado; position:relative;
   padding:0 0 26px 42px; margin-bottom:26px;
   border-bottom:1px solid var(--linea-suave);
 }
@@ -1270,6 +1279,46 @@ form .btn-principal + .casilla-legal{
   .legal-clausulas > li{padding-left:34px;}
 }
 
+/* Los dos niveles de subtitulo de la Politica de Cookies (REQ-00016). El
+   apartado va numerado «2.1», y el numero lo compone el contador igual que el
+   de la clausula: el texto no lo lleva escrito. El nombre de la herramienta no
+   se numera —el documento tampoco lo hace—. */
+.legal-apartado{
+  counter-increment:apartado; position:relative;
+  font-size:16px; line-height:1.35; margin:24px 0 9px; padding-left:38px;
+}
+.legal-apartado::before{
+  content:counter(clausula) '.' counter(apartado) '.'; position:absolute; left:0; top:1px;
+  font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:400;
+  color:var(--verde-claro);
+}
+.legal-herramienta{
+  font-size:14px; margin:20px 0 8px;
+  font-family:'IBM Plex Mono',monospace; letter-spacing:.02em; color:var(--verde);
+}
+.legal-clausulas h2 + .legal-apartado{margin-top:16px;}
+
+/* El boton de preferencias, dentro de la clausula que promete que se puede
+   volver a ellas. Cuando no hay herramientas configuradas no hay dialogo que
+   abrir, y ahi va un parrafo en su lugar en vez de un boton muerto. */
+.legal-accion{margin:18px 0 4px;}
+.legal-accion-inactiva{
+  font-size:14px; color:var(--gris);
+  padding:12px 14px; background:var(--arena-suave); border-radius:8px;
+}
+
+/* El anexo de cookies, FUERA del texto aprobado. Va separado a proposito: la
+   clausula 7 remite el detalle al mecanismo de gestion de cookies, y media
+   tabla —la de los proveedores— todavia no esta comprobada contra la
+   instalacion real. Mezclarla con el documento la haria pasar por definitiva. */
+.legal-anexo{
+  margin-top:44px; padding-top:30px; border-top:2px solid var(--linea);
+  font-size:15px; line-height:1.75;
+}
+.legal-anexo h2{font-size:19px; line-height:1.3; margin:0 0 10px;}
+.legal-anexo h3{font-size:16px; margin:30px 0 8px;}
+.legal-anexo > p{margin:0 0 10px; color:var(--gris);}
+
 /* Los otros dos documentos, al pie del que se esta leyendo: quien lee uno suele
    querer mirar el siguiente, y volver al pie de la pagina a buscarlo es un
    viaje de mas. */
@@ -1279,11 +1328,3 @@ form .btn-principal + .casilla-legal{
   text-decoration:underline; text-underline-offset:3px;
 }
 .legal-otros a:hover{color:var(--verde);}
-
-/* Sin fecha, unas condiciones no se pueden comparar con las que alguien acepto.
-   Es la otra mitad de usuarios.acepto_legal_en. */
-.legal-pie{
-  margin-top:30px; padding-top:18px; border-top:1px solid var(--linea);
-  font-family:'IBM Plex Mono',monospace; font-size:11.5px;
-  letter-spacing:.04em; color:var(--gris);
-}

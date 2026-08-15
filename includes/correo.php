@@ -40,6 +40,31 @@ function correoRemitente(): array
 }
 
 /**
+ * La dirección PÚBLICA de contacto, la que se imprime en las páginas legales.
+ *
+ * No es correoRemitente(). Aquella es de sistema —no-responder@—, y publicar un
+ * buzón que nadie lee en un documento que promete atender consultas es peor que
+ * no publicar ninguno.
+ *
+ * Nace vacía a propósito. La piden dos textos legales aprobados: el Aviso de
+ * Privacidad manda ejercer los derechos ARCO «al correo electrónico de contacto
+ * de omdara» y la Política de Cookies deja un hueco literal donde va. Ninguno de
+ * los dos dice cuál es, así que hasta que se decida y se ponga en
+ * config.local.php, quien tenga que escribir usa el formulario de /contacto, que
+ * sí llega a alguien. Anotado en docs/pendientes.md.
+ *
+ * @return string La dirección, o cadena vacía si todavía no hay ninguna.
+ */
+function correoContacto(): string
+{
+    global $CONFIG;
+
+    $direccion = trim((string) ($CONFIG['correo']['contacto'] ?? ''));
+
+    return filter_var($direccion, FILTER_VALIDATE_EMAIL) ? $direccion : '';
+}
+
+/**
  * Envía un correo de texto plano.
  *
  * De texto plano y no HTML a propósito: un correo con maquetación pesa más,

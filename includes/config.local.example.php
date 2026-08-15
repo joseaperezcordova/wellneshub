@@ -70,9 +70,18 @@ return [
     // de crear un buzón que ya había fallado, sigue rechazando un buen rato.
     // Por eso conviene probar con una dirección nueva en vez de insistir con la
     // que ya está en la lista negra.
+    // 'contacto' es OTRA COSA, y no puede ser la misma dirección. Es el buzón
+    // PÚBLICO, el que se imprime en las páginas legales: el Aviso de Privacidad
+    // manda ejercer ahí los derechos ARCO y la Política de Cookies lo pide para
+    // dudas sobre cookies. Tiene que leerlo alguien.
+    //
+    // Déjalo vacío mientras no exista. Las dos páginas ofrecen entonces el
+    // formulario de /contacto, que sí llega a los administradores. Lo que no
+    // hacen es publicar el no-responder@.
     'correo' => [
         'remitente' => 'no-responder@tudominio.com',
         'nombre'    => 'OMDARA',
+        'contacto'  => '',
     ],
 
     // ---- Captcha del formulario de reportes -------------------------------

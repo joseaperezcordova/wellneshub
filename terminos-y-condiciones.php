@@ -133,8 +133,6 @@ require __DIR__ . '/includes/layout.php';
     <a href="<?= e(url('privacidad')) ?>">Aviso de Privacidad</a>
     <a href="<?= e(url('cookies')) ?>">Política de Cookies</a>
   </div>
-
-  <?php require __DIR__ . '/includes/legal-pie.php'; ?>
 </section>
 
 <?php pie(); ?>
