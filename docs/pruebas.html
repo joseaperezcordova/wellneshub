@@ -406,8 +406,8 @@
 
         <label class="prueba">
           <input type="checkbox">
-          <span class="qué">Recorre el menú de arriba: Inicio, Actividades.</span>
-          <span class="esperado">Cada una es una página distinta y <b>el enlace de la que estás viendo aparece marcado</b>.</span>
+          <span class="qué">Recorre el menú de arriba: Inicio, Buscar actividades, ¿Cómo funciona?</span>
+          <span class="esperado">Cada una es una página distinta y <b>el enlace de la que estás viendo aparece marcado</b>. Ojo con esto último: hasta ahora la marca no salía al llegar por las direcciones limpias.</span>
         </label>
 
         <label class="prueba">
@@ -447,9 +447,34 @@
         </label>
 
         <p class="intro-sec" style="margin-top:26px;">
-          Y las <b>preguntas frecuentes</b>, que antes eran una lista de temas pendientes y
-          ahora tienen respuestas de verdad. Se llega desde el pie del sitio.
+          Y dos páginas informativas: <b>¿Cómo funciona?</b>, que ahora está también en el menú
+          de arriba, y las <b>preguntas frecuentes</b>, que antes eran una lista de temas
+          pendientes y ahora tienen respuestas de verdad.
         </p>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Abre «¿Cómo funciona?» desde el menú de arriba, y luego desde el pie.</span>
+          <span class="esperado">Las dos llevan a la misma página, con los cuatro pasos para publicar.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué"><b>Sin sesión iniciada</b>, dale a «Publicar una actividad» en esa página.</span>
+          <span class="esperado">Te manda al login. Al entrar —o al crear la cuenta, pasando por la casilla de Términos— <b>sigues directo al formulario de publicar</b>, sin volver a la portada ni tener que buscar el botón otra vez.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Ahora <b>con sesión iniciada</b>, el mismo botón.</span>
+          <span class="esperado">Va derecho al formulario.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Lee los cuatro pasos y compáralos con lo que te pasó al publicar.</span>
+          <span class="esperado">Deben coincidir. El paso 2 es <b>la vista previa</b>, no «enviar a revisión»: aquí no hay aprobación que esperar. Si algo no cuadra, avísanos — es la parte que más se discutió.</span>
+        </label>
 
         <label class="prueba">
           <input type="checkbox">

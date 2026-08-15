@@ -32,11 +32,30 @@ $u = usuarioActual();
 /* Qué enlace del menú va marcado. Se puede pasar a mano con $seccion; si no, se
    deduce del archivo que se esté sirviendo, que acierta en todos los casos que
    hay hoy y no obliga a acordarse de ponerlo. */
-$seccion = $seccion ?? [
-    'index.php'  => 'inicio',
-    'buscar.php' => 'buscar',
-    'blog.php'   => 'blog',
-][basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''))] ?? '';
+/* Qué enlace del menú va marcado. Se puede pasar a mano con $seccion; si no, se
+   deduce.
+
+   PRIMERO POR LA RUTA DEL ENRUTADOR, y solo después por el archivo. Desde que
+   las direcciones limpias pasan por router.php (REQ-00002), SCRIPT_NAME vale
+   "router.php" en TODAS ellas, así que el mapa de archivos devolvía vacío y
+   ningún enlace salía marcado al llegar por /actividades o /como-funciona.
+   Seguía funcionando solo entrando por el .php, que es justo la dirección que no
+   se publica. El mapa de archivos se queda para esas entradas directas. */
+$seccionesPorRuta = [
+    'inicio'        => 'inicio',
+    'actividades'   => 'buscar',
+    'como-funciona' => 'como',
+    'blog'          => 'blog',
+];
+
+$seccion = $seccion
+    ?? ($seccionesPorRuta[$GLOBALS['rutaActual'] ?? ''] ?? null)
+    ?? [
+        'index.php'          => 'inicio',
+        'buscar.php'         => 'buscar',
+        'blog.php'           => 'blog',
+        'como-funciona.php'  => 'como',
+    ][basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''))] ?? '';
 
 /** El enlace del menú, con su marca si es la sección en la que estamos. */
 function enlaceMenu(string $claveRuta, string $claveTexto, string $clave, string $seccion): string
@@ -213,6 +232,11 @@ $scVerifica = trim((string) ($CONFIG['analytics']['search_console_verificacion']
     <nav class="mainnav" id="mainnav">
       <?= enlaceMenu('inicio',      'nav.inicio',      'inicio', $seccion) ?>
       <?= enlaceMenu('actividades', 'nav.actividades', 'buscar', $seccion) ?>
+      <?php /* «¿Cómo funciona?» arriba y en el pie, las dos a /como-funciona
+               (REQ-00013). Es la página que convierte a quien mira en quien
+               publica, y desde el pie solo la encuentra quien ya bajó hasta
+               abajo. */ ?>
+      <?= enlaceMenu('como-funciona', 'nav.como_funciona', 'como', $seccion) ?>
       <?php /* El blog no entra en el MVP (REQ-00004). El enlace no se borra: se
                pregunta por él, y vuelve solo el día que se quite de
                SECCIONES_OCULTAS. */ ?>

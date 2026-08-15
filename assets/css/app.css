@@ -1146,3 +1146,70 @@ form .btn-principal + .casilla-legal{
   border-top:1px solid var(--linea); font-size:14px; color:var(--gris);
 }
 .faq-pie a{color:var(--terracota-texto); text-decoration:underline; text-underline-offset:2px;}
+
+/* --------------------------------------- guia «¿Cómo funciona?» (REQ-00013) -- */
+.guia-intro{max-width:680px; font-size:16.5px; line-height:1.7; color:var(--gris); margin:0 0 34px;}
+
+.guia-titulo{font-size:19px; margin:0 0 14px;}
+.guia-motivos{
+  list-style:none; padding:0; margin:0 0 44px; max-width:680px;
+  display:grid; gap:9px;
+}
+.guia-motivos li{
+  position:relative; padding-left:28px; font-size:15px; line-height:1.55;
+}
+/* La palomita se dibuja con bordes: un caracter «✓» en el marcado lo leeria en
+   voz alta un lector de pantalla delante de cada linea, cinco veces seguidas. */
+.guia-motivos li::before{
+  content:''; position:absolute; left:4px; top:6px; width:9px; height:5px;
+  border-left:2px solid var(--verde-claro); border-bottom:2px solid var(--verde-claro);
+  transform:rotate(-45deg);
+}
+
+/* Los cuatro pasos. Numeros en circulo a la izquierda y texto al lado; en movil
+   el circulo sube y el texto pasa debajo, porque a 320px una columna de 34px mas
+   sus margenes se come un tercio del ancho. */
+.guia-pasos{list-style:none; padding:0; margin:0; max-width:720px; counter-reset:none;}
+.guia-pasos > li{display:flex; gap:16px; padding:0 0 26px; position:relative;}
+.guia-pasos > li:not(:last-child)::after{
+  /* La linea que une un paso con el siguiente: convierte cuatro bloques sueltos
+     en una secuencia, que es lo que se esta contando. */
+  content:''; position:absolute; left:16px; top:38px; bottom:6px; width:1px;
+  background:var(--linea);
+}
+.guia-num{
+  flex-shrink:0; width:33px; height:33px; border-radius:50%; z-index:1;
+  background:var(--verde); color:var(--blanco);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'IBM Plex Mono',monospace; font-size:14px;
+}
+.guia-pasos h4{font-family:'Fraunces',serif; font-weight:500; font-size:17px; margin:5px 0 6px;}
+.guia-pasos p{margin:0; font-size:14.5px; line-height:1.65; color:var(--gris);}
+
+.guia-acciones{display:flex; gap:12px; flex-wrap:wrap; margin-top:30px;}
+.btn-cta{
+  display:inline-block; width:auto; max-width:none; padding:13px 26px;
+  border-radius:10px; font-size:15px; font-weight:600; text-align:center;
+}
+.btn-cta-claro{background:var(--blanco); color:var(--verde);}
+.btn-cta-claro:hover{background:var(--arena);}
+.btn-cta-hueco{border:1.5px solid rgba(255,255,255,.55); color:var(--blanco);}
+.btn-cta-hueco:hover{background:rgba(255,255,255,.1); border-color:var(--blanco);}
+
+/* El cierre, a sangre y en verde bosque: se lee como final de pagina y no como
+   un apartado mas de la lista. */
+.guia-cierre{
+  background:var(--verde); color:var(--blanco); margin-top:20px; padding:56px 0 60px;
+}
+.guia-cierre h2{font-size:30px; line-height:1.2; color:var(--blanco); max-width:620px;}
+.guia-cierre p{
+  max-width:620px; margin:14px 0 0; font-size:15.5px; line-height:1.7;
+  color:rgba(255,255,255,.85);
+}
+@media(max-width:640px){
+  .guia-cierre{padding:40px 0 44px;}
+  .guia-cierre h2{font-size:24px;}
+  .guia-pasos > li{flex-direction:column; gap:10px;}
+  .guia-pasos > li::after{display:none;}
+  .guia-acciones .btn-cta{width:100%;}
+}

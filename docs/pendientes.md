@@ -272,15 +272,26 @@ guarde. Media hora, cuando haya suficientes mensajes para que haga falta.
 
 ---
 
-### 2l. Las FAQ dan por hecha una revisión previa que no existe
+### 2l. Dos páginas dan por hecha una revisión previa que no existe
 
-**Qué pasa:** el requerimiento de las preguntas frecuentes traía cuatro
-respuestas construidas sobre una cola de aprobación —«envía tu actividad para
-revisión», «revisamos cada publicación», «normalmente entre 24 y 72 horas
-hábiles», «te indicaremos el motivo por el que no fue aprobado»—. **Eso no es lo
-que hace el sitio.** `publicarEvento()` pone la actividad en línea en el momento
-en que su dueño le da a publicar, y la moderación es posterior: alguien reporta,
-un administrador mira y, si toca, la oculta.
+**Dónde:** las preguntas frecuentes y «¿Cómo funciona?». Los dos requerimientos
+llegaron con el mismo supuesto, así que es una sola decisión.
+
+**Qué pasa:** las FAQ traían cuatro respuestas construidas sobre una cola de
+aprobación —«envía tu actividad para revisión», «revisamos cada publicación»,
+«normalmente entre 24 y 72 horas hábiles», «te indicaremos el motivo por el que
+no fue aprobado»— y «¿Cómo funciona?» traía dos de sus cuatro pasos —«Envía tu
+actividad a revisión» y «Una vez aprobada»—. **Eso no es lo que hace el sitio.**
+`publicarEvento()` pone la actividad en línea en el momento en que su dueño le
+da a publicar, y la moderación es posterior: alguien reporta, un administrador
+mira y, si toca, la oculta.
+
+> **En «¿Cómo funciona?» es peor que en las FAQ**, y por eso se corrigió igual:
+> esa página se lee ANTES de publicar. Quien la creyera esperaría un correo de
+> aprobación, no revisaría que su actividad ya está pública, y descubriría el
+> error cuando le escribiera la primera persona interesada. El paso 2 pasa a
+> describir el que sí existe —la vista previa—, que además es donde de verdad se
+> decide publicar.
 
 **Qué se hizo:** las respuestas se reescribieron para decir lo que ocurre de
 verdad. Publicarlas tal cual habría dejado a los organizadores esperando un

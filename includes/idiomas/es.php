@@ -28,6 +28,8 @@ return [
     // ofrece una acción entre otras acciones, abajo se nombra una sección
     // dentro de un índice donde ya se sabe que todo son enlaces.
     'nav.actividades' => 'Buscar actividades',
+    // En la cabecera y en el pie, las dos a /como-funciona (REQ-00013).
+    'nav.como_funciona' => '¿Cómo funciona?',
     'nav.blog'        => 'Blog',
     'nav.publicar'    => 'Publicar actividad',
     'nav.publicar_corto'  => 'Publicar',
