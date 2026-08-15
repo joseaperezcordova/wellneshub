@@ -30,14 +30,15 @@ iconos están puestos y maquetados, con `aria-label` y `rel="nofollow"`; solo el
 
 ---
 
-### 2. Texto legal: Privacidad y Cookies
+### 2. Texto legal: la Política de Cookies
 
-**Qué falta:** el texto de **dos** de las tres páginas legales.
+**Qué falta:** el texto de **una** de las tres páginas legales.
 
-**Los Términos y Condiciones ya están** (REQ-00014): once cláusulas, con
-jurisdicción en La Paz, Baja California Sur, y su fecha de última actualización.
-Quedan `aviso-de-privacidad.php` y `politica-de-cookies.php`, que siguen con el
-aviso de contenido pendiente.
+**Las otras dos ya están.** Los Términos y Condiciones (REQ-00014): once
+cláusulas, con jurisdicción en La Paz, Baja California Sur. El Aviso de
+Privacidad (REQ-00015): ocho cláusulas, fechado el 13 de agosto de 2026 — con
+la salvedad de 2m, que hay que leer. Queda `politica-de-cookies.php`, la única
+que sigue con el aviso de contenido pendiente.
 
 > **Dos cosas que los Términos no dicen y el sitio sí hace.** No es un error del
 > documento —puede ser deliberado—, pero conviene que lo mire quien asesora:
@@ -46,36 +47,78 @@ aviso de contenido pendiente.
 > que obligan a los organizadores y que hoy solo constan en las preguntas
 > frecuentes y en «¿Cómo funciona?».
 
-**Dónde:** `aviso-de-privacidad.php` y `politica-de-cookies.php`.
+**Dónde:** `politica-de-cookies.php`.
 
 **No lo redacta quien programa.** Obliga a la empresa frente a organizadores y
 asistentes, y un texto copiado de otra web describe un servicio que no es este.
 
-**Lo que sí aporta el código, y está ya escrito en cada página:** el inventario
-de lo que el sitio hace de verdad — las reglas que aplica (plazo de 24 horas,
-sin revisión previa, OMDARA no gestiona pagos), los seis tipos de dato personal
-que guarda, y las cookies que pone. Es la parte que se pierde cuando se copia
-una plantilla.
+**Lo que sí aporta el código, y está ya escrito en la página:** el inventario de
+las catorce cookies que el sitio pone de verdad, con proveedor, finalidad y
+duración. Es la parte que se pierde cuando se copia una plantilla, y aquí ya
+está hecha: solo falta la redacción legal que la envuelve.
 
 **Para cerrarlo:** sustituir el bloque provisional por el texto definitivo y
 borrar el `require` de `includes/aviso-pendiente.php`.
 
-> **Ojo con el orden de prioridad.** En México el Aviso de Privacidad no es
-> cortesía: la LFPDPPP lo exige a quien trate datos personales, y este sitio los
-> trata desde el primer registro. Ahora mismo el sitio opera sin él.
+> **Ya no es el pendiente más urgente.** Lo era mientras el Aviso de Privacidad
+> estaba en blanco: la LFPDPPP lo exige a quien trate datos personales, dos
+> casillas obligatorias enlazaban a él —la del formulario de contacto (REQ-00007)
+> y la del alta de cuenta (REQ-00008)—, y ambas pedían aceptar una página que
+> decía que su texto estaba pendiente. Eso ya está resuelto.
 >
-> Y desde REQ-00007 hay un sitio donde se nota a simple vista: el formulario de
-> contactar al organizador obliga a marcar «He leído y acepto el Aviso de
-> Privacidad», y ese enlace lleva a una página que dice que su texto está
-> pendiente. Pedir que acepten algo que no está escrito es peor que no pedirlo.
-> **Es el pendiente más urgente de esta lista.**
->
-> Con REQ-00008 son dos sitios: **nadie puede crear cuenta sin aceptar los
-> Términos y el Aviso**. Los Términos ya están escritos; el Aviso no. La
-> fecha de aceptación sí queda guardada, y los Términos ya llevan la suya
-> —«14 Agosto, 2026»—, así que ese par ya sirve para saber qué versión aceptó
-> alguien. Con el Aviso todavía no: cuanto antes se redacte, menos gente habrá
-> aceptado una página en blanco.
+> Lo que queda es que la Política de Cookies **sí se enlaza desde el banner de
+> consentimiento** (REQ-00003), que aparece en la primera visita de todo el
+> mundo. Es la página legal que más gente va a abrir, y hoy abre con un aviso de
+> que no está escrita.
+
+---
+
+### 2m. El Aviso de Privacidad cubre menos de lo que el sitio hace
+
+**Qué pasa:** el Aviso publicado (REQ-00015) describe el tratamiento de los
+datos del formulario **«Contactar Organizador»**. El sitio trata más datos que
+esos, y en más momentos.
+
+**Por qué está tal cual:** el criterio de aceptación del requerimiento dice
+«el contenido se muestra completo y sin modificaciones». No se toca ni una coma,
+igual que en los Términos. Esto no es una corrección: es la lista para que la
+mire quien asesora y decida si falta o si es deliberado.
+
+**Lo que el sitio guarda hoy, y el Aviso no menciona:**
+
+- **Nombre y correo** de quien se registra, para poder entrar y para avisar al
+  organizador de sus mensajes.
+- **Identificador de Google** de quien entra con esa cuenta. Se guarda el `sub`,
+  no el correo, porque el `sub` no cambia.
+- **Códigos de acceso** enviados por correo. Se guardan cifrados y caducan solos.
+- **Dirección IP** de quien reporta una actividad, escribe a un organizador o
+  usa el formulario de `/contacto`, para limitar envíos repetidos.
+- **Nombre, correo, teléfono y mensaje** de quien escribe por `/contacto`, que es
+  un formulario distinto del que el Aviso describe y va a OMDARA, no a un
+  organizador.
+- **Datos de la actividad** que publica un organizador, públicos por definición,
+  y desde REQ-00012 también su **teléfono, Instagram y sitio web** guardados en
+  la cuenta.
+- **Datos de navegación** que reciben terceros cuando el visitante los acepta:
+  Google Analytics 4, Microsoft Clarity y Meta Pixel, más OpenStreetMap para los
+  mapas. Están documentados en la Política de Cookies, pero el Aviso no los
+  nombra.
+
+**Tres desajustes concretos, además del inventario:**
+
+1. **La cláusula 8 ata el consentimiento al formulario de contacto.** Pero desde
+   REQ-00008 **nadie crea cuenta sin aceptar este Aviso**, y ese momento no
+   aparece en el documento. La casilla del alta enlaza aquí igualmente.
+2. **La cláusula 5 no da a dónde escribir.** Dice «al correo electrónico de
+   contacto de omdara», sin dirección. Los derechos ARCO se ejercen por una vía
+   concreta; hoy la más cercana es `/contacto`, que el Aviso tampoco nombra.
+3. **No hay responsable identificado.** La LFPDPPP pide nombre y domicilio de
+   quien trata los datos. El documento no los trae.
+
+**Para cerrarlo:** decidir si el Aviso se amplía. Si se amplía, el texto nuevo
+entra en `$clausulas` dentro de `aviso-de-privacidad.php` y **hay que subir la
+fecha de `$legalActualizado`** — es lo que permite saber qué versión aceptó cada
+persona (ver 2e).
 
 ---
 

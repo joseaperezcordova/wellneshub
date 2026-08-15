@@ -163,6 +163,13 @@ function filaCookie(string $nombre, string $proveedor, string $finalidad, string
        publicar una actividad</strong>: el sitio no tiene forma de recordar quién eres
        entre una página y la siguiente.</p>
   </div>
+
+  <?php /* Los otros dos documentos, desde aquí: quien lee uno suele querer
+           mirar el siguiente, y volver al pie a buscarlo es un viaje de más. */ ?>
+  <div class="legal-otros">
+    <a href="<?= e(url('terminos')) ?>">Términos y Condiciones</a>
+    <a href="<?= e(url('privacidad')) ?>">Aviso de Privacidad</a>
+  </div>
 </section>
 
 <?php pie(); ?>
