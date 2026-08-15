@@ -18,8 +18,8 @@
  */
 
 declare(strict_types=1);
-require __DIR__ . '/includes/config.php';
-require __DIR__ . '/includes/eventos.php'; // esAdmin()
+require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/eventos.php'; // esAdmin()
 
 $u = exigirSesion();
 

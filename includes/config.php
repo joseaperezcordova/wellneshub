@@ -8,6 +8,31 @@
 declare(strict_types=1);
 
 /*
+ * INCLÚYELO SIEMPRE CON require_once. NUNCA CON require.
+ *
+ * Este archivo declara funciones, así que cargarlo dos veces es un error fatal
+ * —«Cannot redeclare detectarUrlBase()»— y un 500 sin nada en pantalla.
+ *
+ * Y cargarlo dos veces es lo normal desde que hay enrutador: router.php empieza
+ * por aquí para poder resolver la dirección, y después incluye la página, que
+ * también empieza por aquí porque tiene que seguir funcionando cuando se la
+ * llama directa (/buscar.php) o desde otra (evento.php desde el router). Con
+ * `require` a secas, TODAS las direcciones limpias devolvían 500 y solo
+ * funcionaban las que terminan en .php. Así estuvo desde que se introdujo el
+ * enrutador hasta que se vio en el servidor.
+ *
+ * NO SE PUEDE ARREGLAR CON UNA GUARDA AQUÍ DENTRO. Se intentó:
+ *
+ *     if (defined('OMDARA_ARRANCADO')) return;
+ *
+ * y no sirve. PHP declara las funciones de un archivo al COMPILARLO, que es
+ * antes de ejecutar su primera línea, así que el error fatal ya ha ocurrido
+ * cuando ese `return` tendría su turno. La única defensa está en quien incluye,
+ * y por eso hay una prueba que recorre todos los puntos de entrada y falla si
+ * alguno vuelve a escribir `require`.
+ */
+
+/*
  * Código escrito para PHP 7.4, que es lo que trae el XAMPP de esta máquina.
  * Corre igual en 8.x, así que no depende de qué versión tenga el hosting; si
  * usara sintaxis de 8 (match, str_starts_with, never) reventaría en local.

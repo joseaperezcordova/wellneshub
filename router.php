@@ -19,7 +19,7 @@
  */
 
 declare(strict_types=1);
-require __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/config.php';
 
 /*
  * La ruta pedida, sin la carpeta desde la que se sirve el sitio.

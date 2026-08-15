@@ -29,7 +29,7 @@
  */
 
 declare(strict_types=1);
-require __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/config.php';
 
 $titulo      = t('pagina.cookies.titulo');
 $descripcion = t('pagina.cookies.meta');

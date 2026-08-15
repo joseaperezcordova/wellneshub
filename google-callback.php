@@ -10,8 +10,8 @@
  */
 
 declare(strict_types=1);
-require __DIR__ . '/includes/config.php';
-require __DIR__ . '/includes/google.php';
+require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/google.php';
 
 // El usuario le dio a "Cancelar" en la pantalla de Google.
 if (!empty($_GET['error'])) {
