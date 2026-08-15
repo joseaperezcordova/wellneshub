@@ -39,12 +39,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirigir('/codigo.php');
 
     } else {
-        [$ok, $resultado] = verificarCodigo($email, (string) ($_POST['codigo'] ?? ''));
+        [$estado, $resultado] = verificarCodigo($email, (string) ($_POST['codigo'] ?? ''));
 
-        if ($ok) {
+        if ($estado === 'entra') {
+            // Ya tenía cuenta: esto es entrar, no darse de alta, así que no se
+            // le vuelve a pedir la casilla. Si la marcó en login.php y su cuenta
+            // es de antes de REQ-00008, se aprovecha para dejar constancia.
+            if (!empty($_SESSION['acepta_legal'])) {
+                registrarAceptacionLegal((int) $resultado);
+            }
+            unset($_SESSION['acepta_legal']);
+
             iniciarSesion((int) $resultado);
             redirigir(destinoTrasLogin());
+
+        } elseif ($estado === 'nueva') {
+            /*
+             * Aquí NO se crea la cuenta (REQ-00008). El código ya se gastó y el
+             * correo está demostrado; lo que falta es aceptar los documentos.
+             *
+             * Si ya marcó la casilla en login.php no se le pregunta dos veces:
+             * se crea aquí mismo con la aceptación registrada. Si no la marcó,
+             * la pantalla de completar-registro.php la exige.
+             */
+            if (!empty($_SESSION['acepta_legal'])) {
+                unset($_SESSION['acepta_legal'], $_SESSION['codigo_email']);
+
+                $nuevoId = crearUsuarioPorCorreo($email);
+                registrarAceptacionLegal($nuevoId);
+                iniciarSesion($nuevoId);
+                redirigir(destinoTrasLogin());
+            }
+
+            $_SESSION['alta_pendiente'] = ['via' => 'correo', 'email' => $email, 'en' => time()];
+            unset($_SESSION['codigo_email']);
+            redirigir('/completar-registro.php');
         }
+
         $error = $resultado;
     }
 }

@@ -59,6 +59,12 @@ borrar el `require` de `includes/aviso-pendiente.php`.
 > Privacidad», y ese enlace lleva a una página que dice que su texto está
 > pendiente. Pedir que acepten algo que no está escrito es peor que no pedirlo.
 > **Es el pendiente más urgente de esta lista.**
+>
+> Con REQ-00008 son dos sitios y el segundo es peor: **nadie puede crear cuenta
+> sin aceptar los Términos y el Aviso**, y los dos documentos están vacíos. La
+> fecha de aceptación sí queda guardada, así que el día que se escriba el texto
+> habrá constancia de quién aceptó *algo* —pero no de qué—. Cuanto antes se
+> redacten, menos gente habrá aceptado una página en blanco.
 
 ---
 
@@ -78,6 +84,46 @@ de `crearContacto()` en `includes/contacto.php` —el `columnaExiste()` y la ram
 sin teléfono—, que vuelve a ser un único INSERT. `columnaExiste()` en
 `includes/db.php` se queda: no estorba y la próxima migración a mano lo
 agradecerá.
+
+---
+
+### 2d. Ejecutar la migración 16 (aceptación de Términos y Aviso)
+
+**Qué falta:** correr `database/migracion-16-aceptacion-legal.sql` en phpMyAdmin,
+en pruebas y en producción.
+
+**Qué pasa mientras tanto:** la casilla se pide y se exige igual —nadie crea
+cuenta sin marcarla—, pero la fecha no queda registrada y en el log aparece un
+aviso por cada alta. `registrarAceptacionLegal()` lo comprueba antes de escribir,
+por el mismo motivo que la 15: publicar el código antes de aplicar la migración
+no puede significar «nadie puede crear cuenta».
+
+**Cuanto antes mejor**, más que la 15: aquí lo que se pierde no es un dato de
+contacto, es la prueba de que alguien aceptó.
+
+**Para cerrarlo:** ejecutar el `.sql` y quitar el `columnaExiste()` de
+`registrarAceptacionLegal()` en `includes/auth.php`.
+
+---
+
+### 2e. Qué versión de los documentos aceptó cada persona
+
+**Qué falta:** decidir si hace falta guardarlo, y con qué numeración.
+
+**Qué hay hoy:** solo `usuarios.acepto_legal_en`, la fecha. No se guarda versión
+**a propósito**: los dos documentos no están escritos, así que una columna de
+versión solo podría guardar un número inventado.
+
+**Cuándo empieza a hacer falta:** en cuanto los textos existan y cambien. A
+partir de ahí, «aceptó el 14 de agosto» deja de decir qué aceptó, y toca una
+migración más —columna de versión— y decidir si un cambio de documento obliga a
+volver a pedir la aceptación.
+
+**Y una decisión aparte:** las cuentas creadas antes de REQ-00008 tienen
+`acepto_legal_en` en NULL, que es información correcta y no un hueco. Hay que
+decidir si se les pide aceptar al entrar, o si se da por bueno lo que ya estaba.
+El código NO las obliga: obligar a las cuentas existentes habría dejado fuera a
+todo el mundo el día del despliegue.
 
 ---
 

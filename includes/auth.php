@@ -9,8 +9,13 @@
  *     demostraría una contraseña —control del buzón— sin obligar a nadie a
  *     inventarse una, ni a nosotros a custodiarla.
  *
- * La consecuencia práctica es que no hay "registro" separado. La primera vez
- * que alguien entra con un correo desconocido, la cuenta se crea sola.
+ * La consecuencia práctica era que no había "registro" separado: la primera vez
+ * que alguien entraba con un correo desconocido, la cuenta se creaba sola.
+ *
+ * REQ-00008 metió un paso en medio y no se puede saltar: nadie tiene cuenta sin
+ * haber aceptado los Términos y el Aviso de Privacidad. Así que identificarse y
+ * darse de alta dejaron de ser lo mismo —ver el bloque de resolverPorCorreo()—,
+ * y la cuenta la crea completar-registro.php, después de la casilla.
  */
 
 declare(strict_types=1);
@@ -62,9 +67,14 @@ function iniciarSesion(int $usuarioId): void
     session_regenerate_id(true);
     $_SESSION['uid'] = $usuarioId;
 
-    // Rastros del flujo del código: ya no hacen falta y no deben sobrevivir.
+    // Rastros de los flujos de entrada y de alta: ya no hacen falta y no deben
+    // sobrevivir. 'alta_pendiente' sobre todo — es lo que autoriza a crear una
+    // cuenta, y una vez dentro no puede quedarse esperando en la sesión.
     // 'volver_a' no se toca aquí: lo lee la página que redirige justo después.
-    unset($_SESSION['codigo_email'], $_SESSION['codigo_error'], $_SESSION['codigo_aviso']);
+    unset(
+        $_SESSION['codigo_email'], $_SESSION['codigo_error'], $_SESSION['codigo_aviso'],
+        $_SESSION['alta_pendiente'], $_SESSION['acepta_legal']
+    );
 
     db()->prepare('UPDATE usuarios SET ultimo_acceso_en = NOW() WHERE id = ?')
         ->execute([$usuarioId]);
@@ -194,38 +204,94 @@ function nombreDesdeCorreo(string $email): string
 }
 
 /**
- * Encuentra la cuenta de ese correo o la crea.
+ * IDENTIFICAR NO ES DAR DE ALTA (REQ-00008)
+ *
+ * Antes esto era una sola función, buscarOCrearUsuario(): comprobabas el código
+ * y salías con una cuenta, existiera antes o no. El requerimiento parte eso en
+ * dos, porque entre «he demostrado que este correo es mío» y «tengo cuenta»
+ * tiene que caber una pantalla: la de aceptar los Términos y el Aviso de
+ * Privacidad.
+ *
+ * De ahí este contrato, que usan los dos caminos de entrada —el código por
+ * correo y Google—:
+ *
+ *   ['entra', id]        ya tiene cuenta: adentro
+ *   ['nueva', '']        no la tiene: hay que pasar por completar-registro.php
+ *   ['error', mensaje]   no puede entrar, y esto es lo que hay que decirle
+ *
+ * Que los dos caminos hablen el mismo idioma es lo que evita que la puerta
+ * legal quede puesta en uno y olvidada en el otro, que es exactamente lo que el
+ * requerimiento se preocupa de prohibir para Google.
+ */
+
+/**
+ * ¿Este correo ya tiene cuenta?
  *
  * Solo se llama después de comprobar un código, así que llegar aquí ya prueba
  * que quien lo pide abre ese buzón. Por eso el correo se da por verificado.
  *
- * @return array{0:bool,1:string} [ok, id como texto o mensaje de error]
+ * @return array{0:string,1:string}
  */
-function buscarOCrearUsuario(string $email): array
+function resolverPorCorreo(string $email): array
 {
     $email = mb_strtolower(trim($email));
     $u     = buscarUsuarioPorEmail($email);
 
-    if ($u) {
-        if ($u['estado'] !== 'activo') {
-            return [false, 'Esta cuenta está suspendida.'];
-        }
+    if (!$u) return ['nueva', ''];
 
-        // Cuenta que venía de Google sin verificar, o de antes de esto.
-        if (empty($u['email_verificado_en'])) {
-            db()->prepare('UPDATE usuarios SET email_verificado_en = NOW() WHERE id = ?')
-                ->execute([$u['id']]);
-        }
-
-        return [true, (string) $u['id']];
+    if ($u['estado'] !== 'activo') {
+        return ['error', 'Esta cuenta está suspendida.'];
     }
 
-    $st = db()->prepare(
-        'INSERT INTO usuarios (nombre, email, email_verificado_en) VALUES (?, ?, NOW())'
-    );
-    $st->execute([nombreDesdeCorreo($email), $email]);
+    // Cuenta que venía de Google sin verificar, o de antes de esto.
+    if (empty($u['email_verificado_en'])) {
+        db()->prepare('UPDATE usuarios SET email_verificado_en = NOW() WHERE id = ?')
+            ->execute([$u['id']]);
+    }
 
-    return [true, (string) db()->lastInsertId()];
+    return ['entra', (string) $u['id']];
+}
+
+/**
+ * Crea la cuenta de quien acaba de aceptar los documentos.
+ *
+ * Solo se llama desde completar-registro.php, y solo con la casilla marcada.
+ */
+function crearUsuarioPorCorreo(string $email): int
+{
+    $email = mb_strtolower(trim($email));
+
+    db()->prepare(
+        'INSERT INTO usuarios (nombre, email, email_verificado_en) VALUES (?, ?, NOW())'
+    )->execute([nombreDesdeCorreo($email), $email]);
+
+    return (int) db()->lastInsertId();
+}
+
+/**
+ * Deja constancia de que aceptó los Términos y el Aviso de Privacidad.
+ *
+ * COALESCE y no NOW() a secas: vale la primera vez que aceptó, no la última vez
+ * que se le preguntó. Si alguna vez se vuelve a pedir —porque cambien los
+ * documentos— la fecha original es la que prueba el alta.
+ *
+ * La comprobación de columna es la misma historia que el teléfono de la
+ * migración 15: las migraciones de este proyecto se ejecutan a mano, y entre
+ * publicar el código y aplicarlas pasa un rato. Sin esto, ese rato sería
+ * «nadie puede crear cuenta». Se prefiere perder el registro de la aceptación
+ * —que se sigue exigiendo en pantalla— antes que cerrar la puerta.
+ */
+function registrarAceptacionLegal(int $usuarioId): void
+{
+    if (!columnaExiste('usuarios', 'acepto_legal_en')) {
+        error_log('usuarios.acepto_legal_en no existe todavía: falta ejecutar '
+            . 'database/migracion-16-aceptacion-legal.sql. La aceptación no quedó registrada.');
+        return;
+    }
+
+    db()->prepare(
+        'UPDATE usuarios SET acepto_legal_en = COALESCE(acepto_legal_en, NOW()) WHERE id = ?'
+    )->execute([$usuarioId]);
 }
 
 
@@ -324,9 +390,14 @@ function solicitarCodigo(string $email): array
 }
 
 /**
- * Comprueba el código y devuelve el usuario, creándolo si es la primera vez.
+ * Comprueba el código.
  *
- * @return array{0:bool,1:string} [ok, id como texto o mensaje de error]
+ * Ya NO crea la cuenta (REQ-00008): eso pasó a completar-registro.php, después
+ * de aceptar los documentos. Devuelve el contrato de tres estados que describe
+ * el bloque de resolverPorCorreo(); los errores de código propios de aquí
+ * también salen como ['error', mensaje].
+ *
+ * @return array{0:string,1:string} ['entra'|'nueva'|'error', id o mensaje]
  */
 function verificarCodigo(string $email, string $codigo): array
 {
@@ -336,7 +407,7 @@ function verificarCodigo(string $email, string $codigo): array
     $codigo = preg_replace('/\D+/', '', $codigo);
 
     if (strlen((string) $codigo) !== 6) {
-        return [false, 'El código son seis cifras.'];
+        return ['error', 'El código son seis cifras.'];
     }
 
     $pdo = db();
@@ -351,12 +422,12 @@ function verificarCodigo(string $email, string $codigo): array
     $fila = $st->fetch();
 
     if (!$fila) {
-        return [false, 'Ese código caducó o ya se usó. Pide uno nuevo.'];
+        return ['error', 'Ese código caducó o ya se usó. Pide uno nuevo.'];
     }
 
     if ((int) $fila['intentos'] >= CODIGO_MAX_INTENTOS) {
         $pdo->prepare('UPDATE codigos_acceso SET usado_en = NOW() WHERE id = ?')->execute([$fila['id']]);
-        return [false, 'Demasiados intentos con ese código. Pide uno nuevo.'];
+        return ['error', 'Demasiados intentos con ese código. Pide uno nuevo.'];
     }
 
     // El intento se cuenta ANTES de comprobar. Contarlo después deja la puerta
@@ -373,25 +444,38 @@ function verificarCodigo(string $email, string $codigo): array
 
     $pdo->prepare('UPDATE codigos_acceso SET usado_en = NOW() WHERE id = ?')->execute([$fila['id']]);
 
-    return buscarOCrearUsuario($email);
+    // El código ya está gastado: a partir de aquí, quien siga adelante es quien
+    // abre ese buzón. Lo que devuelve resolverPorCorreo() decide si entra o si
+    // tiene que pasar antes por la casilla legal.
+    return resolverPorCorreo($email);
 }
 
 
 // ---------------------------------------------------------------- Google ----
 
 /**
- * Entrada por Google: encuentra la cuenta, la enlaza o la crea.
+ * Google dice quién eres. No dice que hayas aceptado nada (REQ-00008).
+ *
+ * Esto era una sola función que resolvía y creaba de una vez, y ahí estaba el
+ * problema que el requerimiento nombra: pulsar «Continuar con Google» y aceptar
+ * la pantalla de Google creaba la cuenta, así que autenticarse EQUIVALÍA a
+ * aceptar los documentos. Ahora resolver y crear son dos pasos, y entre medias
+ * cabe la casilla.
+ *
+ * Enlazar una cuenta que ya existe SÍ se hace aquí, y no es una excepción a lo
+ * anterior: esa cuenta ya está creada, no se está dando de alta a nadie. Lo
+ * único que cambia es que a partir de ahora también se puede entrar con Google.
  *
  * @param array $perfil sub, email, email_verified, name, picture
- * @return array{0:bool,1:string} [ok, id como texto o mensaje de error]
+ * @return array{0:string,1:string} ['entra'|'nueva'|'error', id o mensaje]
  */
-function entrarConGoogle(array $perfil): array
+function resolverGoogle(array $perfil): array
 {
     $sub   = (string) ($perfil['sub'] ?? '');
     $email = mb_strtolower(trim((string) ($perfil['email'] ?? '')));
 
     if ($sub === '' || $email === '') {
-        return [false, 'Google no devolvió los datos necesarios.'];
+        return ['error', 'Google no devolvió los datos necesarios.'];
     }
 
     $pdo = db();
@@ -406,8 +490,8 @@ function entrarConGoogle(array $perfil): array
     $st->execute([$sub]);
 
     if ($u = $st->fetch()) {
-        if ($u['estado'] !== 'activo') return [false, 'Esta cuenta está suspendida.'];
-        return [true, (string) $u['id']];
+        if ($u['estado'] !== 'activo') return ['error', 'Esta cuenta está suspendida.'];
+        return ['entra', (string) $u['id']];
     }
 
     // 2. Primera vez con Google, pero quizá ya existe la cuenta —creada al
@@ -420,54 +504,85 @@ function entrarConGoogle(array $perfil): array
     $verificado = !empty($perfil['email_verified']);
 
     if ($existente && !$verificado) {
-        return [false, 'Ese correo ya está registrado. Entra pidiendo un código.'];
+        return ['error', 'Ese correo ya está registrado. Entra pidiendo un código.'];
     }
+
+    if (!$existente) return ['nueva', ''];
+
+    if ($existente['estado'] !== 'activo') return ['error', 'Esta cuenta está suspendida.'];
+
+    $usuarioId = (int) $existente['id'];
 
     $pdo->beginTransaction();
     try {
-        if ($existente) {
-            $usuarioId = (int) $existente['id'];
-
-            // Aprovechamos para dar el correo por verificado y poner avatar si
-            // la cuenta no tenía.
-            $pdo->prepare(
-                'UPDATE usuarios
-                    SET email_verificado_en = COALESCE(email_verificado_en, NOW()),
-                        avatar_url          = COALESCE(avatar_url, ?)
-                  WHERE id = ?'
-            )->execute([$perfil['picture'] ?? null, $usuarioId]);
-        } else {
-            // Sin el permiso 'profile' Google no manda nombre (ver googleScope()
-            // en google.php y por qué está desactivado): se deriva del correo,
-            // igual que en el acceso por código.
-            $nombre = trim((string) ($perfil['name'] ?? ''));
-            if ($nombre === '') {
-                $nombre = nombreDesdeCorreo($email);
-            }
-
-            $pdo->prepare(
-                'INSERT INTO usuarios (nombre, email, email_verificado_en, avatar_url)
-                 VALUES (?, ?, ?, ?)'
-            )->execute([
-                $nombre,
-                $email,
-                $verificado ? date('Y-m-d H:i:s') : null,
-                $perfil['picture'] ?? null,
-            ]);
-            $usuarioId = (int) $pdo->lastInsertId();
-        }
-
+        // Aprovechamos para dar el correo por verificado y poner avatar si la
+        // cuenta no tenía.
         $pdo->prepare(
-            'INSERT INTO identidades_oauth (usuario_id, proveedor, proveedor_uid, email_proveedor)
-             VALUES (?, "google", ?, ?)'
-        )->execute([$usuarioId, $sub, $email]);
+            'UPDATE usuarios
+                SET email_verificado_en = COALESCE(email_verificado_en, NOW()),
+                    avatar_url          = COALESCE(avatar_url, ?)
+              WHERE id = ?'
+        )->execute([$perfil['picture'] ?? null, $usuarioId]);
+
+        enlazarIdentidadGoogle($usuarioId, $sub, $email);
+
+        $pdo->commit();
+    } catch (Throwable $ex) {
+        $pdo->rollBack();
+        error_log('Enlace con Google fallido: ' . $ex->getMessage());
+        return ['error', 'No se pudo completar el acceso con Google.'];
+    }
+
+    return ['entra', (string) $usuarioId];
+}
+
+function enlazarIdentidadGoogle(int $usuarioId, string $sub, string $email): void
+{
+    db()->prepare(
+        'INSERT INTO identidades_oauth (usuario_id, proveedor, proveedor_uid, email_proveedor)
+         VALUES (?, "google", ?, ?)'
+    )->execute([$usuarioId, $sub, $email]);
+}
+
+/**
+ * Crea la cuenta de quien llegó por Google y ya aceptó los documentos.
+ *
+ * Solo se llama desde completar-registro.php, y solo con la casilla marcada.
+ * Devuelve null si algo falló; el mensaje queda en el log.
+ */
+function crearUsuarioConGoogle(array $perfil): ?int
+{
+    $sub   = (string) ($perfil['sub'] ?? '');
+    $email = mb_strtolower(trim((string) ($perfil['email'] ?? '')));
+    $pdo   = db();
+
+    // Sin el permiso 'profile' Google no manda nombre (ver googleScope() en
+    // google.php y por qué está desactivado): se deriva del correo, igual que
+    // en el acceso por código.
+    $nombre = trim((string) ($perfil['name'] ?? ''));
+    if ($nombre === '') $nombre = nombreDesdeCorreo($email);
+
+    $pdo->beginTransaction();
+    try {
+        $pdo->prepare(
+            'INSERT INTO usuarios (nombre, email, email_verificado_en, avatar_url)
+             VALUES (?, ?, ?, ?)'
+        )->execute([
+            $nombre,
+            $email,
+            !empty($perfil['email_verified']) ? date('Y-m-d H:i:s') : null,
+            $perfil['picture'] ?? null,
+        ]);
+        $usuarioId = (int) $pdo->lastInsertId();
+
+        enlazarIdentidadGoogle($usuarioId, $sub, $email);
 
         $pdo->commit();
     } catch (Throwable $ex) {
         $pdo->rollBack();
         error_log('Alta con Google fallida: ' . $ex->getMessage());
-        return [false, 'No se pudo completar el acceso con Google.'];
+        return null;
     }
 
-    return [true, (string) $usuarioId];
+    return $usuarioId;
 }

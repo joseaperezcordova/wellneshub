@@ -16,6 +16,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValido($_POST['csrf'] ?? null)) {
         $error = 'La sesión caducó. Vuelve a intentarlo.';
     } else {
+        /*
+         * La casilla se recuerda para el paso siguiente (REQ-00008).
+         *
+         * No se exige AQUÍ, y es deliberado: este formulario es a la vez entrar
+         * y crear cuenta —lo dice su propio título—, así que exigirla obligaría
+         * a quien ya tiene cuenta a volver a aceptar los Términos en cada
+         * inicio de sesión. Aceptar se hace una vez, al darse de alta.
+         *
+         * Comprobarlo aquí tendría además un efecto feo: como solo se podría
+         * exigir a los correos sin cuenta, el propio mensaje de error revelaría
+         * si un correo está registrado o no, a cualquiera que lo probara.
+         *
+         * Donde sí es obligatoria es donde se crea la cuenta, que es lo que el
+         * requerimiento pide de verdad: completar-registro.php no deja pasar sin
+         * ella. Marcarla aquí solo ahorra esa pantalla a quien ya la marcó.
+         */
+        $_SESSION['acepta_legal'] = !empty($_POST['acepto']);
+
         $normalizado    = mb_strtolower(trim($email));
         [$ok, $mensaje] = solicitarCodigo($email);
 
@@ -89,6 +107,18 @@ require __DIR__ . '/includes/layout.php';
     </div>
 
     <button class="btn-principal" type="submit">Continuar</button>
+
+    <?php
+    /*
+     * Debajo del botón, como pide REQ-00008. Sin el atributo "required" del
+     * navegador: aquí no se puede bloquear el envío sin bloquear también a
+     * quien solo viene a entrar. La casilla es obligatoria para crear cuenta, y
+     * eso lo garantiza completar-registro.php, que es donde la cuenta se crea.
+     */
+    $casillaMarcada     = !empty($_SESSION['acepta_legal']);
+    $casillaObligatoria = false;
+    ?>
+    <?php require __DIR__ . '/includes/casilla-legal.php'; ?>
   </form>
 </div>
 

@@ -36,6 +36,11 @@ CREATE TABLE IF NOT EXISTS usuarios (
   email               VARCHAR(190)     NOT NULL,
   email_verificado_en DATETIME         NULL DEFAULT NULL,
 
+  -- Cuándo aceptó los Términos y el Aviso de Privacidad (migración 16). NULL
+  -- en las cuentas anteriores a REQ-00008: no se les inventa una fecha, así
+  -- que este campo dice exactamente cuáles se dieron de alta sin la casilla.
+  acepto_legal_en     DATETIME         NULL DEFAULT NULL,
+
   avatar_url          VARCHAR(500)     NULL DEFAULT NULL,
 
   rol                 ENUM('visitante','organizador','admin')

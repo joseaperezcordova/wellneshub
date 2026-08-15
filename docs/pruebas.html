@@ -596,9 +596,51 @@
         <p class="quien">No hay contraseñas en ningún sitio</p>
         <p class="intro-sec">
           Se entra de dos maneras: con Google, o pidiendo un código de seis cifras al correo.
-          La primera vez que entras, la cuenta se crea sola — no hay pantalla de registro,
-          y eso es a propósito.
+          La primera vez hay <b>un paso más</b>: aceptar los Términos y el Aviso de Privacidad.
+          Sin eso no se crea la cuenta, por ninguno de los dos caminos.
         </p>
+
+        <p class="intro-sec">
+          Para probar esto necesitas <b>un correo que no tenga cuenta todavía</b>. Si usas uno
+          que ya entró alguna vez, no verás la casilla: entrar y darse de alta no son lo mismo,
+          y a quien ya aceptó no se le vuelve a preguntar.
+        </p>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Con un correo nuevo: escríbelo, <b>sin marcar</b> la casilla de abajo, y continúa. Mete el código.</span>
+          <span class="esperado">No entras directo: aparece «Completa tu registro» con la casilla, y <b>dice con qué correo se va a crear la cuenta</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Ahí, dale a «Crear mi cuenta» <b>sin marcar</b> la casilla.</span>
+          <span class="esperado">No se crea nada y dice: «Para crear tu cuenta debes aceptar los Términos y Condiciones y el Aviso de Privacidad.»</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Pulsa los dos enlaces de la casilla: Términos y Condiciones, y Aviso de Privacidad.</span>
+          <span class="esperado">Cada uno abre su página <b>en otra pestaña</b>, sin hacerte perder el paso donde estabas. Hoy las dos dicen que su texto está pendiente — eso es lo que hay, y es un pendiente conocido.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Marca la casilla y crea la cuenta.</span>
+          <span class="esperado">Entras. A partir de aquí, salir y volver a entrar <b>ya no vuelve a pedir la casilla</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Ahora con Google, y con una cuenta de Google que no haya entrado nunca aquí.</span>
+          <span class="esperado">Después de la pantalla de Google <b>no entras directo</b>: pasa por «Completa tu registro» con la misma casilla. Autenticarse con Google no vale como aceptar los documentos.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Repite el primer caso pero <b>marcando</b> la casilla ya en la pantalla del correo, antes de continuar.</span>
+          <span class="esperado">Tras meter el código entras directo, sin la pantalla de en medio. Ya habías aceptado.</span>
+        </label>
 
         <label class="prueba">
           <input type="checkbox">
