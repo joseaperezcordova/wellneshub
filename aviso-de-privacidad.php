@@ -22,13 +22,8 @@ $anchoLibre  = true;
 require __DIR__ . '/includes/layout.php';
 ?>
 
-<section class="wrap block">
-  <div class="block-head">
-    <div>
-      <div class="eyebrow">Legal</div>
-      <h2 style="margin-top:6px;">Aviso de Privacidad</h2>
-    </div>
-  </div>
+<section class="wrap block legal">
+  <?php $legalTitulo = 'Aviso de Privacidad'; require __DIR__ . '/includes/legal-cabecera.php'; ?>
 
   <?php $avisoPendiente = 'En México lo exige la LFPDPPP a quien trate datos personales, y este sitio los trata. Debe redactarlo o revisarlo quien asesore legalmente a OMDARA, e incluir al responsable, sus datos de contacto y cómo se ejercen los derechos ARCO.'; ?>
   <?php require __DIR__ . '/includes/aviso-pendiente.php'; ?>

@@ -30,13 +30,23 @@ iconos están puestos y maquetados, con `aria-label` y `rel="nofollow"`; solo el
 
 ---
 
-### 2. Texto legal: Términos, Privacidad y Cookies
+### 2. Texto legal: Privacidad y Cookies
 
-**Qué falta:** el texto de las tres páginas legales.
+**Qué falta:** el texto de **dos** de las tres páginas legales.
 
-**Dónde:** `terminos-y-condiciones.php`, `aviso-de-privacidad.php` y
-`politica-de-cookies.php`. Las tres existen, están enlazadas desde el pie y en
-el sitemap, y muestran un aviso de contenido pendiente.
+**Los Términos y Condiciones ya están** (REQ-00014): once cláusulas, con
+jurisdicción en La Paz, Baja California Sur, y su fecha de última actualización.
+Quedan `aviso-de-privacidad.php` y `politica-de-cookies.php`, que siguen con el
+aviso de contenido pendiente.
+
+> **Dos cosas que los Términos no dicen y el sitio sí hace.** No es un error del
+> documento —puede ser deliberado—, pero conviene que lo mire quien asesora:
+> el plazo de **24 horas** para corregir una actividad publicada, pasado el cual
+> se congela; y que la moderación es **posterior**, no previa. Las dos son reglas
+> que obligan a los organizadores y que hoy solo constan en las preguntas
+> frecuentes y en «¿Cómo funciona?».
+
+**Dónde:** `aviso-de-privacidad.php` y `politica-de-cookies.php`.
 
 **No lo redacta quien programa.** Obliga a la empresa frente a organizadores y
 asistentes, y un texto copiado de otra web describe un servicio que no es este.
@@ -60,11 +70,12 @@ borrar el `require` de `includes/aviso-pendiente.php`.
 > pendiente. Pedir que acepten algo que no está escrito es peor que no pedirlo.
 > **Es el pendiente más urgente de esta lista.**
 >
-> Con REQ-00008 son dos sitios y el segundo es peor: **nadie puede crear cuenta
-> sin aceptar los Términos y el Aviso**, y los dos documentos están vacíos. La
-> fecha de aceptación sí queda guardada, así que el día que se escriba el texto
-> habrá constancia de quién aceptó *algo* —pero no de qué—. Cuanto antes se
-> redacten, menos gente habrá aceptado una página en blanco.
+> Con REQ-00008 son dos sitios: **nadie puede crear cuenta sin aceptar los
+> Términos y el Aviso**. Los Términos ya están escritos; el Aviso no. La
+> fecha de aceptación sí queda guardada, y los Términos ya llevan la suya
+> —«14 Agosto, 2026»—, así que ese par ya sirve para saber qué versión aceptó
+> alguien. Con el Aviso todavía no: cuanto antes se redacte, menos gente habrá
+> aceptado una página en blanco.
 
 ---
 

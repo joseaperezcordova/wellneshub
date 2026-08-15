@@ -42,13 +42,8 @@ function filaCookie(string $nombre, string $proveedor, string $finalidad, string
 }
 ?>
 
-<section class="wrap block">
-  <div class="block-head">
-    <div>
-      <div class="eyebrow">Legal</div>
-      <h2 style="margin-top:6px;">Política de Cookies</h2>
-    </div>
-  </div>
+<section class="wrap block legal">
+  <?php $legalTitulo = 'Política de Cookies'; require __DIR__ . '/includes/legal-cabecera.php'; ?>
 
   <?php $avisoPendiente = 'La redacción legal debe revisarla quien asesore legalmente a OMDARA. El inventario de cookies de abajo sí es definitivo: sale del código.'; ?>
   <?php require __DIR__ . '/includes/aviso-pendiente.php'; ?>
