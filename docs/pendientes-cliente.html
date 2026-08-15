@@ -1,0 +1,504 @@
+<title>Qué falta en OMDARA</title>
+
+<style>
+  /* ---- Paleta OMDARA. No se inventan colores: son los ocho de la marca. ---- */
+  :root{
+    --ground:#F7F5EF;      /* crema */
+    --surface:#FFFFFF;
+    --fill:#DCE8DD;        /* salvia, para los fondos tranquilos */
+    --ink:#20332D;
+    --muted:#65736D;
+    --forest:#1F4639;
+    --accent:#2068BE;      /* el azul, en su tono legible sobre claro */
+    --rule:#D5DED7;
+    --rule-soft:#E6EAE4;
+
+    --bloquea:#B85450;
+    --importante:#8A6A1F;
+    --cuando:#4F7D4A;
+
+    --paso:2.5rem;
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#151D19;
+      --surface:#1B241F;
+      --fill:#243128;
+      --ink:#E7EDE8;
+      --muted:#94A39C;
+      --forest:#BBD3C0;
+      --accent:#7FB2F2;
+      --rule:#2E3C34;
+      --rule-soft:#26332C;
+
+      --bloquea:#E8918D;
+      --importante:#D8B461;
+      --cuando:#8FC488;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#151D19;
+    --surface:#1B241F;
+    --fill:#243128;
+    --ink:#E7EDE8;
+    --muted:#94A39C;
+    --forest:#BBD3C0;
+    --accent:#7FB2F2;
+    --rule:#2E3C34;
+    --rule-soft:#26332C;
+
+    --bloquea:#E8918D;
+    --importante:#D8B461;
+    --cuando:#8FC488;
+  }
+
+  /* ---- Tipografía. Sin fuentes externas: el visor las bloquea y una fuente
+         que no carga es peor que una pila del sistema bien elegida. ---- */
+  html{ -webkit-text-size-adjust:100%; }
+
+  body{
+    margin:0;
+    background:var(--ground);
+    color:var(--ink);
+    font-family:ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size:17px;
+    line-height:1.65;
+  }
+
+  .mono{
+    font-family:ui-monospace, "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
+    font-size:.7rem;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+  }
+
+  .hoja{
+    max-width:41rem;
+    margin:0 auto;
+    padding:clamp(2rem, 6vw, 4.5rem) clamp(1.15rem, 5vw, 2rem) 5rem;
+  }
+
+  /* ---- Cabecera ---- */
+  .cab{ border-bottom:2px solid var(--forest); padding-bottom:1.5rem; }
+  .cab .marca{ color:var(--muted); display:block; margin-bottom:1.1rem; }
+  .cab h1{
+    font-size:clamp(2rem, 6vw, 2.9rem);
+    line-height:1.08;
+    letter-spacing:-.022em;
+    font-weight:600;
+    margin:0;
+    text-wrap:balance;
+    color:var(--forest);
+  }
+  .cab .fecha{ color:var(--muted); font-size:.95rem; margin:.9rem 0 0; }
+
+  .intro{ margin:2rem 0 0; }
+  .intro p{ margin:0 0 1rem; }
+  .intro p:last-child{ margin-bottom:0; }
+  .intro strong{ font-weight:600; }
+
+  /* ---- Resumen de tres cifras ---- */
+  .resumen{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(9rem, 1fr));
+    gap:1px;
+    background:var(--rule);
+    border:1px solid var(--rule);
+    margin:2.5rem 0 0;
+  }
+  .resumen div{ background:var(--ground); padding:1.1rem 1.15rem 1.25rem; }
+  .resumen .n{
+    font-size:2.1rem;
+    font-weight:600;
+    line-height:1;
+    letter-spacing:-.03em;
+    font-variant-numeric:tabular-nums;
+    color:var(--forest);
+    display:block;
+    margin-bottom:.5rem;
+  }
+  .resumen .q{ color:var(--muted); font-size:.9rem; line-height:1.4; }
+
+  /* ---- Aviso destacado ---- */
+  .aviso{
+    background:var(--fill);
+    border-left:3px solid var(--forest);
+    padding:1.15rem 1.3rem;
+    margin:2.5rem 0 0;
+    font-size:.98rem;
+  }
+  .aviso p{ margin:0 0 .7rem; }
+  .aviso p:last-child{ margin-bottom:0; }
+  .aviso .titulo{ font-weight:600; color:var(--forest); }
+
+  /* ---- Secciones ---- */
+  .seccion{ margin-top:var(--paso); }
+  .seccion > header{
+    border-bottom:1px solid var(--forest);
+    padding-bottom:.55rem;
+    margin-bottom:.5rem;
+  }
+  .seccion > header h2{
+    font-size:1.28rem;
+    font-weight:600;
+    letter-spacing:-.012em;
+    margin:0;
+    color:var(--forest);
+    text-wrap:balance;
+  }
+  .seccion > header .quien{ color:var(--muted); display:block; margin-bottom:.55rem; }
+  .seccion > .resumen-seccion{ color:var(--muted); font-size:.95rem; margin:.9rem 0 0; }
+
+  /* ---- Un punto de la lista. Sin tarjetas: filetes y aire. ---- */
+  .punto{ padding:1.7rem 0; border-bottom:1px solid var(--rule-soft); }
+  .punto:last-child{ border-bottom:none; padding-bottom:.5rem; }
+
+  .estado{ display:block; margin-bottom:.5rem; }
+  .estado.b{ color:var(--bloquea); }
+  .estado.i{ color:var(--importante); }
+  .estado.c{ color:var(--cuando); }
+
+  .punto h3{
+    font-size:1.1rem;
+    font-weight:600;
+    line-height:1.35;
+    margin:0 0 .75rem;
+    letter-spacing:-.008em;
+    text-wrap:balance;
+  }
+  .punto p{ margin:0 0 .8rem; }
+  .punto p:last-child{ margin-bottom:0; }
+  .punto ul{ margin:0 0 .8rem; padding-left:1.15rem; }
+  .punto li{ margin-bottom:.35rem; }
+  .punto li:last-child{ margin-bottom:0; }
+
+  .rotulo{
+    font-weight:600;
+    color:var(--forest);
+  }
+
+  /* La petición concreta: lo único que el cliente tiene que hacer. */
+  .pide{
+    background:var(--surface);
+    border:1px solid var(--rule);
+    padding:.85rem 1rem;
+    margin-top:1rem;
+    font-size:.95rem;
+  }
+  .pide .rotulo{ display:block; margin-bottom:.2rem; }
+
+  .nota{ color:var(--muted); font-size:.93rem; }
+
+  a{ color:var(--accent); text-underline-offset:2px; }
+  a:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  .pie{
+    margin-top:3.5rem;
+    padding-top:1.4rem;
+    border-top:1px solid var(--rule);
+    color:var(--muted);
+    font-size:.92rem;
+  }
+  .pie p{ margin:0 0 .6rem; }
+  .pie p:last-child{ margin-bottom:0; }
+
+  @media (prefers-reduced-motion:no-preference){
+    a{ transition:color .15s ease; }
+  }
+</style>
+
+<div class="hoja">
+
+  <header class="cab">
+    <span class="marca mono">OMDARA · Estado del proyecto</span>
+    <h1>Qué falta en OMDARA</h1>
+    <p class="fecha">15 de agosto de 2026</p>
+  </header>
+
+  <div class="intro">
+    <p>Esta lista recoge <strong>lo que no puede avanzar sin una respuesta o un dato de
+      OMDARA</strong>, y lo que queda por hacer de nuestro lado. En todos los casos el
+      trabajo de programación ya está hecho: lo que falta es un texto, una dirección de
+      correo o una decisión.</p>
+    <p>No entran aquí las funciones que sencillamente todavía no se han pedido. Para
+      eso están los requerimientos.</p>
+  </div>
+
+  <div class="resumen">
+    <div>
+      <span class="n">3</span>
+      <span class="q">datos o textos que esperamos de ustedes</span>
+    </div>
+    <div>
+      <span class="n">8</span>
+      <span class="q">decisiones de producto por tomar</span>
+    </div>
+    <div>
+      <span class="n">4</span>
+      <span class="q">asuntos técnicos de nuestro lado</span>
+    </div>
+  </div>
+
+  <div class="aviso">
+    <p><span class="titulo">Lo único que hoy impide pasar a producción</span></p>
+    <p>La versión en inglés está a medias: la navegación, los botones y los formularios ya
+      están traducidos, pero el contenido de las páginas sigue en español. El propio
+      requerimiento prohíbe publicar una traducción parcial, así que el sitio vive en el
+      entorno de pruebas hasta que se cierren los textos en inglés.</p>
+    <p>Todo lo demás de esta lista se puede cerrar con el sitio ya publicado.</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <section class="seccion">
+    <header>
+      <span class="quien mono">Lo necesitamos de ustedes</span>
+      <h2>Datos y textos que faltan</h2>
+    </header>
+    <p class="resumen-seccion">Tres huecos. Los tres están preparados en el sitio: en
+      cuanto llegue el dato, aparece solo.</p>
+
+    <div class="punto">
+      <span class="estado mono b">Bloquea · dos documentos legales</span>
+      <h3>Un correo de contacto público</h3>
+      <p>Hace falta una dirección que lea alguien, para publicarla en las páginas legales.
+        Dos de los tres documentos ya aprobados la piden y ninguno la da:</p>
+      <ul>
+        <li>El <strong>Aviso de Privacidad</strong> manda ejercer los derechos de acceso y
+          cancelación de datos «enviando una solicitud al correo electrónico de contacto de
+          omdara».</li>
+        <li>La <strong>Política de Cookies</strong> deja el hueco escrito con todas las
+          letras: <em>[correo de omdara]</em>.</li>
+      </ul>
+      <p><span class="rotulo">Mientras tanto:</span> el sitio ofrece el formulario de
+        contacto, que sí llega a los administradores. Lo que no hace es publicar el buzón
+        automático de «no responder»: una dirección que nadie lee, impresa en un documento
+        que promete atender consultas, es peor que no poner ninguna.</p>
+      <div class="pide">
+        <span class="rotulo mono">Qué necesitamos</span>
+        Una dirección de correo del dominio principal, con buzón creado y alguien detrás.
+        No hace falta tocar el código: en cuanto exista, las dos páginas la imprimen.
+      </div>
+    </div>
+
+    <div class="punto">
+      <span class="estado mono i">Importante · se ve en todas las páginas</span>
+      <h3>Las direcciones de Instagram, Facebook y WhatsApp</h3>
+      <p>Los tres iconos ya están en el pie de página, maquetados y accesibles, pero no
+        llevan a ninguna parte: el enlace está vacío a la espera de las direcciones
+        definitivas.</p>
+      <div class="pide">
+        <span class="rotulo mono">Qué necesitamos</span>
+        La dirección de cada uno de los tres perfiles.
+      </div>
+    </div>
+
+    <div class="punto">
+      <span class="estado mono b">Bloquea · el paso a producción</span>
+      <h3>Los textos en inglés y las descripciones para buscadores</h3>
+      <p>La base bilingüe está construida: cada página tiene su dirección en los dos
+        idiomas, el selector conserva la página al cambiar de idioma y los buscadores ya
+        saben qué versión es cuál. Lo traducido hoy es la interfaz —menús, botones,
+        etiquetas—; falta el contenido.</p>
+      <p>Queda pendiente, por orden: portada y buscador, el formulario para publicar una
+        actividad, la ficha y los correos, y por último el contenido que escriben los
+        propios organizadores.</p>
+      <p class="nota">Las 23 categorías son un caso aparte y muy barato: basta con dar su
+        nombre en inglés, sin tocar ninguna actividad ya publicada.</p>
+      <div class="pide">
+        <span class="rotulo mono">Qué necesitamos</span>
+        Los textos definitivos en inglés y las descripciones para buscadores de cada
+        página, más el lema de la marca.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="seccion">
+    <header>
+      <span class="quien mono">Esperan una decisión</span>
+      <h2>Decisiones de producto</h2>
+    </header>
+    <p class="resumen-seccion">Ninguna bloquea el funcionamiento del sitio. Las dos
+      primeras tienen consecuencias legales y conviene resolverlas pronto.</p>
+
+    <div class="punto">
+      <span class="estado mono b">Legal · conviene revisarlo</span>
+      <h3>El Aviso de Privacidad cubre menos de lo que el sitio hace</h3>
+      <p>El texto aprobado describe los datos del formulario «Contactar Organizador». El
+        sitio, además, guarda el correo de quien se registra, su identificador de Google,
+        los códigos de acceso, direcciones IP para frenar envíos repetidos, los datos del
+        formulario de contacto general y, si el visitante lo acepta, información de
+        navegación que reciben Google, Microsoft y Meta.</p>
+      <p>Hay tres detalles más que conviene mirar: el documento liga el consentimiento
+        únicamente al formulario de contacto, aunque también hay que aceptarlo para crear
+        una cuenta; no dice a qué dirección escribir para ejercer los derechos sobre los
+        datos; y no identifica al responsable con nombre y domicilio, que es lo que pide la
+        ley mexicana.</p>
+      <p><span class="rotulo">Por qué está así:</span> el requerimiento pedía publicar el
+        contenido «completo y sin modificaciones». No hemos cambiado ni una coma. Esto no
+        es una corrección, es la lista para que la revise quien asesora legalmente.</p>
+      <div class="pide">
+        <span class="rotulo mono">Qué hay que decidir</span>
+        Si el Aviso se amplía. Si se amplía, hay que actualizar también su fecha: es lo
+        que permite saber qué versión aceptó cada persona.
+      </div>
+    </div>
+
+    <div class="punto">
+      <span class="estado mono i">Afecta a dos páginas públicas</span>
+      <h3>¿Se revisan las actividades antes de publicarse?</h3>
+      <p>Las preguntas frecuentes y la página «¿Cómo funciona?» llegaron describiendo una
+        cola de aprobación de 24 a 72 horas. <strong>El sitio no funciona así:</strong> la
+        actividad se publica en el momento en que su autor le da a publicar, y la
+        moderación es posterior — alguien reporta, un administrador revisa y, si procede,
+        la oculta.</p>
+      <p>Reescribimos esas respuestas para que digan lo que ocurre de verdad. Publicarlas
+        tal cual habría dejado a los organizadores esperando un correo de aprobación que no
+        llega, y a los visitantes creyendo que alguien comprobó lo que están leyendo.</p>
+      <div class="pide">
+        <span class="rotulo mono">Qué hay que decidir</span>
+        O confirman que no habrá revisión previa —y entonces no hay nada que hacer—, o se
+        pide como requerimiento nuevo y se recupera la redacción original.
+      </div>
+    </div>
+
+    <div class="punto">
+      <span class="estado mono i">Legal · posible omisión</span>
+      <h3>Dos reglas que el sitio aplica y los Términos no mencionan</h3>
+      <p>Un organizador tiene <strong>24 horas</strong> para corregir una actividad ya
+        publicada; pasado ese plazo queda congelada. Y la moderación es posterior, no
+        previa. Las dos obligan a los organizadores y hoy solo aparecen en las preguntas
+        frecuentes.</p>
+      <p class="nota">Puede ser deliberado. Lo señalamos para que lo vea quien asesora
+        legalmente, no para cambiarlo por nuestra cuenta.</p>
+      <div class="pide">
+        <span class="rotulo mono">Qué hay que decidir</span>
+        Si esas dos reglas deben constar en los Términos y Condiciones.
+      </div>
+    </div>
+
+    <div class="punto">
+      <span class="estado mono c">Cuando se decida</span>
+      <h3>¿Se muestran los datos de contacto del organizador?</h3>
+      <p>El Instagram, el WhatsApp y el sitio web del organizador se guardan en su cuenta y
+        se reutilizan al publicar, pero <strong>no aparecen en ninguna parte del sitio
+        público</strong>. Se hizo así porque el requerimiento solo pedía guardarlos, y otro
+        dice expresamente que esa sección no crea un perfil público.</p>
+      <p>Si la intención era mostrarlos, es un requerimiento aparte: hay que decidir cuáles
+        se publican, con qué aviso a quien los escribe, y qué pasa con las actividades ya
+        publicadas de organizadores que nunca aceptaron que su número saliera.</p>
+    </div>
+
+    <div class="punto">
+      <span class="estado mono c">Cuando se decida</span>
+      <h3>El logotipo y el subtítulo de la marca</h3>
+      <p>El logotipo actual es una rueda de cuatro cuartos, heredada de cuando el proyecto
+        se llamaba <em>Rueda</em>. Con OMDARA el motivo ya no significa nada. Ajustamos sus
+        colores para que se lea sobre la cabecera verde, pero es un parche, no una
+        identidad.</p>
+      <p>En la misma línea, hay que confirmar si «Directorio wellness MX» sigue siendo el
+        subtítulo definitivo.</p>
+      <div class="pide">
+        <span class="rotulo mono">Qué necesitamos</span>
+        Una marca gráfica, y confirmación del subtítulo.
+      </div>
+    </div>
+
+    <div class="punto">
+      <span class="estado mono c">Cuando se decida</span>
+      <h3>¿«Contactar al organizador» abre en ventana o en página?</h3>
+      <p>Hoy es una página propia, con la tarjeta dibujada tal como la muestra el
+        requerimiento. En una captura de pantalla no se distingue de una ventana flotante;
+        la diferencia es que hay una dirección y una recarga.</p>
+      <p>Se hizo así porque el envío se valida en el servidor, igual que todo lo demás, y
+        además funciona sin JavaScript. Cambiarlo a ventana flotante no obliga a rehacer
+        nada: el mismo formulario se carga dentro de un contenedor.</p>
+    </div>
+
+    <div class="punto">
+      <span class="estado mono c">Cuando se decida</span>
+      <h3>¿El acceso a las preferencias de cookies va también en el pie?</h3>
+      <p>Quien acepta o rechaza cookies puede cambiar de opinión desde la Política de
+        Cookies. Ponerlo también en el pie de todas las páginas es inmediato, pero la
+        estructura del pie está aprobada columna por columna y añadir una entrada es
+        cambiar algo ya acordado.</p>
+    </div>
+
+    <div class="punto">
+      <span class="estado mono c">Cuando haya volumen</span>
+      <h3>El seguimiento de los mensajes de contacto</h3>
+      <p>Los mensajes que llegan por el formulario de contacto se guardan y se pueden leer
+        desde el panel de administración, pero todos se quedan marcados como «Nuevo»: nadie
+        puede pasarlos a «Respondido» o «Cerrado».</p>
+      <p>El propio requerimiento lo acotaba así — «no es necesario crear un sistema completo
+        de tickets para el MVP». Se dejó el campo preparado para no tener que rehacer la
+        base de datos el día que se quiera. Es media hora de trabajo cuando haga falta.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="seccion">
+    <header>
+      <span class="quien mono">De nuestro lado</span>
+      <h2>Trabajo técnico pendiente</h2>
+    </header>
+    <p class="resumen-seccion">No requiere nada de ustedes. Se listan para que la
+      fotografía esté completa.</p>
+
+    <div class="punto">
+      <span class="estado mono b">Pendiente de aplicar</span>
+      <h3>Cinco actualizaciones de la base de datos</h3>
+      <p>El hosting no permite automatizarlas, así que se ejecutan a mano en los dos
+        entornos. El código está escrito para funcionar <em>antes y después</em> de
+        aplicarlas: si falta alguna, el dato no se guarda pero nada se rompe.</p>
+      <p><span class="rotulo">La más urgente</span> es la que registra la fecha en que cada
+        persona aceptó los Términos y el Aviso de Privacidad. Hoy la aceptación se exige
+        —nadie crea cuenta sin marcarla— pero la fecha no queda guardada, y esa fecha es la
+        prueba. Las otras cuatro guardan el teléfono en los mensajes al organizador, los
+        datos de contacto de la cuenta, y el motivo y el estado de los mensajes.</p>
+    </div>
+
+    <div class="punto">
+      <span class="estado mono i">Falta el flujo completo</span>
+      <h3>Cambiar el correo desde «Mi cuenta»</h3>
+      <p>El correo se muestra pero no se puede editar, y la página explica por qué. Aquí no
+        hay contraseñas: <strong>el correo es la credencial</strong>, y el código de acceso
+        llega a ese buzón. Un cambio sin verificar antes el buzón nuevo dejaría a esa
+        persona fuera de su cuenta para siempre, sin forma de recuperarla. Basta un dedazo.</p>
+      <p>Lo que falta no es una validación, es un flujo entero: comprobar que el correo
+        nuevo no tiene cuenta, enviar un código a ese buzón, aplicar el cambio solo al
+        confirmarlo y avisar al correo anterior por si no fue su dueño quien lo pidió.</p>
+    </div>
+
+    <div class="punto">
+      <span class="estado mono c">Al encender la analítica</span>
+      <h3>Comprobar las cookies reales</h3>
+      <p>La Política de Cookies lleva un anexo con las cookies que se han identificado. Las
+        dos que pone OMDARA son seguras; las de Google, Microsoft y Meta salen de la
+        documentación de cada proveedor, y el conjunto real depende de cómo quede
+        configurada cada herramienta.</p>
+      <p>Está marcado como provisional dentro de la propia página, y el texto legal no
+        depende de esa tabla. Se comprobará con las tres herramientas encendidas y tráfico
+        real.</p>
+    </div>
+
+    <div class="punto">
+      <span class="estado mono c">Limpieza interna</span>
+      <h3>Dos tareas de mantenimiento sin efecto visible</h3>
+      <p>Los nombres internos de algunos colores quedaron de la paleta anterior y conviene
+        renombrarlos en un cambio aislado, sin tocar ningún valor. Y las direcciones
+        antiguas de algunas páginas siguen respondiendo además de las nuevas; los buscadores
+        ya saben cuál es la buena, pero lo limpio es que redirijan.</p>
+    </div>
+  </section>
+
+  <footer class="pie">
+    <p>Documento de estado del proyecto OMDARA. Refleja la situación al cierre del
+      requerimiento REQ-00016 (Política de Cookies).</p>
+    <p>Cada punto indica qué falta, qué ocurre mientras tanto y qué hace falta para
+      cerrarlo, de modo que resolverlo sea aportar un dato y no volver a investigar dónde
+      iba.</p>
+  </footer>
+
+</div>
