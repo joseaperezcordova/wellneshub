@@ -69,6 +69,33 @@ return [
     'pagina.cookies.meta'         => 'Qué cookies usa OMDARA, para qué sirven y cómo desactivarlas.',
     'pagina.404.titulo'           => 'Página no encontrada',
 
+    // ---- Consentimiento de cookies (REQ-00003) ----
+    // El requerimiento escribe la marca en minúsculas; aquí va OMDARA, que es
+    // como se escribe en el resto del sitio. Un banner que llama a la marca de
+    // otra forma parece de otro sitio, que es justo lo contrario de lo que
+    // tiene que transmitir el primer aviso que alguien ve.
+    'cookies.banner.titulo' => 'Usamos cookies',
+    'cookies.banner.texto'  => 'Utilizamos cookies y tecnologías similares para que OMDARA funcione correctamente, analizar cómo se utiliza la plataforma y, cuando corresponda, medir nuestras campañas de marketing. Puedes aceptar todas, rechazar las no necesarias o configurar tus preferencias.',
+    'cookies.aceptar'       => 'Aceptar todas',
+    'cookies.rechazar'      => 'Rechazar no necesarias',
+    'cookies.configurar'    => 'Configurar preferencias',
+    'cookies.cerrar'        => 'Cerrar',
+
+    'cookies.panel.titulo'        => 'Preferencias de cookies',
+    'cookies.necesarias.titulo'   => 'Necesarias',
+    'cookies.necesarias.estado'   => 'Siempre activas',
+    'cookies.necesarias.texto'    => 'Son necesarias para el funcionamiento de OMDARA.',
+    'cookies.analiticas.titulo'   => 'Analíticas',
+    'cookies.analiticas.texto'    => 'Nos ayudan a entender cómo se utiliza OMDARA y mejorar la plataforma.',
+    'cookies.marketing.titulo'    => 'Marketing',
+    'cookies.marketing.texto'     => 'Nos permiten medir campañas publicitarias y mejorar nuestras acciones de marketing.',
+    'cookies.incluye'             => 'Incluye:',
+    'cookies.activadas'           => 'Activadas',
+    'cookies.desactivadas'        => 'Desactivadas',
+    'cookies.guardar'             => 'Guardar preferencias',
+    'cookies.politica'            => 'Leer la Política de Cookies',
+    'cookies.abrir_preferencias'  => 'Cambiar mis preferencias de cookies',
+
     // ---- Aviso de contenido pendiente ----
     'pendiente.titulo' => 'Contenido pendiente.',
     'pendiente.texto'  => 'Esta página ya está publicada y enlazada desde el pie, pero su texto todavía no está escrito.',

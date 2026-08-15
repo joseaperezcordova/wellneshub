@@ -122,9 +122,20 @@ return [
     // ---- Analítica -----------------------------------------------------
     // Las cuatro llaves de abajo son independientes: cada una enciende su
     // propia herramienta si tiene algo puesto, y no hace nada si está vacía.
-    // includes/layout.php no imprime NINGÚN script de analítica en local
-    // —ni con los IDs puestos—, para que probar el sitio en la máquina de
-    // quien programa no ensucie los datos reales.
+    // No se carga NINGUNA en local —ni con los IDs puestos—, para que probar
+    // el sitio en la máquina de quien programa no ensucie los datos reales.
+    //
+    // OJO: tener el ID puesto ya no significa que la herramienta se cargue.
+    // Desde REQ-00003 hay consentimiento de cookies, y GA4, Clarity y el
+    // píxel de Meta solo arrancan si el visitante acepta su categoría
+    // (analíticas las dos primeras, marketing el píxel). Un ID sin
+    // consentimiento no mide nada, y eso es lo correcto.
+    //
+    // Corolario práctico: el banner solo aparece si hay al menos una
+    // herramienta configurada. Sin IDs, el sitio solo pone la cookie de
+    // sesión —que es necesaria y no requiere permiso—, así que un aviso ahí
+    // no protegería a nadie: solo acostumbraría a la gente a aceptar sin
+    // leer. Para revisar el diálogo sin IDs, usa 'probar_consentimiento'.
     //
     // Los IDs no están atados al dominio: siguen funcionando igual el día
     // que el sitio se mude del subdominio de pruebas al dominio final, sin
@@ -156,6 +167,15 @@ return [
         // Google. Si tienes acceso al DNS del subdominio, es la mejor
         // opción; si no, esta etiqueta funciona igual de bien.
         'search_console_verificacion' => '',
+
+        // Solo para revisar el banner y el panel de preferencias cuando
+        // todavía no hay ningún ID puesto —o estás en local—. Enciende el
+        // diálogo, no las herramientas: no hay nada que cargar.
+        //
+        // Déjalo en false en producción. Un aviso de cookies que no controla
+        // ninguna cookie es ruido, y peor: entrena a la gente a darle a
+        // "aceptar" sin mirar.
+        'probar_consentimiento' => false,
     ],
 
 ];

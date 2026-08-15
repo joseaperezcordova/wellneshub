@@ -135,16 +135,42 @@ líneas de renombrado, sin forma de revisar una cosa sin la otra.
 
 ---
 
-### 6. Analítica sin consentimiento
+### 6. Las duraciones de las cookies están declaradas, no comprobadas
 
-**Qué pasa:** los scripts de GA4, Clarity y Meta Pixel se cargan sin pedir
-permiso.
+**Qué falta:** ver con las tres herramientas encendidas en producción qué
+cookies ponen de verdad, y con qué duración.
 
-**Hoy es defendible** porque el sitio mira a México. Deja de serlo en cuanto
-haya visitantes de la UE: ahí hace falta un banner que los bloquee hasta que
-alguien acepte.
+**Dónde:** `politica-de-cookies.php`, las tres tablas.
 
-**Dónde:** `includes/layout.php`, donde se imprimen los scripts de analítica.
+**De dónde sale lo que hay hoy:** de la documentación de Google, Microsoft y
+Meta. Es lo más honesto que se puede afirmar antes de tener las tres activas con
+tráfico real, y cubre el criterio de REQ-00003 —nombre, proveedor, finalidad,
+duración y categoría— pero no es todavía «las cookies efectivamente generadas».
+
+**Para cerrarlo:** en producción, con las tres configuradas, aceptar todo y
+abrir las herramientas de desarrollo → Application → Cookies. Comparar nombre y
+caducidad con la tabla y corregir lo que no coincida. Dos cosas que suelen
+diferir: `_gcl_au` solo aparece si la cuenta se enlaza con Google Ads, y el
+sufijo real de `_ga_<ID>` no se sabe hasta ver el flujo de datos.
+
+> Ojo con probarlo en pruebas: hoy los IDs de analítica solo están puestos en
+> un entorno. Donde no hay IDs no hay banner, y no es un fallo — es lo que
+> hace `hayQueConsentir()`.
+
+---
+
+### 8. El acceso a las preferencias de cookies vive solo en la Política
+
+**Qué falta:** decidir si el enlace para reabrir el panel va también en el pie.
+
+**Dónde:** hoy está en `politica-de-cookies.php`, como botón. Ponerlo en el pie
+es un `<button data-cookies="configurar">` en la columna «Legal» de
+`includes/layout.php`: el script ya escucha ese atributo en toda la página, así
+que no hace falta nada más.
+
+**Por qué no se puso ya:** REQ-00001 fija la estructura del pie columna por
+columna, y añadir una entrada que no está en ese requerimiento es cambiar algo
+que ya se aprobó. Es una línea el día que producto lo pida.
 
 ---
 

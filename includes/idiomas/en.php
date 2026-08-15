@@ -74,6 +74,35 @@ return [
     'pagina.cookies.titulo'       => 'Cookie Policy',
     'pagina.404.titulo'           => 'Page not found',
 
+    // ---- Consentimiento de cookies (REQ-00003) ----
+    // Sí se traduce, aunque roce lo legal: es lo PRIMERO que ve quien entra, y
+    // un aviso en español en la versión inglesa deja a esa persona decidiendo
+    // sobre sus datos en un idioma que no eligió. El texto describe lo que hace
+    // el sitio —no promete nada ni fija condiciones—, así que traducirlo no
+    // inventa obligaciones. La redacción legal larga sigue en la Política de
+    // Cookies, y esa sí la entrega producto.
+    'cookies.banner.titulo' => 'We use cookies',
+    'cookies.banner.texto'  => 'We use cookies and similar technologies to keep OMDARA working properly, to analyse how the platform is used and, where applicable, to measure our marketing campaigns. You can accept all, reject non-essential ones, or set your preferences.',
+    'cookies.aceptar'       => 'Accept all',
+    'cookies.rechazar'      => 'Reject non-essential',
+    'cookies.configurar'    => 'Set preferences',
+    'cookies.cerrar'        => 'Close',
+
+    'cookies.panel.titulo'        => 'Cookie preferences',
+    'cookies.necesarias.titulo'   => 'Essential',
+    'cookies.necesarias.estado'   => 'Always on',
+    'cookies.necesarias.texto'    => 'They are required for OMDARA to work.',
+    'cookies.analiticas.titulo'   => 'Analytics',
+    'cookies.analiticas.texto'    => 'They help us understand how OMDARA is used and improve the platform.',
+    'cookies.marketing.titulo'    => 'Marketing',
+    'cookies.marketing.texto'     => 'They let us measure advertising campaigns and improve our marketing.',
+    'cookies.incluye'             => 'Includes:',
+    'cookies.activadas'           => 'On',
+    'cookies.desactivadas'        => 'Off',
+    'cookies.guardar'             => 'Save preferences',
+    'cookies.politica'            => 'Read the Cookie Policy',
+    'cookies.abrir_preferencias'  => 'Change my cookie preferences',
+
     // ---- Aviso de contenido pendiente ----
     'pendiente.titulo' => 'Content pending.',
     'pendiente.texto'  => 'This page is already published and linked from the footer, but its text has not been written yet.',

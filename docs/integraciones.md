@@ -47,17 +47,47 @@ archivo de ejemplo explica, clave por clave, dónde sacar cada ID
 (`analytics.google.com`, `clarity.microsoft.com`,
 `business.facebook.com`, `search.google.com/search-console`).
 
-**Nunca se activan en local:** `includes/layout.php` no imprime ningún
-script de analítica cuando la petición viene de `localhost`/`127.0.0.1`,
-tengan o no las claves puestas — así probar el sitio en la máquina de quien
-programa nunca ensucia los datos reales.
+**Nunca se activan en local:** `herramientasAnalitica()` devuelve la lista
+vacía cuando la petición viene de `localhost`/`127.0.0.1`, tengan o no las
+claves puestas — así probar el sitio en la máquina de quien programa nunca
+ensucia los datos reales.
+
+**Ninguna se carga sin consentimiento (REQ-00003).** Tener el ID puesto ya no
+basta. El HTML no lleva ningún script de las tres: solo los IDs y a qué
+categoría pertenece cada uno. Quien los enciende es
+`assets/js/consentimiento.js`, después de leer la respuesta guardada en la
+cookie `omdara_cookies`.
+
+- **analíticas** → Google Analytics 4, Microsoft Clarity
+- **marketing** → Meta Pixel
+
+La puerta está en el navegador y no en PHP a propósito: la respuesta se da en
+la propia página, así que un gate de servidor no encendería nada hasta la
+siguiente visita. `includes/consentimiento.php` lo explica entero.
+
+**El banner solo aparece si hay algo que consentir.** Sin ningún ID
+configurado, el sitio solo pone la cookie de sesión —necesaria, sin permiso— y
+mostrar un aviso ahí sería ruido. Para revisar el diálogo sin IDs:
+`analytics.probar_consentimiento => true`.
+
+**Retirar el permiso** borra las cookies del propio dominio (`_ga*`, `_clck`,
+`_clsk`, `_fbp`, `_fbc`) y recarga la página. Las que Meta y Microsoft ponen en
+los suyos —`fr`, `CLID`, `MUID`— no se pueden tocar desde aquí; la Política de
+Cookies lo dice y remite al navegador.
+
+**El orden de carga importa.** `consentimiento.js` va en el `<head>` y sin
+`defer`: si ya hay respuesta guardada, las herramientas permitidas tienen que
+arrancar antes de que el principio del `<body>` dispare los `whTrack()` que
+vienen de una redirección (publicar, editar). Cargado al final, esos eventos se
+perderían en silencio.
 
 **Eventos propios:** `window.whTrack(nombre, params)` (definido en
 `layout.php`) es el único punto de entrada para todo evento que dispara el
 resto del sitio — `evento.php`, `buscar.js`, `contacto.php`, `auth.php`,
 etc. Reparte a las tres plataformas a la vez, cada una detrás de su propio
 `typeof`: si solo GA4 está activo, las líneas de `fbq`/`clarity` simplemente
-no hacen nada.
+no hacen nada. Ese mismo `typeof` es lo que hace que sin consentimiento no haga
+nada en absoluto, sin que quien lo llama tenga que preguntar por el permiso.
 
 **Estado real (ver el checklist de seguimiento del alcance para el detalle
 completo):** GA4, Search Console y Clarity están en vivo desde julio de

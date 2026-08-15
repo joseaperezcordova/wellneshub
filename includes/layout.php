@@ -135,62 +135,32 @@ $fuentesUrl = 'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@
 <link rel="stylesheet" href="<?= e(assetUrl('assets/css/portada.css')) ?>">
 <?php
 /*
- * Analítica: GA4, Microsoft Clarity y Meta Pixel, cada una con su propia
- * llave en config.local.php y su propio candado — solo se imprime si tiene
- * ID puesto Y fuera de localhost/127.0.0.1. En local nunca hay analítica,
- * ni con los IDs puestos, para que probar el sitio en la máquina de quien
- * programa no ensucie los datos reales. Ver includes/config.local.example.php
- * para dónde se ponen los IDs y por qué es seguro tenerlos ya, antes del
- * dominio final.
+ * Analítica: GA4, Microsoft Clarity y Meta Pixel.
  *
- * whTrack() es el único punto de entrada para los eventos propios del resto
- * del sitio (evento.php, buscar.js, etc.) y reparte a las tres a la vez. Cada
- * comprobación typeof es independiente: si solo GA4 está activo, fbq y
- * clarity() simplemente no existen y esas dos líneas no hacen nada, sin que
- * whTrack() tenga que saber cuáles de las tres están encendidas.
+ * AQUÍ YA NO SE CARGA NINGUNA (REQ-00003). Lo único que sale al HTML son los
+ * IDs y a qué categoría pertenece cada herramienta; quien las enciende es
+ * assets/js/consentimiento.js, y solo después de que alguien haya aceptado esa
+ * categoría. includes/consentimiento.php explica por qué la puerta está en el
+ * navegador y no aquí.
+ *
+ * herramientasAnalitica() se queda con el candado de siempre: una herramienta
+ * sin ID no existe, y en local no hay analítica ni con los IDs puestos, para
+ * que probar el sitio en la máquina de quien programa no ensucie los datos
+ * reales.
+ *
+ * La verificación de Search Console no es una cookie ni rastrea a nadie: es una
+ * etiqueta que Google lee para comprobar que el dominio es tuyo. Va siempre.
+ *
+ * whTrack() es el único punto de entrada para los eventos propios del resto del
+ * sitio (evento.php, buscar.js, etc.) y reparte a las tres a la vez. Cada
+ * comprobación typeof es independiente, así que ahora cumple una segunda
+ * función: sin consentimiento no existe ninguna de las tres y whTrack() no hace
+ * nada, sin que quien lo llama tenga que preguntar por el permiso.
  */
-$ga4Id       = trim((string) ($CONFIG['analytics']['ga4_id'] ?? ''));
-$clarityId   = trim((string) ($CONFIG['analytics']['clarity_id'] ?? ''));
-$metaPixelId = trim((string) ($CONFIG['analytics']['meta_pixel_id'] ?? ''));
-$scVerifica  = trim((string) ($CONFIG['analytics']['search_console_verificacion'] ?? ''));
-$analiticaActiva = empty($CONFIG['es_local']);
+$scVerifica = trim((string) ($CONFIG['analytics']['search_console_verificacion'] ?? ''));
 ?>
 <?php if ($scVerifica !== ''): ?>
 <meta name="google-site-verification" content="<?= e($scVerifica) ?>">
-<?php endif; ?>
-<?php if ($ga4Id !== '' && $analiticaActiva): ?>
-<script async src="https://www.googletagmanager.com/gtag/js?id=<?= e($ga4Id) ?>"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){ dataLayer.push(arguments); }
-  gtag('js', new Date());
-  gtag('config', <?= json_encode($ga4Id) ?>);
-</script>
-<?php endif; ?>
-<?php if ($clarityId !== '' && $analiticaActiva): ?>
-<script>
-  (function(c,l,a,r,i,t,y){
-      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-  })(window, document, "clarity", "script", <?= json_encode($clarityId) ?>);
-</script>
-<?php endif; ?>
-<?php if ($metaPixelId !== '' && $analiticaActiva): ?>
-<script>
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', <?= json_encode($metaPixelId) ?>);
-  fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=<?= e($metaPixelId) ?>&amp;ev=PageView&amp;noscript=1" alt=""></noscript>
 <?php endif; ?>
 <script>
   window.whTrack = function (nombre, params) {
@@ -199,7 +169,19 @@ $analiticaActiva = empty($CONFIG['es_local']);
     if (typeof fbq === 'function')     fbq('trackCustom', nombre, p);
     if (typeof clarity === 'function') clarity('event', nombre);
   };
+  window.OMDARA_COOKIES = <?= json_encode([
+      'cookie'       => CONSENTIMIENTO_COOKIE,
+      'version'      => CONSENTIMIENTO_VERSION,
+      'dias'         => CONSENTIMIENTO_DIAS,
+      'seguro'       => strpos(URL_BASE, 'https://') === 0,
+      'herramientas' => herramientasAnalitica(),
+  ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 </script>
+<?php /* Sin defer y en la cabecera a propósito: si ya hay respuesta guardada,
+         las herramientas permitidas tienen que arrancar ANTES de que el
+         principio del <body> dispare los whTrack() que vienen de una
+         redirección. Cargado al final, esos eventos se perderían en silencio. */ ?>
+<script src="<?= e(assetUrl('assets/js/consentimiento.js')) ?>"></script>
 <?php if (!empty($mapaInteractivo)): ?>
 <!-- El mapa arrastrable de alta/edición: Leaflet + OpenStreetMap, no la API
      de Google (includes/mapa.php explica por qué). Solo entra en las dos
@@ -441,6 +423,11 @@ function pie(): void
     <a href="<?= e(url('contacto')) ?>"><?= et('pie.beta_enlace') ?></a>.
   </div>
 </footer>
+
+<?php /* El banner y el panel de cookies (REQ-00003). Salen ocultos; los enseña
+         assets/js/consentimiento.js. Van fuera del <footer> porque no son parte
+         del pie: se pintan flotando sobre la página. */ ?>
+<?php require __DIR__ . '/cookies-dialogo.php'; ?>
 
 <?php /* La raíz del sitio, para el JavaScript. Los archivos .js son estáticos y
          no pasan por PHP, así que no pueden escribir URL_BASE por su cuenta, y

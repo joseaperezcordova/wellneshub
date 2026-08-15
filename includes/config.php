@@ -116,6 +116,8 @@ require_once __DIR__ . '/idioma.php';
 /* Igual que el anterior: seccionVisible() lo consultan layout.php y la portada,
    así que tiene que estar cargado antes que cualquier plantilla. */
 require_once __DIR__ . '/secciones.php';
+/* Igual: layout.php lo consulta en la cabecera de todas las páginas. */
+require_once __DIR__ . '/consentimiento.php';
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/http.php';
 require_once __DIR__ . '/correo.php';
