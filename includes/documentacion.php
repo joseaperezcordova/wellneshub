@@ -21,6 +21,15 @@ function catalogoDocumentos(): array
     $raiz = dirname(__DIR__);
 
     return [
+        /* Va primero a propósito: es lo único de esta lista que caduca. Los
+           demás documentos describen cómo es el sitio; este dice qué le falta,
+           y un pendiente que nadie ve deja de ser un pendiente. */
+        'pendientes' => [
+            'titulo'      => 'Pendientes',
+            'descripcion' => 'Lo que quedó a medias esperando un dato, un texto o una decisión que no depende de programar.',
+            'archivo'     => $raiz . '/docs/pendientes.md',
+            'tipo'        => 'md',
+        ],
         'readme' => [
             'titulo'      => 'README',
             'descripcion' => 'Visión general: stack, estructura de carpetas, puesta en marcha en local, variables de entorno y despliegue.',

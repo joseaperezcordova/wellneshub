@@ -19,10 +19,25 @@ require __DIR__ . '/includes/eventos.php';
 
 header('Content-Type: application/xml; charset=utf-8');
 
+/*
+ * El listado va con las direcciones limpias —/actividades y no /buscar.php—
+ * porque son las que enlaza el pie. Anunciar una dirección en el sitemap y
+ * enlazar otra que sirve lo mismo es pedirle a Google que decida cuál es la
+ * buena, y a veces elige la que no.
+ *
+ * Las tres legales entran con prioridad baja: tienen que ser encontrables
+ * —Google penaliza no encontrarlas— pero no compiten con las actividades.
+ */
 $paginas = [
-    ['loc' => URL_BASE . '/',            'prioridad' => '1.0', 'frecuencia' => 'daily'],
-    ['loc' => URL_BASE . '/buscar.php',  'prioridad' => '0.8', 'frecuencia' => 'daily'],
-    ['loc' => URL_BASE . '/blog.php',    'prioridad' => '0.4', 'frecuencia' => 'weekly'],
+    ['loc' => URL_BASE . '/',                       'prioridad' => '1.0', 'frecuencia' => 'daily'],
+    ['loc' => URL_BASE . '/actividades',            'prioridad' => '0.8', 'frecuencia' => 'daily'],
+    ['loc' => URL_BASE . '/como-funciona',          'prioridad' => '0.6', 'frecuencia' => 'monthly'],
+    ['loc' => URL_BASE . '/preguntas-frecuentes',   'prioridad' => '0.5', 'frecuencia' => 'monthly'],
+    ['loc' => URL_BASE . '/contacto',               'prioridad' => '0.5', 'frecuencia' => 'monthly'],
+    ['loc' => URL_BASE . '/blog.php',               'prioridad' => '0.4', 'frecuencia' => 'weekly'],
+    ['loc' => URL_BASE . '/terminos-y-condiciones', 'prioridad' => '0.2', 'frecuencia' => 'yearly'],
+    ['loc' => URL_BASE . '/aviso-de-privacidad',    'prioridad' => '0.2', 'frecuencia' => 'yearly'],
+    ['loc' => URL_BASE . '/politica-de-cookies',    'prioridad' => '0.2', 'frecuencia' => 'yearly'],
 ];
 
 $eventos = eventosPublicadosParaSitemap();

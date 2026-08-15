@@ -11,6 +11,32 @@
   RewriteCond %{HTTPS} off
   RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # ---- Direcciones limpias del pie de pagina ----
+  #
+  # El pie enlaza a /actividades y no a /buscar.php porque son las direcciones
+  # que se publican y se comparten: sobreviven a que el archivo se renombre o
+  # se parta en dos, y no cuentan al visitante con que tecnologia esta hecho
+  # el sitio.
+  #
+  # Sin RewriteBase a proposito. El patron se evalua relativo a la carpeta
+  # donde vive este .htaccess, asi que la misma regla vale para el hosting
+  # —donde el sitio cuelga de la raiz— y para XAMPP, donde cuelga de
+  # /wellneshub. Fijar una base rompe uno de los dos.
+  #
+  # Las direcciones .php siguen respondiendo igual: esto añade un camino, no
+  # cierra el que ya habia. Redirigir de .php a la version limpia seria lo
+  # canonico, pero es otro cambio: hay formularios que hacen POST contra su
+  # propio .php y una redireccion 301 los convertiria en GET, perdiendo lo
+  # enviado.
+  RewriteRule ^actividades/?$            buscar.php                 [L]
+  RewriteRule ^publicar-actividad/?$     evento-nuevo.php           [L]
+  RewriteRule ^contacto/?$               contacto.php               [L]
+  RewriteRule ^como-funciona/?$          como-funciona.php          [L]
+  RewriteRule ^preguntas-frecuentes/?$   preguntas-frecuentes.php   [L]
+  RewriteRule ^terminos-y-condiciones/?$ terminos-y-condiciones.php [L]
+  RewriteRule ^aviso-de-privacidad/?$    aviso-de-privacidad.php    [L]
+  RewriteRule ^politica-de-cookies/?$    politica-de-cookies.php    [L]
 </IfModule>
 
 # El README ya no es solo un archivo para quien clona el repositorio: desde

@@ -308,31 +308,75 @@ function pie(): void
 {
     if (empty($GLOBALS['anchoLibre'])) echo "</main>\n";
     ?>
+<?php /* Las direcciones van limpias —/actividades, no /buscar.php— porque son
+         las que se publican y se comparten: sobreviven a que el archivo se
+         renombre y no le cuentan al visitante con qué está hecho el sitio. Las
+         reglas que las resuelven están en el .htaccess de la raíz. */ ?>
 <footer>
   <div class="foot-inner">
-    <div>
+    <div class="foot-marca">
       <div class="logo-text" style="color:var(--blanco);">OMDARA</div>
-      <p style="font-size:13px; opacity:.85; margin-top:10px; max-width:260px;">El directorio de actividades wellness más completo de México — retiros, festivales y círculos, curados a mano.</p>
+      <p class="foot-lema">Tu guía de experiencias de bienestar en México.
+         Conecta con actividades que nutren cuerpo, mente y alma.</p>
+
+      <?php /* Las direcciones de las redes todavía no existen: el requerimiento
+               las deja como «[Agregar URLs definitivas]». Van con rel="nofollow"
+               y aria-label porque un icono suelto no le dice nada a un lector de
+               pantalla. En cuanto haya perfiles, se sustituye el "#". */ ?>
+      <div class="foot-redes">
+        <a href="#" aria-label="OMDARA en Instagram" target="_blank" rel="noopener nofollow">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/>
+          </svg>
+        </a>
+        <a href="#" aria-label="OMDARA en Facebook" target="_blank" rel="noopener nofollow">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14.5 8.5h2.2V5.4h-2.6c-2.3 0-3.7 1.4-3.7 3.8v1.6H8.2v3.1h2.2V21h3.3v-7.1h2.4l.4-3.1h-2.8V9.6c0-.8.3-1.1.8-1.1z"/>
+          </svg>
+        </a>
+        <a href="#" aria-label="OMDARA en WhatsApp" target="_blank" rel="noopener nofollow">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3.5 20.5l1.3-4.2A8.2 8.2 0 1 1 8 19.3z"/>
+            <path d="M9.2 9c.2 1.6 1.6 4.2 4.1 5.2.7.3 1.3-.2 1.5-.7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <h5>Explora</h5>
+      <a href="<?= URL_BASE ?>/actividades">Actividades</a>
     </div>
     <div>
-      <h5>Acerca de</h5>
-      <a href="#">Nuestra misión</a>
-      <a href="#">Cómo curamos las actividades</a>
-      <a href="<?= URL_BASE ?>/evento-nuevo.php">Publica tu actividad</a>
+      <h5>Para organizadores</h5>
+      <a href="<?= URL_BASE ?>/publicar-actividad">Publicar tu actividad</a>
+      <a href="<?= URL_BASE ?>/como-funciona">¿Cómo funciona?</a>
     </div>
     <div>
-      <h5>Contacto</h5>
-      <a href="<?= URL_BASE ?>/contacto.php">Escríbenos</a>
-      <a href="#">WhatsApp</a>
-      <a href="#">Instagram</a>
+      <h5>Ayuda</h5>
+      <a href="<?= URL_BASE ?>/preguntas-frecuentes">Preguntas frecuentes</a>
+      <a href="<?= URL_BASE ?>/contacto">Contacto</a>
     </div>
     <div>
-      <h5>Explorar</h5>
-      <a href="<?= URL_BASE ?>/buscar.php">Buscar actividades</a>
-      <a href="<?= URL_BASE ?>/blog.php">Blog</a>
+      <h5>Legal</h5>
+      <a href="<?= URL_BASE ?>/terminos-y-condiciones">Términos y Condiciones</a>
+      <a href="<?= URL_BASE ?>/aviso-de-privacidad">Aviso de Privacidad</a>
+      <a href="<?= URL_BASE ?>/politica-de-cookies">Política de Cookies</a>
     </div>
   </div>
-  <div class="foot-bottom">© <?= date('Y') ?> OMDARA — Directorio de actividades wellness MX.</div>
+
+  <?php /* Sustituye al copyright. Decir «estamos en beta» donde antes había un
+           «todos los derechos reservados» es una decisión de producto: invita a
+           avisar de los fallos en vez de asumir que el sitio está terminado. */ ?>
+  <div class="foot-bottom">
+    Versión beta: estamos mejorando continuamente la plataforma.
+    Si encuentras algún problema, <a href="<?= URL_BASE ?>/contacto">contáctanos</a>.
+  </div>
 </footer>
 
 <?php /* La raíz del sitio, para el JavaScript. Los archivos .js son estáticos y
