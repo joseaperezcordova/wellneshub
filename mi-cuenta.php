@@ -37,15 +37,22 @@ $ficha = fichaDeUsuario((int) $u['id']);
 
 if (!$ficha) redirigir('/logout.php');
 
-/* El teléfono solo existe después de la migración 17. Hasta entonces el campo
-   sencillamente no aparece, en vez de enseñar uno que no se puede guardar. */
-$hayTelefono = columnaExiste('usuarios', 'telefono');
+/*
+ * Los mismos campos que el formulario de publicar (REQ-00012), sacados de la
+ * misma lista: WhatsApp, Instagram y sitio web. Editarlos aquí o al publicar
+ * cambia lo mismo, y por eso ninguna de las dos pantallas tiene su propia idea
+ * de cuáles son.
+ *
+ * camposContactoDisponibles() deja fuera los que su migración todavía no ha
+ * creado. Un campo que se rellena y se pierde es peor que un campo que no
+ * aparece.
+ */
+$campos = camposContactoDisponibles();
 
 $editando = !empty($_GET['editar']);
 $error    = '';
 $aviso    = '';
 $nombre   = (string) $ficha['nombre'];
-$telefono = (string) ($ficha['telefono'] ?? '');
 
 // Aviso que dejó el guardado antes de redirigir (POST-redirect-GET: sin él,
 // recargar volvería a mandar el formulario).
@@ -55,8 +62,7 @@ if (!empty($_SESSION['cuenta_aviso'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre   = (string) ($_POST['nombre'] ?? '');
-    $telefono = (string) ($_POST['telefono'] ?? '');
+    $nombre   = (string) ($_POST['org_nombre'] ?? '');
     $editando = true;
 
     if (!csrfValido($_POST['csrf'] ?? null)) {
@@ -68,12 +74,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Escribe tu nombre: es como te ven en el sitio.';
 
     } else {
-        guardarContactoUsuario((int) $u['id'], $nombre, $hayTelefono ? $telefono : null);
+        // El mismo guardado que usa el formulario de publicar, con los mismos
+        // nombres de campo. Dos caminos que escriben las mismas columnas acaban
+        // escribiéndolas distinto.
+        guardarContactoOrganizador((int) $u['id'], $_POST);
 
         $_SESSION['cuenta_aviso'] = 'Datos guardados.';
         redirigir('/mi-cuenta.php');
     }
 }
+
+/** El valor de un campo: lo recién escrito si falló, o lo guardado. */
+$valorCampo = function (string $columna) use ($ficha) {
+    if (isset($_POST['org_' . $columna])) return (string) $_POST['org_' . $columna];
+
+    return (string) ($ficha[$columna] ?? '');
+};
 
 $titulo     = 'Mi cuenta';
 $anchoLibre = true;
@@ -144,11 +160,14 @@ function filaCuenta(string $etiqueta, string $valor, string $pista = ''): void
         </div>
 
         <?php
-        filaCuenta('Nombre', (string) $ficha['nombre']);
-        if ($hayTelefono) {
-            filaCuenta('Teléfono de contacto', (string) ($ficha['telefono'] ?? ''),
+        filaCuenta('Nombre', (string) $ficha['nombre'],
+            'Es el nombre que aparece como organizador en tus actividades.');
+
+        foreach ($campos as $columna => $etiqueta) {
+            filaCuenta($etiqueta, (string) ($ficha[$columna] ?? ''),
                 'Solo lo ve el equipo de OMDARA. No aparece en tus actividades.');
         }
+
         filaCuenta('Correo', (string) $ficha['email'],
             'Es con lo que entras. Para cambiarlo hay que verificar el nuevo buzón, y eso todavía no está hecho: escríbenos y lo cambiamos.');
         ?>
@@ -163,21 +182,30 @@ function filaCuenta(string $etiqueta, string $valor, string $pista = ''): void
           <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
 
           <div class="campo">
-            <label for="nombre">Nombre</label>
-            <input id="nombre" name="nombre" type="text" maxlength="120" autocomplete="name"
+            <label for="org_nombre">Nombre</label>
+            <input id="org_nombre" name="org_nombre" type="text" maxlength="120" autocomplete="name"
                    value="<?= e($nombre) ?>" required>
             <div class="pista">Es el nombre que aparece como organizador en tus actividades.</div>
           </div>
 
-          <?php if ($hayTelefono): ?>
+          <?php foreach ($campos as $columna => $etiqueta): ?>
+            <?php
+            $marcador = [
+                'telefono'  => '+52 612 123 4567',
+                'instagram' => '@tucuenta',
+                'sitio_web' => 'https://tusitio.com',
+            ][$columna] ?? '';
+            ?>
             <div class="campo">
-              <label for="telefono">Teléfono de contacto <span class="opcional">opcional</span></label>
-              <input id="telefono" name="telefono" type="tel" maxlength="30" autocomplete="tel"
-                     placeholder="Ej. +52 612 123 4567" value="<?= e($telefono) ?>">
+              <label for="org_<?= e($columna) ?>"><?= e($etiqueta) ?> <span class="opcional">opcional</span></label>
+              <input id="org_<?= e($columna) ?>" name="org_<?= e($columna) ?>"
+                     type="<?= $columna === 'telefono' ? 'tel' : 'text' ?>"
+                     maxlength="<?= $columna === 'sitio_web' ? 500 : 120 ?>"
+                     placeholder="<?= e($marcador) ?>" value="<?= e($valorCampo($columna)) ?>">
               <div class="pista">Solo lo ve el equipo de OMDARA, para localizarte si hay algo con alguna
                 actividad tuya. No se publica en ninguna ficha.</div>
             </div>
-          <?php endif; ?>
+          <?php endforeach; ?>
 
           <div class="campo">
             <label for="correo-fijo">Correo</label>

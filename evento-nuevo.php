@@ -42,6 +42,17 @@ if (postDesbordado()) {
         if (!$errores) {
             $id = crearEvento($e, (int) $u['id']);
             olvidarImagenEnVuelo($e['imagen_url']);   // ya tiene dueño
+
+            /*
+             * Las dos cosas de golpe (REQ-00012): la actividad y los datos de
+             * contacto en su cuenta, para que la próxima vez ya estén puestos.
+             *
+             * Aquí y no antes de validar: si la actividad no se llegó a crear,
+             * guardar a medias dejaría su cuenta cambiada por un formulario que
+             * nunca se envió. Y no impide publicar —todos los campos son
+             * opcionales—, así que no hay nada que comprobar antes.
+             */
+            guardarContactoOrganizador((int) $u['id'], $_POST);
             // Se relee para tener el slug que acaba de generarse. Si por lo que
             // sea no viniera, urlEvento() se apaña con el id y la dirección
             // sigue llevando a la ficha.

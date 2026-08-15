@@ -64,6 +64,55 @@ $err = function (string $campo) use ($errores) {
 $mal = function (string $campo) use ($errores) {
     return isset($errores[$campo]) ? ' con-error' : '';
 };
+
+/*
+ * Información de contacto del organizador (REQ-00012).
+ *
+ * NO son campos de la actividad: viven en su cuenta y se reutilizan en todas
+ * las que publique. Por eso no pasan por $v() —que lee del evento— y llevan el
+ * prefijo «org_», para que quede claro de un vistazo qué se guarda dónde.
+ */
+$orgFicha  = fichaDeUsuario((int) usuarioActual()['id']);
+$orgCampos = camposContactoDisponibles();
+
+/** El valor de un campo de contacto: lo recién escrito si falló, o lo guardado. */
+$ov = function (string $columna) use ($orgFicha) {
+    if (isset($_POST['org_' . $columna])) return (string) $_POST['org_' . $columna];
+
+    return (string) ($orgFicha[$columna] ?? '');
+};
+
+$orgNombre = isset($_POST['org_nombre'])
+    ? (string) $_POST['org_nombre']
+    : (string) ($orgFicha['nombre'] ?? '');
+
+/* ¿Hay algo guardado que ofrecer? El nombre no cuenta: lo tiene todo el mundo
+   desde el alta —se deduce del correo— y ofrecer «usar lo guardado» para eso
+   solo sería enseñar un resumen de un dato que nadie escribió. */
+$orgHayGuardado = false;
+foreach (array_keys($orgCampos) as $columna) {
+    if (trim((string) ($orgFicha[$columna] ?? '')) !== '') $orgHayGuardado = true;
+}
+
+/* Tras un envío fallido la sección se abre: si alguien acaba de escribir aquí y
+   el formulario falló por otro campo, cerrarla esconde lo que escribió. */
+$orgAbierta = $_SERVER['REQUEST_METHOD'] === 'POST';
+
+/* Y si lo que mandó no es lo que tenía guardado, es que lo estaba editando: el
+   resumen no se enseña, porque enseñarlo taparía sus cambios detrás de un
+   botón «Editar» y parecería que se perdieron. */
+$orgEditado = false;
+if ($orgAbierta) {
+    if (isset($_POST['org_nombre']) && trim((string) $_POST['org_nombre']) !== trim((string) ($orgFicha['nombre'] ?? ''))) {
+        $orgEditado = true;
+    }
+    foreach (array_keys($orgCampos) as $columna) {
+        if (isset($_POST['org_' . $columna])
+            && trim((string) $_POST['org_' . $columna]) !== trim((string) ($orgFicha[$columna] ?? ''))) {
+            $orgEditado = true;
+        }
+    }
+}
 ?>
 
 <div class="form-seccion-titulo">
@@ -427,11 +476,92 @@ $mal = function (string $campo) use ($errores) {
 <div class="form-seccion-titulo">
   <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="8.2" r="3.8"/>
+    <path d="M4.8 20c.6-3.7 3.6-5.9 7.2-5.9s6.6 2.2 7.2 5.9"/>
+  </svg>
+  <h2>7. Información de contacto <span class="opcional">opcional</span></h2>
+</div>
+
+<?php
+/*
+ * Va antes de «Información adicional» —donde lo pide REQ-00012— y por eso los
+ * dos apartados de abajo corren un número.
+ *
+ * COLAPSABLE CON <details>, no con JavaScript: abre y cierra solo, el teclado
+ * ya sabe manejarlo y el buscador del navegador (Ctrl+F) encuentra lo de
+ * dentro aunque esté cerrado.
+ */
+?>
+<details class="contacto-org"<?= $orgAbierta ? ' open' : '' ?>>
+  <summary>Información de contacto <span class="opcional">opcional</span></summary>
+
+  <div class="contacto-org-cuerpo">
+    <?php if ($orgHayGuardado && !$orgEditado): ?>
+      <?php /* Lo guardado ya viene cargado en los campos de abajo: esto es su
+               resumen, para no tener que leer cuatro cajas de formulario para
+               comprobar que sigue siendo lo mismo de siempre. «Editar» destapa
+               los campos. Sin JavaScript se ven las dos cosas, que es feo pero
+               funciona; con JavaScript, solo el resumen hasta que se pide
+               editar. */ ?>
+      <div class="contacto-org-guardado" id="orgGuardado">
+        <div class="contacto-org-tit">Usar la información guardada</div>
+        <div class="contacto-org-lista">
+          <div><span>Nombre</span><strong><?= e($orgNombre) ?></strong></div>
+          <?php foreach ($orgCampos as $columna => $etiqueta): ?>
+            <?php $valorOrg = trim((string) ($orgFicha[$columna] ?? '')); ?>
+            <?php if ($valorOrg !== ''): ?>
+              <div><span><?= e($etiqueta) ?></span><strong><?= e($valorOrg) ?></strong></div>
+            <?php endif; ?>
+          <?php endforeach; ?>
+        </div>
+        <button type="button" class="actionbtn" id="orgEditar">Editar</button>
+      </div>
+    <?php endif; ?>
+
+    <div class="contacto-org-campos" id="orgCampos">
+      <div class="campo">
+        <label for="org_nombre">Nombre del organizador</label>
+        <input id="org_nombre" name="org_nombre" type="text" maxlength="120"
+               value="<?= e($orgNombre) ?>" placeholder="Yoga Baja">
+        <div class="pista">Es el nombre que aparece como organizador en tus actividades.</div>
+      </div>
+
+      <?php foreach ($orgCampos as $columna => $etiqueta): ?>
+        <?php
+        $marcador = [
+            'telefono'  => '+52 612 123 4567',
+            'instagram' => '@tucuenta',
+            'sitio_web' => 'https://tusitio.com',
+        ][$columna] ?? '';
+        ?>
+        <div class="campo">
+          <label for="org_<?= e($columna) ?>"><?= e($etiqueta) ?></label>
+          <input id="org_<?= e($columna) ?>" name="org_<?= e($columna) ?>"
+                 type="<?= $columna === 'telefono' ? 'tel' : 'text' ?>"
+                 maxlength="<?= $columna === 'sitio_web' ? 500 : 120 ?>"
+                 value="<?= e($ov($columna)) ?>" placeholder="<?= e($marcador) ?>">
+          <?php if ($columna === 'sitio_web'): ?>
+            <div class="pista">El tuyo, no el de esta actividad — ese va en el apartado siguiente.</div>
+          <?php endif; ?>
+        </div>
+      <?php endforeach; ?>
+    </div>
+
+    <div class="pista contacto-org-nota">
+      Esta información se guardará para facilitar tus próximas publicaciones.
+      Puedes cambiarla cuando quieras desde <strong>Mi cuenta</strong>.
+    </div>
+  </div>
+</details>
+
+<div class="form-seccion-titulo">
+  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <path d="M9.5 14.5l5-5"/>
     <path d="M11 7.5l1-1a3.5 3.5 0 0 1 5 5l-1 1"/>
     <path d="M13 16.5l-1 1a3.5 3.5 0 0 1-5-5l1-1"/>
   </svg>
-  <h2>7. Información adicional <span class="opcional">opcional</span></h2>
+  <h2>8. Información adicional <span class="opcional">opcional</span></h2>
 </div>
 
 <div class="campo<?= $mal('sitio_web') ?>">
@@ -449,7 +579,7 @@ $mal = function (string $campo) use ($errores) {
     <path d="M16 9a3.5 3.5 0 0 1 0 6"/>
     <path d="M18.5 6.5a7 7 0 0 1 0 11"/>
   </svg>
-  <h2>8. Acción principal *</h2>
+  <h2>9. Acción principal *</h2>
 </div>
 
 <div class="campo<?= $mal('accion_principal') ?>">
@@ -465,8 +595,11 @@ $mal = function (string $campo) use ($errores) {
           <path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h15A1.5 1.5 0 0 1 21 6.5v11A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/>
           <path d="M3.5 6.2l8.5 6.8 8.5-6.8"/>
         </svg>
+        <?php /* Sin descripción bajo el título (REQ-00011). Las tres decían, en
+                 corto, lo mismo que la guía de la derecha explica entero: leer
+                 dos veces lo mismo con distintas palabras hace dudar de si son
+                 dos cosas distintas. La guía se queda; esto se va. */ ?>
         <span class="accion-titulo">Contactar al organizador</span>
-        <span class="accion-desc">Los interesados completarán un formulario y recibirás sus datos por correo.</span>
       </label>
     </div>
 
@@ -480,7 +613,6 @@ $mal = function (string $campo) use ($errores) {
           <path d="M9.5 4v16" stroke-dasharray="2 2"/>
         </svg>
         <span class="accion-titulo">Comprar boletos</span>
-        <span class="accion-desc">Agrega el enlace donde las personas pueden comprar sus boletos.</span>
       </label>
       <div class="accion-campos">
         <div class="campo<?= $mal('url_boletos') ?>">
@@ -503,7 +635,6 @@ $mal = function (string $campo) use ($errores) {
           <path d="M8 3v4M16 3v4"/>
         </svg>
         <span class="accion-titulo">Reservar lugar</span>
-        <span class="accion-desc">Agrega el enlace donde las personas pueden reservar su lugar.</span>
       </label>
       <div class="accion-campos">
         <div class="campo<?= $mal('url_reserva') ?>">
@@ -880,6 +1011,31 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
           enlaceBoton.disabled = false;
           enlaceBoton.textContent = 'Usar enlace';
         });
+    });
+  }
+
+  /* ---------- informacion de contacto del organizador (REQ-00012) ----------
+     Los campos ya vienen rellenos con lo que hay guardado. Esto solo decide
+     cual de las dos caras se ve: el resumen o los campos.
+
+     El resumen se esconde DESDE AQUI y no con un atributo hidden en el HTML:
+     sin JavaScript hay que poder editar igual, y un campo escondido en el
+     marcado no habria forma de destaparlo. Asi, sin JavaScript se ven las dos
+     cosas —feo, pero utilizable— y con JavaScript solo el resumen hasta que se
+     pide editar. */
+  var orgGuardado = document.getElementById('orgGuardado');
+  var orgCampos   = document.getElementById('orgCampos');
+  var orgEditar   = document.getElementById('orgEditar');
+
+  if (orgGuardado && orgCampos && orgEditar) {
+    orgCampos.hidden = true;
+
+    orgEditar.addEventListener('click', function () {
+      orgGuardado.hidden = true;
+      orgCampos.hidden   = false;
+
+      var primero = orgCampos.querySelector('input');
+      if (primero) primero.focus();
     });
   }
 })();

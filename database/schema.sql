@@ -41,6 +41,12 @@ CREATE TABLE IF NOT EXISTS usuarios (
   -- con contactos.telefono, que es el de quien escribe desde una ficha.
   telefono            VARCHAR(30)      NULL DEFAULT NULL,
 
+  -- Contacto del organizador que se pide al publicar y se reutiliza en las
+  -- siguientes actividades (migración 18). sitio_web es el DEL ORGANIZADOR; el
+  -- de cada actividad es eventos.sitio_web y son cosas distintas.
+  instagram           VARCHAR(120)     NULL DEFAULT NULL,
+  sitio_web           VARCHAR(500)     NULL DEFAULT NULL,
+
   -- Cuándo aceptó los Términos y el Aviso de Privacidad (migración 16). NULL
   -- en las cuentas anteriores a REQ-00008: no se les inventa una fecha, así
   -- que este campo dice exactamente cuáles se dieron de alta sin la casilla.

@@ -115,8 +115,42 @@ phpMyAdmin, en pruebas y en producción.
 deja editar el nombre; el campo de teléfono sencillamente no aparece, ni en la
 página ni en el panel de administración.
 
-**Para cerrarlo:** ejecutar el `.sql` y quitar los `columnaExiste()` de
-`mi-cuenta.php` y de `guardarContactoUsuario()` en `includes/auth.php`.
+**Para cerrarlo:** ejecutar el `.sql`. La comprobación vive en
+`camposContactoDisponibles()` (`includes/auth.php`) y cubre también la migración
+18, así que se quita cuando estén aplicadas las dos.
+
+---
+
+### 2h. Ejecutar la migración 18 (Instagram y sitio web del organizador)
+
+**Qué falta:** correr `database/migracion-18-contacto-organizador.sql` en
+phpMyAdmin, en pruebas y en producción. Va con la 17: son la misma sección.
+
+**Qué pasa mientras tanto:** la sección «Información de contacto» del formulario
+de publicar aparece igual, pero solo con los campos cuya columna exista. Sin
+ninguna de las dos migraciones, solo se ve el nombre.
+
+**Para cerrarlo:** ejecutar el `.sql` y quitar `camposContactoDisponibles()`,
+dejando que todo use `camposContactoOrganizador()` directamente.
+
+---
+
+### 2i. ¿El contacto del organizador se enseña en la ficha?
+
+**Qué falta:** una decisión de producto.
+
+**Qué hay hoy:** Instagram, WhatsApp y sitio web del organizador se guardan en su
+cuenta (REQ-00012) y **no se publican en ninguna parte**. Se ven en «Mi cuenta» y
+en el panel de administración, nada más.
+
+**Por qué se dejó así:** REQ-00012 solo pide guardarlos y reutilizarlos en las
+siguientes publicaciones; no dice que se muestren. Y REQ-00009 dice lo contrario
+de forma expresa —que esa sección no crea un perfil público—. Además el botón de
+WhatsApp de la ficha se quitó a propósito hace unas semanas.
+
+**Si la intención era volver a enseñarlos**, es otro requerimiento: hay que
+decidir cuáles se publican, con qué aviso a quien los escribe, y qué pasa con
+las actividades ya publicadas de quien nunca aceptó que su número saliera.
 
 ---
 

@@ -362,10 +362,9 @@ input,select{font-family:inherit; font-size:14px;}
 .accion-header input{position:absolute; opacity:0; width:0; height:0;}
 .accion-icono{grid-row:1; flex-shrink:0; opacity:.55;}
 .accion-titulo{grid-row:1; font-size:13.5px; font-weight:600; align-self:center;}
-.accion-desc{
-  grid-column:1 / -1; font-size:11.5px; line-height:1.45; opacity:.92; text-transform:none;
-  font-family:'Inter',sans-serif; letter-spacing:0;
-}
+/* .accion-desc se elimino con REQ-00011 junto a los tres textos que la usaban.
+   La regla se va con ellos: una clase que no aplica a nada se convierte en un
+   estilo que alguien reutiliza sin saber de donde salio. */
 .accion-tarjeta:has(input:checked) .accion-icono{opacity:1; color:var(--terracota);}
 .accion-header:has(input:focus-visible){outline:2px solid var(--terracota-texto); outline-offset:2px;}
 .accion-campos{margin-top:12px;}
@@ -393,6 +392,18 @@ input,select{font-family:inherit; font-size:14px;}
 .guia-item h3{font-size:14px; margin:0 0 5px; color:var(--verde);}
 .guia-item p{font-size:12.5px; line-height:1.55; opacity:.8; margin:0 0 6px;}
 .guia-item .ejemplos{font-size:11.5px; line-height:1.5; opacity:.82;}
+/* El aviso de traduccion (REQ-00010). Se separa de los tres bloques de accion
+   con fondo propio porque no es una opcion mas entre las que elegir: es una
+   advertencia sobre lo que se va a escribir, y leida como cuarta opcion no
+   avisa de nada. */
+.guia-aviso{
+  margin-top:20px; padding:14px 15px; border-radius:9px;
+  background:var(--aviso-fondo); border:1px solid var(--aviso-linea);
+}
+.guia-aviso h3{font-size:13px; margin:0 0 6px; color:var(--aviso);}
+.guia-aviso p{font-size:12px; line-height:1.55; margin:0 0 8px; color:var(--petroleo);}
+.guia-aviso p:last-child{margin-bottom:0;}
+
 .guia-nota{
   margin-top:20px; padding-top:16px; border-top:1px solid var(--linea);
   font-size:12px; line-height:1.55; opacity:.82;
@@ -1044,3 +1055,47 @@ form .btn-principal + .casilla-legal{
 
 .cuenta-acciones{display:flex; align-items:center; gap:12px; margin-top:22px;}
 .cuenta-acciones .btn-principal{width:auto; margin:0;}
+
+/* ------------------------ contacto del organizador al publicar (REQ-00012) -- */
+/* Colapsable de verdad, con <details>: abre y cierra sin JavaScript, el teclado
+   ya sabe manejarlo y Ctrl+F encuentra lo de dentro aunque este cerrado. */
+.contacto-org{
+  border:1px solid var(--linea); border-radius:10px; background:var(--arena-suave);
+  margin-bottom:22px;
+}
+.contacto-org > summary{
+  cursor:pointer; padding:13px 16px; font-size:14px; font-weight:600;
+  color:var(--verde); display:flex; align-items:center; gap:8px;
+}
+.contacto-org > summary::marker{color:var(--verde-claro);}
+.contacto-org[open] > summary{border-bottom:1px solid var(--linea-suave);}
+.contacto-org-cuerpo{padding:16px;}
+.contacto-org-cuerpo .campo{margin-bottom:14px;}
+.contacto-org-cuerpo .campo:last-child{margin-bottom:0;}
+.contacto-org-cuerpo input{background:var(--blanco);}
+
+/* El resumen de lo que ya hay guardado. Los datos van en dos columnas de
+   etiqueta y valor para poder repasarlos de un vistazo, que es de lo que se
+   trata: comprobar que sigue siendo lo de siempre sin leer cuatro cajas de
+   formulario. */
+.contacto-org-guardado{
+  background:var(--blanco); border:1px solid var(--linea-suave);
+  border-radius:9px; padding:14px 16px;
+}
+.contacto-org-tit{
+  font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--verde-claro); margin-bottom:10px;
+}
+.contacto-org-lista{display:grid; gap:7px; margin-bottom:14px;}
+.contacto-org-lista > div{display:flex; gap:10px; font-size:13.5px; line-height:1.4;}
+.contacto-org-lista span{
+  flex-shrink:0; min-width:82px; font-size:12px; color:var(--gris);
+}
+.contacto-org-lista strong{font-weight:500; word-break:break-word;}
+
+.contacto-org-nota{margin-top:14px; line-height:1.55;}
+
+@media(max-width:520px){
+  .contacto-org-lista > div{flex-direction:column; gap:1px;}
+  .contacto-org-lista span{min-width:0;}
+}

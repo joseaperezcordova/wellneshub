@@ -284,34 +284,103 @@ function fichaDeUsuario(int $usuarioId): ?array
 }
 
 /**
- * Guarda los datos de contacto que el organizador puede cambiar.
+ * Los campos de contacto del organizador, y en qué columna vive cada uno.
  *
- * El correo NO está aquí, y no es un olvido: es la credencial con la que se
- * entra. Cambiarlo sin verificar el nuevo buzón deja a alguien fuera de su
- * cuenta para siempre —no hay contraseña con la que recuperarla, el código va
- * justo a ese correo—. Ver docs/pendientes.md.
+ * Una sola lista para que la pantalla de «Mi cuenta», la sección del formulario
+ * de publicar y el guardado hablen de lo mismo. Escritos tres veces, un día uno
+ * de los tres se queda corto.
  *
- * El teléfono se guarda solo si existe la columna, por lo mismo que el de
- * contactos y la fecha de aceptación: las migraciones se aplican a mano, y
- * publicar antes de aplicarlas no puede significar que la página reviente.
+ * 'telefono' aparece como WhatsApp al publicar y como «Teléfono / WhatsApp» en
+ * Mi cuenta: es el mismo número. Dos columnas para el teléfono de una misma
+ * persona acaban diciendo cosas distintas y nadie sabe cuál vale.
+ *
+ * @return array<string, string> columna => etiqueta
  */
-function guardarContactoUsuario(int $usuarioId, string $nombre, ?string $telefono): void
+function camposContactoOrganizador(): array
 {
-    db()->prepare('UPDATE usuarios SET nombre = ? WHERE id = ?')
-        ->execute([mb_substr(trim($nombre), 0, 120), $usuarioId]);
+    return [
+        'telefono'  => 'WhatsApp',
+        'instagram' => 'Instagram',
+        'sitio_web' => 'Sitio web',
+    ];
+}
 
-    if (!columnaExiste('usuarios', 'telefono')) {
-        error_log('usuarios.telefono no existe todavía: falta ejecutar '
-            . 'database/migracion-17-telefono-organizador.sql.');
-        return;
+/**
+ * Los que existen de verdad en la base ahora mismo.
+ *
+ * Las migraciones 17 y 18 se aplican a mano, así que entre publicar el código y
+ * ejecutarlas hay un rato en el que alguna columna no está. Preguntando aquí,
+ * el formulario enseña lo que puede guardar y nada más: un campo que se rellena
+ * y se pierde es peor que un campo que no aparece.
+ */
+function camposContactoDisponibles(): array
+{
+    $vivos = [];
+
+    foreach (camposContactoOrganizador() as $columna => $etiqueta) {
+        if (columnaExiste('usuarios', $columna)) $vivos[$columna] = $etiqueta;
     }
 
-    $telefono = ($telefono !== null && trim($telefono) !== '')
-        ? mb_substr(trim($telefono), 0, 30)
-        : null;
+    return $vivos;
+}
 
-    db()->prepare('UPDATE usuarios SET telefono = ? WHERE id = ?')
-        ->execute([$telefono, $usuarioId]);
+/** Deja el Instagram como @cuenta, venga como venga. */
+function normalizarInstagram(string $valor): string
+{
+    $valor = trim($valor);
+    if ($valor === '') return '';
+
+    // Quien copia su perfil desde el navegador pega la URL entera. Guardarla
+    // así deja «https://instagram.com/yogabaja/» donde debería leerse
+    // «@yogabaja», y encima no se puede comparar con lo que escribió otro.
+    if (preg_match('~instagram\.com/([^/?#\s]+)~i', $valor, $m)) $valor = $m[1];
+
+    $valor = ltrim($valor, '@');
+    $valor = preg_replace('/[^A-Za-z0-9._]/', '', $valor);
+
+    return $valor === '' ? '' : '@' . mb_substr((string) $valor, 0, 119);
+}
+
+/** Una dirección web utilizable: sin esquema, un navegador la lee como ruta. */
+function normalizarSitioWeb(string $valor): string
+{
+    $valor = trim($valor);
+    if ($valor === '') return '';
+
+    if (!preg_match('~^https?://~i', $valor)) $valor = 'https://' . $valor;
+
+    return mb_substr($valor, 0, 500);
+}
+
+/**
+ * Guarda la información de contacto del organizador (REQ-00012).
+ *
+ * Se llama al publicar y al editar una actividad: el requerimiento pide que
+ * «Publicar» haga las dos cosas, crear la actividad y dejar estos datos en la
+ * cuenta para no tener que volver a escribirlos.
+ *
+ * El nombre solo se cambia si viene con algo. Los demás sí se pueden vaciar a
+ * propósito —quien borra su Instagram quiere borrarlo—, pero borrar el nombre
+ * dejaría la cuenta sin cómo llamarla y sus actividades sin organizador.
+ */
+function guardarContactoOrganizador(int $usuarioId, array $datos): void
+{
+    $nombre = trim((string) ($datos['org_nombre'] ?? ''));
+    if ($nombre !== '') {
+        db()->prepare('UPDATE usuarios SET nombre = ? WHERE id = ?')
+            ->execute([mb_substr($nombre, 0, 120), $usuarioId]);
+    }
+
+    foreach (array_keys(camposContactoDisponibles()) as $columna) {
+        $valor = trim((string) ($datos['org_' . $columna] ?? ''));
+
+        if ($columna === 'instagram') $valor = normalizarInstagram($valor);
+        if ($columna === 'sitio_web') $valor = normalizarSitioWeb($valor);
+        if ($columna === 'telefono')  $valor = mb_substr($valor, 0, 30);
+
+        db()->prepare("UPDATE usuarios SET `$columna` = ? WHERE id = ?")
+            ->execute([$valor !== '' ? $valor : null, $usuarioId]);
+    }
 }
 
 /**

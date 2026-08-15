@@ -74,6 +74,11 @@ if ($puede && postDesbordado()) {
                 borrarImagenGuardada($imagenPrevia);
             }
 
+            // El mismo formulario trae la sección de contacto del organizador
+            // (REQ-00012), así que también aquí se guarda: corregir un teléfono
+            // mal escrito es justo lo que se viene a hacer a «editar».
+            guardarContactoOrganizador((int) $u['id'], $_POST);
+
             $_SESSION['evento_aviso'] = 'Cambios guardados.';
             $_SESSION['eventos_ga'] = [
                 ['nombre' => 'editar_actividad', 'params' => ['id' => (int) $ev['id'], 'categoria' => $e['categoria']]],
