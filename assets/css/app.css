@@ -161,9 +161,17 @@ input,select{font-family:inherit; font-size:14px;}
   background:var(--verde-claro); color:var(--blanco);
   font-family:'Fraunces',serif; font-size:16px;
 }
+/* OJO CON EL COLOR DE TEXTO: es obligatorio, no decorativo.
+   Este panel es blanco pero cuelga de .topbar, que pinta su texto en blanco
+   para el verde bosque. Sin fijarlo aqui, los enlaces heredan ese blanco
+   —a{color:inherit}— y el menu entero queda blanco sobre blanco: se abre, se
+   puede pulsar y no se lee nada. Paso con el cambio de paleta, cuando la
+   cabecera dejo de ser clara.
+   La regla vale para cualquier cosa clara que se cuelgue de la cabecera. */
 .cuenta-menu{
   position:absolute; right:0; top:calc(100% + 10px); min-width:230px;
-  background:var(--blanco); border:1px solid var(--linea); border-radius:12px;
+  background:var(--blanco); color:var(--petroleo);
+  border:1px solid var(--linea); border-radius:12px;
   box-shadow:0 14px 34px rgba(47,78,93,.16); padding:6px; z-index:50;
 }
 .cuenta-quien{padding:10px 12px 12px; border-bottom:1px solid var(--linea-suave); margin-bottom:6px;}
