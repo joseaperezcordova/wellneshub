@@ -273,11 +273,18 @@ $scVerifica = trim((string) ($CONFIG['analytics']['search_console_verificacion']
               <strong><?= e($u['nombre']) ?></strong>
               <span><?= e($u['email']) ?></span>
             </div>
-            <!-- «Mis actividades» y no «Publicar actividad»: publicar ya está en
+            <!-- «Mi cuenta», con sus dos entradas (REQ-00009). El rótulo no es
+                 un enlace a propósito: no hay ninguna página «Mi cuenta» que
+                 enseñar por encima de estas dos, y un enlace que lleva a un
+                 índice de dos elementos es un clic de más.
+
+                 «Mis actividades» y no «Publicar actividad»: publicar ya está en
                  el botón de al lado, y lo que hay detrás de este enlace es la
                  lista de las actividades propias, que es otra cosa.
                  Antes iban a /#panel-organizador y /#admin porque los dos
                  paneles vivían dentro de la portada. Ahora son páginas. -->
+            <div class="cuenta-grupo">Mi cuenta</div>
+            <a href="<?= URL_BASE ?>/mi-cuenta.php">Información de contacto</a>
             <a href="<?= URL_BASE ?>/mis-eventos.php">Mis actividades</a>
             <?php if ($u['rol'] === 'admin'): ?>
               <a href="<?= URL_BASE ?>/admin.php">Panel admin</a>

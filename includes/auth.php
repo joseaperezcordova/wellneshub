@@ -269,6 +269,52 @@ function crearUsuarioPorCorreo(string $email): int
 }
 
 /**
+ * La ficha completa de quien tiene la sesión abierta, para «Mi cuenta».
+ *
+ * usuarioActual() no sirve aquí: trae solo las columnas que necesitan la
+ * cabecera y los permisos, y a propósito —es una consulta que se hace en TODAS
+ * las páginas—. Esta es para la única pantalla que enseña la cuenta entera.
+ */
+function fichaDeUsuario(int $usuarioId): ?array
+{
+    $st = db()->prepare('SELECT * FROM usuarios WHERE id = ? LIMIT 1');
+    $st->execute([$usuarioId]);
+
+    return $st->fetch() ?: null;
+}
+
+/**
+ * Guarda los datos de contacto que el organizador puede cambiar.
+ *
+ * El correo NO está aquí, y no es un olvido: es la credencial con la que se
+ * entra. Cambiarlo sin verificar el nuevo buzón deja a alguien fuera de su
+ * cuenta para siempre —no hay contraseña con la que recuperarla, el código va
+ * justo a ese correo—. Ver docs/pendientes.md.
+ *
+ * El teléfono se guarda solo si existe la columna, por lo mismo que el de
+ * contactos y la fecha de aceptación: las migraciones se aplican a mano, y
+ * publicar antes de aplicarlas no puede significar que la página reviente.
+ */
+function guardarContactoUsuario(int $usuarioId, string $nombre, ?string $telefono): void
+{
+    db()->prepare('UPDATE usuarios SET nombre = ? WHERE id = ?')
+        ->execute([mb_substr(trim($nombre), 0, 120), $usuarioId]);
+
+    if (!columnaExiste('usuarios', 'telefono')) {
+        error_log('usuarios.telefono no existe todavía: falta ejecutar '
+            . 'database/migracion-17-telefono-organizador.sql.');
+        return;
+    }
+
+    $telefono = ($telefono !== null && trim($telefono) !== '')
+        ? mb_substr(trim($telefono), 0, 30)
+        : null;
+
+    db()->prepare('UPDATE usuarios SET telefono = ? WHERE id = ?')
+        ->execute([$telefono, $usuarioId]);
+}
+
+/**
  * Deja constancia de que aceptó los Términos y el Aviso de Privacidad.
  *
  * COALESCE y no NOW() a secas: vale la primera vez que aceptó, no la última vez

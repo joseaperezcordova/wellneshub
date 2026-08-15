@@ -130,15 +130,20 @@ require __DIR__ . '/includes/layout.php';
     <!-- ORGANIZADORES — quien ya publicó al menos una actividad (ver publicarEvento()) -->
     <div class="admin-panel" id="panel-organizadores">
       <table class="admtable">
-        <thead><tr><th>Nombre</th><th>Correo</th><th>Actividades publicadas</th><th>Último acceso</th><th>Cuenta</th></tr></thead>
+        <?php /* El teléfono es el que cada organizador pone en «Mi cuenta»
+                 (REQ-00009). Es el único sitio donde se lee: no se publica en
+                 ninguna ficha, y está aquí para poder localizar a alguien
+                 cuando hay algo que resolver con una actividad suya. */ ?>
+        <thead><tr><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Actividades publicadas</th><th>Último acceso</th><th>Cuenta</th></tr></thead>
         <tbody>
           <?php if (!$organizadoresAdmin): ?>
-            <tr><td colspan="5" style="opacity:.8;">Todavía no hay organizadores con actividades publicadas.</td></tr>
+            <tr><td colspan="6" style="opacity:.8;">Todavía no hay organizadores con actividades publicadas.</td></tr>
           <?php endif; ?>
           <?php foreach ($organizadoresAdmin as $org): ?>
             <tr>
               <td><?= e($org['nombre']) ?></td>
               <td><?= e($org['email']) ?></td>
+              <td><?= !empty($org['telefono']) ? e($org['telefono']) : '—' ?></td>
               <td><?= number_format((int) $org['publicadas']) ?></td>
               <td><?= $org['ultimo_acceso_en'] ? e(date('d M Y', strtotime($org['ultimo_acceso_en']))) : '—' ?></td>
               <td><span class="badge <?= $org['estado'] === 'activo' ? 'on' : 'off' ?>"><?= e(ucfirst($org['estado'])) ?></span></td>

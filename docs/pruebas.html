@@ -857,7 +857,50 @@
 
       <!-- 05 ─────────────────────────────────────────────── -->
       <section id="s5">
-        <div class="cab-sec"><span class="n">05</span><h2>Editar, y hasta cuándo</h2></div>
+        <div class="cab-sec"><span class="n">05</span><h2>Mi cuenta, y hasta cuándo se puede editar</h2></div>
+
+        <p class="intro-sec">
+          Lo primero es nuevo: el menú de tu cuenta, arriba a la derecha, ahora tiene
+          <b>Mi cuenta</b> con dos entradas.
+        </p>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Con sesión abierta, pulsa tu avatar arriba a la derecha.</span>
+          <span class="esperado">Bajo el rótulo <b>Mi cuenta</b> hay dos entradas: «Información de contacto» y «Mis actividades».</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Entra a «Información de contacto» y mira lo que hay antes de tocar nada.</span>
+          <span class="esperado">Se leen tus datos, con un botón <b>«Editar»</b>. Nada es editable hasta darle.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Dale a «Editar», cambia tu nombre, pon un teléfono y guarda.</span>
+          <span class="esperado">Vuelve a la vista de lectura con «Datos guardados.» y los datos nuevos. <b>Recarga la página</b>: no debe volver a enviarse el formulario.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Vuelve a «Editar» y fíjate en el campo del correo.</span>
+          <span class="esperado">Se ve pero <b>no se puede escribir en él</b>, y explica por qué: es la dirección a la que llega tu código para entrar. Cambiarlo es un pendiente conocido.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Borra tu nombre entero y guarda.</span>
+          <span class="esperado">No deja: dice que escribas tu nombre.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Mira una actividad tuya publicada, ahora que pusiste teléfono.</span>
+          <span class="esperado">El teléfono <b>no sale por ningún lado</b>. Esa sección es privada: lo que se publica es tu nombre y lo que escribiste en la ficha.</span>
+        </label>
+
+        <div class="cab-sec" style="margin-top:34px;"><span class="n">05b</span><h2>Editar, y hasta cuándo</h2></div>
         <p class="quien">La regla que más fácil es romper</p>
         <p class="intro-sec">
           Una actividad publicada se puede corregir durante 24 horas. Después se congela, y los

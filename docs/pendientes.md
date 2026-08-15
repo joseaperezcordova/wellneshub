@@ -106,6 +106,46 @@ contacto, es la prueba de que alguien aceptó.
 
 ---
 
+### 2f. Ejecutar la migración 17 (teléfono del organizador)
+
+**Qué falta:** correr `database/migracion-17-telefono-organizador.sql` en
+phpMyAdmin, en pruebas y en producción.
+
+**Qué pasa mientras tanto:** «Mi cuenta → Información de contacto» funciona y
+deja editar el nombre; el campo de teléfono sencillamente no aparece, ni en la
+página ni en el panel de administración.
+
+**Para cerrarlo:** ejecutar el `.sql` y quitar los `columnaExiste()` de
+`mi-cuenta.php` y de `guardarContactoUsuario()` en `includes/auth.php`.
+
+---
+
+### 2g. Cambiar el correo desde «Mi cuenta»
+
+**Qué falta:** el flujo para que alguien cambie su propio correo.
+
+**Dónde:** `mi-cuenta.php`. Hoy el correo se enseña pero no se edita, y la
+página explica por qué en pantalla.
+
+**Por qué no se hizo ya:** aquí no hay contraseñas — el correo *es* la
+credencial, y el código de acceso va justo a ese buzón. Un cambio sin verificar
+antes el buzón nuevo deja a esa persona fuera de su cuenta **para siempre**, sin
+ninguna forma de recuperarla: basta un dedazo. No es una validación de formato
+lo que falta, es un flujo entero.
+
+**Lo que hace falta para cerrarlo:**
+
+1. Comprobar que el correo nuevo no tiene ya cuenta.
+2. Mandar un código **al correo nuevo** y guardar el cambio como pendiente.
+3. Cambiarlo solo al confirmar ese código.
+4. Avisar al correo viejo de que se cambió, por si no fue su dueño quien lo
+   pidió. Es el paso que suele faltar y el único que detecta un secuestro.
+
+Mientras tanto, la página dice que se escriba para cambiarlo. Es honesto, pero
+no aguanta muchos organizadores.
+
+---
+
 ### 2e. Qué versión de los documentos aceptó cada persona
 
 **Qué falta:** decidir si hace falta guardarlo, y con qué numeración.

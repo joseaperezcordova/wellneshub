@@ -451,13 +451,24 @@ function eventosTodos(int $limite = 200): array
  */
 function organizadoresConConteo(): array
 {
+    /*
+     * Subconsulta para el conteo en vez de JOIN + GROUP BY, y u.* en vez de la
+     * lista de columnas. Las dos cosas por el mismo motivo: desde la migración
+     * 17 hay una columna más —el teléfono—, y una lista explícita habría que
+     * mantenerla aquí Y en el GROUP BY, con el añadido de que reventaría en el
+     * rato que pasa entre publicar el código y aplicar la migración a mano.
+     *
+     * HAVING y no WHERE sobre el alias: WHERE se evalúa antes que la
+     * subconsulta. El resultado es el mismo que el del JOIN interno de antes
+     * —solo organizadores con al menos una actividad publicada—.
+     */
     $st = db()->query(
-        "SELECT u.id, u.nombre, u.email, u.estado, u.ultimo_acceso_en,
-                COUNT(e.id) AS publicadas
+        "SELECT u.*,
+                (SELECT COUNT(*) FROM eventos e
+                  WHERE e.usuario_id = u.id AND e.situacion = 'publicado') AS publicadas
            FROM usuarios u
-           JOIN eventos e ON e.usuario_id = u.id AND e.situacion = 'publicado'
           WHERE u.rol = 'organizador'
-       GROUP BY u.id, u.nombre, u.email, u.estado, u.ultimo_acceso_en
+         HAVING publicadas > 0
        ORDER BY publicadas DESC, u.nombre ASC"
     );
 
