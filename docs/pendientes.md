@@ -239,6 +239,40 @@ páginas. Vive en pruebas hasta cerrar la fase 4.
 
 ---
 
+### 2j. Las FAQ dan por hecha una revisión previa que no existe
+
+**Qué pasa:** el requerimiento de las preguntas frecuentes traía cuatro
+respuestas construidas sobre una cola de aprobación —«envía tu actividad para
+revisión», «revisamos cada publicación», «normalmente entre 24 y 72 horas
+hábiles», «te indicaremos el motivo por el que no fue aprobado»—. **Eso no es lo
+que hace el sitio.** `publicarEvento()` pone la actividad en línea en el momento
+en que su dueño le da a publicar, y la moderación es posterior: alguien reporta,
+un administrador mira y, si toca, la oculta.
+
+**Qué se hizo:** las respuestas se reescribieron para decir lo que ocurre de
+verdad. Publicarlas tal cual habría dejado a los organizadores esperando un
+correo de aprobación que no llega, y a los visitantes creyendo que alguien
+comprobó lo que están leyendo.
+
+**Otras tres, por lo mismo:**
+
+| Decía | Por qué no |
+|---|---|
+| «Puedes actualizar la información antes o después de su publicación» | Cierto a medias: después de publicar hay 24 horas y luego se congela |
+| «Encontrarás sus datos de contacto o el botón para comunicarte» | Los datos del organizador no se publican (REQ-00009) |
+| «Puedes ocultarlo desde tu panel» | Ocultar es una acción de administración; su dueño puede eliminarla dentro del plazo |
+
+**Para cerrarlo, una de dos:**
+
+1. **Producto confirma** que no habrá revisión previa → no hay nada que hacer:
+   las respuestas de hoy ya son correctas.
+2. **Se implementa la revisión previa** → es un requerimiento propio (cola de
+   moderación, estado «en revisión», aviso al organizador cuando se aprueba o se
+   rechaza con el motivo), y entonces se restituye la redacción original, que
+   está en el requerimiento tal como llegó.
+
+---
+
 ## Decisiones de diseño abiertas
 
 ### 2c. ¿El contacto tiene que flotar sobre la ficha?

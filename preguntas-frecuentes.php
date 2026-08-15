@@ -2,19 +2,183 @@
 /**
  * Preguntas frecuentes.
  *
- * Existe porque el pie la enlaza (REQ-00001). El texto está pendiente; las
- * preguntas de abajo son las que ya se contestan en otras partes del sitio
- * —el plazo de 24 horas para corregir, que no hace falta cuenta para
- * escribirle a un organizador, cómo se modera— así que son el punto de
- * partida natural.
+ * LAS RESPUESTAS DESCRIBEN LO QUE EL SITIO HACE HOY
+ *
+ * Siete de las que traía el requerimiento no coincidían con el código, y todas
+ * en la misma dirección: daban por hecho una revisión previa que no existe.
+ * Aquí no hay cola de aprobación —publicarEvento() pone la actividad en línea
+ * en el momento en que su dueño le da a publicar— y la moderación es posterior:
+ * alguien reporta, un administrador mira y, si toca, la oculta.
+ *
+ * Publicar «revisamos cada publicación, tarda entre 24 y 72 horas hábiles»
+ * habría dejado a los organizadores esperando un correo que no llega, y a los
+ * visitantes creyendo que alguien comprobó lo que están leyendo. Las respuestas
+ * afectadas se reescribieron para decir lo que pasa de verdad; la redacción
+ * original está en docs/pendientes.md, para restituirla el día que exista esa
+ * revisión.
+ *
+ * ACORDEONES CON <details>, NO CON JAVASCRIPT
+ *
+ * Abren y cierran solos, el teclado ya sabe manejarlos, los lectores de
+ * pantalla los anuncian como lo que son y el buscador del navegador encuentra
+ * el texto de dentro aunque estén cerrados. Una pregunta frecuente que no se
+ * puede encontrar con Ctrl+F no es de mucha ayuda.
  */
 
 declare(strict_types=1);
 require __DIR__ . '/includes/config.php';
+require __DIR__ . '/includes/eventos.php';
 
 $titulo      = t('pagina.faq.titulo');
 $descripcion = t('pagina.faq.meta');
 $anchoLibre  = true;
+
+/*
+ * La lista de categorías sale del catálogo y no escrita a mano. Escribirla aquí
+ * significaría que cada categoría nueva deja esta página mintiendo un poco más,
+ * y nadie va a acordarse de venir a corregirla.
+ */
+$categoriasTexto = implode(', ', array_keys(categoriasMenu()));
+
+/**
+ * Las preguntas, por bloques. En un array y no en el marcado para que añadir
+ * una sea escribir dos líneas, y para que quien las revise pueda leerlas
+ * seguidas sin HTML en medio.
+ *
+ * La respuesta admite HTML: varias necesitan un enlace, y mandar a alguien a
+ * buscar «Publicar actividad» por su cuenta desde una respuesta que habla de
+ * ella es trabajo de más.
+ */
+$bloques = [
+    'Para usuarios' => [
+        [
+            '¿Qué es OMDARA?',
+            'Es una plataforma para descubrir actividades, clases, talleres, retiros y eventos de bienestar en un solo lugar.',
+        ],
+        [
+            '¿Tiene algún costo usar la plataforma?',
+            'No. Buscar y explorar actividades es gratuito.',
+        ],
+        [
+            '¿Cómo me inscribo a una actividad?',
+            'Cada organizador elige cómo recibir inscripciones. En la página de la actividad encontrarás un botón para '
+            . 'solicitar información, reservar o comprar boletos, según corresponda.',
+        ],
+        [
+            '¿OMDARA organiza los eventos?',
+            'No. Somos una plataforma que conecta a los usuarios con los organizadores. Cada organizador es responsable '
+            . 'de su evento: de lo que ofrece, de sus precios y de sus condiciones.',
+        ],
+        [
+            '¿Cómo sé si un evento sigue disponible?',
+            'La información la proporciona el organizador. Te recomendamos confirmar directamente con él antes de asistir.',
+        ],
+        [
+            '¿Puedo cancelar una reserva?',
+            'Las cancelaciones y reembolsos dependen de las políticas de cada organizador. OMDARA no gestiona pagos ni '
+            . 'reservas, así que no puede cancelarlas ni devolver un importe.',
+        ],
+        [
+            /*
+             * El requerimiento decía «encontrarás sus datos de contacto o el
+             * botón». Los datos de contacto del organizador NO se publican
+             * —REQ-00009 dice expresamente que su ficha de cuenta no es un
+             * perfil público—, así que lo que hay es el botón.
+             */
+            '¿Cómo contacto al organizador?',
+            'En la página de la actividad hay un botón para comunicarte. Si el organizador eligió «Contactar al '
+            . 'organizador», se abre un formulario y tu mensaje le llega por correo, con tu dirección puesta para que '
+            . 'pueda responderte directamente. No hace falta tener cuenta.',
+        ],
+        [
+            '¿Puedo sugerir un evento o actividad?',
+            'Sí. <a href="' . e(url('contacto')) . '">Escríbenos</a> para recomendar un evento o un organizador.',
+        ],
+    ],
+
+    'Para organizadores' => [
+        [
+            '¿Quién puede publicar actividades?',
+            'Cualquier organizador, empresa o profesional que ofrezca experiencias relacionadas con el bienestar.',
+        ],
+        [
+            '¿Publicar tiene costo?',
+            'Durante la etapa beta, publicar actividades es gratuito.',
+        ],
+        [
+            /*
+             * Cambiado: no hay «enviar para revisión». El formulario guarda un
+             * borrador, se ve la vista previa y publicar es una decisión del
+             * propio organizador, que surte efecto en el momento.
+             */
+            '¿Cómo publico un evento?',
+            'Crea una cuenta, completa el formulario de <a href="' . e(url('publicar')) . '">publicación</a> y verás una '
+            . 'vista previa de tu actividad tal como la verá la gente. Desde ahí decides si publicarla. '
+            . 'Se hace pública en ese momento.',
+        ],
+        [
+            /*
+             * Cambiado: la pregunta original —«¿Por qué mi evento debe ser
+             * revisado?»— parte de algo que no ocurre. Se reformula para
+             * responder la duda de fondo, que es si alguien vigila lo que se
+             * publica.
+             */
+            '¿Revisan mi actividad antes de publicarla?',
+            'No hay una revisión previa: tu actividad se publica en cuanto le das a publicar, sin esperar a nadie. '
+            . 'Lo que sí hacemos es revisar después: cualquiera puede reportar una actividad, y el equipo la mira y la '
+            . 'retira si no cumple. Es lo que permite publicar sin esperas sin renunciar a la calidad del directorio.',
+        ],
+        [
+            /*
+             * Cambiado: no hay aprobación que esperar. La pregunta se queda
+             * porque es la que la gente va a buscar, con la respuesta correcta.
+             */
+            '¿Cuánto tarda en aparecer mi actividad?',
+            'Aparece de inmediato. En cuanto la publicas ya se puede encontrar en el buscador y compartir su enlace.',
+        ],
+        [
+            /*
+             * Cambiado: «antes o después de su publicación» es cierto solo a
+             * medias, y la mitad que falta es la que genera el problema.
+             */
+            '¿Puedo editar mi evento?',
+            'Mientras es borrador, todo lo que quieras. Una vez publicada, puedes corregirla durante '
+            . EVENTO_MARGEN_EDICION_H . ' horas. Pasado ese plazo se congela y los cambios hay que pedírnoslos: es para '
+            . 'que una actividad no cambie de fecha ni de precio cuando ya hay gente que contaba con ella.',
+        ],
+        [
+            '¿Qué tipo de actividades aceptan?',
+            'Experiencias de bienestar en cualquiera de estas categorías: ' . e($categoriasTexto) . '. '
+            . 'Si lo tuyo encaja en el bienestar y no ves su categoría, <a href="' . e(url('contacto')) . '">dínoslo</a>.',
+        ],
+        [
+            '¿Puedo incluir un enlace para reservas o boletos?',
+            'Sí. Al publicar eliges la acción principal de tu actividad: contactarte, comprar boletos o reservar lugar. '
+            . 'En las dos últimas agregas el enlace que ya utilices —Eventbrite, Boletia, tu propio sitio, un formulario— '
+            . 'y el botón de la ficha lleva ahí.',
+        ],
+        [
+            /*
+             * Cambiado: no existe «no aprobado». Lo que sí puede pasar es que
+             * se oculte después, y eso es lo que se explica.
+             */
+            '¿Qué pasa si mi actividad se retira?',
+            'Si una actividad publicada incumple las reglas, se oculta y te avisamos del motivo para que puedas '
+            . 'corregirla. Dejar de estar visible no la borra: sigue en tu panel.',
+        ],
+        [
+            /*
+             * Cambiado: el panel del organizador no tiene «ocultar» —esa es una
+             * acción de administración—. Lo que sí puede hacer su dueño es
+             * eliminarla mientras esté dentro del plazo de edición.
+             */
+            '¿Cómo elimino un evento?',
+            'Desde la página de tu actividad, mientras siga dentro del plazo de edición. Después de ese plazo, '
+            . '<a href="' . e(url('contacto')) . '">escríbenos</a> y la retiramos: es la misma regla que la de editar, '
+            . 'y por el mismo motivo.',
+        ],
+    ],
+];
 
 require __DIR__ . '/includes/layout.php';
 ?>
@@ -27,27 +191,25 @@ require __DIR__ . '/includes/layout.php';
     </div>
   </div>
 
-  <?php $avisoPendiente = 'Las respuestas las define quien lleva el producto.'; ?>
-  <?php require __DIR__ . '/includes/aviso-pendiente.php'; ?>
+  <div class="faq">
+    <?php foreach ($bloques as $bloque => $preguntas): ?>
+      <h3 class="faq-bloque"><?= e($bloque) ?></h3>
 
-  <div style="max-width:760px; font-size:15px; line-height:1.75;">
-    <p style="opacity:.75; margin-bottom:22px;">Preguntas que el sitio ya responde en
-       otros sitios y que conviene reunir aquí:</p>
-
-    <ul style="opacity:.75; padding-left:20px;">
-      <li style="margin-bottom:9px;">¿Cuesta algo publicar una actividad?</li>
-      <li style="margin-bottom:9px;">¿Necesito una cuenta para contactar a un organizador?</li>
-      <li style="margin-bottom:9px;">Publiqué una actividad con un error, ¿puedo corregirla?</li>
-      <li style="margin-bottom:9px;">¿Quién revisa las actividades antes de que se publiquen?</li>
-      <li style="margin-bottom:9px;">Vi una actividad sospechosa, ¿cómo la reporto?</li>
-      <li style="margin-bottom:9px;">¿Qué tipo de actividades se aceptan?</li>
-      <li style="margin-bottom:9px;">¿Cómo se cobra a los asistentes?</li>
-    </ul>
+      <?php foreach ($preguntas as [$pregunta, $respuesta]): ?>
+        <details class="faq-item">
+          <?php /* El «+» y el «−» los pone el CSS, no el marcado: un signo
+                   escrito aquí lo leería en voz alta un lector de pantalla
+                   —«más, ¿cómo publico un evento?»— cuando ya anuncia por su
+                   cuenta si está abierto o cerrado. */ ?>
+          <summary><?= e($pregunta) ?></summary>
+          <div class="faq-respuesta"><?= $respuesta ?></div>
+        </details>
+      <?php endforeach; ?>
+    <?php endforeach; ?>
   </div>
 
-  <div style="margin-top:34px;">
-    <p style="font-size:14px; opacity:.75;">¿No está tu pregunta?
-      <a href="<?= URL_BASE ?>/contacto" style="text-decoration:underline;">Escríbenos</a>.</p>
+  <div class="faq-pie">
+    ¿No está tu pregunta? <a href="<?= e(url('contacto')) ?>">Escríbenos</a> y te contestamos.
   </div>
 </section>
 
