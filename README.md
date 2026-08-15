@@ -67,7 +67,7 @@ wellneshub/
 ├── resolver-mapa.php           Endpoint AJAX: enlace de Google Maps → lat/lng
 ├── sitemap.php                 sitemap.xml dinámico para buscadores
 ├── robots.txt
-├── blog.php                    Maqueta — no hay tabla de artículos todavía
+├── blog.php                    Maqueta, y oculta en el MVP (ver includes/secciones.php)
 ├── diagnostico-correo.php      Herramienta de diagnóstico de correo · solo admin
 │                                (borrable una vez que el correo funcione en el hosting final)
 ├── .htaccess                   Redirección a HTTPS, cache de estáticos
@@ -292,5 +292,7 @@ Todo lo de abajo vive en `docs/` — no se despliega, es material interno.
 - Recuperación de contraseña / verificación de correo: no aplica — no hay
   contraseñas en este sistema (ver [Cómo se entra](#cómo-se-entra)).
 - Dominio final, DNS y confirmación de SSL/HTTPS ahí.
-- Blog real (tabla de artículos y forma de escribirlos) — hoy es una maqueta.
+- Blog real (tabla de artículos y forma de escribirlos) — hoy es una maqueta, y
+  está oculto en el MVP junto con el boletín (REQ-00004). Se vuelven a enseñar
+  quitándolos de `SECCIONES_OCULTAS` en `includes/secciones.php`.
 - Meta Pixel: el código ya está listo, falta crear la cuenta.

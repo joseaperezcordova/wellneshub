@@ -108,6 +108,17 @@ return [
         'pedir_perfil'  => false,
     ],
 
+    // ---- Secciones ocultas ------------------------------------------------
+    // OPCIONAL, y normalmente no se toca. Blog y Newsletter salen ocultos en el
+    // MVP (REQ-00004); la lista manda desde includes/secciones.php, que viaja en
+    // git y por tanto vale igual en pruebas y en producción.
+    //
+    // Esto de aquí solo sirve para ENSEÑAR en un entorno algo que sigue oculto
+    // en el otro —revisar el blog en pruebas, por ejemplo—. Publicar de verdad
+    // se decide en el código, donde queda un commit que revisar:
+    //
+    //     'secciones' => ['blog' => true],
+
     // ---- Analítica -----------------------------------------------------
     // Las cuatro llaves de abajo son independientes: cada una enciende su
     // propia herramienta si tiene algo puesto, y no hace nada si está vacía.

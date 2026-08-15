@@ -225,7 +225,12 @@ $analiticaActiva = empty($CONFIG['es_local']);
     <nav class="mainnav" id="mainnav">
       <?= enlaceMenu('inicio',      'nav.inicio',      'inicio', $seccion) ?>
       <?= enlaceMenu('actividades', 'nav.actividades', 'buscar', $seccion) ?>
-      <?= enlaceMenu('blog',        'nav.blog',        'blog',   $seccion) ?>
+      <?php /* El blog no entra en el MVP (REQ-00004). El enlace no se borra: se
+               pregunta por él, y vuelve solo el día que se quite de
+               SECCIONES_OCULTAS. */ ?>
+      <?php if (seccionVisible('blog')): ?>
+        <?= enlaceMenu('blog',      'nav.blog',        'blog',   $seccion) ?>
+      <?php endif; ?>
     </nav>
 
     <div class="topbar-right">

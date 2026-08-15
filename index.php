@@ -197,6 +197,13 @@ require __DIR__ . '/includes/layout.php';
   </div>
 </section>
 
+<?php
+/*
+ * Blog y Newsletter no entran en el MVP (REQ-00004). Los dos bloques se quedan
+ * escritos tal cual —maquetados, con sus estilos y su JavaScript— y solo se
+ * pregunta si toca enseñarlos. Ver includes/secciones.php.
+ */
+if (seccionVisible('blog')): ?>
 <section class="block wrap">
   <div class="block-head">
     <h2>Artículos</h2>
@@ -229,7 +236,9 @@ require __DIR__ . '/includes/layout.php';
     </a>
   </div>
 </section>
+<?php endif; ?>
 
+<?php if (seccionVisible('newsletter')): ?>
 <section class="block wrap">
   <div class="newsletter">
     <div>
@@ -247,6 +256,7 @@ require __DIR__ . '/includes/layout.php';
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <script>
   var EVENTOS = <?= json_encode($eventosJs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES

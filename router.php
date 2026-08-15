@@ -46,6 +46,15 @@ $claveEncontrada = null;
 $idiomaEncontrado = IDIOMA_POR_DEFECTO;
 
 foreach (rutasSitio() as $clave => $destino) {
+    /*
+     * Una sección oculta (REQ-00004) deja de resolver: /blog da 404 igual que
+     * cualquier dirección inventada. Quitar el enlace del menú y dejar la
+     * dirección abierta no es ocultar —se sigue compartiendo, se sigue
+     * indexando—, y la clave de ruta y la de sección son la misma palabra a
+     * propósito, para que esto no necesite una tabla de equivalencias.
+     */
+    if (!seccionVisible($clave)) continue;
+
     foreach (idiomasDisponibles() as $idioma) {
         if (isset($destino[$idioma]) && $destino[$idioma] === $ruta) {
             $claveEncontrada  = $clave;

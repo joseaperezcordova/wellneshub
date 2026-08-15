@@ -9,10 +9,29 @@
  *
  * Lo que cambia respecto a antes es que ahora tiene dirección propia
  * —/blog.php— en vez de ser una vista escondida dentro de la portada.
+ *
+ * FUERA DEL MVP (REQ-00004). La página entera se queda escrita; lo que hay es
+ * una puerta cerrada delante. Tiene que estar aquí y no solo en el enrutador
+ * porque este archivo existe de verdad: el .htaccess sirve /blog.php directo
+ * sin pasar por router.php, así que sin esta comprobación la dirección seguiría
+ * abierta para quien la conociera.
  */
 
 declare(strict_types=1);
 require __DIR__ . '/includes/config.php';
+
+if (!seccionVisible('blog')) {
+    http_response_code(404);
+
+    $titulo = t('pagina.404.titulo');
+    require __DIR__ . '/includes/layout.php';
+    echo '<div class="auth-caja"><h1>' . et('pagina.404.titulo') . '</h1>'
+       . '<p class="sub">Puede que el enlace esté mal escrito o que la página se haya movido.</p>'
+       . '<a class="btn-principal" style="text-decoration:none; display:block; text-align:center;"'
+       . ' href="' . e(URL_BASE) . '/">Ir al inicio</a></div>';
+    pie();
+    exit;
+}
 
 $titulo      = 'Blog';
 $descripcion = 'Guías y agenda de bienestar en México: retiros de yoga, festivales holísticos y consejos para tu próxima actividad.';

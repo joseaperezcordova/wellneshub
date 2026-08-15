@@ -113,6 +113,9 @@ if (session_status() === PHP_SESSION_NONE) {
 /* Va antes que los demás: url(), t() y idiomaActual() los usan las plantillas
    de layout.php, y layout.php lo carga cualquier página. */
 require_once __DIR__ . '/idioma.php';
+/* Igual que el anterior: seccionVisible() lo consultan layout.php y la portada,
+   así que tiene que estar cargado antes que cualquier plantilla. */
+require_once __DIR__ . '/secciones.php';
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/http.php';
 require_once __DIR__ . '/correo.php';

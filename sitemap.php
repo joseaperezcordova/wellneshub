@@ -51,6 +51,11 @@ foreach (rutasSitio() as $clave => $destino) {
     // redirección al login y no una página que indexar.
     if (!isset($prioridades[$clave])) continue;
 
+    // Lo que no se enseña tampoco se le ofrece a Google (REQ-00004): un
+    // sitemap que anuncia una dirección que devuelve 404 es un error de
+    // rastreo en Search Console, no un descuido silencioso.
+    if (!seccionVisible($clave)) continue;
+
     [$prioridad, $frecuencia] = $prioridades[$clave];
 
     foreach (idiomasDisponibles() as $idioma) {
