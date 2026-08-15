@@ -53,6 +53,31 @@ borrar el `require` de `includes/aviso-pendiente.php`.
 > **Ojo con el orden de prioridad.** En México el Aviso de Privacidad no es
 > cortesía: la LFPDPPP lo exige a quien trate datos personales, y este sitio los
 > trata desde el primer registro. Ahora mismo el sitio opera sin él.
+>
+> Y desde REQ-00007 hay un sitio donde se nota a simple vista: el formulario de
+> contactar al organizador obliga a marcar «He leído y acepto el Aviso de
+> Privacidad», y ese enlace lleva a una página que dice que su texto está
+> pendiente. Pedir que acepten algo que no está escrito es peor que no pedirlo.
+> **Es el pendiente más urgente de esta lista.**
+
+---
+
+### 2b. Ejecutar la migración 15 (teléfono en los mensajes al organizador)
+
+**Qué falta:** correr `database/migracion-15-telefono-en-contactos.sql` en
+phpMyAdmin, en pruebas y en producción.
+
+**Qué pasa mientras tanto:** nada visible. El formulario funciona, el teléfono
+llega al correo del organizador —que es para lo que se pide— y solo se pierde en
+la base. `crearContacto()` comprueba si la columna existe antes de escribir, para
+que publicar el código antes de aplicar la migración no tire el formulario
+entero, que es lo que pasó con las tablas la primera vez.
+
+**Para cerrarlo:** ejecutar el `.sql` en los dos entornos y luego quitar el rodeo
+de `crearContacto()` en `includes/contacto.php` —el `columnaExiste()` y la rama
+sin teléfono—, que vuelve a ser un único INSERT. `columnaExiste()` en
+`includes/db.php` se queda: no estorba y la próxima migración a mano lo
+agradecerá.
 
 ---
 
@@ -95,6 +120,26 @@ páginas. Vive en pruebas hasta cerrar la fase 4.
 ---
 
 ## Decisiones de diseño abiertas
+
+### 2c. ¿El contacto tiene que flotar sobre la ficha?
+
+**Qué falta:** decidir si «Contactar al organizador» abre una ventana encima de
+la actividad —con la ficha detrás, difuminada— o sigue siendo una página propia.
+
+**Qué hay hoy:** una página, `/contactar.php?id=`, con la tarjeta dibujada tal
+como la enseña REQ-00007. En una captura no se distingue; la diferencia es que
+hay una dirección y una recarga.
+
+**Por qué se hizo así:** el envío se valida en el servidor como todo lo demás
+—CSRF, captcha y límite por IP—. Una ventana que envía sin recargar necesita una
+capa de JavaScript por encima de esos tres, y esa capa es justo donde se cuelan
+los envíos sin validar. Además así funciona sin JavaScript, y un error de
+validación tiene dónde volver con lo escrito dentro.
+
+**Para cerrarlo si se quiere la ventana:** no hay que tirar nada. El mismo
+formulario se carga dentro de un contenedor y se envía por `fetch`, con la página
+actual como respaldo cuando falle. `.modal-overlay` ya existe en
+`assets/css/portada.css`, sin usar, desde el prototipo.
 
 ### 3. El logotipo
 

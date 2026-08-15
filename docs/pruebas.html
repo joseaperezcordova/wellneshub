@@ -892,8 +892,51 @@
 
       <!-- 06 ─────────────────────────────────────────────── -->
       <section id="s6">
-        <div class="cab-sec"><span class="n">06</span><h2>Reportar una actividad</h2></div>
+        <div class="cab-sec"><span class="n">06</span><h2>Contactar y reportar</h2></div>
         <p class="quien">Sin cuenta, como cualquier visitante</p>
+
+        <p class="intro-sec">
+          Primero lo nuevo: escribirle al organizador. Solo aparece en las actividades cuya
+          acción principal es «Contactar al organizador» — las que venden boletos o piden
+          reserva llevan a otro sitio.
+        </p>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">En una actividad de ese tipo, dale a «Contactar al organizador».</span>
+          <span class="esperado">Se abre el formulario, y arriba se ve <b>a qué actividad le estás escribiendo</b>: nombre, dónde y cuándo. Sin eso, alguien que llegue desde un enlace guardado no sabría a quién escribe.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Escribe un mensaje largo y mira el contador de abajo a la derecha.</span>
+          <span class="esperado">Va contando, y <b>al llegar a 500 el campo deja de aceptar letras</b>.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Intenta enviar <b>sin marcar</b> la casilla del Aviso de Privacidad.</span>
+          <span class="esperado">No se envía y te lo dice. <b>El enlace del Aviso de Privacidad abre en otra pestaña</b> y no te hace perder lo escrito.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Ahora sí: rellena todo, pon un teléfono y envía.</span>
+          <span class="esperado">Sale la pantalla de «¡Mensaje enviado!» con el botón para volver a la actividad. <b>Al organizador le llega un correo</b> con tu nombre, tu correo, tu teléfono y tu mensaje, y puede responderlo directamente.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Vuelve a la actividad e intenta escribir otra vez enseguida.</span>
+          <span class="esperado">No te deja: dice que le des tiempo a responder. Es a propósito, para que nadie llene el correo de un organizador.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Da a la <b>×</b> de arriba a la derecha del formulario.</span>
+          <span class="esperado">Vuelves a la actividad.</span>
+        </label>
+
         <p class="intro-sec">
           Cualquiera puede avisar de que una actividad está mal. El aviso no la esconde: solo la
           pone en la lista de lo que hay que revisar. Hazlo desde una ventana de incógnito.

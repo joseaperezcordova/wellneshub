@@ -302,6 +302,9 @@ CREATE TABLE IF NOT EXISTS contactos (
 
   nombre      VARCHAR(120)    NOT NULL,
   email       VARCHAR(190)    NOT NULL,
+  -- Teléfono de quien escribe, no del organizador (migración 15). Opcional, y
+  -- tal cual se tecleó: es para que una persona lo marque.
+  telefono    VARCHAR(30)     NULL DEFAULT NULL,
   mensaje     VARCHAR(1000)   NULL DEFAULT NULL,
 
   ip          VARBINARY(16)   NOT NULL,

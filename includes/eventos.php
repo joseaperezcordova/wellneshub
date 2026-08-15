@@ -1033,6 +1033,42 @@ function fechaCorta(string $fecha): string
 }
 
 /**
+ * Cuándo es, en una sola línea: "Sábado 17 de agosto, 7:00".
+ *
+ * Para sitios donde la actividad no es la protagonista sino el contexto —el
+ * formulario de contactar al organizador, por ejemplo—, donde hacen falta las
+ * tres formas de fecha resueltas en un renglón y no el bloque de tres líneas
+ * de la ficha.
+ *
+ * El día de la semana va escrito aquí y no con setlocale: la traducción del
+ * sistema depende de qué locales tenga instalado el servidor, y un hosting
+ * compartido sin es_MX devuelve "Saturday" sin avisar de nada.
+ */
+function fechaResumen(array $ev): string
+{
+    static $dias  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+    static $meses = ['enero','febrero','marzo','abril','mayo','junio','julio',
+                     'agosto','septiembre','octubre','noviembre','diciembre'];
+
+    if (($ev['tipo_actividad'] ?? '') === 'recurrente') {
+        return (frecuenciasRecurrencia()[$ev['frecuencia']] ?? 'Varias fechas')
+             . ', ' . substr((string) $ev['hora_recurrente'], 0, 5);
+    }
+
+    $ts = (int) strtotime((string) $ev['fecha_inicio']);
+
+    if (terminaOtroDia($ev)) {
+        return 'Del ' . fechaCorta((string) $ev['fecha_inicio'])
+             . ' al ' . fechaCorta((string) $ev['fecha_fin']);
+    }
+
+    $dia = mb_convert_case($dias[(int) date('w', $ts)], MB_CASE_TITLE, 'UTF-8');
+
+    return $dia . ' ' . (int) date('j', $ts) . ' de ' . $meses[(int) date('n', $ts) - 1]
+         . ', ' . date('H:i', $ts);
+}
+
+/**
  * ¿Termina esta actividad en un día distinto del que empieza?
  *
  * NO vale preguntar si fecha_fin está puesta, que es lo que hacía la ficha.

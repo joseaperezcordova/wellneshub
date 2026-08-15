@@ -875,3 +875,94 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
   font-family:'IBM Plex Mono',monospace; font-size:12.5px;
   background:var(--arena-suave); border-radius:4px; padding:2px 6px;
 }
+
+/* ------------------------------------ contactar al organizador (REQ-00007) -- */
+/* La tarjeta del formulario y la de confirmacion. Hereda de .auth-caja —misma
+   caja blanca, mismo borde, misma sombra— pero mas ancha: aqui hay un resumen
+   de la actividad y un aviso encima del boton, y a 430px eso se convierte en
+   una columna estrecha con seis parrafos.
+
+   Las etiquetas siguen siendo las del resto de formularios del sitio (mono, en
+   versalitas). El diseño de referencia las dibuja en redonda, pero ese es el
+   aspecto de un boceto generico: cambiarlas solo aqui dejaria este formulario
+   distinto de publicar, entrar y reportar. */
+.tarjeta-contacto{
+  max-width:520px; margin:44px auto 72px; background:var(--blanco);
+  border:1px solid var(--linea); border-radius:16px; padding:30px 30px 26px;
+  box-shadow:0 14px 40px rgba(47,78,93,.09);
+}
+@media(max-width:560px){ .tarjeta-contacto{padding:24px 20px; margin:24px auto 48px;} }
+.tarjeta-contacto h1{font-size:25px; line-height:1.2;}
+.tarjeta-contacto .sub{font-size:13.5px; opacity:.8; margin:6px 0 0;}
+.tarjeta-contacto .auth-pie{margin-top:18px; font-size:11.5px; opacity:.75; line-height:1.6;}
+
+.contacto-cab{display:flex; align-items:flex-start; justify-content:space-between; gap:16px;}
+.contacto-cerrar{
+  flex-shrink:0; font-size:26px; line-height:1; color:var(--gris);
+  padding:0 2px; margin-top:-2px;
+}
+.contacto-cerrar:hover{color:var(--petroleo);}
+
+/* El bloque que dice a que actividad se le esta escribiendo. */
+.contacto-actividad{
+  background:var(--arena-suave); border:1px solid var(--linea-suave);
+  border-radius:10px; padding:14px 16px; margin:22px 0 24px;
+}
+.contacto-actividad-tit{
+  font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--verde-claro); margin-bottom:5px;
+}
+.contacto-actividad strong{display:block; font-size:16px; line-height:1.3; margin-bottom:7px;}
+.contacto-actividad-dato{
+  display:flex; align-items:baseline; gap:8px;
+  font-size:13px; color:var(--gris); line-height:1.5; margin-top:3px;
+}
+.contacto-actividad-dato span{flex-shrink:0; color:var(--verde-claro);}
+
+/* «*» de campo obligatorio. No es color solo: el asterisco se ve igual sin
+   distinguir colores, que es de lo que trata la marca. */
+.obligatorio{color:var(--error); font-weight:700;}
+
+/* Contador del mensaje, alineado a la derecha bajo el campo. Lo enseña el
+   script de la pagina; sin JavaScript no aparece y no falta. */
+.tarjeta-contacto .contador{
+  font-family:'IBM Plex Mono',monospace; font-size:10.5px; opacity:.7;
+  text-align:right; margin-top:5px;
+}
+
+.contacto-nota{
+  background:var(--arena-suave); border-left:3px solid var(--verde-claro);
+  border-radius:8px; padding:12px 14px; margin:4px 0 18px;
+  font-size:12.5px; line-height:1.6; color:var(--gris);
+}
+.contacto-nota strong{display:block; color:var(--petroleo); margin-bottom:3px; font-size:13px;}
+
+.contacto-privacidad{
+  display:flex; align-items:flex-start; gap:10px; cursor:pointer;
+  font-size:13.5px; line-height:1.5; margin:0 0 18px;
+}
+.contacto-privacidad input{
+  flex-shrink:0; width:18px; height:18px; margin:1px 0 0; accent-color:var(--verde);
+}
+.contacto-privacidad a{color:var(--terracota-texto); text-decoration:underline; text-underline-offset:2px;}
+
+.btn-enviar{display:flex; align-items:center; justify-content:center; gap:8px;}
+
+/* ---- Confirmacion ---- */
+.contacto-hecho{text-align:center; padding:14px 0 6px;}
+.contacto-tick{
+  width:104px; height:104px; margin:0 auto 22px; border-radius:50%;
+  background:var(--exito-fondo); color:var(--verde-claro);
+  display:flex; align-items:center; justify-content:center;
+}
+.contacto-hecho h1{font-size:24px; color:var(--verde); margin-bottom:12px;}
+.contacto-hecho p{font-size:14px; line-height:1.6; color:var(--gris); margin:0 0 6px; }
+.contacto-hecho p:last-of-type{margin-bottom:28px;}
+
+/* Boton de contorno: la confirmacion no tiene ninguna accion principal que
+   competir, asi que un boton solido pediria un clic que no hace falta dar. */
+.btn-contorno{
+  display:block; text-align:center; padding:12px 20px; border-radius:10px;
+  border:1.5px solid var(--verde); color:var(--verde); font-size:14.5px; font-weight:600;
+}
+.btn-contorno:hover{background:var(--arena-suave);}

@@ -26,18 +26,43 @@ function contactoRepetido(int $eventoId): bool
     return (int) $st->fetchColumn() > 0;
 }
 
-function crearContacto(int $eventoId, string $nombre, string $email, ?string $mensaje): void
+/**
+ * Guarda el mensaje.
+ *
+ * EL TELÉFONO SE GUARDA SI LA COLUMNA ESTÁ, Y SI NO, NO.
+ *
+ * Lo añade migracion-15, y las migraciones de este proyecto se ejecutan a mano
+ * en phpMyAdmin: entre publicar el código y aplicarlas pasa un rato. Sin este
+ * rodeo, ese rato sería el formulario de contacto devolviendo un error 500 a
+ * todo el mundo —ya pasó una vez, con el sitio entero—.
+ *
+ * Perder el teléfono en la base mientras tanto no rompe nada: al organizador le
+ * llega igual en el correo, que es para lo que se pide. Lo que no puede pasar
+ * es que el mensaje no llegue.
+ *
+ * Cuando la migración esté aplicada en pruebas y en producción, esto vuelve a
+ * ser un único INSERT con las seis columnas.
+ */
+function crearContacto(int $eventoId, string $nombre, string $email, ?string $telefono, ?string $mensaje): void
 {
-    db()->prepare(
-        'INSERT INTO contactos (evento_id, nombre, email, mensaje, ip)
-         VALUES (?, ?, ?, ?, ?)'
-    )->execute([
-        $eventoId,
-        mb_substr($nombre, 0, 120),
-        mb_substr($email, 0, 190),
-        $mensaje !== null ? mb_substr($mensaje, 0, 1000) : null,
-        ipBinaria(),
-    ]);
+    $conTelefono = columnaExiste('contactos', 'telefono');
+
+    $columnas = 'evento_id, nombre, email, ' . ($conTelefono ? 'telefono, ' : '') . 'mensaje, ip';
+    $huecos   = $conTelefono ? '?, ?, ?, ?, ?, ?' : '?, ?, ?, ?, ?';
+
+    $valores = [$eventoId, mb_substr($nombre, 0, 120), mb_substr($email, 0, 190)];
+    if ($conTelefono) {
+        $valores[] = ($telefono !== null && $telefono !== '') ? mb_substr($telefono, 0, 30) : null;
+    }
+    $valores[] = ($mensaje !== null && $mensaje !== '') ? mb_substr($mensaje, 0, 1000) : null;
+    $valores[] = ipBinaria();
+
+    db()->prepare("INSERT INTO contactos ($columnas) VALUES ($huecos)")->execute($valores);
+
+    if (!$conTelefono && $telefono !== null && $telefono !== '') {
+        error_log('contactos.telefono no existe todavía: falta ejecutar '
+            . 'database/migracion-15-telefono-en-contactos.sql. El mensaje se guardó sin teléfono.');
+    }
 }
 
 /**
@@ -48,13 +73,17 @@ function crearContacto(int $eventoId, string $nombre, string $email, ?string $me
  * hay nada que agrupar. El Reply-To queda puesto al correo de quien
  * escribió, así que el organizador solo tiene que darle "Responder".
  */
-function avisarOrganizador(array $ev, string $nombre, string $email, ?string $mensaje): void
+function avisarOrganizador(array $ev, string $nombre, string $email, ?string $telefono, ?string $mensaje): void
 {
     $cuerpo = "Alguien quiere contactarte por tu actividad publicada en OMDARA.\n\n"
             . 'Actividad:  ' . $ev['titulo'] . "\n"
             . 'Nombre:     ' . $nombre . "\n"
             . 'Correo:     ' . $email . "\n"
-            . ($mensaje !== null && $mensaje !== '' ? "Mensaje:\n" . $mensaje . "\n\n" : "\n")
+            // El teléfono solo aparece si lo dieron: una línea "Teléfono: —" en
+            // cada correo enseña a saltarse ese renglón, y el día que sí venga
+            // uno tampoco se leerá.
+            . ($telefono !== null && $telefono !== '' ? 'Teléfono:   ' . $telefono . "\n" : '')
+            . ($mensaje !== null && $mensaje !== '' ? "\nMensaje:\n" . $mensaje . "\n\n" : "\n")
             . "Para responder, contesta directamente este correo: llega a $email.\n\n"
             . urlEvento($ev) . "\n";
 
