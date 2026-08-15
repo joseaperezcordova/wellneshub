@@ -42,7 +42,7 @@ $titulo        = 'Directorio de actividades wellness en México';
 $descripcion   = 'Encuentra retiros, festivales y círculos de bienestar en todo México: yoga, breathwork, sound healing, temazcal y más. Publica tu actividad gratis.';
 $seccion       = 'inicio';
 $anchoLibre    = true;
-$scriptsPagina = ['assets/js/inicio.js'];
+$scriptsPagina = ['assets/js/inicio.js', 'assets/js/buscador.js'];
 
 require __DIR__ . '/includes/layout.php';
 ?>
@@ -115,7 +115,18 @@ require __DIR__ . '/includes/layout.php';
         <input id="bDonde" name="q" type="text" placeholder="Tulum, CDMX, Oaxaca…"
                autocomplete="off" list="lugaresConEventos">
         <?php /* El datalist propone solo sitios donde hay algo. Es la forma
-                 barata de que nadie teclee una ciudad vacía. */ ?>
+                 barata de que nadie teclee una ciudad vacía.
+
+                 Desde REQ-00005 la lista que se ve NO es esta: el navegador la
+                 dibuja a su manera —estrecha y pegada al campo, la «nube de
+                 diálogo» del requerimiento— y no hay CSS que la cambie.
+                 assets/js/buscador.js lee estas opciones, monta con ellas un
+                 panel igual que el de los otros dos campos y le quita el
+                 atributo «list» al input para que no salgan las dos listas.
+
+                 El datalist se queda por lo mismo que se quedan los <select>:
+                 si ese archivo no llega a ejecutarse, el campo sigue
+                 proponiendo sitios. */ ?>
         <datalist id="lugaresConEventos">
           <?php foreach ($lugares as $l): ?><option value="<?= e($l) ?>"></option><?php endforeach; ?>
         </datalist>

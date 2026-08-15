@@ -224,7 +224,12 @@
      boton circular. Va fuera de .hero-banner —que recorta por overflow— y sube
      con margin negativo para montarse encima. */
   .buscador{
-    position:relative; z-index:2; margin:-34px auto 0; max-width:920px;
+    /* z-index:12 y no 2. Con 2 empataba con .evnext —la flecha del carril de
+       proximas actividades, que tambien es 2— y en un empate gana el ultimo del
+       documento: el panel de «Qué», que mide hasta 360px, se metia por debajo
+       de esa flecha. Sigue por debajo de la cabecera pegajosa (40) y del modal
+       (100), que son los dos que si tienen que taparlo. */
+    position:relative; z-index:12; margin:-34px auto 0; max-width:920px;
     background:var(--paper); border:1px solid var(--line); border-radius:999px;
     display:flex; align-items:center; padding:7px 7px 7px 10px;
     box-shadow:0 14px 38px rgba(47,78,93,0.20);
@@ -240,12 +245,15 @@
   }
   .bcampo input:focus, .bcampo select:focus{outline:none;}
   .bsep{width:1px; height:34px; background:var(--line); flex-shrink:0;}
-  .buscador button{
+  /* El hijo directo, que es el de la lupa. Desde REQ-00005 los campos «Cuándo»
+     y «Qué» tambien llevan un <button> dentro, y con «.buscador button» los
+     tres se habrian convertido en un circulo naranja de 48px. */
+  .buscador > button{
     flex-shrink:0; width:48px; height:48px; border-radius:50%; border:none;
     background:var(--marigold); color:var(--tinta-boton);
     display:flex; align-items:center; justify-content:center;
   }
-  .buscador button:hover{background:var(--marigold-deep);}
+  .buscador > button:hover{background:var(--marigold-deep);}
   /* En movil la pastilla se rompe en filas: tres campos de 90px de ancho no se
      pueden rellenar, y el circulo del boton deja de tener sentido. */
   @media(max-width:760px){
@@ -253,7 +261,72 @@
     .bcampo{flex:1 1 100%;}
     .bcampo + .bcampo{border-top:1px solid var(--line-soft);}
     .bsep{display:none;}
-    .buscador button{width:100%; height:44px; border-radius:999px; margin-top:6px;}
+    .buscador > button{width:100%; height:44px; border-radius:999px; margin-top:6px;}
+  }
+
+  /* ---------- desplegables del buscador (REQ-00005) ----------
+     Los tres campos se abrian de tres formas distintas porque eran tres
+     controles distintos —un <datalist> y dos <select>—, y la ventana de esos
+     controles la pinta el sistema operativo: no admite ancho, ni color, ni
+     direccion de apertura. Un <select> que no cabe debajo se abre hacia
+     arriba y no hay CSS que lo impida. Por eso la lista se dibuja aqui.
+     assets/js/buscador.js la construye y explica el resto. */
+
+  /* El panel se posiciona contra el campo, que es lo que fija su ancho. */
+  .bcampo{position:relative;}
+  /* Mientras esta abierto, el campo se queda resaltado: sin esto, con el panel
+     abierto no se ve de cual de los tres es. */
+  .bcampo.abierto{background:var(--arena-suave);}
+
+  /* El valor visible de «Cuándo» y «Qué». Hereda el aspecto del <select> al que
+     sustituye para que los tres campos sigan pareciendo el mismo campo. */
+  .bvalor{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    width:100%; border:none; background:none; padding:0; text-align:left;
+    font-family:inherit; font-size:14px; color:var(--ink); line-height:1.4;
+  }
+  .bvalor .btexto{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  /* La flecha, dibujada con bordes: sustituye a la del <select>, que
+     desaparece al ocultarlo. */
+  .bflecha{
+    flex-shrink:0; width:7px; height:7px; margin-bottom:3px;
+    border-right:1.6px solid var(--jungle); border-bottom:1.6px solid var(--jungle);
+    transform:rotate(45deg); transition:transform .15s;
+  }
+  .bcampo.abierto .bflecha{transform:rotate(-135deg); margin-bottom:-2px;}
+
+  /* Siempre hacia ABAJO y con el ancho del campo: los dos criterios del
+     requerimiento. Al ser un elemento de la pagina y no una ventana del
+     sistema, no hay ningun caso en que se de la vuelta solo.
+
+     Cuando no cabe —«Qué» tiene veintitres practicas— crece hasta el limite y
+     desplaza por dentro. Un <select> en esa situacion se abria hacia arriba;
+     esto no. */
+  .bdrop{
+    position:absolute; top:calc(100% + 10px); left:0; width:100%; min-width:190px;
+    z-index:30; max-height:min(52vh, 360px); overflow-y:auto;
+    background:var(--paper); border:1px solid var(--line); border-radius:12px;
+    padding:6px; box-shadow:0 16px 40px rgba(47,78,93,0.18);
+  }
+  .bdrop[hidden]{display:none;}
+  .bopcion{
+    padding:9px 12px; border-radius:8px; font-size:14px; color:var(--ink);
+    line-height:1.35; cursor:pointer;
+  }
+  .bopcion[hidden]{display:none;}
+  /* «activa» es la que se elegiria ahora —con el raton encima o con las
+     flechas—; «aria-selected» es la que ya esta elegida. Son cosas distintas y
+     se ven distintas: el fondo marca donde estas, la negrita que ya es tuya. */
+  .bopcion.activa{background:var(--arena-suave);}
+  .bopcion[aria-selected="true"]{font-weight:600; color:var(--jungle);}
+
+  /* En movil los campos son filas de ancho completo, asi que el panel tambien.
+     Las filas crecen a 44px de alto: es el minimo para acertar con el dedo, y
+     es la parte donde un desplegable propio pierde contra el del sistema si no
+     se cuida. */
+  @media(max-width:760px){
+    .bdrop{top:calc(100% + 6px); max-height:46vh;}
+    .bopcion{padding:12px 12px; font-size:15px;}
   }
 
   /* ---------- explorar por categoria: menu lineal ----------
