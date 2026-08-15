@@ -1099,6 +1099,53 @@
         </label>
 
         <p class="intro-sec">
+          Y el <b>formulario de contacto general</b>, el del pie del sitio. Es para escribirle a
+          OMDARA, no a un organizador.
+        </p>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Abre «Contacto» desde el pie y despliega «Motivo del contacto».</span>
+          <span class="esperado">Hay seis motivos. Con la mayoría <b>no aparece</b> ningún campo de actividad.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Elige «Problema con una actividad» y luego cambia a «Pregunta general».</span>
+          <span class="esperado">Al elegir el primero aparece «¿Qué actividad está relacionada?»; al cambiar al segundo <b>desaparece y se vacía</b>. Si escribiste algo ahí, no debe viajar con el mensaje.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Envía el formulario vacío.</span>
+          <span class="esperado">Cada campo que falta dice <b>debajo</b> qué le pasa, todos a la vez. No de uno en uno.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Pon un correo sin arroba y envía.</span>
+          <span class="esperado">Dice «Introduce un correo electrónico válido» junto a ese campo.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Rellénalo bien y dale a «Enviar mensaje» <b>dos veces seguidas, rápido</b>.</span>
+          <span class="esperado">El botón se bloquea y pone «Enviando…». Solo debe llegar <b>un</b> mensaje.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Intenta escribir otra vez enseguida.</span>
+          <span class="esperado">No deja: dice que esperes. Es el límite por IP, quince minutos.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Si eres admin, entra al panel y abre la pestaña <b>«Mensajes»</b>.</span>
+          <span class="esperado">Ahí está el que acabas de mandar, con su motivo y su actividad si la pusiste. Y te llegó por correo, con el motivo entre corchetes en el asunto.</span>
+        </label>
+
+        <p class="intro-sec">
           Cualquiera puede avisar de que una actividad está mal. El aviso no la esconde: solo la
           pone en la lista de lo que hay que revisar. Hazlo desde una ventana de incógnito.
         </p>

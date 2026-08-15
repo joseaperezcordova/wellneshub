@@ -112,16 +112,103 @@ function contactoSitioRepetido(): bool
     return (int) $st->fetchColumn() > 0;
 }
 
-function crearContactoSitio(string $nombre, string $email, string $mensaje): void
+/**
+ * Por qué puede escribir alguien: clave interna => lo que se lee en el menú.
+ *
+ * La clave es lo que se guarda y lo que se compara; la etiqueta, lo que se
+ * enseña. Separadas porque cambiar cómo se lee un motivo no debería obligar a
+ * tocar lo que hay guardado en filas anteriores, que es el mismo criterio de
+ * categoriasMenu() y de ordenesBusqueda().
+ */
+function motivosContacto(): array
 {
-    db()->prepare(
-        'INSERT INTO mensajes_contacto (nombre, email, mensaje, ip) VALUES (?, ?, ?, ?)'
-    )->execute([
-        mb_substr($nombre, 0, 120),
-        mb_substr($email, 0, 190),
-        mb_substr($mensaje, 0, 1000),
-        ipBinaria(),
-    ]);
+    return [
+        'general'    => 'Pregunta general',
+        'actividad'  => 'Problema con una actividad',
+        'cuenta'     => 'Problema con mi cuenta',
+        'organizador'=> 'Soy organizador',
+        'reporte'    => 'Reportar contenido',
+        'otro'       => 'Otro',
+    ];
+}
+
+/**
+ * ¿Este motivo obliga a decir de qué actividad se habla?
+ *
+ * Los dos que se refieren a una en concreto. Sin el nombre, un «problema con
+ * una actividad» llega a administración sin decir con cuál, y la primera
+ * respuesta tiene que ser preguntarlo.
+ */
+function motivoPideActividad(string $motivo): bool
+{
+    return in_array($motivo, ['actividad', 'reporte'], true);
+}
+
+/** Los cuatro estados del hilo. Solo se leen: no hay pantalla para cambiarlos. */
+function estadosContacto(): array
+{
+    return [
+        'nuevo'      => 'Nuevo',
+        'revision'   => 'En revisión',
+        'respondido' => 'Respondido',
+        'cerrado'    => 'Cerrado',
+    ];
+}
+
+/**
+ * Guarda el mensaje.
+ *
+ * El motivo y la actividad se escriben solo si existen sus columnas
+ * (migración 19), por lo mismo que las cuatro migraciones anteriores: se
+ * aplican a mano, y entre publicar el código y ejecutarlas hay un rato en el
+ * que el formulario tiene que seguir funcionando. Los dos datos van igual al
+ * correo del administrador, que es lo que hace que alguien actúe.
+ */
+function crearContactoSitio(string $nombre, string $email, string $mensaje,
+                            string $motivo = 'general', ?string $actividad = null): void
+{
+    $conMotivo = columnaExiste('mensajes_contacto', 'motivo');
+
+    $columnas = 'nombre, email, ' . ($conMotivo ? 'motivo, actividad_nombre, ' : '') . 'mensaje, ip';
+    $huecos   = $conMotivo ? '?, ?, ?, ?, ?, ?' : '?, ?, ?, ?';
+
+    $valores = [mb_substr($nombre, 0, 120), mb_substr($email, 0, 190)];
+
+    if ($conMotivo) {
+        $valores[] = isset(motivosContacto()[$motivo]) ? $motivo : 'general';
+        $valores[] = ($actividad !== null && trim($actividad) !== '')
+            ? mb_substr(trim($actividad), 0, 200)
+            : null;
+    }
+
+    $valores[] = mb_substr($mensaje, 0, 1000);
+    $valores[] = ipBinaria();
+
+    db()->prepare("INSERT INTO mensajes_contacto ($columnas) VALUES ($huecos)")->execute($valores);
+
+    if (!$conMotivo) {
+        error_log('mensajes_contacto.motivo no existe todavía: falta ejecutar '
+            . 'database/migracion-19-contacto-motivo.sql. El mensaje se guardó sin motivo ni actividad.');
+    }
+}
+
+/**
+ * Los mensajes recibidos, para el panel de administración.
+ *
+ * El requerimiento pide guardarlos «para tener un historial»: un historial que
+ * nadie puede leer no es un historial, así que hay una pestaña que los enseña.
+ * Cambiar el estado de uno es otra cosa y no está hecho —ver docs/pendientes.md.
+ */
+function mensajesContactoRecientes(int $limite = 100): array
+{
+    // SELECT * y no una lista de columnas: hasta que se aplique la migración 19
+    // faltan tres, y una lista explícita reventaría la pestaña entera.
+    $st = db()->prepare(
+        'SELECT * FROM mensajes_contacto ORDER BY creado_en DESC LIMIT ' . (int) $limite
+    );
+    $st->execute();
+
+    return $st->fetchAll();
 }
 
 /**
@@ -133,7 +220,8 @@ function crearContactoSitio(string $nombre, string $email, string $mensaje): voi
  * propio; agruparlos sería perder el mensaje de alguien por llegar el mismo
  * día que el de otro.
  */
-function avisarAdminsContactoSitio(string $nombre, string $email, string $mensaje): void
+function avisarAdminsContactoSitio(string $nombre, string $email, string $mensaje,
+                                   string $motivo = 'general', ?string $actividad = null): void
 {
     $admins = db()->query(
         'SELECT email FROM usuarios WHERE rol = "admin" AND estado = "activo"'
@@ -144,13 +232,25 @@ function avisarAdminsContactoSitio(string $nombre, string $email, string $mensaj
         return;
     }
 
+    $motivoTexto = motivosContacto()[$motivo] ?? $motivo;
+
     $cuerpo = "Alguien escribió desde el formulario de contacto de OMDARA.\n\n"
+            . 'Motivo:  ' . $motivoTexto . "\n"
             . 'Nombre:  ' . $nombre . "\n"
-            . 'Correo:  ' . $email . "\n\n"
-            . "Mensaje:\n" . $mensaje . "\n\n"
+            . 'Correo:  ' . $email . "\n"
+            // Solo si viene. Una línea "Actividad: —" en cada correo enseña a
+            // saltarse ese renglón, y el día que sí traiga una tampoco se leerá.
+            . ($actividad !== null && trim($actividad) !== ''
+                ? 'Actividad: ' . trim($actividad) . "\n" : '')
+            . "\nMensaje:\n" . $mensaje . "\n\n"
             . "Para responder, contesta directamente este correo: llega a $email.\n";
 
+    // El motivo va también en el asunto: quien abre la bandeja decide qué mirar
+    // primero por ahí, y «te escribió desde OMDARA» no distingue una alianza de
+    // un reporte de contenido.
+    $asunto = '[' . $motivoTexto . '] ' . $nombre . ' te escribió desde OMDARA';
+
     foreach ($admins as $a) {
-        enviarCorreo($a['email'], $nombre . ' te escribió desde OMDARA', $cuerpo, $email);
+        enviarCorreo($a['email'], $asunto, $cuerpo, $email);
     }
 }

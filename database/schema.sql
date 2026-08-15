@@ -345,14 +345,29 @@ CREATE TABLE IF NOT EXISTS mensajes_contacto (
 
   nombre      VARCHAR(120)    NOT NULL,
   email       VARCHAR(190)    NOT NULL,
+
+  -- Por qué escribe (migración 19). Una de las claves de motivosContacto(), en
+  -- includes/contacto.php, que es donde se valida.
+  motivo      VARCHAR(40)     NOT NULL DEFAULT 'general',
+  -- El nombre de la actividad, tal cual lo escribió. NO es clave ajena a
+  -- eventos a propósito: quien se queja no tiene por qué acertar el nombre
+  -- exacto para poder hacerlo.
+  actividad_nombre VARCHAR(200) NULL DEFAULT NULL,
+
   mensaje     VARCHAR(1000)   NOT NULL,
+
+  -- Para seguir el hilo sin montar un sistema de tickets. Hoy solo se lee: no
+  -- hay pantalla para cambiarlo (ver docs/pendientes.md).
+  estado      ENUM('nuevo','revision','respondido','cerrado')
+                              NOT NULL DEFAULT 'nuevo',
 
   ip          VARBINARY(16)   NOT NULL,
 
   creado_en   DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   PRIMARY KEY (id),
-  KEY idx_mensajes_contacto_ip (ip, creado_en)
+  KEY idx_mensajes_contacto_ip (ip, creado_en),
+  KEY idx_mensajes_contacto_estado (estado, creado_en)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 

@@ -239,7 +239,40 @@ páginas. Vive en pruebas hasta cerrar la fase 4.
 
 ---
 
-### 2j. Las FAQ dan por hecha una revisión previa que no existe
+### 2j. Ejecutar la migración 19 (motivo y estado en los mensajes de contacto)
+
+**Qué falta:** correr `database/migracion-19-contacto-motivo.sql` en phpMyAdmin,
+en pruebas y en producción.
+
+**Qué pasa mientras tanto:** el formulario de `/contacto` funciona entero —pide
+el motivo, pide la actividad cuando toca, y los dos van en el correo al
+administrador, que es lo que hace que alguien actúe—. Lo único que se pierde es
+guardarlos en la base, y en el panel esas columnas salen con un guion.
+
+**Para cerrarlo:** ejecutar el `.sql` y quitar el `columnaExiste()` de
+`crearContactoSitio()` en `includes/contacto.php`.
+
+---
+
+### 2k. Los mensajes de contacto se quedan en «Nuevo» para siempre
+
+**Qué falta:** una pantalla para cambiar el estado de un mensaje.
+
+**Qué hay hoy:** la columna `estado` con sus cuatro valores, y una pestaña
+«Mensajes» en el panel de administración que los **lee**. Nadie puede pasar uno
+a «En revisión», «Respondido» ni «Cerrado».
+
+**Por qué se dejó así:** el propio requerimiento lo acota — «no es necesario
+crear un sistema completo de tickets para el MVP; un registro básico es
+suficiente». Se guarda el campo para no tener que migrar otra vez el día que se
+haga, pero conviene saber que hoy no significa nada.
+
+**Para cerrarlo:** un desplegable por fila en esa pestaña y un POST que lo
+guarde. Media hora, cuando haya suficientes mensajes para que haga falta.
+
+---
+
+### 2l. Las FAQ dan por hecha una revisión previa que no existe
 
 **Qué pasa:** el requerimiento de las preguntas frecuentes traía cuatro
 respuestas construidas sobre una cola de aprobación —«envía tu actividad para

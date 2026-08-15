@@ -41,6 +41,7 @@ $categoriasAdmin    = categoriasConConteo();
 $estadosAdmin       = estadosConConteo();
 $ciudadesAdmin      = ciudadesConConteo();
 $usuariosAdmin      = usuariosTodos();
+$mensajesAdmin      = mensajesContactoRecientes();
 
 $cifras = [
     'publicadas'    => contarActividadesPublicadas(),
@@ -89,6 +90,7 @@ require __DIR__ . '/includes/layout.php';
       <button data-panel="categorias">Categorías</button>
       <button data-panel="ciudades">Ciudades y estados</button>
       <button data-panel="usuarios">Usuarios</button>
+      <button data-panel="mensajes">Mensajes<?php if ($mensajesAdmin): ?> <span class="pendientes"><?= count($mensajesAdmin) ?></span><?php endif; ?></button>
     </div>
 
     <!-- ACTIVIDADES — la única pestaña con datos de verdad -->
@@ -208,6 +210,45 @@ require __DIR__ . '/includes/layout.php';
           <?php endforeach; ?>
         </tbody>
       </table>
+    </div>
+
+    <!-- MENSAJES — lo que llega por /contacto. Solo lectura: el requerimiento
+         pide guardarlos "para tener un historial", y un historial que nadie
+         puede leer no es un historial. Cambiar el estado de un mensaje es otra
+         cosa y no está hecha (ver docs/pendientes.md). -->
+    <div class="admin-panel" id="panel-mensajes">
+      <table class="admtable">
+        <thead><tr><th>Cuándo</th><th>Quién</th><th>Motivo</th><th>Actividad</th><th>Mensaje</th><th>Estado</th></tr></thead>
+        <tbody>
+          <?php if (!$mensajesAdmin): ?>
+            <tr><td colspan="6" style="opacity:.8;">Todavía no ha escrito nadie.</td></tr>
+          <?php endif; ?>
+          <?php foreach ($mensajesAdmin as $ms): ?>
+            <tr>
+              <td style="white-space:nowrap;"><?= e(date('d M Y H:i', strtotime($ms['creado_en']))) ?></td>
+              <td>
+                <?= e($ms['nombre']) ?><br>
+                <a href="mailto:<?= e($ms['email']) ?>" style="font-size:12px; opacity:.85;"><?= e($ms['email']) ?></a>
+              </td>
+              <?php /* Los tres campos de la migración 19 pueden no existir
+                       todavía: el panel tiene que aguantar los dos casos. */ ?>
+              <td><?= e(motivosContacto()[$ms['motivo'] ?? ''] ?? '—') ?></td>
+              <td><?= !empty($ms['actividad_nombre']) ? e($ms['actividad_nombre']) : '—' ?></td>
+              <td style="max-width:340px;"><?= e($ms['mensaje']) ?></td>
+              <td>
+                <span class="badge <?= ($ms['estado'] ?? 'nuevo') === 'nuevo' ? 'on' : 'off' ?>">
+                  <?= e(estadosContacto()[$ms['estado'] ?? 'nuevo'] ?? 'Nuevo') ?>
+                </span>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+      <div class="evergreen-note" style="margin-top:18px;">
+        Solo se leen. El estado de cada mensaje se queda en «Nuevo» porque todavía no hay
+        pantalla para cambiarlo: el requerimiento pedía un registro básico, no un sistema de
+        tickets. Responder se hace desde el correo, que llega con el Reply-To puesto.
+      </div>
     </div>
 
   </div>
