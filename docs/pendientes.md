@@ -56,6 +56,44 @@ borrar el `require` de `includes/aviso-pendiente.php`.
 
 ---
 
+### 3. Traducción al inglés — REQ-00002, fases 2 a 5
+
+**Qué está hecho (fase 1):** los cimientos. El idioma lo decide la dirección,
+`rutasSitio()` es el mapa único del que salen enrutado, enlaces, hreflang y
+sitemap, el selector conserva la página al cambiar de idioma, y la cabecera y
+el pie —que salen en todas las páginas— están traducidos.
+
+**Qué falta, por fases:**
+
+| Fase | Alcance | Depende de |
+|---|---|---|
+| 2 | Portada, buscador y filtros | Textos EN |
+| 3 | Formulario de actividad: 40+ etiquetas y mensajes de validación | Textos EN |
+| 4 | Ficha de actividad, contacto, login y correos | Textos EN |
+| 5 | Contenido dinámico: título y descripción de cada actividad | Migración de base |
+
+**Las 23 categorías** son caso aparte. Se guardan en `eventos.categoria` como
+texto en español, así que traducirlas es añadir la etiqueta inglesa en
+`categoriasMenu()` —que ya separa «clave que se guarda» de «etiqueta que se
+lee»— sin tocar ni una fila.
+
+**La fase 5 necesita una migración**: columnas para título y descripción en
+inglés, más un comportamiento de reserva cuando el organizador no las rellene.
+El requerimiento pide expresamente no traducir automáticamente lo que escribió
+el organizador.
+
+**Bloqueado por:** los textos finales ES/EN y los textos SEO, que el propio
+REQ-00002 declara como dependencia y todavía no se han entregado. En
+`includes/idiomas/en.php` está traducida la interfaz funcional —navegación,
+botones, etiquetas—; falta el texto editorial: el lema de la marca y las meta
+descriptions de cada página.
+
+**Mientras tanto no se promueve a producción.** El requerimiento prohíbe la
+traducción parcial, y hoy el inglés cubre el armazón pero no el cuerpo de las
+páginas. Vive en pruebas hasta cerrar la fase 4.
+
+---
+
 ## Decisiones de diseño abiertas
 
 ### 3. El logotipo

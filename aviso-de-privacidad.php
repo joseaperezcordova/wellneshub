@@ -15,8 +15,8 @@
 declare(strict_types=1);
 require __DIR__ . '/includes/config.php';
 
-$titulo      = 'Aviso de Privacidad';
-$descripcion = 'Qué datos personales trata OMDARA, con qué finalidad y durante cuánto tiempo.';
+$titulo      = t('pagina.privacidad.titulo');
+$descripcion = t('pagina.privacidad.meta');
 $anchoLibre  = true;
 
 require __DIR__ . '/includes/layout.php';

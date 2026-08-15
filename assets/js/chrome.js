@@ -42,35 +42,13 @@
     });
   }
 
-  /* ---------- selector de idioma (ES/EN) ----------
-     Todavía no traduce nada: cambia el titular de la portada y poco más, que es
-     lo que hacía en el prototipo. Se queda porque quitarlo sería decidir por
-     nadie que el sitio no va a ser bilingüe, y esa decisión no es de aquí. */
-  var i18n = {
-    es: {
-      h1:  'Encuentra tu próximo <em>retiro, festival o círculo</em> de bienestar',
-      tag: 'Directorio de actividades · México'
-    },
-    en: {
-      h1:  'Find your next <em>retreat, festival or wellness</em> circle',
-      tag: 'Activity directory · Mexico'
-    }
-  };
+  /* Aquí vivía el selector de idioma, que traducía el titular de la portada
+     con JavaScript y dejaba el resto de la página en español, con la misma
+     dirección. Eso es justo lo que el REQ-00002 llama traducción parcial.
 
-  var botonesIdioma = document.querySelectorAll('#langToggle button');
-
-  botonesIdioma.forEach(function (b) {
-    b.addEventListener('click', function () {
-      botonesIdioma.forEach(function (x) { x.classList.remove('active'); });
-      b.classList.add('active');
-
-      // Solo la portada tiene ese titular. En las demás páginas no hay nada que
-      // cambiar todavía, y el botón se limita a quedarse marcado.
-      var t   = i18n[b.dataset.lang];
-      var h1  = document.querySelector('.hero h1');
-      var tag = document.querySelector('.hero .eyebrow');
-      if (h1)  h1.innerHTML   = t.h1;
-      if (tag) tag.textContent = t.tag;
-    });
-  });
+     Ahora el idioma lo decide la dirección —/actividades contra /activities—,
+     el selector son dos enlaces normales y el servidor devuelve la página
+     entera en el idioma que toca. Sin JavaScript de por medio: así funciona
+     con el clic central, se puede compartir, y Google indexa las dos
+     versiones por separado. Ver includes/idioma.php. */
 })();

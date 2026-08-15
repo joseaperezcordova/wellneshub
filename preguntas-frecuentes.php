@@ -12,8 +12,8 @@
 declare(strict_types=1);
 require __DIR__ . '/includes/config.php';
 
-$titulo      = 'Preguntas frecuentes';
-$descripcion = 'Dudas habituales sobre cómo publicar una actividad en OMDARA, contactar a un organizador y cómo se revisa lo que se publica.';
+$titulo      = t('pagina.faq.titulo');
+$descripcion = t('pagina.faq.meta');
 $anchoLibre  = true;
 
 require __DIR__ . '/includes/layout.php';

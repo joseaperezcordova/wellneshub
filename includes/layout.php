@@ -39,19 +39,26 @@ $seccion = $seccion ?? [
 ][basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''))] ?? '';
 
 /** El enlace del menú, con su marca si es la sección en la que estamos. */
-function enlaceMenu(string $ruta, string $texto, string $clave, string $seccion): string
+function enlaceMenu(string $claveRuta, string $claveTexto, string $clave, string $seccion): string
 {
     $activo = $clave === $seccion ? ' class="active"' : '';
     $aqui   = $clave === $seccion ? ' aria-current="page"' : '';
 
-    return '<a href="' . URL_BASE . $ruta . '"' . $activo . $aqui . '>' . e($texto) . '</a>';
+    // La dirección sale de url() y el texto de t(): los dos dependen del
+    // idioma, y escribir aquí "/buscar.php" mandaría a un inglés a una
+    // dirección en español —justo lo que el requerimiento prohíbe.
+    return '<a href="' . e(url($claveRuta)) . '"' . $activo . $aqui . '>' . et($claveTexto) . '</a>';
 }
 ?><!DOCTYPE html>
-<html lang="es-MX">
+<?php /* El sitio en español es de México —"es-MX" fija ortografía y formato de
+         fecha—; el inglés no se marca región: no hay una versión británica y
+         otra estadounidense, y elegir una haría que la otra pareciera un
+         error. */ ?>
+<html lang="<?= e(idiomaActual() === 'es' ? 'es-MX' : 'en') ?>">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?= e($titulo ?? 'OMDARA') ?> · OMDARA</title>
+<title><?= e($titulo ?? t('marca.nombre')) ?> · <?= et('marca.nombre') ?></title>
 <?php
 /*
  * Meta description + Open Graph/Twitter Card. Cada página puede fijar
@@ -65,9 +72,40 @@ $descripcionMeta = trim((string) ($descripcion
 $urlActualMeta = URL_BASE . (string) ($_SERVER['REQUEST_URI'] ?? '/');
 ?>
 <meta name="description" content="<?= e($descripcionMeta) ?>">
-<meta property="og:site_name" content="OMDARA">
+<?php
+/*
+ * Canonical y hreflang.
+ *
+ * El canonical apunta a la dirección limpia de esta página en SU idioma, no a
+ * la que el visitante escribió: /buscar.php y /actividades sirven lo mismo, y
+ * sin esto Google decide por su cuenta cuál indexar —a veces la .php, que es
+ * la que no queremos publicar.
+ *
+ * hreflang le dice que /actividades y /activities son la misma página en dos
+ * idiomas y no contenido duplicado. Tiene que declararse en las DOS
+ * direcciones y cada una incluirse a sí misma; si solo una apunta a la otra,
+ * Google ignora el par entero. x-default marca cuál servir a quien no encaja
+ * en ninguno de los dos idiomas.
+ *
+ * Solo se emite en las páginas del enrutador. Una ficha de actividad no tiene
+ * equivalente inglés declarado, y anunciar uno que no existe es peor que
+ * callarse.
+ */
+$claveRutaSeo = $GLOBALS['rutaActual'] ?? null;
+if ($claveRutaSeo !== null):
+?>
+<link rel="canonical" href="<?= e(url($claveRutaSeo)) ?>">
+<?php foreach (idiomasDisponibles() as $idiomaSeo): ?>
+  <?php if (isset(rutasSitio()[$claveRutaSeo][$idiomaSeo])): ?>
+<link rel="alternate" hreflang="<?= e($idiomaSeo) ?>" href="<?= e(url($claveRutaSeo, $idiomaSeo)) ?>">
+  <?php endif; ?>
+<?php endforeach; ?>
+<link rel="alternate" hreflang="x-default" href="<?= e(url($claveRutaSeo, IDIOMA_POR_DEFECTO)) ?>">
+<?php endif; ?>
+<meta property="og:site_name" content="<?= et('marca.nombre') ?>">
 <meta property="og:type" content="website">
-<meta property="og:title" content="<?= e($titulo ?? 'OMDARA') ?>">
+<meta property="og:locale" content="<?= e(idiomaActual() === 'es' ? 'es_MX' : 'en_US') ?>">
+<meta property="og:title" content="<?= e($titulo ?? t('marca.nombre')) ?>">
 <meta property="og:description" content="<?= e($descripcionMeta) ?>">
 <meta property="og:url" content="<?= e($urlActualMeta) ?>">
 <?php if (!empty($imagenOg)): ?>
@@ -176,33 +214,54 @@ $analiticaActiva = empty($CONFIG['es_local']);
 
 <div class="topbar">
   <div class="topbar-inner">
-    <a class="logo" href="<?= URL_BASE ?>/">
+    <a class="logo" href="<?= e(url('inicio')) ?>">
       <div class="logo-mark"></div>
-      <div class="logo-text">OMDARA<small>Directorio wellness MX</small></div>
+      <div class="logo-text"><?= et('marca.nombre') ?><small><?= et('marca.subtitulo') ?></small></div>
     </a>
 
     <?php /* Enlaces de verdad y no botones con JavaScript: así funcionan el clic
              central, «abrir en pestaña nueva» y el buscador de Google. Mientras
              las vistas se conmutaban en el navegador no había otra opción. */ ?>
     <nav class="mainnav" id="mainnav">
-      <?= enlaceMenu('/',           'Inicio',         'inicio', $seccion) ?>
-      <?= enlaceMenu('/buscar.php', 'Buscar actividades', 'buscar', $seccion) ?>
-      <?= enlaceMenu('/blog.php',   'Blog',           'blog',   $seccion) ?>
+      <?= enlaceMenu('inicio',      'nav.inicio',      'inicio', $seccion) ?>
+      <?= enlaceMenu('actividades', 'nav.actividades', 'buscar', $seccion) ?>
+      <?= enlaceMenu('blog',        'nav.blog',        'blog',   $seccion) ?>
     </nav>
 
     <div class="topbar-right">
-      <div class="langtoggle" id="langToggle">
-        <button data-lang="es" class="active">ES</button>
-        <button data-lang="en">EN</button>
-      </div>
+      <?php
+      /*
+       * Selector de idioma: enlaces, no botones.
+       *
+       * Antes eran dos <button> que cambiaban el titular del hero con
+       * JavaScript y nada más — la dirección seguía siendo la misma y el resto
+       * de la página seguía en español. Eso es exactamente lo que el
+       * requerimiento llama traducción parcial.
+       *
+       * Siendo enlaces, cada idioma tiene su dirección propia: se puede
+       * compartir, Google los indexa por separado y funcionan sin JavaScript.
+       * urlEquivalente() es lo que mantiene al visitante en la misma página al
+       * cambiar; solo cae al inicio cuando esa página no existe en el otro
+       * idioma, que es el único caso que el requerimiento permite.
+       */
+      ?>
+      <nav class="langtoggle" aria-label="<?= et('idioma.cambiar') ?>">
+        <?php foreach (idiomasDisponibles() as $idiomaOpcion): ?>
+          <?php $esActual = $idiomaOpcion === idiomaActual(); ?>
+          <a href="<?= e(urlEquivalente($idiomaOpcion)) ?>"
+             hreflang="<?= e($idiomaOpcion) ?>"
+             lang="<?= e($idiomaOpcion) ?>"
+             <?= $esActual ? 'class="active" aria-current="true"' : '' ?>><?= e(mb_strtoupper($idiomaOpcion)) ?></a>
+        <?php endforeach; ?>
+      </nav>
 
       <!-- «Publicar actividad» lo ve todo el mundo, con sesión o sin ella. Quien no
            la tenga pasa por el login y vuelve aquí solo: esconder el botón a los
            visitantes es esconder justo lo que queremos que hagan, y un directorio
            sin organizadores nuevos no crece. La puerta la guarda el servidor
            —exigirSesion() en evento-nuevo.php—, no la ausencia del enlace. -->
-      <a class="btn-publicar" href="<?= URL_BASE ?>/evento-nuevo.php">
-        Publicar<span class="btn-publicar-extra"> actividad</span>
+      <a class="btn-publicar" href="<?= e(url('publicar')) ?>">
+        <?= et('nav.publicar_corto') ?><span class="btn-publicar-extra"> <?= et('nav.publicar_sufijo') ?></span>
       </a>
 
       <?php if ($u): ?>
@@ -315,16 +374,15 @@ function pie(): void
 <footer>
   <div class="foot-inner">
     <div class="foot-marca">
-      <div class="logo-text" style="color:var(--blanco);">OMDARA</div>
-      <p class="foot-lema">Tu guía de experiencias de bienestar en México.
-         Conecta con actividades que nutren cuerpo, mente y alma.</p>
+      <div class="logo-text" style="color:var(--blanco);"><?= et('marca.nombre') ?></div>
+      <p class="foot-lema"><?= et('pie.lema') ?></p>
 
       <?php /* Las direcciones de las redes todavía no existen: el requerimiento
                las deja como «[Agregar URLs definitivas]». Van con rel="nofollow"
                y aria-label porque un icono suelto no le dice nada a un lector de
                pantalla. En cuanto haya perfiles, se sustituye el "#". */ ?>
       <div class="foot-redes">
-        <a href="#" aria-label="OMDARA en Instagram" target="_blank" rel="noopener nofollow">
+        <a href="#" aria-label="<?= et('pie.instagram') ?>" target="_blank" rel="noopener nofollow">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="3" y="3" width="18" height="18" rx="5"/>
@@ -332,13 +390,13 @@ function pie(): void
             <circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/>
           </svg>
         </a>
-        <a href="#" aria-label="OMDARA en Facebook" target="_blank" rel="noopener nofollow">
+        <a href="#" aria-label="<?= et('pie.facebook') ?>" target="_blank" rel="noopener nofollow">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M14.5 8.5h2.2V5.4h-2.6c-2.3 0-3.7 1.4-3.7 3.8v1.6H8.2v3.1h2.2V21h3.3v-7.1h2.4l.4-3.1h-2.8V9.6c0-.8.3-1.1.8-1.1z"/>
           </svg>
         </a>
-        <a href="#" aria-label="OMDARA en WhatsApp" target="_blank" rel="noopener nofollow">
+        <a href="#" aria-label="<?= et('pie.whatsapp') ?>" target="_blank" rel="noopener nofollow">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M3.5 20.5l1.3-4.2A8.2 8.2 0 1 1 8 19.3z"/>
@@ -349,24 +407,24 @@ function pie(): void
     </div>
 
     <div>
-      <h5>Explora</h5>
-      <a href="<?= URL_BASE ?>/actividades">Actividades</a>
+      <h5><?= et('pie.explora') ?></h5>
+      <a href="<?= e(url('actividades')) ?>"><?= et('pie.actividades') ?></a>
     </div>
     <div>
-      <h5>Para organizadores</h5>
-      <a href="<?= URL_BASE ?>/publicar-actividad">Publicar tu actividad</a>
-      <a href="<?= URL_BASE ?>/como-funciona">¿Cómo funciona?</a>
+      <h5><?= et('pie.organizadores') ?></h5>
+      <a href="<?= e(url('publicar')) ?>"><?= et('pie.publicar') ?></a>
+      <a href="<?= e(url('como-funciona')) ?>"><?= et('pie.como_funciona') ?></a>
     </div>
     <div>
-      <h5>Ayuda</h5>
-      <a href="<?= URL_BASE ?>/preguntas-frecuentes">Preguntas frecuentes</a>
-      <a href="<?= URL_BASE ?>/contacto">Contacto</a>
+      <h5><?= et('pie.ayuda') ?></h5>
+      <a href="<?= e(url('faq')) ?>"><?= et('pie.faq') ?></a>
+      <a href="<?= e(url('contacto')) ?>"><?= et('pie.contacto') ?></a>
     </div>
     <div>
-      <h5>Legal</h5>
-      <a href="<?= URL_BASE ?>/terminos-y-condiciones">Términos y Condiciones</a>
-      <a href="<?= URL_BASE ?>/aviso-de-privacidad">Aviso de Privacidad</a>
-      <a href="<?= URL_BASE ?>/politica-de-cookies">Política de Cookies</a>
+      <h5><?= et('pie.legal') ?></h5>
+      <a href="<?= e(url('terminos')) ?>"><?= et('pie.terminos') ?></a>
+      <a href="<?= e(url('privacidad')) ?>"><?= et('pie.privacidad') ?></a>
+      <a href="<?= e(url('cookies')) ?>"><?= et('pie.cookies') ?></a>
     </div>
   </div>
 
@@ -374,8 +432,8 @@ function pie(): void
            «todos los derechos reservados» es una decisión de producto: invita a
            avisar de los fallos en vez de asumir que el sitio está terminado. */ ?>
   <div class="foot-bottom">
-    Versión beta: estamos mejorando continuamente la plataforma.
-    Si encuentras algún problema, <a href="<?= URL_BASE ?>/contacto">contáctanos</a>.
+    <?= et('pie.beta') ?>
+    <a href="<?= e(url('contacto')) ?>"><?= et('pie.beta_enlace') ?></a>.
   </div>
 </footer>
 

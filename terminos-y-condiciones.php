@@ -15,8 +15,8 @@
 declare(strict_types=1);
 require __DIR__ . '/includes/config.php';
 
-$titulo      = 'Términos y Condiciones';
-$descripcion = 'Condiciones de uso de OMDARA para visitantes y organizadores.';
+$titulo      = t('pagina.terminos.titulo');
+$descripcion = t('pagina.terminos.meta');
 $anchoLibre  = true;
 
 require __DIR__ . '/includes/layout.php';

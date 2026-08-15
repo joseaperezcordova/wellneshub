@@ -13,8 +13,8 @@
 declare(strict_types=1);
 require __DIR__ . '/includes/config.php';
 
-$titulo      = 'Cómo funciona';
-$descripcion = 'Cómo encontrar actividades de bienestar en OMDARA y cómo publicar la tuya si eres organizador.';
+$titulo      = t('pagina.como_funciona.titulo');
+$descripcion = t('pagina.como_funciona.meta');
 $anchoLibre  = true;
 
 require __DIR__ . '/includes/layout.php';

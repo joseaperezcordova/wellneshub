@@ -701,9 +701,20 @@
 
   /* ---------- idioma + publicar evento (topbar) ---------- */
   .topbar-right{display:flex; align-items:center; gap:8px;}
-  .langtoggle{display:flex; border:1px solid var(--line); border-radius:20px; overflow:hidden;}
-  .langtoggle button{background:none; border:none; padding:7px 12px; font-size:12px; font-family:'IBM Plex Mono',monospace;}
-  .langtoggle button.active{background:var(--jungle); color:var(--paper);}
+  /* Selector de idioma. Son enlaces —no botones— desde que cada idioma tiene
+     su propia direccion, asi que hay que devolverles el aspecto de pastilla:
+     "footer a" y los estilos de enlace no aplican aqui, pero si el
+     text-decoration heredado. Sobre la cabecera verde el borde va en blanco
+     diluido, como el resto de la cabecera. */
+  .langtoggle{display:flex; border:1px solid rgba(255,255,255,0.28); border-radius:20px; overflow:hidden;}
+  .langtoggle a{
+    display:block; padding:7px 12px; font-size:12px; font-family:'IBM Plex Mono',monospace;
+    color:var(--paper); text-decoration:none; opacity:.75; transition:background .15s, opacity .15s, color .15s;
+  }
+  .langtoggle a:hover{opacity:1; background:rgba(255,255,255,0.12);}
+  /* El idioma activo se marca con salvia y texto bosque, igual que la seccion
+     actual del menu: sobre una cabecera verde, un fondo verde no marcaria nada. */
+  .langtoggle a.active{background:var(--arena); color:var(--jungle); opacity:1;}
   /* Con logo + Publicar + cuenta + hamburguesa, el selector de idioma es lo
      primero que deja de caber en un telefono en vertical. Se esconde antes de
      que el topbar empiece a desbordar la ventana (ver Caso 20). */

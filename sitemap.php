@@ -20,34 +20,68 @@ require __DIR__ . '/includes/eventos.php';
 header('Content-Type: application/xml; charset=utf-8');
 
 /*
- * El listado va con las direcciones limpias —/actividades y no /buscar.php—
- * porque son las que enlaza el pie. Anunciar una dirección en el sitemap y
- * enlazar otra que sirve lo mismo es pedirle a Google que decida cuál es la
- * buena, y a veces elige la que no.
+ * Las direcciones salen de rutasSitio(), no escritas a mano. Añadir una página
+ * o un idioma la mete aquí sola, que es justo lo que se pierde cuando el mapa
+ * de direcciones vive en dos sitios.
  *
- * Las tres legales entran con prioridad baja: tienen que ser encontrables
- * —Google penaliza no encontrarlas— pero no compiten con las actividades.
+ * Cada página se lista UNA VEZ POR IDIOMA, y cada entrada declara sus
+ * alternativas con xhtml:link. Es el equivalente en el sitemap de las
+ * etiquetas hreflang del <head>, y Google pide las dos cosas: el sitemap le
+ * dice qué existe, el head confirma la relación al visitar.
+ *
+ * Las prioridades van por clave y no por posición: si mañana se reordena
+ * rutasSitio() esto no se descoloca.
  */
-$paginas = [
-    ['loc' => URL_BASE . '/',                       'prioridad' => '1.0', 'frecuencia' => 'daily'],
-    ['loc' => URL_BASE . '/actividades',            'prioridad' => '0.8', 'frecuencia' => 'daily'],
-    ['loc' => URL_BASE . '/como-funciona',          'prioridad' => '0.6', 'frecuencia' => 'monthly'],
-    ['loc' => URL_BASE . '/preguntas-frecuentes',   'prioridad' => '0.5', 'frecuencia' => 'monthly'],
-    ['loc' => URL_BASE . '/contacto',               'prioridad' => '0.5', 'frecuencia' => 'monthly'],
-    ['loc' => URL_BASE . '/blog.php',               'prioridad' => '0.4', 'frecuencia' => 'weekly'],
-    ['loc' => URL_BASE . '/terminos-y-condiciones', 'prioridad' => '0.2', 'frecuencia' => 'yearly'],
-    ['loc' => URL_BASE . '/aviso-de-privacidad',    'prioridad' => '0.2', 'frecuencia' => 'yearly'],
-    ['loc' => URL_BASE . '/politica-de-cookies',    'prioridad' => '0.2', 'frecuencia' => 'yearly'],
+$prioridades = [
+    'inicio'        => ['1.0', 'daily'],
+    'actividades'   => ['0.8', 'daily'],
+    'como-funciona' => ['0.6', 'monthly'],
+    'faq'           => ['0.5', 'monthly'],
+    'contacto'      => ['0.5', 'monthly'],
+    'blog'          => ['0.4', 'weekly'],
+    'terminos'      => ['0.2', 'yearly'],
+    'privacidad'    => ['0.2', 'yearly'],
+    'cookies'       => ['0.2', 'yearly'],
 ];
+
+$paginas = [];
+
+foreach (rutasSitio() as $clave => $destino) {
+    // 'publicar' no entra: exige sesión, así que para un buscador es una
+    // redirección al login y no una página que indexar.
+    if (!isset($prioridades[$clave])) continue;
+
+    [$prioridad, $frecuencia] = $prioridades[$clave];
+
+    foreach (idiomasDisponibles() as $idioma) {
+        if (!isset($destino[$idioma])) continue;
+
+        $alternativas = [];
+        foreach (idiomasDisponibles() as $otro) {
+            if (isset($destino[$otro])) $alternativas[$otro] = url($clave, $otro);
+        }
+
+        $paginas[] = [
+            'loc'          => url($clave, $idioma),
+            'prioridad'    => $prioridad,
+            'frecuencia'   => $frecuencia,
+            'alternativas' => $alternativas,
+        ];
+    }
+}
 
 $eventos = eventosPublicadosParaSitemap();
 
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
 <?php foreach ($paginas as $p): ?>
   <url>
     <loc><?= e($p['loc']) ?></loc>
+<?php foreach ($p['alternativas'] as $idiomaAlt => $urlAlt): ?>
+    <xhtml:link rel="alternate" hreflang="<?= e($idiomaAlt) ?>" href="<?= e($urlAlt) ?>"/>
+<?php endforeach; ?>
     <changefreq><?= e($p['frecuencia']) ?></changefreq>
     <priority><?= e($p['prioridad']) ?></priority>
   </url>

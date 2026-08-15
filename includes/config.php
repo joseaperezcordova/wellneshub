@@ -110,6 +110,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+/* Va antes que los demás: url(), t() y idiomaActual() los usan las plantillas
+   de layout.php, y layout.php lo carga cualquier página. */
+require_once __DIR__ . '/idioma.php';
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/http.php';
 require_once __DIR__ . '/correo.php';
