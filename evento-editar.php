@@ -82,8 +82,10 @@ if ($puede && postDesbordado()) {
             // Si se llegó aquí desde el panel admin, esa procedencia se lleva
             // a la ficha para que su enlace de vuelta apunte al mismo sitio.
             $volver = (string) ($_GET['volver'] ?? '');
-            redirigir('/evento.php?id=' . (int) $ev['id']
-                . ($volver !== '' ? '&volver=' . urlencode($volver) : ''));
+            // «?volver» y no «&volver»: la dirección limpia no lleva ya el
+            // «?id=» al que aquel se enganchaba.
+            redirigir(urlEvento($ev)
+                . ($volver !== '' ? '?volver=' . urlencode($volver) : ''));
         }
 
         /*
@@ -130,7 +132,7 @@ require __DIR__ . '/includes/layout.php';
   </p>
 
   <a class="btn-principal" style="text-decoration:none; display:block; text-align:center;"
-     href="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>">Volver a la ficha</a>
+     href="<?= e(urlEvento($ev)) ?>">Volver a la ficha</a>
 
 </div>
 
@@ -140,7 +142,7 @@ require __DIR__ . '/includes/layout.php';
   <div class="auth-caja caja-ancha">
 
     <?php $volverAdmin = ($_GET['volver'] ?? '') === 'admin' && esAdmin($u); ?>
-    <a class="volver" href="<?= $volverAdmin ? URL_BASE . '/admin.php' : URL_BASE . '/evento.php?id=' . (int) $ev['id'] ?>">← <?= $volverAdmin ? 'Volver al panel admin' : 'Volver a la ficha' ?></a>
+    <a class="volver" href="<?= e($volverAdmin ? URL_BASE . '/admin.php' : urlEvento($ev)) ?>">← <?= $volverAdmin ? 'Volver al panel admin' : 'Volver a la ficha' ?></a>
 
     <h1>Editar actividad</h1>
     <?php if ($ev['situacion'] === 'borrador'): ?>
@@ -171,13 +173,13 @@ require __DIR__ . '/includes/layout.php';
              mandan ahí en vez de duplicar esa lógica aquí. */ ?>
     <div class="barra-acciones" style="margin-top:18px;">
       <?php if ($ev['situacion'] === 'oculto' && esAdmin($u)): ?>
-        <form method="post" action="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>">
+        <form method="post" action="<?= e(urlEvento($ev)) ?>">
           <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
           <button class="btn-barra destacado" type="submit" name="publicar" value="1">Volver a publicar</button>
         </form>
       <?php endif; ?>
 
-      <form method="post" action="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>"
+      <form method="post" action="<?= e(urlEvento($ev)) ?>"
             onsubmit="return confirm('¿Eliminar «<?= e(addslashes($ev['titulo'])) ?>»? No se puede deshacer.');">
         <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
         <button class="btn-barra peligro" type="submit" name="eliminar" value="1">Eliminar actividad</button>

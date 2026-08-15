@@ -109,7 +109,7 @@ require __DIR__ . '/includes/layout.php';
              lugar, y también en el título, la categoría y quien organiza, así
              que escribir «Tulum» encuentra Tulum sin necesitar un campo de
              ciudad aparte. */ ?>
-    <form class="buscador" method="get" action="<?= URL_BASE ?>/buscar.php">
+    <form class="buscador" method="get" action="<?= e(url('actividades')) ?>">
       <div class="bcampo">
         <label for="bDonde">Dónde</label>
         <input id="bDonde" name="q" type="text" placeholder="Tulum, CDMX, Oaxaca…"
@@ -183,7 +183,7 @@ require __DIR__ . '/includes/layout.php';
                  dirección —/buscar.php?cat=Yoga—, que se puede compartir,
                  abrir en otra pestaña e indexar. */ ?>
         <?php foreach (categoriasMenu() as $catNombre => $catDatos): ?>
-          <a class="catitem" href="<?= URL_BASE ?>/buscar.php?cat=<?= urlencode($catNombre) ?>">
+          <a class="catitem" href="<?= e(url('actividades')) ?>?cat=<?= urlencode($catNombre) ?>">
             <span class="ic"><?= e($catDatos[0]) ?></span>
             <span class="lbl"><?= e($catDatos[1]) ?></span>
           </a>
@@ -200,7 +200,7 @@ require __DIR__ . '/includes/layout.php';
 <section class="block wrap">
   <div class="block-head">
     <h2>Próximas actividades</h2>
-    <a class="more" href="<?= URL_BASE ?>/buscar.php">Ver todas las actividades →</a>
+    <a class="more" href="<?= e(url('actividades')) ?>">Ver todas las actividades →</a>
   </div>
   <div class="evrail-wrap">
     <div class="evrail" id="proximosRail"></div>

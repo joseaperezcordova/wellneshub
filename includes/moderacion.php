@@ -157,7 +157,10 @@ function crearReporte(int $eventoId, string $motivo, ?string $comentario, string
 function reportesPendientes(int $limite = 100): array
 {
     $st = db()->query(
-        'SELECT e.id, e.titulo, e.situacion, e.categoria, e.ciudad,
+        /* e.slug entra para poder enlazar a /actividad/{slug} (REQ-00006). Sin
+           él el enlace seguiría funcionando —urlEvento() se apaña con el id—,
+           pero cada clic desde moderación pasaría por un 301 de más. */
+        'SELECT e.id, e.slug, e.titulo, e.situacion, e.categoria, e.ciudad,
                 u.nombre AS organizador, u.email AS organizador_email,
                 COUNT(r.id)     AS total,
                 MAX(r.creado_en) AS ultimo,
@@ -166,7 +169,7 @@ function reportesPendientes(int $limite = 100): array
            JOIN eventos  e ON e.id = r.evento_id
            JOIN usuarios u ON u.id = e.usuario_id
           WHERE r.situacion = "pendiente"
-       GROUP BY e.id, e.titulo, e.situacion, e.categoria, e.ciudad, u.nombre, u.email
+       GROUP BY e.id, e.slug, e.titulo, e.situacion, e.categoria, e.ciudad, u.nombre, u.email
        ORDER BY total DESC, ultimo DESC
           LIMIT ' . (int) $limite
     );

@@ -118,7 +118,7 @@ require __DIR__ . '/includes/layout.php';
     <div class="caso">
       <div class="caso-cab">
         <div>
-          <h2><a href="<?= URL_BASE ?>/evento.php?id=<?= (int) $p['id'] ?>"><?= e($p['titulo']) ?></a></h2>
+          <h2><a href="<?= e(urlEvento($p)) ?>"><?= e($p['titulo']) ?></a></h2>
           <div class="caso-meta">
             <?= e($p['categoria']) ?> · <?= e($p['ciudad']) ?> ·
             organiza <?= e($p['organizador']) ?> (<?= e($p['organizador_email']) ?>)

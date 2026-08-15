@@ -23,7 +23,11 @@ return [
 
     // ---- Cabecera ----
     'nav.inicio'      => 'Inicio',
-    'nav.actividades' => 'Actividades',
+    // En la cabecera «Buscar actividades» y en el pie «Actividades» (pie.actividades),
+    // las dos hacia /actividades. Lo pide REQ-00006 y tiene sentido: arriba se
+    // ofrece una acción entre otras acciones, abajo se nombra una sección
+    // dentro de un índice donde ya se sabe que todo son enlaces.
+    'nav.actividades' => 'Buscar actividades',
     'nav.blog'        => 'Blog',
     'nav.publicar'    => 'Publicar actividad',
     'nav.publicar_corto'  => 'Publicar',

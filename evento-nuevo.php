@@ -42,7 +42,10 @@ if (postDesbordado()) {
         if (!$errores) {
             $id = crearEvento($e, (int) $u['id']);
             olvidarImagenEnVuelo($e['imagen_url']);   // ya tiene dueño
-            redirigir('/evento.php?id=' . $id);
+            // Se relee para tener el slug que acaba de generarse. Si por lo que
+            // sea no viniera, urlEvento() se apaña con el id y la dirección
+            // sigue llevando a la ficha.
+            redirigir(urlEvento(buscarEvento($id) ?? ['id' => $id]));
         }
 
         /*

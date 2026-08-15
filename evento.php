@@ -31,6 +31,50 @@ if (!$ev || !puedeVerEvento($ev, $u)) {
     exit;
 }
 
+/*
+ * Dirección canónica: /actividad/{slug} (REQ-00006).
+ *
+ * Un mismo contenido servido en dos direcciones es contenido duplicado para
+ * Google, que elige una por su cuenta —a veces la .php, justo la que no
+ * queremos publicar—, y deja los enlaces repartidos entre las dos. Así solo hay
+ * una, y las otras llevan a ella.
+ *
+ * Esto cubre DOS casos con el mismo código:
+ *   · los enlaces viejos, /evento.php?id=7, que ya están compartidos y en el
+ *     índice de Google;
+ *   · las direcciones de una actividad a la que luego le cambiaron el título,
+ *     porque al cambiar el título cambia el slug.
+ *
+ * VA DESPUÉS DE COMPROBAR QUIÉN PUEDE VERLA, y no antes. Redirigir primero
+ * contaría el título de un borrador a cualquiera que probase números: la
+ * redirección lleva el slug, y el slug es el título. Puesto aquí, quien no
+ * puede verla recibe el 404 de arriba y no se entera de nada.
+ *
+ * Solo en GET: un POST redirigido se convierte en GET y pierde lo enviado, así
+ * que los formularios de la propia ficha —publicar, ocultar, eliminar— dejarían
+ * de funcionar sin decir por qué.
+ */
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
+    $rutaPedida = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
+    $urlCanonica = urlEvento($ev);
+
+    if ($rutaPedida !== (string) parse_url($urlCanonica, PHP_URL_PATH)) {
+        // El resto de parámetros se conserva: admin.php enlaza con
+        // ?volver=admin y perderlo devolvería a quien modera al sitio
+        // equivocado.
+        $resto = $_GET;
+        unset($resto['id']);
+        $cola = $resto ? '?' . http_build_query($resto) : '';
+
+        header('Location: ' . $urlCanonica . $cola, true, 301);
+        exit;
+    }
+}
+
+/* Para el <link rel="canonical"> del <head>. La ficha no pasa por rutasSitio()
+   —no es una página fija—, así que layout.php no puede deducirla sola. */
+$canonical = urlEvento($ev);
+
 $esDueno = $u !== null && (int) $ev['usuario_id'] === (int) $u['id'];
 $mando   = $esDueno || esAdmin($u);
 $error   = '';
@@ -68,12 +112,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($eraVisitante && (int) $ev['usuario_id'] === (int) $u['id']) {
             $_SESSION['eventos_ga'][] = ['nombre' => 'alta_organizador', 'params' => []];
         }
-        redirigir('/evento.php?id=' . (int) $ev['id']);
+        redirigir(urlEvento($ev));
 
     } elseif (isset($_POST['ocultar']) && esAdmin($u)) {
         cambiarSituacionEvento((int) $ev['id'], 'oculto');
         $_SESSION['evento_aviso'] = 'Actividad oculta. Ya no aparece en el listado.';
-        redirigir('/evento.php?id=' . (int) $ev['id']);
+        redirigir(urlEvento($ev));
 
     } elseif (isset($_POST['eliminar'])) {
         // El dueño solo puede borrar mientras podría editar. Pasado ese plazo
@@ -232,7 +276,10 @@ require __DIR__ . '/includes/layout.php';
 
     <div class="ficha-compartir">
       <button type="button" class="btn-barra" id="btnCompartir"
-              data-url="<?= e(URL_BASE . '/evento.php?id=' . (int) $ev['id']) ?>"
+              <?php /* La que se comparte es la limpia (REQ-00006): dice de qué
+                       va antes de abrirla y no cuenta con qué está hecho el
+                       sitio. */ ?>
+              data-url="<?= e(urlEvento($ev)) ?>"
               data-titulo="<?= e($ev['titulo']) ?>">↗ Compartir</button>
       <span class="aviso-copiado" id="avisoCopiado">Enlace copiado.</span>
     </div>

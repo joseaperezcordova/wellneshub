@@ -179,8 +179,15 @@ que ya se aprobó. Es una línea el día que producto lo pida.
 **Qué pasa:** `/buscar.php` y `/actividades` sirven la misma página. Lo canónico
 sería que la primera redirigiera a la segunda.
 
-**Por qué se dejó así:** hay formularios que hacen POST contra su propio `.php`,
-y una redirección 301 los convierte en GET, perdiendo lo enviado. Requiere
-revisar formulario por formulario.
+**Ya no es un problema de posicionamiento.** Desde REQ-00006 las dos declaran
+`<link rel="canonical">` a `/actividades`, así que Google indexa una sola. Y la
+ficha sí redirige de verdad: `/evento.php?id=7` manda un 301 a
+`/actividad/{slug}`, porque ahí el POST se pudo separar del GET —los
+formularios de la ficha postean contra ella misma y una redirección los
+convertiría en GET, perdiendo lo enviado—.
 
-**Dónde:** el bloque de reescritura en `.htaccess` de la raíz.
+**Lo que falta:** hacer lo mismo con el resto de páginas. Requiere revisar
+formulario por formulario cuáles postean contra su propio `.php`.
+
+**Dónde:** el bloque de reescritura en `.htaccess` de la raíz, o el mismo patrón
+de `evento.php` (redirigir solo en GET).

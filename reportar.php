@@ -75,11 +75,11 @@ require __DIR__ . '/includes/layout.php';
   </div>
 
   <a class="btn-principal" style="display:block; text-align:center; text-decoration:none;"
-     href="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>">Volver a la actividad</a>
+     href="<?= e(urlEvento($ev)) ?>">Volver a la actividad</a>
 
 <?php else: ?>
 
-  <a class="volver" href="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>">← Volver a la actividad</a>
+  <a class="volver" href="<?= e(urlEvento($ev)) ?>">← Volver a la actividad</a>
 
   <h1>Reportar actividad</h1>
   <p class="sub">«<?= e($ev['titulo']) ?>»</p>

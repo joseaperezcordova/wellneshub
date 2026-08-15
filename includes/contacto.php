@@ -56,7 +56,7 @@ function avisarOrganizador(array $ev, string $nombre, string $email, ?string $me
             . 'Correo:     ' . $email . "\n"
             . ($mensaje !== null && $mensaje !== '' ? "Mensaje:\n" . $mensaje . "\n\n" : "\n")
             . "Para responder, contesta directamente este correo: llega a $email.\n\n"
-            . URL_BASE . '/evento.php?id=' . (int) $ev['id'] . "\n";
+            . urlEvento($ev) . "\n";
 
     enviarCorreo(
         $ev['organizador_email'],

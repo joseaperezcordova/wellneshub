@@ -61,10 +61,15 @@ function evCardHTML(e) {
 }
 
 /* La tarjeta de la rejilla de resultados y de los relacionados.
-   El segundo argumento se le pega a la dirección: buscar.php lo usa para
+   El segundo argumento se le pega a la dirección: el listado lo usa para
    llevarse los filtros a la ficha y que desde allí se pueda volver. */
 function cardHTML(e, cola) {
-  var url = esc(e.url) + (cola ? '&amp;' + cola : '');
+  /* «?» y no «&», desde REQ-00006. La dirección de una ficha era
+     /evento.php?id=7 —ya traía su interrogante— y ahora es /actividad/{slug},
+     que no trae ninguno. Pegarle «&volver=…» no añadía un parametro: alargaba
+     la RUTA, el slug dejaba de terminar en el numero del que sale el id, y
+     cada clic desde los resultados acababa en un 404. */
+  var url = esc(e.url) + (cola ? '?' + cola : '');
 
   return '<a class="card-event" href="' + url + '">'
     + '<div class="card-img" style="' + fondoTarjeta(e) + '"' + atributoLazyBg(e) + '>'

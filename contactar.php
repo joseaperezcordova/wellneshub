@@ -28,8 +28,7 @@ if (!$ev || $ev['situacion'] !== 'publicado') {
 // organizador eligió otra, aquí no hay nada que hacer: se manda de vuelta a
 // la ficha, que es donde está el enlace que sí corresponde.
 if ($ev['accion_principal'] !== 'informacion') {
-    header('Location: ' . URL_BASE . '/evento.php?id=' . (int) $ev['id']);
-    exit;
+    redirigir(urlEvento($ev));
 }
 
 $error   = '';
@@ -84,11 +83,11 @@ require __DIR__ . '/includes/layout.php';
   </div>
 
   <a class="btn-principal" style="display:block; text-align:center; text-decoration:none;"
-     href="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>">Volver a la actividad</a>
+     href="<?= e(urlEvento($ev)) ?>">Volver a la actividad</a>
 
 <?php else: ?>
 
-  <a class="volver" href="<?= URL_BASE ?>/evento.php?id=<?= (int) $ev['id'] ?>">← Volver a la actividad</a>
+  <a class="volver" href="<?= e(urlEvento($ev)) ?>">← Volver a la actividad</a>
 
   <h1>Contactar al organizador</h1>
   <p class="sub">«<?= e($ev['titulo']) ?>» · <?= e($ev['organizador']) ?></p>

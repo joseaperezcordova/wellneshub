@@ -27,7 +27,7 @@ return [
 
     // ---- Cabecera ----
     'nav.inicio'      => 'Home',
-    'nav.actividades' => 'Activities',
+    'nav.actividades' => 'Search activities',
     'nav.blog'        => 'Blog',
     'nav.publicar'    => 'Post an activity',
     'nav.publicar_corto'  => 'Post',

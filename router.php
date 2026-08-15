@@ -38,6 +38,39 @@ if ($base !== '' && $base !== '/' && strpos($ruta, $base) === 0) {
 $ruta = trim($ruta, '/');
 
 /*
+ * La ficha de una actividad: /actividad/{slug} (REQ-00006).
+ *
+ * Va antes del mapa de páginas porque no es una página fija: son tantas
+ * direcciones como actividades haya, y ninguna se puede escribir en
+ * rutasSitio().
+ *
+ * DEL SLUG SE SACA EL ID, SIN CONSULTAR NADA
+ *
+ * generarSlug() termina siempre en «-{id}». Leerlo de ahí evita una consulta
+ * por slug —y el índice que haría falta para que no fuera lenta—, y resuelve
+ * solo dos cosas que si no habría que resolver a mano: dos actividades con el
+ * mismo título («Yoga al amanecer» cada sábado) y las direcciones viejas de una
+ * actividad a la que le cambiaron el título. En los dos casos el número es el
+ * mismo y llega a la ficha correcta; evento.php se encarga de mandar un 301 a
+ * la dirección buena si el slug ya no es el actual.
+ *
+ * Se pone $_GET['id'] y se incluye evento.php sin tocarla: la ficha sigue
+ * funcionando igual desde aquí, desde /evento.php?id=7 y desde un POST de sus
+ * propios formularios.
+ */
+if (strpos($ruta, 'actividad/') === 0) {
+    $slug = substr($ruta, strlen('actividad/'));
+
+    if (preg_match('/-(\d+)$/', $slug, $coincidencia)) {
+        $_GET['id'] = $coincidencia[1];
+        require __DIR__ . '/evento.php';
+        exit;
+    }
+    /* Sin número al final no es una dirección nuestra. Sigue y acaba en el 404
+       de abajo, que es lo que corresponde. */
+}
+
+/*
  * Buscar la dirección en el mapa. Se recorre entero porque una misma cadena
  * puede ser de un idioma o de otro —"blog" vale para los dos— y hay que saber
  * en cuál se encontró: de ahí sale el idioma de toda la petición.

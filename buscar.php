@@ -39,6 +39,17 @@ $ciudadesFiltro   = $ubicaciones['ciudades'];
 $titulo        = 'Buscar actividades';
 $descripcion   = 'Busca actividades de bienestar en México por ciudad, fecha y categoría: retiros, festivales, yoga, breathwork y más.';
 $anchoLibre    = true;
+
+/*
+ * La dirección pública del directorio es /actividades (REQ-00006). Este archivo
+ * responde también a /buscar.php, que es la interna, y sin canónica Google
+ * podría indexar esa —lo mismo que se acaba de arreglar en la ficha—.
+ *
+ * Cuando se llega por /actividades el enrutador ya deja puesta la ruta y
+ * layout.php emite la canónica y los hreflang por su cuenta; este $canonical
+ * solo cubre la entrada directa por el .php.
+ */
+$canonical = url('actividades');
 $scriptsPagina = ['assets/js/buscar.js'];
 
 require __DIR__ . '/includes/layout.php';
@@ -110,9 +121,12 @@ require __DIR__ . '/includes/layout.php';
     <div>
       <div class="results-head">
         <div class="count" id="resultsCount"></div>
-        <select class="sortsel" id="fOrden">
-          <?php foreach (['fecha' => 'Ordenar: más próximas', 'precio' => 'Precio: menor a mayor',
-                          'nuevos' => 'Recién publicadas'] as $clave => $texto): ?>
+        <?php /* Las tres opciones y su orden salen de ordenesBusqueda(), que es
+                 también de donde sale el whitelist de la dirección. Escritas
+                 aquí a mano, reordenar el menú podía cambiar sin querer cuál
+                 era el orden por defecto —lo era la primera de la otra lista. */ ?>
+        <select class="sortsel" id="fOrden" aria-label="Ordenar resultados">
+          <?php foreach (ordenesBusqueda() as $clave => $texto): ?>
             <option value="<?= e($clave) ?>"<?= $clave === $filtros['orden'] ? ' selected' : '' ?>><?= e($texto) ?></option>
           <?php endforeach; ?>
         </select>
@@ -122,5 +136,10 @@ require __DIR__ . '/includes/layout.php';
     </div>
   </div>
 </section>
+
+<?php /* Cuál es el orden por defecto lo decide PHP. buscar.js lo necesita para
+         no escribirlo en la dirección, y tenerlo escrito a mano en los dos
+         sitios es la forma de que un día dejen de coincidir. */ ?>
+<script>var ORDEN_DEFECTO = <?= json_encode(ordenPorDefecto()) ?>;</script>
 
 <?php pie(); ?>

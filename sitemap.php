@@ -93,7 +93,10 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 <?php endforeach; ?>
 <?php foreach ($eventos as $ev): ?>
   <url>
-    <loc><?= e(URL_BASE . '/evento.php?id=' . $ev['id']) ?></loc>
+    <?php /* La dirección limpia, no /evento.php?id= (REQ-00006). Es la que
+             evento.php declara como canónica, y ofrecerle a Google una
+             distinta de la canónica es pedirle que decida él. */ ?>
+    <loc><?= e(urlEvento($ev)) ?></loc>
     <lastmod><?= e(date('Y-m-d', strtotime($ev['actualizado_en']))) ?></lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>

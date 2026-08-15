@@ -101,6 +101,12 @@ if ($claveRutaSeo !== null):
   <?php endif; ?>
 <?php endforeach; ?>
 <link rel="alternate" hreflang="x-default" href="<?= e(url($claveRutaSeo, IDIOMA_POR_DEFECTO)) ?>">
+<?php elseif (!empty($canonical)): ?>
+<?php /* Páginas que no están en rutasSitio() y aun así tienen una dirección
+         canónica propia: la ficha de actividad, que es /actividad/{slug}. Sin
+         hreflang, porque no hay versión inglesa declarada y anunciar una que no
+         existe es peor que callarse. */ ?>
+<link rel="canonical" href="<?= e($canonical) ?>">
 <?php endif; ?>
 <meta property="og:site_name" content="<?= et('marca.nombre') ?>">
 <meta property="og:type" content="website">

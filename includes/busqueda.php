@@ -27,10 +27,32 @@ function fechasBusqueda(): array
     return ['', 'finde', '7dias', 'mes'];
 }
 
-/** Las formas de ordenar. La primera es la de por defecto. */
+/**
+ * Las formas de ordenar: clave interna => lo que se lee en el menú.
+ *
+ * El ORDEN DE ESTE ARRAY es el orden del menú, y la primera es la de por
+ * defecto. Las dos cosas salen de aquí para que cambiar el menú no obligue a
+ * tocar también el whitelist ni la dirección: antes la lista de claves vivía
+ * aquí y los textos escritos a mano en buscar.php, así que reordenar el menú
+ * podía cambiar sin querer cuál era el orden por defecto.
+ *
+ * «Próximas» y no «Ordenar: más próximas» (REQ-00006): el rótulo del menú ya
+ * dice qué se está haciendo, y repetir «Ordenar:» dentro de la única opción que
+ * lo llevaba hacía que las tres parecieran cosas distintas.
+ */
 function ordenesBusqueda(): array
 {
-    return ['fecha', 'precio', 'nuevos'];
+    return [
+        'fecha'  => 'Próximas',
+        'nuevos' => 'Recién publicadas',
+        'precio' => 'Precio: menor a mayor',
+    ];
+}
+
+/** La forma de ordenar cuando la dirección no dice otra cosa. */
+function ordenPorDefecto(): string
+{
+    return (string) array_key_first(ordenesBusqueda());
 }
 
 /**
@@ -51,7 +73,7 @@ function filtrosDesdePeticion(array $get): array
     if (!in_array($fecha, fechasBusqueda(), true)) $fecha = '';
 
     $orden = (string) ($get['orden'] ?? '');
-    if (!in_array($orden, ordenesBusqueda(), true)) $orden = ordenesBusqueda()[0];
+    if (!isset(ordenesBusqueda()[$orden])) $orden = ordenPorDefecto();
 
     // Las categorías llegan separadas por comas y se cotejan con el catálogo:
     // lo que no esté en él se cae. array_values para que el JSON salga como
@@ -91,7 +113,7 @@ function consultaBusqueda(array $f): string
     if ($f['gratis'])         $partes['gratis'] = '1';
 
     // El orden por defecto no se escribe: no aporta y ensucia la dirección.
-    if ($f['orden'] !== ordenesBusqueda()[0]) $partes['orden'] = $f['orden'];
+    if ($f['orden'] !== ordenPorDefecto()) $partes['orden'] = $f['orden'];
 
     return http_build_query($partes);
 }
@@ -101,7 +123,10 @@ function urlBuscar(array $f): string
 {
     $consulta = consultaBusqueda($f);
 
-    return URL_BASE . '/buscar.php' . ($consulta !== '' ? '?' . $consulta : '');
+    // /actividades y no /buscar.php (REQ-00006): esta dirección acaba en el
+    // enlace «volver a los resultados» de cada ficha, o sea a la vista y en
+    // manos de quien la copie.
+    return url('actividades') . ($consulta !== '' ? '?' . $consulta : '');
 }
 
 /**
@@ -114,7 +139,7 @@ function urlBuscar(array $f): string
  */
 function urlVolverABuscar(?string $volver): string
 {
-    if ($volver === null || $volver === '') return URL_BASE . '/buscar.php';
+    if ($volver === null || $volver === '') return url('actividades');
 
     parse_str($volver, $partes);
 

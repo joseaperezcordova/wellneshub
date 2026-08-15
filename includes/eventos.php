@@ -272,7 +272,7 @@ function eventosPublicados(?string $categoria = null, int $limite = 60): array
 function eventosPublicadosParaSitemap(): array
 {
     $st = db()->query(
-        "SELECT id, actualizado_en
+        "SELECT id, slug, actualizado_en
            FROM eventos
           WHERE situacion = 'publicado'
             AND COALESCE(fecha_fin, fecha_inicio) >= NOW()
@@ -280,7 +280,11 @@ function eventosPublicadosParaSitemap(): array
     );
 
     return array_map(
-        static fn(array $f): array => ['id' => (int) $f['id'], 'actualizado_en' => (string) $f['actualizado_en']],
+        static fn(array $f): array => [
+            'id'             => (int) $f['id'],
+            'slug'           => (string) ($f['slug'] ?? ''),
+            'actualizado_en' => (string) $f['actualizado_en'],
+        ],
         $st->fetchAll()
     );
 }
@@ -1146,7 +1150,7 @@ function eventoParaTarjeta(array $ev): array
         'free'  => (bool) $ev['gratuito'],
         'color' => $ev['color'],
         'img'   => urlImagen($ev['imagen_url']),
-        'url'   => URL_BASE . '/evento.php?id=' . (int) $ev['id'],
+        'url'   => urlEvento($ev),
 
         /*
          * De aquí para abajo no se pinta nada: es lo que necesita el buscador

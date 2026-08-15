@@ -202,9 +202,47 @@ function assetUrl(string $ruta): string
     return URL_BASE . '/' . ltrim($ruta, '/') . '?v=' . $version;
 }
 
-/** Redirige y corta la ejecución. */
+/**
+ * La dirección pública de una actividad: /actividad/{slug} (REQ-00006).
+ *
+ * Antes era /evento.php?id=7. La limpia se comparte mejor, dice de qué va antes
+ * de abrirla y sobrevive a que el archivo se renombre. La resuelve router.php.
+ *
+ * EL ID VA DENTRO DEL SLUG, Y ESO ES LO QUE HACE QUE ESTO SEA BARATO
+ *
+ * generarSlug() termina siempre en «-{id}», así que la dirección se puede leer
+ * al revés: del slug se saca el id sin consultar la base, sin índice nuevo y sin
+ * que dos actividades con el mismo título se estorben —«Yoga al amanecer» cada
+ * sábado es un caso normal, no un error—.
+ *
+ * Si el título cambia, el slug cambia y la dirección vieja sigue llegando al
+ * mismo sitio: evento.php la reconoce y redirige a la nueva con un 301.
+ *
+ * Vive aquí y no en eventos.php porque la usa includes/contacto.php, que se
+ * carga siempre, y eventos.php solo lo cargan las páginas que lo necesitan.
+ */
+function urlEvento(array $ev): string
+{
+    $slug = trim((string) ($ev['slug'] ?? ''));
+
+    // Actividades anteriores al slug, o guardadas a medias: la dirección sigue
+    // siendo válida porque lo único que hace falta leer es el número del final.
+    if ($slug === '') $slug = 'actividad-' . (int) $ev['id'];
+
+    return URL_BASE . '/actividad/' . rawurlencode($slug);
+}
+
+/**
+ * Redirige y corta la ejecución.
+ *
+ * Acepta una ruta relativa a la raíz del sitio —'/login.php'— o una dirección
+ * completa, que es lo que devuelve urlEvento(). Sin esto, cada sitio que manda
+ * a una ficha tendría que volver a montar la cabecera Location a mano.
+ */
 function redirigir(string $ruta): void
 {
-    header('Location: ' . URL_BASE . $ruta);
+    $destino = preg_match('#^https?://#i', $ruta) ? $ruta : URL_BASE . $ruta;
+
+    header('Location: ' . $destino);
     exit;
 }

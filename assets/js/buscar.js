@@ -58,7 +58,11 @@
     if (estado.fecha)        p.set('fecha',  estado.fecha);
     if (estado.cats.length)  p.set('cat',    estado.cats.join(','));
     if (estado.gratis)       p.set('gratis', '1');
-    if (estado.orden !== 'fecha') p.set('orden', estado.orden);
+    /* El orden por defecto no se escribe en la direccion. Cual es lo dice PHP
+       —ordenPorDefecto()—, no un literal aqui: escrito a mano en los dos sitios,
+       cambiar el menu dejaria este a medias y la direccion se llenaria de un
+       parametro que no hace nada. */
+    if (estado.orden !== ORDEN_DEFECTO) p.set('orden', estado.orden);
 
     return p.toString();
   }
@@ -144,8 +148,13 @@
        Lo que interesa guardar es la dirección, no el camino. El offset no
        viaja en la URL: compartir una búsqueda tiene que empezar en la primera
        página, no donde se quedó quien la mandó. */
-    var url2 = 'buscar.php' + (qs ? '?' + qs : '');
-    history.replaceState(null, '', url2);
+    /* location.pathname y no 'buscar.php' escrito a mano (REQ-00006): la
+       direccion publica es /actividades, y reescribirla como buscar.php
+       cambiaba la barra del navegador a la direccion interna en cuanto se
+       tocaba un filtro. Lo que se copiara de ahi ya no era la direccion que se
+       publica. Con pathname se conserva la que sea —tambien /activities el dia
+       que el listado exista en ingles. */
+    history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
   }
 
   function leer() {
