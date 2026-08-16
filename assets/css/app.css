@@ -500,7 +500,31 @@ input,select{font-family:inherit; font-size:14px;}
    input de siempre —arrastrar y soltar, teclado, lector de pantalla, todo
    sigue funcionando porque un <label for="imagen"> activa el input al que
    apunta igual que si se hiciera clic en él directamente—. */
-.imagen-input-oculto{position:absolute; opacity:0; width:0; height:0; pointer-events:none;}
+/* El <input type=file> de verdad: sigue en el DOM —lo necesita el formulario y
+   lo necesita quien navegue con teclado—, pero no se ve. Lo visible es la
+   etiqueta .imagen-dropzone, que lo dispara con su for="imagen".
+   ESTABA ESTIRANDO LA PAGINA. La regla anterior era position:absolute SIN left
+   ni top, asi que el input conservaba su posicion estatica: un elemento que se
+   creia escondido pero seguia teniendo una coordenada real, dependiente del
+   layout, y que se salia por la derecha —era el que ensanchaba el documento y
+   sacaba la barra horizontal en toda la pagina de publicar—.
+   Ahora se ancla en 0,0 y se recorta a cero. Sin coordenada que se escape. */
+.imagen-input-oculto{
+  position:absolute; left:0; top:0;
+  width:1px; height:1px; margin:-1px; padding:0; border:0;
+  overflow:hidden; clip-path:inset(50%); white-space:nowrap;
+  pointer-events:none;
+}
+
+/* El foco del teclado tiene que verse en algun sitio. El input esta recortado y
+   es HERMANO de la etiqueta, no su hijo, asi que el :focus-within de arriba no
+   se entera: sin esto, quien llega tabulando no ve nada resaltado en el unico
+   control para poner imagen. Donde :has() no exista, no pasa nada mas que
+   seguir como estaba. */
+.campo:has(.imagen-input-oculto:focus-visible) .imagen-dropzone{
+  border-color:var(--verde); background:var(--blanco);
+  outline:2px solid var(--terracota-texto); outline-offset:2px;
+}
 .imagen-dropzone{
   display:flex; flex-direction:column; align-items:center; gap:6px;
   border:1.5px dashed var(--linea); border-radius:12px; padding:26px 16px;

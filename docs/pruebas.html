@@ -963,6 +963,24 @@
 
         <label class="prueba">
           <input type="checkbox">
+          <span class="qué">Con el formulario abierto, mira el <b>borde inferior de la ventana</b>: ¿hay barra de desplazamiento horizontal?</span>
+          <span class="esperado">No la hay, y la cabecera verde llega de lado a lado. La hubo: el <code>input</code> de imagen, escondido, se salía por la derecha y ensanchaba el documento entero.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Baja hasta que el mapa quede a la altura del <b>aviso de cookies</b>, y luego sigue bajando hasta que pase por detrás de la cabecera.</span>
+          <span class="esperado">El mapa pasa <b>por debajo</b> de los dos. Se subía encima de ambos: las capas de la librería del mapa competían con las nuestras.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
+          <span class="qué">Sin tocar el ratón, llega con el tabulador hasta «Subir imagen».</span>
+          <span class="esperado">El recuadro punteado <b>se resalta</b> al recibir el foco. Antes no se marcaba nada y no había forma de saber que estabas encima del control.</span>
+        </label>
+
+        <label class="prueba">
+          <input type="checkbox">
           <span class="qué">Mira dónde cayó el pin.</span>
           <span class="esperado">Está <b>en el sitio que buscaste</b>, no en el centro de la ciudad.</span>
         </label>
