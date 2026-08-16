@@ -598,9 +598,20 @@ input,select{font-family:inherit; font-size:14px;}
 /* El mapa arrastrable del formulario. El alto es fijo porque Leaflet no
    sabe medirse solo: sin uno, el contenedor colapsa a 0px y el mapa no
    llega ni a pintarse. */
+/* isolation:isolate NO ES DECORATIVO. Leaflet pinta sus capas con z-index 400
+   —y sus controles con 1000— escritos en su propia hoja de estilos. Sin un
+   contexto de apilamiento propio, esos numeros compiten en la raiz contra los
+   nuestros y ganan siempre: el mapa se subia encima del aviso de cookies (60)
+   y de la cabecera pegajosa (40).
+   Subir nuestros z-index por encima de 1000 seria perseguir los numeros de una
+   libreria que puede cambiarlos; encerrarlos aqui los deja donde pertenecen,
+   dentro del mapa. */
 .mapa-interactivo{
   height:280px; border-radius:12px; border:1px solid var(--linea);
   background:var(--arena);
+  isolation:isolate;
+  /* Y que no se salga de su columna pase lo que pase con las teselas. */
+  max-width:100%; overflow:hidden;
 }
 @media(max-width:520px){ .mapa-interactivo{height:220px;} }
 
