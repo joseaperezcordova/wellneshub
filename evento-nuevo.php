@@ -53,10 +53,18 @@ if (postDesbordado()) {
              * opcionales—, así que no hay nada que comprobar antes.
              */
             guardarContactoOrganizador((int) $u['id'], $_POST);
-            // Se relee para tener el slug que acaba de generarse. Si por lo que
-            // sea no viniera, urlEvento() se apaña con el id y la dirección
-            // sigue llevando a la ficha.
-            redirigir(urlEvento(buscarEvento($id) ?? ['id' => $id]));
+
+            // Se relee para tener el slug que acaba de generarse y el nombre
+            // del organizador (el JOIN de buscarEvento()), que es lo que
+            // necesita el aviso a los administradores además de la ficha.
+            $nuevoEvento = buscarEvento($id);
+            if ($nuevoEvento !== null) {
+                avisarAdminsNuevaActividad($nuevoEvento);
+            }
+
+            // Si por lo que sea no viniera, urlEvento() se apaña con el id y
+            // la dirección sigue llevando a la ficha.
+            redirigir(urlEvento($nuevoEvento ?? ['id' => $id]));
         }
 
         /*

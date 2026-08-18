@@ -950,6 +950,45 @@ function crearEvento(array $e, int $usuarioId): int
     return $id;
 }
 
+/**
+ * Avisa a los administradores de que se creó una actividad nueva.
+ *
+ * Se dispara al CREAR, no al publicar: crearEvento() siempre guarda como
+ * borrador, así que esto puede avisar de algo que su organizador nunca
+ * llegue a publicar. Es a propósito —es la única señal temprana que hay de
+ * que alguien está usando el formulario, y publicarEvento() no manda ningún
+ * correo (ver revisarAlPublicar() en moderacion.php: el filtro de palabras sí
+ * avisa, pero solo si algo suena mal)—.
+ *
+ * Un correo por actividad, sin agrupar ni espaciar como sí hace
+ * avisarAdministradores() con los reportes: crear una actividad no es algo
+ * que una misma persona repita en ráfaga como sí pasa cuando varias reportan
+ * la misma ficha.
+ */
+function avisarAdminsNuevaActividad(array $ev): void
+{
+    $admins = db()->query(
+        'SELECT email FROM usuarios WHERE rol = "admin" AND estado = "activo"'
+    )->fetchAll();
+
+    if (!$admins) {
+        error_log('Actividad ' . $ev['id'] . ' creada y no hay ningún administrador a quien avisar.');
+        return;
+    }
+
+    $cuerpo = "Se creó una actividad nueva en OMDARA.\n\n"
+            . 'Título:     ' . $ev['titulo'] . "\n"
+            . 'Categoría:  ' . $ev['categoria'] . "\n"
+            . 'Organiza:   ' . ($ev['organizador'] ?? '') . "\n"
+            . 'Ciudad:     ' . $ev['ciudad'] . ', ' . $ev['entidad'] . "\n\n"
+            . "Todavía es un borrador: nadie más la ve hasta que su organizador la publique.\n\n"
+            . urlEvento($ev) . "\n";
+
+    foreach ($admins as $a) {
+        enviarCorreo($a['email'], 'Nueva actividad creada: ' . $ev['titulo'], $cuerpo);
+    }
+}
+
 function actualizarEvento(array $e, int $id): void
 {
     db()->prepare(
