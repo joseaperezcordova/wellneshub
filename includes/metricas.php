@@ -142,15 +142,22 @@ function actividadesPublicadasPorMes(int $meses = 8): array
     return $resultado;
 }
 
-/** @return array<int, array{n:string, v:int}> */
+/**
+ * Las categorías con más actividades publicadas, contando TODAS las que
+ * lleve cada una y no solo la principal —una actividad de Yoga y Meditación
+ * suma en las dos, igual que la ve cualquiera que filtre por una u otra—.
+ *
+ * @return array<int, array{n:string, v:int}>
+ */
 function categoriasTop(int $limite = 6): array
 {
     $st = db()->prepare(
-        "SELECT categoria AS n, COUNT(*) AS v
-           FROM eventos
-          WHERE situacion = 'publicado'
-       GROUP BY categoria
-       ORDER BY v DESC, categoria ASC
+        "SELECT ec.categoria AS n, COUNT(*) AS v
+           FROM eventos_categorias ec
+           JOIN eventos e ON e.id = ec.evento_id
+          WHERE e.situacion = 'publicado'
+       GROUP BY ec.categoria
+       ORDER BY v DESC, ec.categoria ASC
           LIMIT " . (int) $limite
     );
     $st->execute();
@@ -186,15 +193,20 @@ function ciudadesTop(int $limite = 6): array
  * categoriasTop(), esto no es un ranking para una gráfica: es el catálogo
  * completo para el panel de administración, así que nada se recorta.
  *
+ * Igual que categoriasTop(), cuenta desde eventos_categorias: una actividad
+ * con dos categorías suma en las dos, así que el total de esta lista puede
+ * superar al número de actividades publicadas y es normal que sea así.
+ *
  * @return array<int, array{nombre:string, icono:string, total:int}>
  */
 function categoriasConConteo(): array
 {
     $st = db()->query(
-        "SELECT categoria, COUNT(*) AS total
-           FROM eventos
-          WHERE situacion = 'publicado'
-       GROUP BY categoria"
+        "SELECT ec.categoria, COUNT(*) AS total
+           FROM eventos_categorias ec
+           JOIN eventos e ON e.id = ec.evento_id
+          WHERE e.situacion = 'publicado'
+       GROUP BY ec.categoria"
     );
     $conteos = array_column($st->fetchAll(), 'total', 'categoria');
 

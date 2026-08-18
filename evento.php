@@ -271,7 +271,16 @@ require __DIR__ . '/includes/layout.php';
   </div>
 
   <div class="ficha-cuerpo">
-    <div class="ficha-cat"><?= e((categorias()[$ev['categoria']] ?? '') . ' ' . $ev['categoria']) ?></div>
+    <?php
+    // Todas las que marcó el organizador, no solo la principal —esa es cosa
+    // de la tarjeta de la portada, donde no cabe más que una—.
+    $catalogoIconos  = categorias();
+    $categoriasFicha = categoriasDeEvento((int) $ev['id']) ?: [$ev['categoria']];
+    ?>
+    <div class="ficha-cat"><?= e(implode(' · ', array_map(
+        static fn(string $c): string => trim(($catalogoIconos[$c] ?? '') . ' ' . $c),
+        $categoriasFicha
+    ))) ?></div>
     <h1><?= e($ev['titulo']) ?></h1>
 
     <div class="ficha-compartir">

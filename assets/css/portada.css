@@ -544,6 +544,12 @@
   }
   .filtros-limpiar:hover{background:var(--arena);}
   .checklist label{display:flex; align-items:center; gap:8px; font-size:13px; padding:4px 0;}
+  /* La del formulario de alta: mismo checklist que el de filtros, pero dentro
+     de la caja ancha del formulario en vez del panel angosto de la barra
+     lateral, así que aquí sí cabe en columnas en vez de una lista larga. */
+  .categorias-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:0 16px;}
+  @media(min-width:640px){ .categorias-grid{grid-template-columns:repeat(3,1fr);} }
+  @media(max-width:420px){ .categorias-grid{grid-template-columns:1fr;} }
   /* Solo la de categorias, que son veintitantas: entera empujaba el filtro de
      precio y el boton de limpiar por debajo del borde de la pantalla, y desde
      ahi no se usan. El alto corta a media fila a proposito, que es lo que

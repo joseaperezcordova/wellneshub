@@ -46,6 +46,16 @@ $horaFinRecurrenteInput = function () use ($e) {
 
 $esRecurrente = ($e['tipo_actividad'] ?? 'unico') === 'recurrente';
 
+/*
+ * Las categorías marcadas. Tras un envío fallido ya vienen en $e['categorias']
+ * —validarEvento() las deja puestas aunque hayan fallado, igual que hace con
+ * cualquier otro campo—; si no, es que se llegó aquí por primera vez: al
+ * editar, lo guardado en eventos_categorias; al dar de alta, ninguna.
+ */
+$categoriasSeleccionadas = isset($e['categorias']) && is_array($e['categorias'])
+    ? $e['categorias']
+    : (isset($e['id']) ? categoriasDeEvento((int) $e['id']) : []);
+
 /** El mensaje de error de un campo, si lo hay. */
 $err = function (string $campo) use ($errores) {
     return isset($errores[$campo])
@@ -134,17 +144,22 @@ if ($orgAbierta) {
   <?= $err('titulo') ?>
 </div>
 
-<div class="campo<?= $mal('categoria') ?>">
-  <label for="categoria">Categoría</label>
-  <select id="categoria" name="categoria" required>
-    <option value="">Elige una…</option>
-    <?php foreach (categorias() as $nombre => $icono): ?>
-      <option value="<?= e($nombre) ?>" <?= $v('categoria') === $nombre ? 'selected' : '' ?>>
-        <?= e($icono . '  ' . $nombre) ?>
-      </option>
+<div class="campo<?= $mal('categorias') ?>">
+  <div class="label-fila">
+    <label>Categorías <span class="pista" style="font-weight:400;">elige hasta <?= EVENTO_CATEGORIAS_MAX ?></span></label>
+    <span class="contador" id="contadorCategorias"></span>
+  </div>
+  <div class="checklist categorias-grid" id="categoriasGrupo">
+    <?php foreach (categoriasMenu() as $catNombre => $catDatos): ?>
+      <label>
+        <input type="checkbox" name="categorias[]" value="<?= e($catNombre) ?>"
+               <?= in_array($catNombre, $categoriasSeleccionadas, true) ? 'checked' : '' ?>>
+        <?= e($catDatos[0] . '  ' . $catNombre) ?>
+      </label>
     <?php endforeach; ?>
-  </select>
-  <?= $err('categoria') ?>
+  </div>
+  <div class="pista">De las que marques, la que quede más arriba en la lista es la principal: la que se ve en la tarjeta de la portada.</div>
+  <?= $err('categorias') ?>
 </div>
 
 <div class="campo<?= $mal('descripcion') ?>">
@@ -758,6 +773,31 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
 
   function sync(){ contador.textContent = campo.value.length + ' / 160'; }
   campo.addEventListener('input', sync);
+  sync();
+})();
+
+/* Tope de categorías en el navegador. El servidor ya lo exige —validarEvento()
+   descarta el sobrante—, pero avisar antes de enviar evita el viaje en balde
+   de mandar el formulario para enterarse ahí de que sobraba una. Las que no
+   están marcadas se deshabilitan al llegar al tope, así que no hace falta
+   explicar "ya no puedes" con otro mensaje: el propio checkbox lo dice. */
+(function(){
+  var MAX = <?= (int) EVENTO_CATEGORIAS_MAX ?>;
+  var grupo = document.getElementById('categoriasGrupo');
+  var contador = document.getElementById('contadorCategorias');
+  if (!grupo) return;
+
+  var cajas = grupo.querySelectorAll('input[type="checkbox"]');
+
+  function sync(){
+    var marcadas = grupo.querySelectorAll('input[type="checkbox"]:checked').length;
+    if (contador) contador.textContent = marcadas + ' / ' + MAX;
+    cajas.forEach(function(caja){
+      caja.disabled = !caja.checked && marcadas >= MAX;
+    });
+  }
+
+  cajas.forEach(function(caja){ caja.addEventListener('change', sync); });
   sync();
 })();
 

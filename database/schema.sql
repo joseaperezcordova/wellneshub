@@ -160,6 +160,13 @@ CREATE TABLE IF NOT EXISTS eventos (
   slug          VARCHAR(190)  NOT NULL,
 
   descripcion   TEXT          NOT NULL,
+
+  -- La categoría PRINCIPAL: la primera que eligió el organizador. Una
+  -- actividad puede tener más de una (migración 20); el conjunto completo
+  -- vive en eventos_categorias, más abajo. Esta columna se queda porque la
+  -- tarjeta de la portada, el aviso de actividad duplicada y las
+  -- estadísticas de un vistazo siguen leyendo un solo valor, y triplicar esa
+  -- lectura para pintar una tarjeta no aporta nada.
   categoria     VARCHAR(60)   NOT NULL,
 
   -- De un día (de siempre) o recurrente. Si es recurrente, frecuencia y
@@ -257,6 +264,27 @@ CREATE TABLE IF NOT EXISTS eventos (
 
   CONSTRAINT fk_evento_usuario
     FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ----------------------------------------------------------------------------
+--  eventos_categorias
+--
+--  Un renglón por cada categoría de cada evento (migración 20). eventos.categoria
+--  sigue guardando la principal —la primera elegida—; aquí vive el conjunto
+--  completo, que es lo que lee la ficha, el editor y el buscador para no dejar
+--  fuera una actividad por su segunda o tercera categoría.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS eventos_categorias (
+  evento_id  INT UNSIGNED NOT NULL,
+  categoria  VARCHAR(60)  NOT NULL,
+
+  PRIMARY KEY (evento_id, categoria),
+  KEY idx_eventos_categorias_categoria (categoria),
+
+  CONSTRAINT fk_eventos_categorias_evento
+    FOREIGN KEY (evento_id) REFERENCES eventos (id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

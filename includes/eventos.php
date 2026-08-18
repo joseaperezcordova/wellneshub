@@ -18,6 +18,16 @@ declare(strict_types=1);
 const EVENTO_MARGEN_EDICION_H = 24;
 
 /**
+ * Cuántas categorías puede llevar una actividad a la vez.
+ *
+ * Sin techo, "elegir categorías" se convierte en "marcarlas todas" para salir
+ * en el mayor número de filtros posible, y el catálogo deja de servir para
+ * nada. Tres alcanza para una actividad de verdad mixta —Yoga y Sonido, un
+ * retiro de Temazcal y Meditación— sin llegar a eso.
+ */
+const EVENTO_CATEGORIAS_MAX = 3;
+
+/**
  * Las categorías, con el icono que usa el menú de la portada.
  *
  * Esta lista es la única fuente: el menú lineal de la portada se dibuja desde
@@ -350,8 +360,12 @@ function eventosBuscar(array $f, int $limite, int $offset): array
         $where[] = 'e.gratuito = 1';
     }
     if ($f['cats']) {
+        // EXISTS contra eventos_categorias y no "e.categoria IN (...)": una
+        // actividad marcada Yoga y Meditación tiene que aparecer al filtrar
+        // por cualquiera de las dos, no solo por la que quedó como principal.
         $marcadores = implode(',', array_fill(0, count($f['cats']), '?'));
-        $where[]    = "e.categoria IN ($marcadores)";
+        $where[]    = "EXISTS (SELECT 1 FROM eventos_categorias ec
+                                 WHERE ec.evento_id = e.id AND ec.categoria IN ($marcadores))";
         array_push($params, ...$f['cats']);
     }
     if ($f['texto'] !== '') {
@@ -501,7 +515,7 @@ function etiquetasCampos(): array
 {
     return [
         'titulo'          => 'Título de la actividad',
-        'categoria'       => 'Categoría',
+        'categorias'      => 'Categorías',
         'descripcion'     => 'Descripción',
         'ciudad'          => 'Ciudad',
         'entidad'         => 'Estado',
@@ -557,10 +571,27 @@ function validarEvento(array $in): array
         $errores['descripcion'] = 'La descripción no puede pasar de 2,000 caracteres.';
     }
 
-    $e['categoria'] = (string) ($in['categoria'] ?? '');
-    if (!isset(categorias()[$e['categoria']])) {
-        $errores['categoria'] = 'Elige una categoría de la lista.';
+    /*
+     * Una o varias categorías (checkboxes "categorias[]"), no ya un único
+     * <select>. Se cotejan con el catálogo y se ordenan como en él —no como
+     * llegaron los checkboxes— para que "la principal" sea siempre
+     * determinista: la primera del catálogo entre las que se marcaron.
+     */
+    $categoriasEntrada = $in['categorias'] ?? [];
+    if (!is_array($categoriasEntrada)) $categoriasEntrada = [];
+    $categoriasEntrada = array_unique(array_map('strval', $categoriasEntrada));
+
+    $catalogoCategorias = array_keys(categorias());
+    $categoriasValidas  = array_values(array_intersect($catalogoCategorias, $categoriasEntrada));
+
+    if (!$categoriasValidas) {
+        $errores['categorias'] = 'Elige al menos una categoría de la lista.';
+    } elseif (count($categoriasValidas) > EVENTO_CATEGORIAS_MAX) {
+        $errores['categorias'] = 'Elige como máximo ' . EVENTO_CATEGORIAS_MAX . ' categorías.';
     }
+
+    $e['categorias'] = array_slice($categoriasValidas, 0, EVENTO_CATEGORIAS_MAX);
+    $e['categoria']  = $e['categorias'][0] ?? '';
 
     $e['entidad'] = trim((string) ($in['entidad'] ?? ''));
     if (!in_array($e['entidad'], estadosMexico(), true)) {
@@ -914,6 +945,8 @@ function crearEvento(array $e, int $usuarioId): int
     $pdo->prepare('UPDATE eventos SET slug = ? WHERE id = ?')
         ->execute([generarSlug($e['titulo'], $id), $id]);
 
+    sincronizarCategoriasEvento($id, $e['categorias']);
+
     return $id;
 }
 
@@ -940,6 +973,50 @@ function actualizarEvento(array $e, int $id): void
         $e['url_boletos'], $e['url_reserva'], $e['sitio_web'], $e['accion_principal'],
         $e['imagen_url'], $e['color'], $id,
     ]);
+
+    sincronizarCategoriasEvento($id, $e['categorias']);
+}
+
+/**
+ * Reescribe el conjunto de categorías guardado para un evento.
+ *
+ * Borra y vuelve a insertar en vez de comparar qué cambió: son como mucho
+ * EVENTO_CATEGORIAS_MAX filas, y calcular la diferencia costaría más código
+ * del que ahorra.
+ */
+function sincronizarCategoriasEvento(int $eventoId, array $categorias): void
+{
+    $pdo = db();
+    $pdo->prepare('DELETE FROM eventos_categorias WHERE evento_id = ?')->execute([$eventoId]);
+
+    if (!$categorias) return;
+
+    $marcadores = implode(',', array_fill(0, count($categorias), '(?, ?)'));
+    $params = [];
+    foreach ($categorias as $categoria) {
+        $params[] = $eventoId;
+        $params[] = $categoria;
+    }
+
+    $pdo->prepare("INSERT INTO eventos_categorias (evento_id, categoria) VALUES $marcadores")
+        ->execute($params);
+}
+
+/**
+ * Las categorías guardadas de un evento, en el orden del catálogo.
+ *
+ * array_intersect() con el catálogo primero, y no al revés, descarta de paso
+ * cualquier categoría huérfana que ya no exista —el mismo caso que resuelve
+ * migracion-05-categorias.sql para eventos.categoria— sin que haga falta otra
+ * comprobación aparte.
+ */
+function categoriasDeEvento(int $eventoId): array
+{
+    $st = db()->prepare('SELECT categoria FROM eventos_categorias WHERE evento_id = ?');
+    $st->execute([$eventoId]);
+    $guardadas = $st->fetchAll(PDO::FETCH_COLUMN);
+
+    return array_values(array_intersect(array_keys(categoriasMenu()), $guardadas));
 }
 
 /**
