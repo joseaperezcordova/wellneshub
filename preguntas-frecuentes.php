@@ -124,9 +124,9 @@ $bloques = [
              * publica.
              */
             '¿Revisan mi actividad antes de publicarla?',
-            'No hay una revisión previa: tu actividad se publica en cuanto le das a publicar, sin esperar a nadie. '
-            . 'Lo que sí hacemos es revisar después: cualquiera puede reportar una actividad, y el equipo la mira y la '
-            . 'retira si no cumple. Es lo que permite publicar sin esperas sin renunciar a la calidad del directorio.',
+            'No. Tu actividad se publica en cuanto la envías, sin esperar una aprobación. '
+            . 'La revisión es posterior. Cualquier persona puede reportarla y, si no cumple con nuestros criterios '
+            . 'o políticas, podremos retirarla.',
         ],
         [
             /*
