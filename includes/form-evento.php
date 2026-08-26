@@ -997,6 +997,55 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
   ciudadSel.addEventListener('change', centrarEnCiudad);
 
   /*
+   * Al escribir o corregir la dirección, mover el pin ahí en vez de esperar
+   * a que alguien lo arrastre (REQ-000-XX). "change" —al salir del campo— y
+   * no "input" en cada tecla: Nominatim pide como mucho una petición por
+   * segundo, y una por letra se sale de eso con la primera palabra.
+   *
+   * A diferencia de centrarEnCiudad(), esto SÍ mueve el pin aunque ya
+   * hubiera uno puesto: el requerimiento pide justo eso —que corregir la
+   * dirección lo actualice de nuevo—, y la dirección es una señal más
+   * precisa que la ciudad.
+   */
+  function geocodificarDireccion(){
+    var direccion = direccionInput.value.trim();
+    if (!direccion || !geocodingMsg) return;
+
+    var partes = [direccion];
+    if (ciudadSel.value)  partes.push(ciudadSel.value);
+    if (entidadSel.value) partes.push(entidadSel.value);
+    partes.push('México');
+
+    var consulta = encodeURIComponent(partes.join(', '));
+
+    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + consulta)
+      .then(function(resp){ return resp.json(); })
+      .then(function(resultados){
+        if (!resultados.length) {
+          geocodingMsg.textContent = 'No pudimos ubicar esa dirección en el mapa. Ajusta el pin a mano.';
+          geocodingMsg.className = 'aviso aviso-error';
+          geocodingMsg.hidden = false;
+          return;
+        }
+
+        var punto = {lat: parseFloat(resultados[0].lat), lng: parseFloat(resultados[0].lon)};
+        mapa.setView(punto, 16);
+        pin.setLatLng(punto);
+        fijarPunto(punto);
+
+        geocodingMsg.textContent = 'Encontramos la dirección y movimos el pin. Ajústalo si no quedó exacto.';
+        geocodingMsg.className = 'aviso aviso-info';
+        geocodingMsg.hidden = false;
+      })
+      .catch(function(){
+        geocodingMsg.textContent = 'No pudimos comprobar esa dirección. Ajusta el pin a mano si hace falta.';
+        geocodingMsg.className = 'aviso aviso-error';
+        geocodingMsg.hidden = false;
+      });
+  }
+  direccionInput.addEventListener('change', geocodificarDireccion);
+
+  /*
    * Pegar un enlace de Google Maps en vez de buscar el punto a mano. El
    * enlace corto que comparte el celular (maps.app.goo.gl) no trae las
    * coordenadas escritas: resolverEnlaceMaps(), en el servidor, sigue la
