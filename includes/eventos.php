@@ -551,6 +551,12 @@ function etiquetasCampos(): array
         'direccion'       => 'Dirección',
         'mapa_url'        => 'Enlace de Google Maps',
 
+        // No es un campo de la actividad —vive en la cuenta del organizador,
+        // ver guardarContactoOrganizador() en includes/auth.php— pero
+        // REQ-000-XX lo volvió obligatorio en el formulario, así que necesita
+        // su propia etiqueta aquí igual que cualquier otro campo requerido.
+        'org_nombre'      => 'Nombre del organizador',
+
         // Actividad de un día.
         'fecha_unica'        => 'Fecha',
         'hora_inicio_unica'  => 'Hora de inicio',

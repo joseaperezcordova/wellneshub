@@ -353,6 +353,20 @@ function normalizarSitioWeb(string $valor): string
 }
 
 /**
+ * ¿Trae el formulario un nombre de organizador con algo escrito?
+ *
+ * REQ-000-XX lo volvió obligatorio. No hace falta consultar la cuenta: el
+ * campo siempre llega precargado con el nombre que ya hubiera guardado (ver
+ * form-evento.php), así que si llega vacío es porque alguien lo borró a
+ * propósito —y guardarContactoOrganizador() lo dejaría tal cual estaba, sin
+ * avisar de que no se guardó nada—.
+ */
+function nombreOrganizadorValido(array $post): bool
+{
+    return trim((string) ($post['org_nombre'] ?? '')) !== '';
+}
+
+/**
  * Guarda la información de contacto del organizador (REQ-00012).
  *
  * Se llama al publicar y al editar una actividad: el requerimiento pide que

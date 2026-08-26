@@ -60,6 +60,10 @@ if ($puede && postDesbordado()) {
             $errores['imagen'] = $errorImagen;
         }
 
+        if (!nombreOrganizadorValido($_POST)) {
+            $errores['org_nombre'] = 'Falta el nombre del organizador.';
+        }
+
         if (!$errores && eventoDuplicado((int) $ev['usuario_id'], $e['entidad'], $e['ciudad'], $e['categoria'], $e['fecha_inicio'], (int) $ev['id'])) {
             $errores['general'] = 'Ya tienes otra actividad de "' . $e['categoria'] . '" en ' . $e['ciudad'] . ', ' . $e['entidad'] . ' para ese mismo día. Si es una repetición sin querer, revisa tus actividades; si es otra cosa, cambia la fecha, la ciudad o la categoría.';
         }

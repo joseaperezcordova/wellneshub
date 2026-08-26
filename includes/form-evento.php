@@ -494,13 +494,16 @@ if ($orgAbierta) {
     <circle cx="12" cy="8.2" r="3.8"/>
     <path d="M4.8 20c.6-3.7 3.6-5.9 7.2-5.9s6.6 2.2 7.2 5.9"/>
   </svg>
-  <h2>7. Información de contacto <span class="opcional">opcional</span></h2>
+  <h2>7. Información de contacto</h2>
 </div>
 
 <?php
 /*
- * Va antes de «Información adicional» —donde lo pide REQ-00012— y por eso los
- * dos apartados de abajo corren un número.
+ * REQ-000-XX fusionó lo que antes eran dos secciones numeradas —«7.
+ * Información de contacto» (el organizador) y «8. Información adicional»
+ * (el sitio de la actividad)— en una sola. Ya no hay un "opcional" a nivel
+ * de sección: con nombre del organizador obligatorio y el resto opcional,
+ * una sola etiqueta para todo el bloque mentiría sobre uno de los dos.
  *
  * COLAPSABLE CON <details>, no con JavaScript: abre y cierra solo, el teclado
  * ya sabe manejarlo y el buscador del navegador (Ctrl+F) encuentra lo de
@@ -508,7 +511,7 @@ if ($orgAbierta) {
  */
 ?>
 <details class="contacto-org"<?= $orgAbierta ? ' open' : '' ?>>
-  <summary>Información de contacto <span class="opcional">opcional</span></summary>
+  <summary>Datos del organizador</summary>
 
   <div class="contacto-org-cuerpo">
     <?php if ($orgHayGuardado && !$orgEditado): ?>
@@ -534,11 +537,12 @@ if ($orgAbierta) {
     <?php endif; ?>
 
     <div class="contacto-org-campos" id="orgCampos">
-      <div class="campo">
-        <label for="org_nombre">Nombre del organizador</label>
-        <input id="org_nombre" name="org_nombre" type="text" maxlength="120"
+      <div class="campo<?= $mal('org_nombre') ?>">
+        <label for="org_nombre">Nombre del organizador <span class="requerido">obligatorio</span></label>
+        <input id="org_nombre" name="org_nombre" type="text" maxlength="120" required
                value="<?= e($orgNombre) ?>" placeholder="Yoga Baja">
         <div class="pista">Es el nombre que aparece como organizador en tus actividades.</div>
+        <?= $err('org_nombre') ?>
       </div>
 
       <?php foreach ($orgCampos as $columna => $etiqueta): ?>
@@ -550,13 +554,13 @@ if ($orgAbierta) {
         ][$columna] ?? '';
         ?>
         <div class="campo">
-          <label for="org_<?= e($columna) ?>"><?= e($etiqueta) ?></label>
+          <label for="org_<?= e($columna) ?>"><?= e($etiqueta) ?> <span class="opcional">opcional</span></label>
           <input id="org_<?= e($columna) ?>" name="org_<?= e($columna) ?>"
                  type="<?= $columna === 'telefono' ? 'tel' : 'text' ?>"
                  maxlength="<?= $columna === 'sitio_web' ? 500 : 120 ?>"
                  value="<?= e($ov($columna)) ?>" placeholder="<?= e($marcador) ?>">
           <?php if ($columna === 'sitio_web'): ?>
-            <div class="pista">El tuyo, no el de esta actividad — ese va en el apartado siguiente.</div>
+            <div class="pista">El tuyo, no el de esta actividad — ese va aquí abajo.</div>
           <?php endif; ?>
         </div>
       <?php endforeach; ?>
@@ -569,21 +573,18 @@ if ($orgAbierta) {
   </div>
 </details>
 
-<div class="form-seccion-titulo">
-  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
-       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <path d="M9.5 14.5l5-5"/>
-    <path d="M11 7.5l1-1a3.5 3.5 0 0 1 5 5l-1 1"/>
-    <path d="M13 16.5l-1 1a3.5 3.5 0 0 1-5-5l1-1"/>
-  </svg>
-  <h2>8. Información adicional <span class="opcional">opcional</span></h2>
-</div>
-
-<div class="campo<?= $mal('sitio_web') ?>">
-  <label for="sitio_web">Sitio web o enlace</label>
+<?php /*
+ * Fuera del <details>, a propósito: es el sitio de ESTA actividad, no del
+ * organizador —esa distinción es justo la que explica la pista de abajo—, y
+ * el acordeón de arriba se llama "Datos del organizador" y por defecto
+ * empieza cerrado. Metido ahí adentro, este campo se escondería detrás de un
+ * clic que no tiene nada que ver con él.
+ */ ?>
+<div class="campo<?= $mal('sitio_web') ?>" style="margin-top:14px;">
+  <label for="sitio_web">Sitio web o enlace de la actividad <span class="opcional">opcional</span></label>
   <input id="sitio_web" name="sitio_web" type="url" maxlength="500"
          value="<?= e($v('sitio_web')) ?>" placeholder="https://tusitio.com">
-  <div class="pista">Comparte un sitio web o perfil de redes sociales para que los interesados conozcan más sobre tu actividad.</div>
+  <div class="pista">Comparte un sitio web o perfil de redes sociales para que los interesados conozcan más sobre esta actividad —no el tuyo, ese va arriba—.</div>
   <?= $err('sitio_web') ?>
 </div>
 
@@ -594,7 +595,7 @@ if ($orgAbierta) {
     <path d="M16 9a3.5 3.5 0 0 1 0 6"/>
     <path d="M18.5 6.5a7 7 0 0 1 0 11"/>
   </svg>
-  <h2>9. Acción principal *</h2>
+  <h2>8. Acción principal *</h2>
 </div>
 
 <div class="campo<?= $mal('accion_principal') ?>">

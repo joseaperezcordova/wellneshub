@@ -487,6 +487,17 @@ input,select{font-family:inherit; font-size:14px;}
   font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.08em;
   opacity:.92; text-transform:none;
 }
+/* Mismo molde que .opcional, pero con el acento de interacción: la etiqueta
+   de un campo obligatorio necesita distinguirse por color, no solo por
+   palabra —quien la lee por encima, sin pararse a leer el texto, tiene que
+   notar la diferencia igual. --terracota-texto y no --terracota a secas: a
+   9.5px esto es texto de verdad, y --terracota-texto es la variante pensada
+   para eso (5.6:1 de contraste sobre fondo claro); --terracota es para
+   botones y superficies, con otras cuentas de contraste detrás. */
+.requerido{
+  font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.08em;
+  text-transform:none; color:var(--terracota-texto);
+}
 
 .campo label.check{
   display:flex; align-items:center; gap:9px; font-family:'Inter',sans-serif;
