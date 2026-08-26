@@ -148,9 +148,10 @@ CREATE TABLE IF NOT EXISTS codigos_acceso (
 --  EL RELOJ DE LAS 24 HORAS
 --
 --  publicado_en no es lo mismo que creado_en, y la diferencia es justo la regla
---  del producto: el organizador puede corregir su evento durante 24 horas
---  DESDE QUE LO PUBLICA, no desde que empezó a escribirlo. Un borrador que pasó
---  tres días a medias no gasta ese margen.
+--  del producto: el organizador puede ELIMINAR su evento durante 24 horas
+--  DESDE QUE LO PUBLICA, no desde que empezó a escribirlo (editarlo ya no tiene
+--  plazo, REQ-000-XX). Un borrador que pasó tres días a medias no gasta ese
+--  margen.
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS eventos (
   id            INT UNSIGNED  NOT NULL AUTO_INCREMENT,

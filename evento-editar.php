@@ -3,9 +3,10 @@
  * Edición de una actividad.
  *
  * El permiso lo decide puedeEditarEvento(): el administrador siempre, y el
- * organizador mientras sea borrador o esté dentro de las 24 horas siguientes a
- * publicarlo. Pasado el plazo esta página no enseña el formulario, y lo explica
- * en vez de limitarse a un "no puedes".
+ * dueño siempre —sin plazo, desde REQ-000-XX—. Si $puede sale en false aquí
+ * es porque quien mira no es ni una cosa ni la otra —está viendo la ficha
+ * pública de la actividad de alguien más y llegó a esta URL a mano—, no
+ * porque se le haya acabado un margen de tiempo.
  */
 
 declare(strict_types=1);
@@ -113,27 +114,17 @@ require __DIR__ . '/includes/layout.php';
 
 <div class="auth-caja caja-ancha">
 
-  <h1>Ya no se puede editar</h1>
+  <h1>No puedes editar esta actividad</h1>
   <p class="sub">«<?= e($ev['titulo']) ?>»</p>
 
   <div class="aviso aviso-error">
-    El plazo para corregir una actividad es de <?= EVENTO_MARGEN_EDICION_H ?> horas desde que se publica<?php
-      // publicado_en puede ser NULL si la actividad nunca llegó a publicarse; en
-      // ese caso no hay fecha límite que enseñar.
-      if (!empty($ev['publicado_en'])):
-        $limite = date('Y-m-d H:i:s', strtotime($ev['publicado_en']) + EVENTO_MARGEN_EDICION_H * 3600);
-    ?>, y el de este terminó el <?= e(fechaLarga($limite)) ?><?php endif; ?>.
+    Solo quien la organiza o un administrador pueden corregirla.
   </div>
 
   <p style="font-size:14px; line-height:1.6;">
-    Es a propósito: una ficha que cambia después de que la gente ya se apuntó
-    —otra fecha, otro precio, otro lugar— deja tirado a quien contaba con lo que
-    leyó. A partir de aquí los cambios pasan por el administrador, que ve qué se
-    modificó y puede avisar si hace falta.
-  </p>
-
-  <p style="font-size:14px; line-height:1.6;">
-    Escríbele contando qué hay que cambiar y en qué actividad.
+    Si es tuya y crees que esto es un error, entra con la misma cuenta con la
+    que la publicaste. Si quieres pedir un cambio en una actividad de otra
+    persona, contacta al organizador desde su ficha.
   </p>
 
   <a class="btn-principal" style="text-decoration:none; display:block; text-align:center;"
@@ -153,13 +144,10 @@ require __DIR__ . '/includes/layout.php';
     <?php if ($ev['situacion'] === 'borrador'): ?>
       <p class="sub">Es un borrador: no la ve nadie más que tú hasta que la publiques.</p>
     <?php elseif ($ev['situacion'] === 'oculto'): ?>
-      <p class="sub">Oculta. No aparece en el listado.</p>
+      <p class="sub">Oculta por moderación. No aparece en el listado, pero puedes corregirla igual.</p>
     <?php else: ?>
-      <?php $quedan = minutosRestantesEdicion($ev); ?>
       <p class="sub">
-        Publicada. Te quedan
-        <strong><?= $quedan >= 60 ? intdiv($quedan, 60) . ' h ' . ($quedan % 60) . ' min' : $quedan . ' min' ?></strong>
-        de margen para corregirla<?= esAdmin($u) && (int) $ev['usuario_id'] !== (int) $u['id'] ? ' (tú eres administrador: puedes editarla siempre)' : '' ?>.
+        Publicada. Se actualizó por última vez el <?= e(fechaLarga($ev['actualizado_en'])) ?>.
       </p>
     <?php endif; ?>
 
@@ -184,11 +172,18 @@ require __DIR__ . '/includes/layout.php';
         </form>
       <?php endif; ?>
 
-      <form method="post" action="<?= e(urlEvento($ev)) ?>"
-            onsubmit="return confirm('¿Eliminar «<?= e(addslashes($ev['titulo'])) ?>»? No se puede deshacer.');">
-        <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-        <button class="btn-barra peligro" type="submit" name="eliminar" value="1">Eliminar actividad</button>
-      </form>
+      <?php /* Guardado aparte de $puede (que ya solo mide EDITAR): desde que
+               los dos permisos se separaron, alguien puede poder editar y ya
+               no poder eliminar —publicada hace más de EVENTO_MARGEN_ELIMINACION_H
+               horas—, y mostrar este botón igual lo mandaría a un error en
+               vez de simplemente no ofrecérselo. */ ?>
+      <?php if (puedeEliminarEvento($ev, $u)): ?>
+        <form method="post" action="<?= e(urlEvento($ev)) ?>"
+              onsubmit="return confirm('¿Eliminar «<?= e(addslashes($ev['titulo'])) ?>»? No se puede deshacer.');">
+          <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+          <button class="btn-barra peligro" type="submit" name="eliminar" value="1">Eliminar actividad</button>
+        </form>
+      <?php endif; ?>
     </div>
 
   </div>

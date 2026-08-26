@@ -54,8 +54,9 @@ La tabla central. Dos aclaraciones que evitan releer el código cada vez:
   (la entidad federativa y la situación de la publicación), así que aquí son
   dos columnas con nombres que no chocan.
 - **`publicado_en` vs. `creado_en`** — el organizador tiene 24 horas para
-  corregir su actividad *desde que la publica*, no desde que empezó a
-  escribirla. Un borrador que estuvo tres días a medias no gasta ese margen.
+  *eliminar* su actividad *desde que la publica*, no desde que empezó a
+  escribirla (editarla no tiene plazo, REQ-000-XX). Un borrador que estuvo
+  tres días a medias no gasta ese margen.
 
 `situacion` es `borrador` → `publicado` → (`oculto` si un administrador lo
 retira). `tipo_actividad` distingue única de recurrente; si es recurrente,

@@ -49,12 +49,17 @@ require __DIR__ . '/includes/layout.php';
       </div>
     <?php else: ?>
       <table class="admtable" style="background:var(--paper); color:var(--ink);">
-        <thead><tr><th>Título</th><th>Fecha</th><th>Situación</th><th></th></tr></thead>
+        <thead><tr><th>Título</th><th>Fecha</th><th>Actualizado</th><th>Situación</th><th></th></tr></thead>
         <tbody>
-          <?php foreach ($misEventos as $me): $p = fechaPartes($me['fecha_inicio']); ?>
+          <?php foreach ($misEventos as $me): $p = fechaPartes($me['fecha_inicio']); $pu = fechaPartes($me['actualizado_en']); ?>
             <tr>
               <td><?= e($me['titulo']) ?></td>
               <td><?= e($p['d'] . ' ' . $p['m'] . ' ' . date('Y', strtotime($me['fecha_inicio']))) ?></td>
+              <?php /* REQ-000-XX: con la edición sin plazo, esto es lo que le
+                       dice al organizador si una ficha sigue vigente o lleva
+                       meses sin tocarse —antes esa pregunta no hacía falta,
+                       porque pasadas 24 horas ya no se podía tocar—. */ ?>
+              <td><?= e($pu['d'] . ' ' . $pu['m'] . ', ' . $pu['hora']) ?></td>
               <td>
                 <?php if ($me['situacion'] === 'publicado'): ?>
                   <span class="badge on" style="color:var(--jungle); background:rgba(47,78,93,0.12);">Publicada</span>
@@ -77,8 +82,9 @@ require __DIR__ . '/includes/layout.php';
         </tbody>
       </table>
       <div class="evergreen-note" style="margin-top:18px;">
-        Una actividad publicada se puede corregir durante <?= EVENTO_MARGEN_EDICION_H ?> horas.
-        Después, los cambios se le piden al administrador.
+        Puedes editar una actividad publicada cuando quieras. Eliminarla se puede desde su ficha,
+        y solo dentro de las <?= EVENTO_MARGEN_ELIMINACION_H ?> horas siguientes a publicarla;
+        pasado ese plazo, pídeselo al administrador.
       </div>
     <?php endif; ?>
 

@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // El dueño solo puede borrar mientras podría editar. Pasado ese plazo
         // borrar sería la puerta de atrás para saltarse la regla de las 24
         // horas: quitar la ficha y volver a subirla cambiada.
-        if (!puedeEditarEvento($ev, $u)) {
+        if (!puedeEliminarEvento($ev, $u)) {
             $error = 'Ya pasó el plazo para borrar esta actividad. Pídeselo al administrador.';
         } else {
             eliminarEvento((int) $ev['id']);
@@ -207,14 +207,24 @@ require __DIR__ . '/includes/layout.php';
         <?php elseif ($ev['situacion'] === 'oculto'): ?>
           <strong>Oculta.</strong> No aparece en el listado.
         <?php else: ?>
-          <?php $quedan = minutosRestantesEdicion($ev); ?>
-          <?php if ($quedan > 0): ?>
-            <strong>Publicada.</strong> Puedes corregirla durante
-            <?= $quedan >= 60 ? intdiv($quedan, 60) . ' h ' . ($quedan % 60) . ' min' : $quedan . ' min' ?> más.
+          <?php
+          /*
+           * Editar ya no tiene plazo (REQ-000-XX): el organizador puede
+           * corregir una actividad publicada en cualquier momento, así que
+           * aquí no hay nada que contar sobre eso. Lo que SÍ sigue teniendo
+           * plazo es ELIMINAR, y por eso es lo único que se avisa —para que
+           * el botón "Eliminar" no desaparezca sin explicación cuando pasen
+           * las horas—.
+           */
+          $quedanEliminar = minutosRestantesEliminacion($ev);
+          ?>
+          <?php if ($quedanEliminar > 0): ?>
+            <strong>Publicada.</strong> Puedes eliminarla durante
+            <?= $quedanEliminar >= 60 ? intdiv($quedanEliminar, 60) . ' h ' . ($quedanEliminar % 60) . ' min' : $quedanEliminar . ' min' ?> más.
           <?php elseif (esAdmin($u)): ?>
-            <strong>Publicada.</strong> Eres administrador: puedes editarla aunque pasara el plazo.
+            <strong>Publicada.</strong> Eres administrador: puedes eliminarla aunque pasara el plazo.
           <?php else: ?>
-            <strong>Publicada.</strong> Pasó el plazo de edición; pídele los cambios al administrador.
+            <strong>Publicada.</strong> Pasó el plazo para eliminarla; pídeselo al administrador si hace falta.
           <?php endif; ?>
         <?php endif; ?>
       </div>
@@ -246,7 +256,7 @@ require __DIR__ . '/includes/layout.php';
           </form>
         <?php endif; ?>
 
-        <?php if (puedeEditarEvento($ev, $u)): ?>
+        <?php if (puedeEliminarEvento($ev, $u)): ?>
           <form method="post" onsubmit="return confirm('¿Eliminar «<?= e(addslashes($ev['titulo'])) ?>»? No se puede deshacer.');">
             <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
             <button class="btn-barra peligro" type="submit" name="eliminar" value="1">Eliminar</button>

@@ -11,11 +11,16 @@
 declare(strict_types=1);
 
 /**
- * Margen que tiene el organizador para corregir su evento después de
- * publicarlo. Pasado ese plazo la ficha se congela y hay que pedirle el cambio
- * al administrador.
+ * Margen que tiene el organizador para ELIMINAR su evento después de
+ * publicarlo. Pasado ese plazo solo el administrador puede retirarlo.
+ *
+ * Hasta REQ-000-XX esta misma constante también limitaba EDITAR, y la
+ * función se llamaba distinto (ver puedeEditarEvento() más abajo). Editar ya
+ * no tiene plazo; borrar sigue teniéndolo, porque quitar la ficha y no volver
+ * a subirla es la puerta de atrás para saltarse esa misma protección —dejar
+ * tirado a quien ya contaba con lo que leyó—.
  */
-const EVENTO_MARGEN_EDICION_H = 24;
+const EVENTO_MARGEN_ELIMINACION_H = 24;
 
 /**
  * Cuántas categorías puede llevar una actividad a la vez.
@@ -182,15 +187,38 @@ function esAdmin(?array $u): bool
 }
 
 /**
- * ¿Puede esta persona modificar este evento?
+ * ¿Puede esta persona EDITAR este evento?
  *
- * El administrador, siempre. El dueño, mientras sea borrador o esté dentro del
- * margen de 24 horas desde que lo publicó.
+ * El administrador, siempre. El dueño, siempre —sin límite de tiempo desde
+ * REQ-000-XX—, mientras siga siendo suyo: borrador, publicada u oculta por
+ * moderación entran los tres aquí. Una actividad retirada no tiene fila que
+ * editar —eliminarEvento() la borra de verdad—, así que ese caso no hace
+ * falta comprobarlo aparte.
+ *
+ * Que el dueño pueda editar una oculta no le devuelve la visibilidad: eso
+ * sigue siendo decisión del administrador (ver el "Volver a publicar" de
+ * evento.php, que solo él puede pulsar). Editar y publicar son permisos
+ * distintos.
+ */
+function puedeEditarEvento(array $ev, ?array $u): bool
+{
+    if ($u === null) return false;
+    if (esAdmin($u)) return true;
+
+    return (int) $ev['usuario_id'] === (int) $u['id'];
+}
+
+/**
+ * ¿Puede esta persona ELIMINAR este evento?
+ *
+ * A diferencia de editar, esto SÍ sigue teniendo plazo: el administrador,
+ * siempre, y el dueño mientras sea borrador o esté dentro del margen de
+ * EVENTO_MARGEN_ELIMINACION_H horas desde que lo publicó.
  *
  * El plazo se calcula sobre publicado_en y no sobre creado_en a propósito: un
  * borrador que estuvo tres días a medias no debe llegar publicado y ya caducado.
  */
-function puedeEditarEvento(array $ev, ?array $u): bool
+function puedeEliminarEvento(array $ev, ?array $u): bool
 {
     if ($u === null)   return false;
     if (esAdmin($u))   return true;
@@ -198,20 +226,20 @@ function puedeEditarEvento(array $ev, ?array $u): bool
     if ((int) $ev['usuario_id'] !== (int) $u['id']) return false;
     if ($ev['situacion'] === 'borrador')            return true;
 
-    return minutosRestantesEdicion($ev) > 0;
+    return minutosRestantesEliminacion($ev) > 0;
 }
 
 /**
- * Minutos que quedan de margen, o 0 si ya pasó.
+ * Minutos que quedan para poder ELIMINAR, o 0 si ya pasó.
  *
  * Sirve para dos cosas: decidir el permiso y avisar en pantalla de cuánto
  * queda, que es lo que evita que alguien descubra el plazo cuando ya expiró.
  */
-function minutosRestantesEdicion(array $ev): int
+function minutosRestantesEliminacion(array $ev): int
 {
     if (empty($ev['publicado_en'])) return 0;
 
-    $limite = strtotime($ev['publicado_en']) + EVENTO_MARGEN_EDICION_H * 3600;
+    $limite = strtotime($ev['publicado_en']) + EVENTO_MARGEN_ELIMINACION_H * 3600;
     $quedan = (int) ceil(($limite - time()) / 60);
 
     return max(0, $quedan);

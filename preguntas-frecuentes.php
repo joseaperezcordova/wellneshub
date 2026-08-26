@@ -142,9 +142,9 @@ $bloques = [
              * medias, y la mitad que falta es la que genera el problema.
              */
             '¿Puedo editar mi evento?',
-            'Mientras es borrador, todo lo que quieras. Una vez publicada, puedes corregirla durante '
-            . EVENTO_MARGEN_EDICION_H . ' horas. Pasado ese plazo se congela y los cambios hay que pedírnoslos: es para '
-            . 'que una actividad no cambie de fecha ni de precio cuando ya hay gente que contaba con ella.',
+            'Sí, en cualquier momento: borrador o ya publicada, no hay plazo para corregirla. '
+            . 'Lo que sí conserva un plazo es <em>eliminarla</em> —ver la siguiente pregunta—, '
+            . 'que es distinto.',
         ],
         [
             '¿Qué tipo de actividades aceptan?',
@@ -170,12 +170,14 @@ $bloques = [
             /*
              * Cambiado: el panel del organizador no tiene «ocultar» —esa es una
              * acción de administración—. Lo que sí puede hacer su dueño es
-             * eliminarla mientras esté dentro del plazo de edición.
+             * eliminarla mientras esté dentro del plazo de eliminación
+             * (REQ-000-XX separó este plazo del de editar, que ya no tiene).
              */
             '¿Cómo elimino un evento?',
-            'Desde la página de tu actividad, mientras siga dentro del plazo de edición. Después de ese plazo, '
-            . '<a href="' . e(url('contacto')) . '">escríbenos</a> y la retiramos: es la misma regla que la de editar, '
-            . 'y por el mismo motivo.',
+            'Desde la página de tu actividad, mientras sigan sin pasar ' . EVENTO_MARGEN_ELIMINACION_H . ' horas '
+            . 'desde que la publicaste. Después de ese plazo, '
+            . '<a href="' . e(url('contacto')) . '">escríbenos</a> y la retiramos: es para que una ficha no '
+            . 'desaparezca de golpe cuando ya hay gente que contaba con ella.',
         ],
     ],
 ];
