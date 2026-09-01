@@ -20,10 +20,10 @@ $ev = buscarEvento((int) ($_GET['id'] ?? 0));
 // dueño, así que no hay nada que denunciar.
 if (!$ev || $ev['situacion'] !== 'publicado') {
     http_response_code(404);
-    $titulo = 'Actividad no encontrada';
+    $titulo = t('ficha.no_encontrada.titulo');
     require __DIR__ . '/includes/layout.php';
-    echo '<div class="auth-caja"><h1>Esa actividad no existe</h1>'
-       . '<p class="sub">Puede que ya se haya retirado.</p></div>';
+    echo '<div class="auth-caja"><h1>' . et('ficha.no_encontrada.h1') . '</h1>'
+       . '<p class="sub">' . et('reportar.no_encontrada.texto') . '</p></div>';
     pie();
     exit;
 }
@@ -38,18 +38,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // implica una petición a Cloudflare, y no hay razón para gastarla en un
     // envío que ya se cayó por el token.
     if (!csrfValido($_POST['csrf'] ?? null)) {
-        $error = 'El formulario caducó. Vuelve a cargarlo.';
+        $error = t('captcha.error.caducado');
 
     } elseif (!($captcha = captchaValido($_POST))[0]) {
         $error = $captcha[1];
 
     } elseif (!isset(motivosReporte()[$motivo])) {
-        $error = 'Ayúdanos a mantener una comunidad segura. Selecciona el motivo por el que deseas reportar esta actividad.';
+        $error = t('reportar.error.motivo_falta');
 
     } elseif (reporteRepetido((int) $ev['id'])) {
         // Se dice claramente en vez de fingir que se aceptó. Quien ya reportó de
         // buena fe merece saber que su aviso llegó y que no hace falta insistir.
-        $error = 'Ya reportaste esta actividad. La estamos revisando.';
+        $error = t('reportar.error.repetido');
 
     } else {
         crearReporte((int) $ev['id'], $motivo, $comento !== '' ? $comento : null);
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$titulo = 'Reportar actividad';
+$titulo = t('reportar.pagina.titulo');
 require __DIR__ . '/includes/layout.php';
 ?>
 
@@ -66,22 +66,21 @@ require __DIR__ . '/includes/layout.php';
 
 <?php if ($enviado): ?>
 
-  <h1>Gracias por tu reporte</h1>
-  <p class="sub">Lo revisaremos lo antes posible.</p>
+  <h1><?= et('reportar.enviado.h1') ?></h1>
+  <p class="sub"><?= et('reportar.enviado.sub') ?></p>
 
   <div class="aviso aviso-ok">
-    La actividad sigue publicada mientras tanto. No la retiramos por un aviso
-    automático: lo revisa una persona.
+    <?= et('reportar.enviado.aviso') ?>
   </div>
 
   <a class="btn-principal" style="display:block; text-align:center; text-decoration:none;"
-     href="<?= e(urlEvento($ev)) ?>">Volver a la actividad</a>
+     href="<?= e(urlEvento($ev)) ?>"><?= et('reportar.enviado.volver') ?></a>
 
 <?php else: ?>
 
-  <a class="volver" href="<?= e(urlEvento($ev)) ?>">← Volver a la actividad</a>
+  <a class="volver" href="<?= e(urlEvento($ev)) ?>"><?= et('reportar.volver_actividad') ?></a>
 
-  <h1>Reportar actividad</h1>
+  <h1><?= et('reportar.pagina.titulo') ?></h1>
   <p class="sub">«<?= e($ev['titulo']) ?>»</p>
 
   <?php if ($error): ?>
@@ -93,7 +92,7 @@ require __DIR__ . '/includes/layout.php';
     <?= captchaCamposOcultos() ?>
 
     <div class="campo">
-      <label>¿Qué le pasa a esta actividad?</label>
+      <label><?= et('reportar.form.pregunta') ?></label>
       <div class="motivos">
         <?php foreach (motivosReporte() as $clave => $etiqueta): ?>
           <label class="motivo">
@@ -106,18 +105,18 @@ require __DIR__ . '/includes/layout.php';
     </div>
 
     <div class="campo">
-      <label for="comentario">Cuéntanos más <span class="opcional">opcional</span></label>
+      <label for="comentario"><?= et('reportar.form.comentario') ?> <span class="opcional"><?= et('campo.opcional') ?></span></label>
       <textarea id="comentario" name="comentario" rows="4" maxlength="1000"
-                placeholder="Qué viste exactamente. Cuanto más concreto, más rápido se resuelve."><?= e($comento) ?></textarea>
+                placeholder="<?= et('reportar.form.comentario_placeholder') ?>"><?= e($comento) ?></textarea>
     </div>
 
     <?= captchaHtml() ?>
 
-    <button class="btn-principal" type="submit">Enviar reporte</button>
+    <button class="btn-principal" type="submit"><?= et('reportar.enviar_btn') ?></button>
   </form>
 
   <div class="auth-pie">
-    Tu aviso no oculta la actividad. Solo la pone en la lista de lo que hay que revisar.
+    <?= et('reportar.pie') ?>
   </div>
 
 <?php endif; ?>

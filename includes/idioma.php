@@ -175,18 +175,23 @@ function urlEquivalente(string $idioma): string
 }
 
 /**
- * El texto de una clave, en el idioma actual.
+ * El texto de una clave, en el idioma actual —o en el que se le pida—.
  *
  * Si falta en inglés cae al español en vez de enseñar la clave en crudo. Un
  * "pie.legal" suelto en mitad del pie es peor que la frase en español: el
  * visitante no entiende qué pasó, y quien programa tampoco se entera si no
  * mira esa página. El aviso va al log, que es donde sí se busca.
+ *
+ * El segundo argumento es para lo poco que necesita un idioma fijo en vez del
+ * de la página actual —hoy, los correos: no tienen mecanismo de idioma
+ * propio, así que van siempre en español pase lo que pase con la petición
+ * que los dispara. Ver motivosContacto() en includes/contacto.php.
  */
-function t(string $clave): string
+function t(string $clave, ?string $idiomaForzado = null): string
 {
     static $catalogos = [];
 
-    $idioma = idiomaActual();
+    $idioma = $idiomaForzado ?? idiomaActual();
 
     if (!isset($catalogos[$idioma])) {
         $archivo = __DIR__ . '/idiomas/' . $idioma . '.php';
@@ -213,7 +218,7 @@ function t(string $clave): string
 }
 
 /** Igual que t(), pero ya escapado para HTML. Ahorra e(t('...')) por todas partes. */
-function et(string $clave): string
+function et(string $clave, ?string $idiomaForzado = null): string
 {
-    return e(t($clave));
+    return e(t($clave, $idiomaForzado));
 }

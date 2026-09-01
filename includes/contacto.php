@@ -120,15 +120,15 @@ function contactoSitioRepetido(): bool
  * tocar lo que hay guardado en filas anteriores, que es el mismo criterio de
  * categoriasMenu() y de ordenesBusqueda().
  */
-function motivosContacto(): array
+function motivosContacto(?string $idioma = null): array
 {
     return [
-        'general'    => 'Pregunta general',
-        'actividad'  => 'Problema con una actividad',
-        'cuenta'     => 'Problema con mi cuenta',
-        'organizador'=> 'Soy organizador',
-        'reporte'    => 'Reportar contenido',
-        'otro'       => 'Otro',
+        'general'    => t('contacto.motivo.general', $idioma),
+        'actividad'  => t('contacto.motivo.actividad', $idioma),
+        'cuenta'     => t('contacto.motivo.cuenta', $idioma),
+        'organizador'=> t('contacto.motivo.organizador', $idioma),
+        'reporte'    => t('contacto.motivo.reporte', $idioma),
+        'otro'       => t('contacto.motivo.otro', $idioma),
     ];
 }
 
@@ -232,7 +232,9 @@ function avisarAdminsContactoSitio(string $nombre, string $email, string $mensaj
         return;
     }
 
-    $motivoTexto = motivosContacto()[$motivo] ?? $motivo;
+    // Español fijo: el resto del correo también lo está, y no hay mecanismo
+    // de idioma para correos todavía (ver docs/pendientes.md, fase 4).
+    $motivoTexto = motivosContacto('es')[$motivo] ?? $motivo;
 
     $cuerpo = "Alguien escribió desde el formulario de contacto de OMDARA.\n\n"
             . 'Motivo:  ' . $motivoTexto . "\n"

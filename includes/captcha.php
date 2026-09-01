@@ -96,8 +96,7 @@ function captchaHtml(): string
     // que a quien está delante no le dice nada. Este aviso sí: explica qué pasó
     // y qué hacer, sin destapar nada de la configuración.
     $fallo = '<div id="captchaFallo" class="captcha-fallo" hidden>'
-           . 'No se pudo cargar la comprobación de seguridad. Recarga la página; '
-           . 'si vuelve a pasar, avísanos y lo revisamos.'
+           . et('captcha.fallo_carga')
            . '</div>'
            . '<script>function captchaError(){var a=document.getElementById("captchaFallo");'
            . 'if(a)a.hidden=false;return true;}</script>';
@@ -129,7 +128,7 @@ function captchaCamposOcultos(): string
     $firma = hash_hmac('sha256', (string) $ahora, sesionSemilla());
 
     return '<div class="trampa" aria-hidden="true">'
-         . '<label>No rellenes esto<input type="text" name="sitio_web" tabindex="-1" autocomplete="off"></label>'
+         . '<label>' . et('captcha.trampa_label') . '<input type="text" name="sitio_web" tabindex="-1" autocomplete="off"></label>'
          . '</div>'
          . '<input type="hidden" name="ts" value="' . $ahora . '">'
          . '<input type="hidden" name="ts_firma" value="' . $firma . '">';
@@ -161,7 +160,7 @@ function captchaValido(array $post): array
         // No se le dice que le hemos pillado: un bot que sabe por qué falla se
         // arregla; uno que solo ve un error genérico, no.
         error_log('Campo trampa relleno desde ' . ipCliente());
-        return [false, 'No se pudo enviar el formulario. Inténtalo otra vez.'];
+        return [false, t('captcha.error.trampa')];
     }
 
     // --- capa 1: reloj
@@ -169,11 +168,11 @@ function captchaValido(array $post): array
     $firma = (string) ($post['ts_firma'] ?? '');
 
     if ($ts === '' || !hash_equals(hash_hmac('sha256', $ts, sesionSemilla()), $firma)) {
-        return [false, 'El formulario caducó. Vuelve a cargarlo.'];
+        return [false, t('captcha.error.caducado')];
     }
 
     if (time() - (int) $ts < CAPTCHA_SEGUNDOS_MINIMOS) {
-        return [false, 'Tómate un momento para revisarlo y vuelve a enviarlo.'];
+        return [false, t('captcha.error.muy_rapido')];
     }
 
     // --- capa 2: el proveedor, si está configurado
@@ -194,7 +193,7 @@ function captchaValido(array $post): array
         // comprueba desde el servidor, donde nadie puede fingirlo; aquí falta
         // algo que tenía que mandar el navegador, y eso sí se puede omitir a
         // voluntad.
-        return [false, 'Confirma que no eres un robot. Si no ves la casilla, recarga la página.'];
+        return [false, t('captcha.error.falta_token')];
     }
 
     [$http, $cuerpo] = peticionHttp(
@@ -217,7 +216,7 @@ function captchaValido(array $post): array
     $datos = json_decode($cuerpo, true);
 
     if (empty($datos['success'])) {
-        return [false, 'No se pudo verificar que seas una persona. Inténtalo otra vez.'];
+        return [false, t('captcha.error.no_verificado')];
     }
 
     return [true, ''];

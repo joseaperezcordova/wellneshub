@@ -1308,15 +1308,15 @@ function fechaResumen(array $ev): string
                      'agosto','septiembre','octubre','noviembre','diciembre'];
 
     if (($ev['tipo_actividad'] ?? '') === 'recurrente') {
-        return (frecuenciasRecurrencia()[$ev['frecuencia']] ?? 'Varias fechas')
+        return (frecuenciasRecurrencia()[$ev['frecuencia']] ?? t('ficha.varias_fechas'))
              . ', ' . substr((string) $ev['hora_recurrente'], 0, 5);
     }
 
     $ts = (int) strtotime((string) $ev['fecha_inicio']);
 
     if (terminaOtroDia($ev)) {
-        return 'Del ' . fechaCorta((string) $ev['fecha_inicio'])
-             . ' al ' . fechaCorta((string) $ev['fecha_fin']);
+        return t('ficha.del') . ' ' . fechaCorta((string) $ev['fecha_inicio'])
+             . ' ' . t('ficha.al') . ' ' . fechaCorta((string) $ev['fecha_fin']);
     }
 
     $dia = mb_convert_case($dias[(int) date('w', $ts)], MB_CASE_TITLE, 'UTF-8');

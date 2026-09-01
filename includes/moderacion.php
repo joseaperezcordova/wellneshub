@@ -22,12 +22,12 @@ const REPORTE_AVISO_ESPERA_H = 12;  // entre dos correos al admin por el mismo e
 function motivosReporte(): array
 {
     return [
-        'inapropiado'    => 'Contenido ofensivo o inapropiado',
-        'enganoso'       => 'Información falsa o engañosa',
-        'spam'           => 'Spam o publicidad',
-        'no_es_wellness' => 'No es una actividad de bienestar',
-        'duplicado'      => 'Está publicado dos veces',
-        'otro'           => 'Otro motivo',
+        'inapropiado'    => t('reportar.motivo.inapropiado'),
+        'enganoso'       => t('reportar.motivo.enganoso'),
+        'spam'           => t('reportar.motivo.spam'),
+        'no_es_wellness' => t('reportar.motivo.no_es_wellness'),
+        'duplicado'      => t('reportar.motivo.duplicado'),
+        'otro'           => t('reportar.motivo.otro'),
     ];
 }
 

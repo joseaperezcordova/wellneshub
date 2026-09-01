@@ -51,45 +51,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
      * que además viene incompleto.
      */
     if (!csrfValido($_POST['csrf'] ?? null)) {
-        $errores['general'] = 'El formulario caducó. Vuelve a cargarlo.';
+        $errores['general'] = t('captcha.error.caducado');
 
     } elseif (!($captcha = captchaValido($_POST))[0]) {
         $errores['general'] = $captcha[1];
 
     } else {
         if (trim($nombre) === '') {
-            $errores['nombre'] = 'Este campo es obligatorio.';
+            $errores['nombre'] = t('contacto.error.campo_obligatorio');
         }
 
         if (trim($email) === '') {
-            $errores['email'] = 'Este campo es obligatorio.';
+            $errores['email'] = t('contacto.error.campo_obligatorio');
         } elseif (!filter_var(trim($email), FILTER_VALIDATE_EMAIL)) {
-            $errores['email'] = 'Introduce un correo electrónico válido.';
+            $errores['email'] = t('contacto.error.correo_invalido');
         }
 
         // No basta con que venga algo: tiene que ser uno de los seis. Un valor
         // inventado no debe acabar guardado como si fuera un motivo real.
         if (!isset(motivosContacto()[$motivo])) {
-            $errores['motivo'] = 'Este campo es obligatorio.';
+            $errores['motivo'] = t('contacto.error.campo_obligatorio');
         }
 
         // Solo cuando el motivo lo pide. Si no, lo que venga se ignora: el campo
         // ni siquiera se ve, así que un valor ahí es basura o un intento.
         if (motivoPideActividad($motivo) && trim($actividad) === '') {
-            $errores['actividad'] = 'Este campo es obligatorio.';
+            $errores['actividad'] = t('contacto.error.campo_obligatorio');
         }
 
         if (trim($mensaje) === '') {
-            $errores['mensaje'] = 'Este campo es obligatorio.';
+            $errores['mensaje'] = t('contacto.error.campo_obligatorio');
         } elseif (mb_strlen(trim($mensaje)) < CONTACTO_SITIO_MIN) {
-            $errores['mensaje'] = 'Cuéntanos un poco más: con ' . CONTACTO_SITIO_MIN
-                . ' caracteres no hay mucho a lo que responder.';
+            $errores['mensaje'] = sprintf(t('contacto.error.mensaje_corto'), CONTACTO_SITIO_MIN);
         }
 
         // El límite por IP se mira al final: es lo más caro de los cinco y no
         // tiene sentido preguntarlo por un formulario que ya se cayó.
         if (!$errores && contactoSitioRepetido()) {
-            $errores['general'] = 'Ya nos escribiste hace un momento. Danos tiempo para responder antes de volver a escribir.';
+            $errores['general'] = t('contacto.error.repetido');
         }
 
         if (!$errores) {
@@ -105,8 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$titulo      = 'Contacta a OMDARA';
-$descripcion = 'Escríbenos: dudas, ayuda, problemas con una actividad o cualquier cosa que necesites consultarnos.';
+$titulo      = t('contacto.pagina.titulo');
+$descripcion = t('contacto.pagina.meta');
 require __DIR__ . '/includes/layout.php';
 
 /** El mensaje de error de un campo, si lo hay. Mismo patrón que form-evento.php. */
@@ -128,27 +127,25 @@ $mal = function (string $campo) use ($errores): string {
 
   <script>whTrack('mensaje_contacto', <?= json_encode(['motivo' => $motivo]) ?>);</script>
 
-  <h1>Hemos recibido tu mensaje.</h1>
-  <p class="sub">Gracias por contactarnos. Te responderemos a la brevedad.</p>
+  <h1><?= et('contacto.enviado.h1') ?></h1>
+  <p class="sub"><?= et('contacto.enviado.sub') ?></p>
 
   <div class="aviso aviso-ok">
-    Te responderemos al correo que nos dejaste. Si no tienes noticias en unos días,
-    revisa tu carpeta de spam.
+    <?= et('contacto.enviado.aviso') ?>
   </div>
 
   <a class="btn-principal" style="display:block; text-align:center; text-decoration:none;"
-     href="<?= URL_BASE ?>/">Volver al inicio</a>
+     href="<?= URL_BASE ?>/"><?= et('evento.editar.volver_inicio') ?></a>
 
 <?php else: ?>
 
-  <h1>Contacta a OMDARA</h1>
-  <p class="sub">¿Tienes alguna pregunta, necesitas ayuda o quieres reportar un problema?
-     Completa el formulario y nos pondremos en contacto contigo.</p>
+  <h1><?= et('contacto.pagina.titulo') ?></h1>
+  <p class="sub"><?= et('contacto.form.sub') ?></p>
 
   <?php if (isset($errores['general'])): ?>
     <div class="aviso aviso-error"><?= e($errores['general']) ?></div>
   <?php elseif ($errores): ?>
-    <div class="aviso aviso-error">Revisa los campos marcados.</div>
+    <div class="aviso aviso-error"><?= et('contacto.form.revisa_campos') ?></div>
   <?php endif; ?>
 
   <form method="post" novalidate id="formContacto">
@@ -156,24 +153,24 @@ $mal = function (string $campo) use ($errores): string {
     <?= captchaCamposOcultos() ?>
 
     <div class="campo<?= $mal('nombre') ?>">
-      <label for="nombre">Nombre <span class="obligatorio">*</span></label>
+      <label for="nombre"><?= et('contacto.campo.nombre') ?> <span class="obligatorio">*</span></label>
       <input id="nombre" name="nombre" type="text" maxlength="120" autocomplete="name"
-             placeholder="Tu nombre" value="<?= e($nombre) ?>" required>
+             placeholder="<?= et('contacto.campo.nombre_placeholder') ?>" value="<?= e($nombre) ?>" required>
       <?= $err('nombre') ?>
     </div>
 
     <div class="campo<?= $mal('email') ?>">
-      <label for="email">Correo electrónico <span class="obligatorio">*</span></label>
+      <label for="email"><?= et('contacto.campo.correo') ?> <span class="obligatorio">*</span></label>
       <input id="email" name="email" type="email" maxlength="190" autocomplete="email"
-             placeholder="tu@email.com" value="<?= e($email) ?>" required>
-      <div class="pista">Aquí te vamos a responder.</div>
+             placeholder="<?= et('contacto.campo.correo_placeholder') ?>" value="<?= e($email) ?>" required>
+      <div class="pista"><?= et('contacto.campo.correo_ayuda') ?></div>
       <?= $err('email') ?>
     </div>
 
     <div class="campo<?= $mal('motivo') ?>">
-      <label for="motivo">Motivo del contacto <span class="obligatorio">*</span></label>
+      <label for="motivo"><?= et('contacto.campo.motivo') ?> <span class="obligatorio">*</span></label>
       <select id="motivo" name="motivo" required>
-        <option value="">Elige uno…</option>
+        <option value=""><?= et('contacto.campo.motivo_placeholder') ?></option>
         <?php foreach (motivosContacto() as $clave => $etiqueta): ?>
           <option value="<?= e($clave) ?>"
                   data-actividad="<?= motivoPideActividad($clave) ? '1' : '0' ?>"
@@ -198,28 +195,27 @@ $mal = function (string $campo) use ($errores): string {
     $mostrarActividad = motivoPideActividad($motivo) || isset($errores['actividad']);
     ?>
     <div class="campo<?= $mal('actividad') ?>" id="campoActividad"<?= $mostrarActividad ? '' : ' hidden' ?>>
-      <label for="actividad">¿Qué actividad está relacionada? <span class="obligatorio">*</span></label>
+      <label for="actividad"><?= et('contacto.campo.actividad') ?> <span class="obligatorio">*</span></label>
       <input id="actividad" name="actividad" type="text" maxlength="200"
-             placeholder="Nombre de la actividad" value="<?= e($actividad) ?>">
-      <div class="pista">Indica el nombre de la actividad sobre la que nos escribes.</div>
+             placeholder="<?= et('contacto.campo.actividad_placeholder') ?>" value="<?= e($actividad) ?>">
+      <div class="pista"><?= et('contacto.campo.actividad_ayuda') ?></div>
       <?= $err('actividad') ?>
     </div>
 
     <div class="campo<?= $mal('mensaje') ?>">
-      <label for="mensaje">Mensaje <span class="obligatorio">*</span></label>
+      <label for="mensaje"><?= et('contacto.campo.mensaje') ?> <span class="obligatorio">*</span></label>
       <textarea id="mensaje" name="mensaje" rows="5" maxlength="<?= CONTACTO_SITIO_MAX ?>" required
-                placeholder="Cuéntanos cómo podemos ayudarte..."><?= e($mensaje) ?></textarea>
+                placeholder="<?= et('contacto.campo.mensaje_placeholder') ?>"><?= e($mensaje) ?></textarea>
       <?= $err('mensaje') ?>
     </div>
 
     <?= captchaHtml() ?>
 
-    <button class="btn-principal" type="submit" id="botonEnviar">Enviar mensaje</button>
+    <button class="btn-principal" type="submit" id="botonEnviar" data-enviando="<?= et('contacto.enviando') ?>"><?= et('contacto.enviar_btn') ?></button>
   </form>
 
   <div class="auth-pie">
-    ¿Es sobre una actividad publicada y quieres hablar con quien la organiza? Ve a su ficha
-    y usa «Contactar al organizador»: llega directo a esa persona y te responde antes.
+    <?= et('contacto.pie') ?>
   </div>
 
 <?php endif; ?>
@@ -272,7 +268,7 @@ $mal = function (string $campo) use ($errores): string {
          durante su propio evento no llega a enviar el formulario. */
       setTimeout(function () {
         boton.disabled    = true;
-        boton.textContent = 'Enviando…';
+        boton.textContent = boton.dataset.enviando;
       }, 0);
     });
   }

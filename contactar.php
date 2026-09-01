@@ -34,10 +34,10 @@ $ev = buscarEvento((int) ($_GET['id'] ?? 0));
 
 if (!$ev || $ev['situacion'] !== 'publicado') {
     http_response_code(404);
-    $titulo = 'Actividad no encontrada';
+    $titulo = t('ficha.no_encontrada.titulo');
     require __DIR__ . '/includes/layout.php';
-    echo '<div class="auth-caja"><h1>Esa actividad no existe</h1>'
-       . '<p class="sub">Puede que ya se haya retirado.</p></div>';
+    echo '<div class="auth-caja"><h1>' . et('ficha.no_encontrada.h1') . '</h1>'
+       . '<p class="sub">' . et('contactar.no_encontrada.texto') . '</p></div>';
     pie();
     exit;
 }
@@ -65,31 +65,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // implica una petición a Cloudflare, y no hay razón para gastarla en un
     // envío que ya se cayó por el token.
     if (!csrfValido($_POST['csrf'] ?? null)) {
-        $error = 'El formulario caducó. Vuelve a cargarlo.';
+        $error = t('contactar.error.formulario_caducado');
 
     } elseif (!($captcha = captchaValido($_POST))[0]) {
         $error = $captcha[1];
 
     } elseif (trim($nombre) === '') {
-        $error = 'Escribe tu nombre para que el organizador sepa quién pregunta.';
+        $error = t('contactar.error.nombre_falta');
 
     } elseif (!filter_var(trim($email), FILTER_VALIDATE_EMAIL)) {
-        $error = 'Ese correo no parece válido.';
+        $error = t('contactar.error.correo_invalido');
 
     } elseif (trim($mensaje) === '') {
         // Desde REQ-00007 el mensaje es obligatorio. Un aviso de "alguien
         // quiere contactarte" sin nada dentro obliga al organizador a escribir
         // primero para averiguar qué le preguntan, y ahí se pierde la mitad.
-        $error = 'Escribe tu mensaje: es lo que el organizador va a leer.';
+        $error = t('contactar.error.mensaje_falta');
 
     } elseif (!$acepta) {
         // Se comprueba en el servidor y no solo con el "required" del
         // navegador: ese se salta desactivando JavaScript o mandando el POST a
         // mano, y entonces el consentimiento no habría existido nunca.
-        $error = 'Marca la casilla del Aviso de Privacidad para poder enviar tu mensaje.';
+        $error = t('contactar.error.privacidad');
 
     } elseif (contactoRepetido((int) $ev['id'])) {
-        $error = 'Ya le escribiste a este organizador hace un momento. Dale tiempo a responder antes de volver a escribir.';
+        $error = t('contactar.error.repetido');
 
     } else {
         $nombre   = trim($nombre);
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$titulo = 'Contactar al organizador';
+$titulo = t('contactar.pagina.titulo');
 require __DIR__ . '/includes/layout.php';
 ?>
 
@@ -123,25 +123,25 @@ require __DIR__ . '/includes/layout.php';
       </svg>
     </div>
 
-    <h1>¡Mensaje enviado!</h1>
-    <p>Hemos recibido tu mensaje y lo enviaremos al organizador de esta actividad.</p>
-    <p>La respuesta dependerá del organizador.</p>
+    <h1><?= et('contactar.enviado.titulo') ?></h1>
+    <p><?= et('contactar.enviado.texto1') ?></p>
+    <p><?= et('contactar.enviado.texto2') ?></p>
 
-    <a class="btn-contorno" href="<?= e(urlEvento($ev)) ?>">← Volver a la actividad</a>
+    <a class="btn-contorno" href="<?= e(urlEvento($ev)) ?>"><?= et('contactar.enviado.volver') ?></a>
   </div>
 
 <?php else: ?>
 
   <div class="contacto-cab">
     <div>
-      <h1>Contacta al organizador</h1>
-      <p class="sub">Completa el formulario y enviaremos tu mensaje al organizador.</p>
+      <h1><?= et('contactar.cab.titulo') ?></h1>
+      <p class="sub"><?= et('contactar.cab.sub') ?></p>
     </div>
     <?php /* La × es un enlace y no un botón con JavaScript: cerrar aquí es
              volver a la actividad, y siendo enlace funciona el clic central,
              el «abrir en pestaña nueva» y el teclado sin nada más. */ ?>
     <a class="contacto-cerrar" href="<?= e(urlEvento($ev)) ?>"
-       aria-label="Cerrar y volver a la actividad">&times;</a>
+       aria-label="<?= et('contactar.cerrar_aria') ?>">&times;</a>
   </div>
 
   <?php /* Qué actividad se está consultando. El requerimiento lo pide, y hace
@@ -149,7 +149,7 @@ require __DIR__ . '/includes/layout.php';
            un enlace guardado o desde otra pestaña, y sin esto no hay forma de
            saber a quién se le está escribiendo. */ ?>
   <div class="contacto-actividad">
-    <div class="contacto-actividad-tit">Actividad</div>
+    <div class="contacto-actividad-tit"><?= et('contactar.actividad_label') ?></div>
     <strong><?= e($ev['titulo']) ?></strong>
     <div class="contacto-actividad-dato">
       <span aria-hidden="true">◎</span>
@@ -172,32 +172,32 @@ require __DIR__ . '/includes/layout.php';
     <?= captchaCamposOcultos() ?>
 
     <div class="campo">
-      <label for="nombre">Tu nombre <span class="obligatorio">*</span></label>
+      <label for="nombre"><?= et('contactar.campo.nombre') ?> <span class="obligatorio">*</span></label>
       <input id="nombre" name="nombre" type="text" maxlength="120" autocomplete="name"
-             placeholder="Escribe tu nombre" value="<?= e($nombre) ?>" required>
+             placeholder="<?= et('contactar.campo.nombre_placeholder') ?>" value="<?= e($nombre) ?>" required>
     </div>
 
     <div class="campo">
-      <label for="email">Tu correo electrónico <span class="obligatorio">*</span></label>
+      <label for="email"><?= et('contactar.campo.correo') ?> <span class="obligatorio">*</span></label>
       <input id="email" name="email" type="email" maxlength="190" autocomplete="email"
-             placeholder="ejemplo@correo.com" value="<?= e($email) ?>" required>
-      <div class="pista">Aquí te va a responder el organizador.</div>
+             placeholder="<?= et('contactar.campo.correo_placeholder') ?>" value="<?= e($email) ?>" required>
+      <div class="pista"><?= et('contactar.campo.correo_ayuda') ?></div>
     </div>
 
     <div class="campo">
-      <label for="telefono">Tu teléfono / WhatsApp <span class="opcional">opcional</span></label>
+      <label for="telefono"><?= et('contactar.campo.telefono') ?> <span class="opcional"><?= et('campo.opcional') ?></span></label>
       <?php /* type="tel" y no "text": en el teléfono abre el teclado numérico.
                Sin patrón de validación a propósito — un número mexicano, uno
                con prefijo internacional y uno con extensión se escriben de
                formas distintas, y todas son correctas para quien va a marcar. */ ?>
       <input id="telefono" name="telefono" type="tel" maxlength="30" autocomplete="tel"
-             placeholder="Ej. +52 612 123 4567" value="<?= e($telefono) ?>">
+             placeholder="<?= et('contactar.campo.telefono_placeholder') ?>" value="<?= e($telefono) ?>">
     </div>
 
     <div class="campo">
-      <label for="mensaje">Tu mensaje <span class="obligatorio">*</span></label>
+      <label for="mensaje"><?= et('contactar.campo.mensaje') ?> <span class="obligatorio">*</span></label>
       <textarea id="mensaje" name="mensaje" rows="4" maxlength="<?= CONTACTO_MENSAJE_MAX ?>"
-                placeholder="Escribe aquí tu mensaje..." required><?= e($mensaje) ?></textarea>
+                placeholder="<?= et('contactar.campo.mensaje_placeholder') ?>" required><?= e($mensaje) ?></textarea>
       <?php /* El contador sale del propio maxlength, así que cambiar el tope se
                hace en un sitio. Sin JavaScript no aparece, y no pasa nada: el
                navegador ya impide pasarse y el servidor recorta. */ ?>
@@ -205,24 +205,23 @@ require __DIR__ . '/includes/layout.php';
     </div>
 
     <div class="contacto-nota">
-      <strong>¿Qué pasa con tu mensaje?</strong>
-      Recibiremos tu mensaje y lo enviaremos al organizador de esta actividad.
-      La respuesta dependerá del organizador.
+      <strong><?= et('contactar.nota_titulo') ?></strong>
+      <?= et('contactar.nota_texto') ?>
     </div>
 
     <?= captchaHtml() ?>
 
     <label class="contacto-privacidad">
       <input type="checkbox" name="privacidad" value="1"<?= $acepta ? ' checked' : '' ?> required>
-      <span>He leído y acepto el
-        <a href="<?= e(url('privacidad')) ?>" target="_blank" rel="noopener">Aviso de Privacidad</a>.</span>
+      <span><?= et('contactar.privacidad_texto') ?>
+        <a href="<?= e(url('privacidad')) ?>" target="_blank" rel="noopener"><?= et('pie.privacidad') ?></a>.</span>
     </label>
 
-    <button class="btn-principal btn-enviar" type="submit">✈ Enviar mensaje</button>
+    <button class="btn-principal btn-enviar" type="submit"><?= et('contactar.enviar_btn') ?></button>
   </form>
 
   <div class="auth-pie">
-    Tu correo y tu teléfono solo los recibe el organizador de esta actividad. No se hacen públicos en ningún lado.
+    <?= et('contactar.pie') ?>
   </div>
 
 <?php endif; ?>

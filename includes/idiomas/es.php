@@ -437,10 +437,122 @@ return [
     'ficha.mapa_titulo_prefijo' => 'Mapa con la ubicación de',
     'ficha.como_llegar'         => 'Cómo llegar →',
     'ficha.reportar'            => 'Reportar esta actividad',
+    'ficha.varias_fechas'       => 'Varias fechas',
 
     // Mensaje de la sesión que evento-editar.php deja para cuando se vuelve
     // a la ficha tras guardar cambios.
     'evento.editar.cambios_guardados' => 'Cambios guardados.',
+
+    // ---- Contactar al organizador (contactar.php) ----
+    'contactar.no_encontrada.texto' => 'Puede que ya se haya retirado.',
+    'contactar.error.formulario_caducado' => 'El formulario caducó. Vuelve a cargarlo.',
+    'contactar.error.nombre_falta'  => 'Escribe tu nombre para que el organizador sepa quién pregunta.',
+    'contactar.error.correo_invalido' => 'Ese correo no parece válido.',
+    'contactar.error.mensaje_falta' => 'Escribe tu mensaje: es lo que el organizador va a leer.',
+    'contactar.error.privacidad'    => 'Marca la casilla del Aviso de Privacidad para poder enviar tu mensaje.',
+    'contactar.error.repetido'      => 'Ya le escribiste a este organizador hace un momento. Dale tiempo a responder antes de volver a escribir.',
+
+    'contactar.pagina.titulo' => 'Contactar al organizador',
+    'contactar.enviado.titulo' => '¡Mensaje enviado!',
+    'contactar.enviado.texto1' => 'Hemos recibido tu mensaje y lo enviaremos al organizador de esta actividad.',
+    'contactar.enviado.texto2' => 'La respuesta dependerá del organizador.',
+    'contactar.enviado.volver' => '← Volver a la actividad',
+
+    'contactar.cab.titulo' => 'Contacta al organizador',
+    'contactar.cab.sub'    => 'Completa el formulario y enviaremos tu mensaje al organizador.',
+    'contactar.cerrar_aria' => 'Cerrar y volver a la actividad',
+    'contactar.actividad_label' => 'Actividad',
+
+    'contactar.campo.nombre' => 'Tu nombre',
+    'contactar.campo.nombre_placeholder' => 'Escribe tu nombre',
+    'contactar.campo.correo' => 'Tu correo electrónico',
+    'contactar.campo.correo_placeholder' => 'ejemplo@correo.com',
+    'contactar.campo.correo_ayuda' => 'Aquí te va a responder el organizador.',
+    'contactar.campo.telefono' => 'Tu teléfono / WhatsApp',
+    'contactar.campo.telefono_placeholder' => 'Ej. +52 612 123 4567',
+    'contactar.campo.mensaje' => 'Tu mensaje',
+    'contactar.campo.mensaje_placeholder' => 'Escribe aquí tu mensaje...',
+
+    'contactar.nota_titulo' => '¿Qué pasa con tu mensaje?',
+    'contactar.nota_texto'  => 'Recibiremos tu mensaje y lo enviaremos al organizador de esta actividad. La respuesta dependerá del organizador.',
+
+    'contactar.privacidad_texto' => 'He leído y acepto el',
+    'contactar.enviar_btn'       => '✈ Enviar mensaje',
+    'contactar.pie'              => 'Tu correo y tu teléfono solo los recibe el organizador de esta actividad. No se hacen públicos en ningún lado.',
+
+    // ---- Captcha compartido (includes/captcha.php) ----
+    // Usado por contactar.php, contacto.php y reportar.php.
+    'captcha.error.trampa'       => 'No se pudo enviar el formulario. Inténtalo otra vez.',
+    'captcha.error.caducado'     => 'El formulario caducó. Vuelve a cargarlo.',
+    'captcha.error.muy_rapido'   => 'Tómate un momento para revisarlo y vuelve a enviarlo.',
+    'captcha.error.falta_token'  => 'Confirma que no eres un robot. Si no ves la casilla, recarga la página.',
+    'captcha.error.no_verificado'=> 'No se pudo verificar que seas una persona. Inténtalo otra vez.',
+    'captcha.fallo_carga'        => 'No se pudo cargar la comprobación de seguridad. Recarga la página; si vuelve a pasar, avísanos y lo revisamos.',
+    'captcha.trampa_label'       => 'No rellenes esto',
+
+    // ---- Contacto general del sitio (contacto.php) ----
+    'contacto.pagina.titulo' => 'Contacta a OMDARA',
+    'contacto.pagina.meta'   => 'Escríbenos: dudas, ayuda, problemas con una actividad o cualquier cosa que necesites consultarnos.',
+
+    'contacto.error.campo_obligatorio' => 'Este campo es obligatorio.',
+    'contacto.error.correo_invalido'   => 'Introduce un correo electrónico válido.',
+    'contacto.error.mensaje_corto'     => 'Cuéntanos un poco más: con %d caracteres no hay mucho a lo que responder.',
+    'contacto.error.repetido'          => 'Ya nos escribiste hace un momento. Danos tiempo para responder antes de volver a escribir.',
+
+    'contacto.enviado.h1'    => 'Hemos recibido tu mensaje.',
+    'contacto.enviado.sub'   => 'Gracias por contactarnos. Te responderemos a la brevedad.',
+    'contacto.enviado.aviso' => 'Te responderemos al correo que nos dejaste. Si no tienes noticias en unos días, revisa tu carpeta de spam.',
+
+    'contacto.form.sub'            => '¿Tienes alguna pregunta, necesitas ayuda o quieres reportar un problema? Completa el formulario y nos pondremos en contacto contigo.',
+    'contacto.form.revisa_campos'  => 'Revisa los campos marcados.',
+
+    'contacto.campo.nombre' => 'Nombre',
+    'contacto.campo.nombre_placeholder' => 'Tu nombre',
+    'contacto.campo.correo' => 'Correo electrónico',
+    'contacto.campo.correo_placeholder' => 'tu@email.com',
+    'contacto.campo.correo_ayuda' => 'Aquí te vamos a responder.',
+    'contacto.campo.motivo' => 'Motivo del contacto',
+    'contacto.campo.motivo_placeholder' => 'Elige uno…',
+    'contacto.campo.actividad' => '¿Qué actividad está relacionada?',
+    'contacto.campo.actividad_placeholder' => 'Nombre de la actividad',
+    'contacto.campo.actividad_ayuda' => 'Indica el nombre de la actividad sobre la que nos escribes.',
+    'contacto.campo.mensaje' => 'Mensaje',
+    'contacto.campo.mensaje_placeholder' => 'Cuéntanos cómo podemos ayudarte...',
+    'contacto.enviar_btn' => 'Enviar mensaje',
+    'contacto.enviando'   => 'Enviando…',
+    'contacto.pie' => '¿Es sobre una actividad publicada y quieres hablar con quien la organiza? Ve a su ficha y usa «Contactar al organizador»: llega directo a esa persona y te responde antes.',
+
+    'contacto.motivo.general'     => 'Pregunta general',
+    'contacto.motivo.actividad'   => 'Problema con una actividad',
+    'contacto.motivo.cuenta'      => 'Problema con mi cuenta',
+    'contacto.motivo.organizador' => 'Soy organizador',
+    'contacto.motivo.reporte'     => 'Reportar contenido',
+    'contacto.motivo.otro'        => 'Otro',
+
+    // ---- Reportar actividad (reportar.php) ----
+    'reportar.no_encontrada.texto' => 'Puede que ya se haya retirado.',
+    'reportar.error.motivo_falta'  => 'Ayúdanos a mantener una comunidad segura. Selecciona el motivo por el que deseas reportar esta actividad.',
+    'reportar.error.repetido'      => 'Ya reportaste esta actividad. La estamos revisando.',
+
+    'reportar.pagina.titulo' => 'Reportar actividad',
+    'reportar.enviado.h1'    => 'Gracias por tu reporte',
+    'reportar.enviado.sub'   => 'Lo revisaremos lo antes posible.',
+    'reportar.enviado.aviso' => 'La actividad sigue publicada mientras tanto. No la retiramos por un aviso automático: lo revisa una persona.',
+    'reportar.volver_actividad' => '← Volver a la actividad',
+    'reportar.enviado.volver'   => 'Volver a la actividad',
+
+    'reportar.form.pregunta' => '¿Qué le pasa a esta actividad?',
+    'reportar.form.comentario' => 'Cuéntanos más',
+    'reportar.form.comentario_placeholder' => 'Qué viste exactamente. Cuanto más concreto, más rápido se resuelve.',
+    'reportar.enviar_btn' => 'Enviar reporte',
+    'reportar.pie' => 'Tu aviso no oculta la actividad. Solo la pone en la lista de lo que hay que revisar.',
+
+    'reportar.motivo.inapropiado'    => 'Contenido ofensivo o inapropiado',
+    'reportar.motivo.enganoso'       => 'Información falsa o engañosa',
+    'reportar.motivo.spam'           => 'Spam o publicidad',
+    'reportar.motivo.no_es_wellness' => 'No es una actividad de bienestar',
+    'reportar.motivo.duplicado'      => 'Está publicado dos veces',
+    'reportar.motivo.otro'           => 'Otro motivo',
 
     // ---- Consentimiento de cookies (REQ-00003) ----
     // El requerimiento escribe la marca en minúsculas; aquí va OMDARA, que es

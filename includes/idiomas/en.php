@@ -410,8 +410,118 @@ return [
     'ficha.mapa_titulo_prefijo' => 'Map showing the location of',
     'ficha.como_llegar'         => 'Get directions →',
     'ficha.reportar'            => 'Report this activity',
+    'ficha.varias_fechas'       => 'Multiple dates',
 
     'evento.editar.cambios_guardados' => 'Changes saved.',
+
+    // ---- Contact the organizer (contactar.php) ----
+    'contactar.no_encontrada.texto' => 'It may have already been taken down.',
+    'contactar.error.formulario_caducado' => 'The form expired. Reload it.',
+    'contactar.error.nombre_falta'  => 'Write your name so the organizer knows who\'s asking.',
+    'contactar.error.correo_invalido' => 'That email doesn\'t look valid.',
+    'contactar.error.mensaje_falta' => 'Write your message: it\'s what the organizer will read.',
+    'contactar.error.privacidad'    => 'Check the Privacy Notice box to send your message.',
+    'contactar.error.repetido'      => 'You already wrote to this organizer a moment ago. Give them time to respond before writing again.',
+
+    'contactar.pagina.titulo' => 'Contact the organizer',
+    'contactar.enviado.titulo' => 'Message sent!',
+    'contactar.enviado.texto1' => 'We\'ve received your message and will send it to this activity\'s organizer.',
+    'contactar.enviado.texto2' => 'The response depends on the organizer.',
+    'contactar.enviado.volver' => '← Back to the activity',
+
+    'contactar.cab.titulo' => 'Contact the organizer',
+    'contactar.cab.sub'    => 'Fill out the form and we\'ll send your message to the organizer.',
+    'contactar.cerrar_aria' => 'Close and go back to the activity',
+    'contactar.actividad_label' => 'Activity',
+
+    'contactar.campo.nombre' => 'Your name',
+    'contactar.campo.nombre_placeholder' => 'Write your name',
+    'contactar.campo.correo' => 'Your email',
+    'contactar.campo.correo_placeholder' => 'example@email.com',
+    'contactar.campo.correo_ayuda' => 'This is where the organizer will reply.',
+    'contactar.campo.telefono' => 'Your phone / WhatsApp',
+    'contactar.campo.telefono_placeholder' => 'E.g. +52 612 123 4567',
+    'contactar.campo.mensaje' => 'Your message',
+    'contactar.campo.mensaje_placeholder' => 'Write your message here...',
+
+    'contactar.nota_titulo' => 'What happens with your message?',
+    'contactar.nota_texto'  => 'We\'ll receive your message and send it to this activity\'s organizer. The response depends on the organizer.',
+
+    'contactar.privacidad_texto' => 'I have read and accept the',
+    'contactar.enviar_btn'       => '✈ Send message',
+    'contactar.pie'              => 'Your email and phone are only shared with this activity\'s organizer. They are never made public.',
+
+    // ---- Shared captcha (includes/captcha.php) ----
+    'captcha.error.trampa'       => 'The form couldn\'t be sent. Try again.',
+    'captcha.error.caducado'     => 'The form expired. Reload it.',
+    'captcha.error.muy_rapido'   => 'Take a moment to review it and send it again.',
+    'captcha.error.falta_token'  => 'Confirm you\'re not a robot. If you don\'t see the checkbox, reload the page.',
+    'captcha.error.no_verificado'=> 'We couldn\'t verify you\'re a person. Try again.',
+    'captcha.fallo_carga'        => 'The security check couldn\'t load. Reload the page; if it happens again, let us know and we\'ll look into it.',
+    'captcha.trampa_label'       => 'Don\'t fill this in',
+
+    // ---- Site contact (contacto.php) ----
+    'contacto.pagina.titulo' => 'Contact OMDARA',
+
+    'contacto.error.campo_obligatorio' => 'This field is required.',
+    'contacto.error.correo_invalido'   => 'Enter a valid email address.',
+    'contacto.error.mensaje_corto'     => 'Tell us a bit more: with %d characters there isn\'t much to respond to.',
+    'contacto.error.repetido'          => 'You already wrote to us a moment ago. Give us time to respond before writing again.',
+
+    'contacto.enviado.h1'    => 'We\'ve received your message.',
+    'contacto.enviado.sub'   => 'Thanks for reaching out. We\'ll get back to you soon.',
+    'contacto.enviado.aviso' => 'We\'ll reply to the email you left us. If you don\'t hear back in a few days, check your spam folder.',
+
+    'contacto.form.sub'            => 'Have a question, need help, or want to report a problem? Fill out the form and we\'ll get in touch.',
+    'contacto.form.revisa_campos'  => 'Check the marked fields.',
+
+    'contacto.campo.nombre' => 'Name',
+    'contacto.campo.nombre_placeholder' => 'Your name',
+    'contacto.campo.correo' => 'Email',
+    'contacto.campo.correo_placeholder' => 'you@email.com',
+    'contacto.campo.correo_ayuda' => 'This is where we\'ll reply.',
+    'contacto.campo.motivo' => 'Reason for contacting us',
+    'contacto.campo.motivo_placeholder' => 'Choose one…',
+    'contacto.campo.actividad' => 'Which activity is this about?',
+    'contacto.campo.actividad_placeholder' => 'Activity name',
+    'contacto.campo.actividad_ayuda' => 'Tell us the name of the activity you\'re writing about.',
+    'contacto.campo.mensaje' => 'Message',
+    'contacto.campo.mensaje_placeholder' => 'Tell us how we can help...',
+    'contacto.enviar_btn' => 'Send message',
+    'contacto.enviando'   => 'Sending…',
+    'contacto.pie' => 'Is this about a published activity and you want to talk to whoever organizes it? Go to its page and use "Contact the organizer": it reaches that person directly and gets you a faster reply.',
+
+    'contacto.motivo.general'     => 'General question',
+    'contacto.motivo.actividad'   => 'Problem with an activity',
+    'contacto.motivo.cuenta'      => 'Problem with my account',
+    'contacto.motivo.organizador' => 'I\'m an organizer',
+    'contacto.motivo.reporte'     => 'Report content',
+    'contacto.motivo.otro'        => 'Other',
+
+    // ---- Report activity (reportar.php) ----
+    'reportar.no_encontrada.texto' => 'It may have already been taken down.',
+    'reportar.error.motivo_falta'  => 'Help us keep the community safe. Select the reason you want to report this activity.',
+    'reportar.error.repetido'      => 'You already reported this activity. We\'re reviewing it.',
+
+    'reportar.pagina.titulo' => 'Report activity',
+    'reportar.enviado.h1'    => 'Thanks for your report',
+    'reportar.enviado.sub'   => 'We\'ll review it as soon as possible.',
+    'reportar.enviado.aviso' => 'The activity stays published in the meantime. We don\'t take it down over an automatic notice: a person reviews it.',
+    'reportar.volver_actividad' => '← Back to the activity',
+    'reportar.enviado.volver'   => 'Back to the activity',
+
+    'reportar.form.pregunta' => 'What\'s wrong with this activity?',
+    'reportar.form.comentario' => 'Tell us more',
+    'reportar.form.comentario_placeholder' => 'What you saw exactly. The more specific, the faster it gets resolved.',
+    'reportar.enviar_btn' => 'Send report',
+    'reportar.pie' => 'Your report doesn\'t hide the activity. It just adds it to the list of things to review.',
+
+    'reportar.motivo.inapropiado'    => 'Offensive or inappropriate content',
+    'reportar.motivo.enganoso'       => 'False or misleading information',
+    'reportar.motivo.spam'           => 'Spam or advertising',
+    'reportar.motivo.no_es_wellness' => 'Not a wellness activity',
+    'reportar.motivo.duplicado'      => 'Posted twice',
+    'reportar.motivo.otro'           => 'Other reason',
 
     // ---- Consentimiento de cookies (REQ-00003) ----
     // Sí se traduce, aunque roce lo legal: es lo PRIMERO que ve quien entra, y
