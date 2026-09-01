@@ -183,8 +183,20 @@ require __DIR__ . '/includes/layout.php';
 <?php if ($ev['situacion'] === 'publicado'): ?>
   <!-- Solo la ficha ya publicada cuenta como "visualización de actividad": la
        vista previa de un borrador la recarga una y otra vez quien la escribe
-       mientras la ajusta, y eso no es tráfico real. -->
+       mientras la ajusta, y eso no es tráfico real. Mismo motivo por el que
+       el marcado Schema.org va aquí adentro y no siempre: un borrador no
+       tiene por qué anunciarse a Google como si ya existiera. -->
   <script>whTrack('ver_actividad', <?= json_encode(['id' => (int) $ev['id'], 'categoria' => $ev['categoria'], 'ciudad' => $ev['ciudad']]) ?>);</script>
+  <?php /*
+   * JSON_UNESCAPED_SLASHES NO va aquí: sin escapar "/", un título o
+   * descripción que trajera literalmente "</script>" —el organizador
+   * escribe ese texto libre, sin depurar— cerraría esta etiqueta y
+   * ejecutaría lo que viniera después. json_encode() por defecto escribe
+   * "\/" en su lugar, que un navegador nunca lee como cierre de etiqueta;
+   * es la misma razón por la que las URL de aquí abajo se ven con barras
+   * escapadas y no es un error.
+   */ ?>
+  <script type="application/ld+json"><?= json_encode(datosEstructuradosEvento($ev), JSON_UNESCAPED_UNICODE) ?></script>
 <?php endif; ?>
 
 <div class="ficha-envoltorio">

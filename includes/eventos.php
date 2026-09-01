@@ -1385,3 +1385,99 @@ function fechaIso(?string $fecha): ?string
 {
     return ($fecha === null || $fecha === '') ? null : str_replace(' ', 'T', $fecha);
 }
+
+
+// ------------------------------------------------------- datos estructurados ----
+
+/**
+ * El marcado Schema.org/Event de una actividad, para que Google pueda
+ * mostrar fecha, lugar y precio directamente en el resultado de búsqueda
+ * (rich result) en vez de solo un enlace y una descripción.
+ *
+ * SIN HORA LOCAL EXPLÍCITA A PROPÓSITO: fecha_inicio/fecha_fin no guardan
+ * zona horaria —México tiene varias—, así que en vez de adivinar un offset
+ * se manda la fecha "pelada" (2026-08-29T10:00:00). Es justo lo que Google
+ * documenta como válido cuando no se conoce el offset: la interpreta como
+ * hora local del lugar del evento, que es exactamente lo que es.
+ *
+ * SIEMPRE PRESENCIAL: este directorio no tiene actividades en línea —todas
+ * piden ciudad, estado y lugar—, así que eventAttendanceMode es siempre
+ * "Offline" y no hace falta comprobar nada para decidirlo.
+ *
+ * SIEMPRE "programado": no hay una acción de "cancelar" o "posponer" en el
+ * modelo de datos —lo que existe es ocultar, que ya deja de mostrar la
+ * ficha entera—, así que eventStatus es siempre EventScheduled: si algo se
+ * cancela de verdad, se oculta, y una ficha oculta no llega a llamar a esta
+ * función porque nunca se le pide a un visitante.
+ *
+ * "offers" SOLO SI EL PRECIO ES UN DATO REAL: "gratuito" cuenta como precio
+ * cero, pero "de pago, precio por confirmar" (precio NULL) no es un número
+ * que Google pueda anunciar sin mentir, así que ahí se omite el bloque
+ * entero en vez de inventar un valor.
+ */
+function datosEstructuradosEvento(array $ev): array
+{
+    $datos = [
+        '@context'            => 'https://schema.org',
+        '@type'               => 'Event',
+        'name'                => $ev['titulo'],
+        'description'         => $ev['descripcion'],
+        'startDate'           => fechaIso($ev['fecha_inicio']),
+        'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendedMode',
+        'eventStatus'         => 'https://schema.org/EventScheduled',
+        'url'                 => urlEvento($ev),
+        'location'            => [
+            '@type'   => 'Place',
+            'name'    => $ev['lugar'],
+            'address' => array_filter([
+                '@type'           => 'PostalAddress',
+                'streetAddress'   => $ev['direccion'] ?: null,
+                'addressLocality' => $ev['ciudad'],
+                'addressRegion'   => $ev['entidad'],
+                'addressCountry'  => 'MX',
+            ]),
+        ],
+        'organizer' => [
+            '@type' => 'Organization',
+            'name'  => $ev['organizador'] ?? '',
+        ],
+    ];
+
+    if (!empty($ev['fecha_fin'])) {
+        $datos['endDate'] = fechaIso($ev['fecha_fin']);
+    }
+
+    $imagen = urlImagen($ev['imagen_url'] ?? null);
+    if ($imagen !== null) {
+        $datos['image'] = [$imagen];
+    }
+
+    if (eventoTienePunto($ev)) {
+        $datos['location']['geo'] = [
+            '@type'     => 'GeoCoordinates',
+            'latitude'  => (float) $ev['latitud'],
+            'longitude' => (float) $ev['longitud'],
+        ];
+    }
+
+    $precioConocido = !empty($ev['gratuito']) || $ev['precio'] !== null;
+    if ($precioConocido) {
+        $urlOferta = null;
+        if ($ev['accion_principal'] === 'boletos' && !empty($ev['url_boletos'])) {
+            $urlOferta = URL_BASE . '/salida.php?id=' . (int) $ev['id'] . '&tipo=boletos';
+        } elseif ($ev['accion_principal'] === 'reservar' && !empty($ev['url_reserva'])) {
+            $urlOferta = URL_BASE . '/salida.php?id=' . (int) $ev['id'] . '&tipo=reservar';
+        }
+        if ($urlOferta === null) $urlOferta = urlEvento($ev);
+
+        $datos['offers'] = [
+            '@type'         => 'Offer',
+            'url'           => $urlOferta,
+            'price'         => !empty($ev['gratuito']) ? '0' : (string) $ev['precio'],
+            'priceCurrency' => 'MXN',
+            'availability'  => 'https://schema.org/InStock',
+        ];
+    }
+
+    return $datos;
+}
