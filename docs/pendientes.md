@@ -300,26 +300,41 @@ el pie —que salen en todas las páginas— están traducidos.
 | 2 | Portada y buscador — **hecho, 2026-09-01** | Textos EN |
 | 3 | Formulario de actividad — **hecho, 2026-09-01** (`evento-editar.php` traducido pero sin ruta `/en` propia, ver nota) | Textos EN |
 | 4 | Ficha, contacto/reportar y login/registro — **hecho, 2026-09-01**. Correos aparte, ver nota | Textos EN |
-| 5 | Contenido dinámico: título y descripción de cada actividad | Migración de base |
+| 5 | Contenido dinámico: título y descripción de cada actividad — **hecho, 2026-09-01** | Migración de base |
 
 **Las 23 categorías — hecho, 2026-09-01.** `categoriasMenu()` acepta idioma
 y devuelve la etiqueta inglesa sin tocar `eventos.categoria` ni el `?cat=` de
 las direcciones, que se quedan en español siempre. Se traduce sola en
 cualquier página que la use (portada, `buscar.php`, el formulario de alta).
 
-**La fase 5 necesita una migración**: columnas para título y descripción en
-inglés, más un comportamiento de reserva cuando el organizador no las rellene.
-El requerimiento pide expresamente no traducir automáticamente lo que escribió
-el organizador.
+**La fase 5** agregó `titulo_en`/`descripcion_en` (migración 21, opcionales)
+y **una ruta nueva, `/activity/{slug}`**, paralela a `/actividad/{slug}`
+(`router.php`) — sin ella, el contenido en inglés no tenía forma de
+mostrarse a nadie. `urlEvento()` genera el prefijo según el idioma;
+`urlEquivalente()` ahora deja que una página fuera de `rutasSitio()`
+declare su propia equivalencia entre idiomas (`evento.php` la usa, así que
+el selector de idioma se queda en la misma actividad en vez de mandar al
+inicio). `tituloEvento()`/`descripcionEvento()` centralizan la reserva al
+español cuando el organizador no escribió versión en inglés —nunca se
+traduce nada solo—.
 
-**Varias páginas de la fase 4 no tienen ruta limpia en `/en`**: `evento.php`,
-`evento-editar.php`, `contactar.php`, `reportar.php`, `login.php`,
-`codigo.php` y `completar-registro.php` no están en `rutasSitio()` —son por
-`?id=N` o no tienen dirección fija propia—, así que `idiomaActual()` no
-tiene de dónde sacar el idioma y siempre cae al español, aunque su texto ya
-está traducido en `includes/idiomas/en.php` y listo para cuando existan esas
-rutas. `evento-nuevo.php` y `contacto.php` sí tienen ruta propia
-(`/publish-an-activity`, `/contact`) y sí se ven en inglés.
+**Dos fugas de idioma más, encontradas y evitadas al implementar la fase
+5**: los correos `avisarAdminsNuevaActividad()` y `avisarOrganizador()`
+ahora fijan español explícito en su enlace a la ficha (mismo patrón que
+`motivosContacto()`, abajo); y `buscar-datos.php` —un `fetch()` directo que
+no pasa por el enrutador— nunca sabía en qué idioma estaba la página que lo
+llamaba, así que las tarjetas de resultados se quedaban en español pese a
+`tituloEvento()`. `buscar.js` le manda ahora el idioma explícito por
+parámetro. De paso se encontró un texto de la fase 2 que se había quedado
+suelto: "Gratis"/"Ver actividad →" en `assets/js/tarjetas.js` (compartido
+por portada y buscador, JS global y no de una página) — resuelto con un
+objeto `TARJETA_T` impreso en `includes/layout.php` para todo el sitio.
+
+**Sigue sin ruta limpia en `/en`**: `evento-editar.php`, `contactar.php`,
+`reportar.php`, `login.php`, `codigo.php` y `completar-registro.php` —por
+`?id=N` o sin dirección fija propia—, así que siguen cayendo al español
+aunque su texto ya está traducido. `evento.php`, `evento-nuevo.php` y
+`contacto.php` sí tienen ruta propia y se ven en inglés.
 
 **Los correos quedaron fuera de la fase 4, a propósito.** Sus plantillas
 (`includes/correo.php`, `includes/contacto.php`) siguen en español fijo. No
@@ -343,12 +358,16 @@ la regla para el resto de páginas.
 
 **Sobre promover a producción:** el requerimiento prohíbe la traducción
 parcial. Hoy el inglés cubre el armazón, la portada, el buscador, el
-formulario de actividad, la ficha, contacto/reportar y login/registro
-—fases 2 a 4 completas—, pero no los correos (parte de la fase 4, ver nota
-arriba) ni la fase 5. El sitio ya vive en el dominio final (`omdara.com.mx`, ver
-`docs/operacion.md`); esta nota queda para que quede claro que esa promoción
-se hizo sin cerrar esta parte del requerimiento, no para sugerir que ya se
-cumplió.
+formulario de actividad, la ficha, contacto/reportar, login/registro y el
+contenido bilingüe por actividad —fases 2 a 5 completas—, pero no los
+correos (ver nota arriba). El sitio ya vive en el dominio final
+(`omdara.com.mx`, ver `docs/operacion.md`); esta nota queda para que quede
+claro que esa promoción se hizo sin cerrar esta parte del requerimiento, no
+para sugerir que ya se cumplió.
+
+**Falta correr la migración 21 en producción** (`titulo_en`/`descripcion_en`
+en `eventos`) — ver el punto siguiente para el patrón de aviso, o
+directamente `database/migracion-21-titulo-descripcion-en.sql`.
 
 ---
 
