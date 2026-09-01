@@ -14,8 +14,10 @@
  *
  * LOS NOMBRES SON DE LA PALETA VIEJA Y NO MIENTEN POR CAPRICHO
  *
- * --terracota vale hoy azul, y --petroleo vale verde carbon. Renombrar los
- * ocho tokens obliga a tocar ~400 reglas de portada.css y este archivo, y
+ * --verde vale hoy negro, y --petroleo vale un negro cálido para texto —de
+ * la paleta OMDARA original solo --terracota volvió a valer, literalmente,
+ * terracota, en el cambio a blanco/negro/naranja—. Renombrar los ocho
+ * tokens obliga a tocar ~400 reglas de portada.css y este archivo, y
  * mezclaria "cambiar los colores" con "cambiar como se llaman": dos revisiones
  * distintas en un solo diff, donde un error de color se esconde detras de mil
  * lineas de renombrado. El renombrado va aparte; el comentario de cada token
@@ -23,55 +25,65 @@
  */
 :root{
   /* ---- Paleta OMDARA ----
-     Proporcion buscada: 60% crema/blanco, 20% verde bosque, 10% salvia,
-     5% verde natural, 5% azul. El azul no debe volverse un segundo color
-     dominante: es interaccion y conversion, no identidad. */
-  --fondo:#F7F5EF;        /* CREAM  · fondo general, nunca blanco puro     */
-  --verde:#1F4639;        /* FOREST · color principal de marca             */
-  --verde-claro:#4F7D4A;  /* GREEN  · acciones secundarias, estados buenos */
-  --arena:#DCE8DD;        /* SAGE   · fondos suaves y bloques              */
-  --terracota:#2878D7;    /* BLUE   · destacados e interaccion             */
-  --petroleo:#20332D;     /* TEXT   · texto principal                      */
-  --gris:#65736D;         /* MUTED  · texto secundario                     */
+     Blanco y negro como base, con un solo acento: naranja quemado, y solo
+     para lo que pide accion —los CTA—, no como segundo color de identidad.
+     Mismos ocho nombres de siempre (ver el comentario de arriba del
+     archivo): --terracota vuelve a valer, literalmente, terracota.
 
-  --blanco:#FFFFFF;       /* WHITE  · cards, formularios, superficies      */
+     Cada valor de aqui es mas contrastado que el que reemplaza —se
+     recalculo con la formula WCAG antes de fijarlo—, asi que ninguno de los
+     ajustes de opacidad para texto tenue hechos antes en este mismo
+     proyecto se rompe: todos quedan con MAS margen que antes, no menos. */
+  --fondo:#F7F7F5;        /* BLANCO ROTO · fondo general, nunca blanco puro */
+  --verde:#161616;        /* NEGRO  · color principal de marca              */
+  --verde-claro:#4A4A47;  /* GRIS   · acciones secundarias                  */
+  --arena:#EDEDE9;        /* GRIS CLARO · fondos suaves y bloques           */
+  --terracota:#B5551F;    /* NARANJA · el unico acento: los CTA             */
+  --petroleo:#221F1B;     /* TEXTO  · texto principal                       */
+  --gris:#5A5A56;         /* MUTED  · texto secundario                      */
 
-  /* Salvia aclarada para el bloque informativo del modal de contacto. */
-  --arena-suave:#F0F5F0;
-  /* Las tarjetas del panel admin, sobre el fondo verde bosque. DERIVADO:
-     no esta en la especificacion, es bosque aclarado para despegar la tarjeta
-     del fondo sin salirse del verde. */
-  --petroleo-suave:#2A5A48;
+  --blanco:#FFFFFF;       /* WHITE  · cards, formularios, superficies       */
 
-  /* El azul, en sus tres papeles.
-     Como fondo de boton lleva texto blanco (4.5:1, cumple AA). Como TEXTO
-     sobre blanco se queda en 4.46:1 y no llega, asi que ahi se usa el tono
-     oscuro —el mismo que la especificacion da para el hover— que sube a
-     5.6:1. Sobre fondos oscuros (hero, footer, cabecera) ninguno de los dos
-     azules es legible: ahi manda la salvia. */
-  --terracota-viva:#2068BE;   /* hover del boton azul                      */
-  --terracota-texto:#2068BE;  /* azul legible sobre fondo claro     5.6:1  */
-  --terracota-palida:#DCE8DD; /* sobre fondo oscuro: salvia        11.5:1  */
-  --tinta-boton:#FFFFFF;      /* texto sobre el boton azul                 */
+  /* Gris claro aclarado para el bloque informativo del modal de contacto. */
+  --arena-suave:#F2F2EF;
+  /* Las tarjetas del panel admin, sobre el fondo negro. DERIVADO: gris muy
+     oscuro para despegar la tarjeta del fondo sin salirse de la escala de
+     grises. */
+  --petroleo-suave:#2A2A27;
 
-  /* Los degradados de las tarjetas de la portada. DERIVADOS: la
-     especificacion no cubre el hero, y un degradado necesita pasos
-     intermedios que no existen en una paleta de ocho colores. Salen de
-     interpolar entre bosque, verde natural y salvia. */
-  --verde-agua:#356B57;
-  --verde-hondo:#17352B;
-  --petroleo-hondo:#152A22;
+  /* El naranja, en sus tres papeles —"no tan brillante" pedia justo esto:
+     un tono quemado, no un naranja vivo de acento publicitario.
+     Como fondo de boton lleva texto blanco (4.9:1, cumple AA con margen).
+     Como TEXTO sobre blanco necesita mas oscuro para leerse bien, asi que
+     ahi se usa el tono profundo —el mismo que de hover— que sube a 6.16:1.
+     Sobre fondos oscuros (hero, footer, cabecera, panel admin) ese mismo
+     naranja profundo tampoco se lee: ahi manda una version clara del propio
+     naranja, no un gris neutro, para que el acento se reconozca igual. */
+  --terracota-viva:#9C4A1E;   /* hover del boton naranja                   */
+  --terracota-texto:#9C4A1E;  /* naranja legible sobre fondo claro  6.16:1 */
+  --terracota-palida:#EEC29E; /* sobre fondo oscuro: naranja claro  11.1:1 */
+  --tinta-boton:#FFFFFF;      /* texto sobre el boton naranja               */
 
-  /* Divisores y bordes. La especificacion los da como color solido y no como
-     transparencia: #E3E8E4 para divisores del buscador, #D5DED7 para bordes
-     de filtro. --linea es la del borde y --linea-suave la del divisor. */
-  --linea:#D5DED7;
-  --linea-suave:#E3E8E4;
+  /* Los degradados de las tarjetas de la portada. DERIVADOS: una escala de
+     grises entre el blanco roto y el negro, con paradas intermedias para
+     que el degradado tenga pasos y no un salto brusco. */
+  --verde-agua:#3A3A37;
+  --verde-hondo:#0E0E0E;
+  --petroleo-hondo:#0B0B0A;
+
+  /* Divisores y bordes: grises neutros, ya sin matiz verde. --linea es la
+     del borde y --linea-suave la del divisor. */
+  --linea:#D9D9D5;
+  --linea-suave:#E7E7E3;
 
   /* ---- Estados ----
-     Los cuatro de la especificacion. El de advertencia todavia no lo usa
-     ninguna regla; se deja definido para no volver a inventarlo a mano el dia
-     que haga falta, que es como llegaron aqui los otros nueve. */
+     A proposito NO se tocan con el resto de la paleta: son color funcional
+     —error, exito, aviso, info—, no identidad de marca, y cambiarlos a
+     escala de grises les quitaria justo lo que los hace reconocibles de un
+     vistazo. Antes --exito reutilizaba el hex de --verde-claro y --info el
+     de --terracota porque coincidian por casualidad; ahora que las dos
+     cambiaron de familia de color, --exito e --info llevan su propio valor
+     escrito, ya no atado a lo que le pase al resto de la paleta. */
   --error:#B85450;
   --error-fuerte:#B85450;      /* bordes y la marca "!" */
   --error-fondo:#F8E9E7;
@@ -172,7 +184,7 @@ input,select{font-family:inherit; font-size:14px;}
   position:absolute; right:0; top:calc(100% + 10px); min-width:230px;
   background:var(--blanco); color:var(--petroleo);
   border:1px solid var(--linea); border-radius:12px;
-  box-shadow:0 14px 34px rgba(47,78,93,.16); padding:6px; z-index:50;
+  box-shadow:0 14px 34px rgba(22,22,22,.16); padding:6px; z-index:50;
 }
 .cuenta-quien{padding:10px 12px 12px; border-bottom:1px solid var(--linea-suave); margin-bottom:6px;}
 .cuenta-quien strong{display:block; font-size:14px;}
@@ -188,7 +200,7 @@ input,select{font-family:inherit; font-size:14px;}
 .auth-caja{
   max-width:430px; margin:56px auto 72px; background:var(--blanco);
   border:1px solid var(--linea); border-radius:16px; padding:34px 32px 30px;
-  box-shadow:0 14px 40px rgba(47,78,93,.09);
+  box-shadow:0 14px 40px rgba(22,22,22,.09);
 }
 @media(max-width:520px){ .auth-caja{padding:26px 20px; margin:28px auto 48px;} }
 .auth-caja h1{font-size:26px; margin-bottom:6px;}
@@ -316,7 +328,7 @@ input,select{font-family:inherit; font-size:14px;}
   min-width:0; border:1px solid var(--linea); border-radius:12px; padding:16px;
   transition:border-color .15s, background .15s;
 }
-.tipo-fecha-tarjeta:has(input:checked){border-color:var(--terracota); background:rgba(199,110,67,.04);}
+.tipo-fecha-tarjeta:has(input:checked){border-color:var(--terracota); background:rgba(181,85,31,.04);}
 .tipo-fecha-header{
   display:flex; align-items:center; gap:8px; cursor:pointer; margin:0 0 14px;
   font-family:'Inter',sans-serif; font-size:13.5px; font-weight:600;
@@ -343,7 +355,7 @@ input,select{font-family:inherit; font-size:14px;}
 .campo label.precio-op .precio-icono{opacity:.55;}
 .campo label.precio-op .precio-titulo{font-size:13.5px; font-weight:600;}
 .campo label.precio-op:has(input:checked){
-  border-color:var(--terracota); background:rgba(199,110,67,.08);
+  border-color:var(--terracota); background:rgba(181,85,31,.08);
 }
 .campo label.precio-op:has(input:checked) .precio-icono{opacity:1; color:var(--terracota);}
 .campo label.precio-op:has(input:focus-visible){outline:2px solid var(--terracota-texto); outline-offset:2px;}
@@ -361,7 +373,7 @@ input,select{font-family:inherit; font-size:14px;}
   min-width:0; border:1px solid var(--linea); border-radius:12px; padding:14px;
   transition:border-color .15s, background .15s;
 }
-.accion-tarjeta:has(input:checked){border-color:var(--terracota); background:rgba(199,110,67,.04);}
+.accion-tarjeta:has(input:checked){border-color:var(--terracota); background:rgba(181,85,31,.04);}
 .accion-header{
   display:grid; grid-template-columns:auto 1fr; align-items:start; gap:4px 9px;
   cursor:pointer; margin:0; font-family:'Inter',sans-serif; letter-spacing:0;
@@ -682,7 +694,7 @@ input,select{font-family:inherit; font-size:14px;}
 .ficha-fecha{
   position:absolute; left:20px; bottom:20px; background:var(--blanco);
   border-radius:12px; padding:9px 14px; text-align:center; line-height:1.1;
-  box-shadow:0 6px 18px rgba(47,78,93,.18);
+  box-shadow:0 6px 18px rgba(22,22,22,.18);
 }
 .ficha-fecha .d{display:block; font-family:'Fraunces',serif; font-size:24px;}
 .ficha-fecha .m{
@@ -821,7 +833,7 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
   padding:20px 28px;
   background:var(--verde); color:var(--blanco);
   border-top:1px solid rgba(255,255,255,.14);
-  box-shadow:0 -8px 28px rgba(32,51,45,.18);
+  box-shadow:0 -8px 28px rgba(34,31,27,.18);
 }
 .cookies-banner[hidden]{display:none;}
 .cookies-banner-texto{flex:1; min-width:280px; max-width:760px;}
@@ -849,7 +861,7 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
 
 .cookies-fondo{
   position:fixed; inset:0; z-index:70;
-  background:rgba(21,42,34,.55);
+  background:rgba(11,11,10,.55);
   display:flex; align-items:center; justify-content:center; padding:20px;
   overflow-y:auto;
 }
@@ -857,7 +869,7 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
 .cookies-panel{
   background:var(--blanco); border-radius:12px; width:100%; max-width:560px;
   max-height:calc(100vh - 40px); overflow-y:auto;
-  padding:26px 28px; box-shadow:0 20px 50px rgba(21,42,34,.3);
+  padding:26px 28px; box-shadow:0 20px 50px rgba(11,11,10,.3);
 }
 .cookies-panel-cab{display:flex; align-items:center; justify-content:space-between; gap:16px;}
 .cookies-panel-cab h2{font-size:21px;}
@@ -893,7 +905,7 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
 .cookies-pista::after{
   content:''; position:absolute; top:3px; left:3px; width:18px; height:18px;
   border-radius:50%; background:var(--blanco); transition:transform .15s;
-  box-shadow:0 1px 3px rgba(32,51,45,.3);
+  box-shadow:0 1px 3px rgba(34,31,27,.3);
 }
 .cookies-switch input:checked + .cookies-pista{background:var(--verde-claro);}
 .cookies-switch input:checked + .cookies-pista::after{transform:translateX(18px);}
@@ -954,7 +966,7 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
 .tarjeta-contacto{
   max-width:520px; margin:44px auto 72px; background:var(--blanco);
   border:1px solid var(--linea); border-radius:16px; padding:30px 30px 26px;
-  box-shadow:0 14px 40px rgba(47,78,93,.09);
+  box-shadow:0 14px 40px rgba(22,22,22,.09);
 }
 @media(max-width:560px){ .tarjeta-contacto{padding:24px 20px; margin:24px auto 48px;} }
 .tarjeta-contacto h1{font-size:25px; line-height:1.2;}

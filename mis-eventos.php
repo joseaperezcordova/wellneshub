@@ -62,7 +62,7 @@ require __DIR__ . '/includes/layout.php';
               <td><?= e($pu['d'] . ' ' . $pu['m'] . ', ' . $pu['hora']) ?></td>
               <td>
                 <?php if ($me['situacion'] === 'publicado'): ?>
-                  <span class="badge on" style="color:var(--jungle); background:rgba(47,78,93,0.12);">Publicada</span>
+                  <span class="badge on" style="color:var(--jungle); background:rgba(22,22,22,0.08);">Publicada</span>
                 <?php elseif ($me['situacion'] === 'borrador'): ?>
                   <span class="badge-pending">Borrador · sin publicar</span>
                 <?php else: ?>
