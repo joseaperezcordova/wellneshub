@@ -298,7 +298,7 @@ el pie —que salen en todas las páginas— están traducidos.
 | Fase | Alcance | Depende de |
 |---|---|---|
 | 2 | Portada y buscador — **hecho, 2026-09-01** | Textos EN |
-| 3 | Formulario de actividad — **hecho, 2026-09-01** (`evento-editar.php` traducido pero sin ruta `/en` propia, ver nota) | Textos EN |
+| 3 | Formulario de actividad — **hecho, 2026-09-01** (`evento-editar.php` con ruta `/edit-activity/{id}` propia desde el mismo día, ver nota) | Textos EN |
 | 4 | Ficha, contacto/reportar y login/registro — **hecho, 2026-09-01**. Correos aparte, ver nota | Textos EN |
 | 5 | Contenido dinámico: título y descripción de cada actividad — **hecho, 2026-09-01** | Migración de base |
 
@@ -330,11 +330,40 @@ suelto: "Gratis"/"Ver actividad →" en `assets/js/tarjetas.js` (compartido
 por portada y buscador, JS global y no de una página) — resuelto con un
 objeto `TARJETA_T` impreso en `includes/layout.php` para todo el sitio.
 
-**Sigue sin ruta limpia en `/en`**: `evento-editar.php`, `contactar.php`,
-`reportar.php`, `login.php`, `codigo.php` y `completar-registro.php` —por
-`?id=N` o sin dirección fija propia—, así que siguen cayendo al español
-aunque su texto ya está traducido. `evento.php`, `evento-nuevo.php` y
-`contacto.php` sí tienen ruta propia y se ven en inglés.
+**Las seis páginas sin ruta limpia en `/en` ya la tienen, 2026-09-01.**
+`evento-editar.php`, `contactar.php` y `reportar.php` ganaron rutas por id
+—`/editar-actividad/{id}` y `/edit-activity/{id}`, `/contactar/{id}` y
+`/contact-organizer/{id}`, `/reportar/{id}` y `/report/{id}` (`router.php`,
+un solo bloque combinado con el mismo patrón que `/actividad/{slug}`; sin
+slug porque no son direcciones para compartir ni indexar). `login.php`,
+`codigo.php` y `completar-registro.php` entraron a `rutasSitio()` como
+páginas fijas —`/iniciar-sesion`/`/sign-in`, `/codigo-de-acceso`/
+`/access-code`, `/completar-registro`/`/complete-registration`—, y por eso
+**no** se sumaron a `sitemap.php`: ese archivo solo publica lo que trae
+entrada en su propio `$prioridades`, así que las tres se quedan fuera del
+sitemap sin necesidad de marcarlas aparte.
+
+`urlContactar()`, `urlReportar()` y `urlEditarEvento()` (`includes/config.php`)
+generan estas direcciones según el idioma, igual que `urlEvento()`; los
+enlaces que antes escribían `evento-editar.php?id=`, `contactar.php?id=` y
+`reportar.php?id=` a mano —en `evento.php`, `admin.php`, `moderacion.php` y
+`mis-eventos.php`— pasan todos por ahí ahora. Las tres páginas de acción
+declaran su propia `$GLOBALS['urlEquivalente']` para que el selector de
+idioma se quede en el mismo formulario.
+
+Todos los `redirigir('/login.php')`, `redirigir('/codigo.php')` y
+`redirigir('/completar-registro.php')` sueltos por el flujo de entrada
+(`login.php`, `codigo.php`, `completar-registro.php`, `includes/auth.php`)
+pasaron a `redirigir(url('login'))` etc., para que alguien que entra desde
+`/sign-in` no acabe a mitad de camino en español. El único hueco que quedaba
+era **Google**: `google-callback.php` tiene dirección fija por Google
+Console y no puede pasar por el enrutador, así que no tenía de dónde sacar
+el idioma de quien volvía. Se resolvió pasándolo como `?idioma=` al salir
+hacia Google (`login.php` → `google-redirect.php`) y guardándolo en sesión
+de un solo uso para que `google-callback.php` lo recupere a la vuelta —y con
+`$GLOBALS['idioma']` fijado ahí mismo, hasta los mensajes de error que arma
+`resolverGoogle()` (`includes/auth.php`) salen en el idioma correcto en vez
+de en español fijo.
 
 **Los correos quedaron fuera de la fase 4, a propósito.** Sus plantillas
 (`includes/correo.php`, `includes/contacto.php`) siguen en español fijo. No

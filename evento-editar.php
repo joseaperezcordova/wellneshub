@@ -35,6 +35,13 @@ if (!$ev) {
     exit;
 }
 
+// Para que el selector de idioma de la cabecera se quede en este mismo
+// formulario en vez de mandar al inicio (urlEquivalente(), includes/idioma.php).
+$GLOBALS['urlEquivalente'] = [
+    'es' => urlEditarEvento($ev, 'es'),
+    'en' => urlEditarEvento($ev, 'en'),
+];
+
 $puede = puedeEditarEvento($ev, $u);
 
 $e       = $ev;

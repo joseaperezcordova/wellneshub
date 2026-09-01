@@ -117,7 +117,7 @@ require __DIR__ . '/includes/layout.php';
               </td>
               <td>
                 <a class="actionbtn" href="<?= e(urlEvento($ea)) ?>?volver=admin">Ver</a>
-                <a class="actionbtn" href="<?= URL_BASE ?>/evento-editar.php?id=<?= (int) $ea['id'] ?>&volver=admin">Editar</a>
+                <a class="actionbtn" href="<?= e(urlEditarEvento($ea) . '?volver=admin') ?>">Editar</a>
               </td>
             </tr>
           <?php endforeach; ?>

@@ -177,7 +177,7 @@ require __DIR__ . '/includes/layout.php';
     <div class="hero-actions">
       <?php /* Sin sesión no tiene sentido llevarlo al panel: primero hay que
                saber quién es. Va al login, que ya trae la vía de entrada. */ ?>
-      <a class="ghostlink" href="<?= URL_BASE ?><?= $u ? '/mis-eventos.php' : '/login.php' ?>">
+      <a class="ghostlink" href="<?= $u ? e(URL_BASE . '/mis-eventos.php') : e(url('login')) ?>">
         <?= et('inicio.publica.enlace') ?>
       </a>
     </div>

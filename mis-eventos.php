@@ -74,7 +74,7 @@ require __DIR__ . '/includes/layout.php';
                    href="<?= e(urlEvento($me)) ?>">Ver</a>
                 <?php if (puedeEditarEvento($me, $u)): ?>
                   <a class="actionbtn" style="color:var(--ink); border-color:var(--line);"
-                     href="<?= URL_BASE ?>/evento-editar.php?id=<?= (int) $me['id'] ?>">Editar</a>
+                     href="<?= e(urlEditarEvento($me)) ?>">Editar</a>
                 <?php endif; ?>
               </td>
             </tr>

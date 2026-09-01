@@ -264,11 +264,39 @@ function urlEvento(array $ev, ?string $idioma = null): string
 }
 
 /**
+ * Contactar al organizador, reportar una actividad o editarla: tres páginas
+ * que actúan sobre una actividad por su id numérico (REQ-00002 fase con
+ * rutas /en). A diferencia de urlEvento(), aquí no hace falta el slug —no son
+ * direcciones para compartir ni indexar—, así que el número basta.
+ */
+function urlContactar(array $ev, ?string $idioma = null): string
+{
+    $idioma = $idioma ?? idiomaActual();
+
+    return URL_BASE . '/' . ($idioma === 'en' ? 'contact-organizer' : 'contactar') . '/' . (int) $ev['id'];
+}
+
+function urlReportar(array $ev, ?string $idioma = null): string
+{
+    $idioma = $idioma ?? idiomaActual();
+
+    return URL_BASE . '/' . ($idioma === 'en' ? 'report' : 'reportar') . '/' . (int) $ev['id'];
+}
+
+function urlEditarEvento(array $ev, ?string $idioma = null): string
+{
+    $idioma = $idioma ?? idiomaActual();
+
+    return URL_BASE . '/' . ($idioma === 'en' ? 'edit-activity' : 'editar-actividad') . '/' . (int) $ev['id'];
+}
+
+/**
  * Redirige y corta la ejecución.
  *
- * Acepta una ruta relativa a la raíz del sitio —'/login.php'— o una dirección
- * completa, que es lo que devuelve urlEvento(). Sin esto, cada sitio que manda
- * a una ficha tendría que volver a montar la cabecera Location a mano.
+ * Acepta una ruta relativa a la raíz del sitio —'/logout.php'— o una
+ * dirección completa, que es lo que devuelven url() y urlEvento(). Sin esto,
+ * cada sitio que manda a otra página tendría que volver a montar la
+ * cabecera Location a mano.
  */
 function redirigir(string $ruta): void
 {

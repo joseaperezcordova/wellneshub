@@ -28,6 +28,13 @@ if (!$ev || $ev['situacion'] !== 'publicado') {
     exit;
 }
 
+// Para que el selector de idioma de la cabecera se quede en este mismo
+// formulario en vez de mandar al inicio (urlEquivalente(), includes/idioma.php).
+$GLOBALS['urlEquivalente'] = [
+    'es' => urlReportar($ev, 'es'),
+    'en' => urlReportar($ev, 'en'),
+];
+
 $error   = '';
 $enviado = false;
 $motivo  = (string) ($_POST['motivo'] ?? '');

@@ -340,7 +340,7 @@ $scVerifica = trim((string) ($CONFIG['analytics']['search_console_verificacion']
       <?php else: ?>
         <!-- Sin sesión: enlace, no botón con JavaScript, para que funcione el
              clic central y el «abrir en pestaña nueva». -->
-        <a class="btn-cuenta" href="<?= URL_BASE ?>/login.php" aria-label="<?= et('nav.entrar_aria') ?>">
+        <a class="btn-cuenta" href="<?= e(url('login')) ?>" aria-label="<?= et('nav.entrar_aria') ?>">
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"
                fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
             <circle cx="12" cy="8.2" r="3.8"/>

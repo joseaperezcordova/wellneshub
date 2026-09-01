@@ -49,6 +49,13 @@ if ($ev['accion_principal'] !== 'informacion') {
     redirigir(urlEvento($ev));
 }
 
+// Para que el selector de idioma de la cabecera se quede en este mismo
+// formulario en vez de mandar al inicio (urlEquivalente(), includes/idioma.php).
+$GLOBALS['urlEquivalente'] = [
+    'es' => urlContactar($ev, 'es'),
+    'en' => urlContactar($ev, 'en'),
+];
+
 /** Tope del mensaje. El contador de debajo del campo lee de aquí. */
 const CONTACTO_MENSAJE_MAX = 500;
 

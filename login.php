@@ -3,7 +3,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/google.php';
 
-if (haySesion()) redirigir('/');
+if (haySesion()) redirigir(url('inicio'));
 
 $error = '';
 
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($ok) {
             $_SESSION['codigo_email'] = $normalizado;
-            redirigir('/codigo.php');
+            redirigir(url('codigo'));
         }
 
         // Si ya se había mandado un código a este mismo correo, el fallo es
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // escribirlo. Se le manda al paso siguiente con el aviso.
         if (($_SESSION['codigo_email'] ?? '') === $normalizado) {
             $_SESSION['codigo_error'] = $mensaje;
-            redirigir('/codigo.php');
+            redirigir(url('codigo'));
         }
 
         $error = $mensaje;
@@ -85,7 +85,7 @@ require __DIR__ . '/includes/layout.php';
   <?php endif; ?>
 
   <?php if (googleConfigurado()): ?>
-    <a class="btn-google" href="<?= URL_BASE ?>/google-redirect.php">
+    <a class="btn-google" href="<?= URL_BASE ?>/google-redirect.php?idioma=<?= e(idiomaActual()) ?>">
       <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
         <path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.8-2 5.1-4.4 6.7v5.5h7.1c4.2-3.8 6.6-9.5 6.6-16.2z"/>
         <path fill="#34A853" d="M24 46c6 0 11-2 14.5-5.3l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.6-3.9-12.3-9.1H4.3v5.7C7.8 41.1 15.3 46 24 46z"/>

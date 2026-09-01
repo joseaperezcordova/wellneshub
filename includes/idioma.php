@@ -126,6 +126,21 @@ function rutasSitio(): array
             'es' => 'blog',
             'en' => 'blog',   // se escribe igual en los dos idiomas
         ],
+        'login' => [
+            'archivo' => 'login.php',
+            'es' => 'iniciar-sesion',
+            'en' => 'sign-in',
+        ],
+        'codigo' => [
+            'archivo' => 'codigo.php',
+            'es' => 'codigo-de-acceso',
+            'en' => 'access-code',
+        ],
+        'completar-registro' => [
+            'archivo' => 'completar-registro.php',
+            'es' => 'completar-registro',
+            'en' => 'complete-registration',
+        ],
     ];
 }
 

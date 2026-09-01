@@ -10,10 +10,10 @@
 declare(strict_types=1);
 require_once __DIR__ . '/includes/config.php';
 
-if (haySesion()) redirigir('/');
+if (haySesion()) redirigir(url('inicio'));
 
 $email = (string) ($_SESSION['codigo_email'] ?? '');
-if ($email === '') redirigir('/login.php');
+if ($email === '') redirigir(url('login'));
 
 $error = '';
 $aviso = '';
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (isset($_POST['reenviar'])) {
         [$ok, $mensaje] = solicitarCodigo($email);
         $_SESSION[$ok ? 'codigo_aviso' : 'codigo_error'] = $mensaje;
-        redirigir('/codigo.php');
+        redirigir(url('codigo'));
 
     } else {
         [$estado, $resultado] = verificarCodigo($email, (string) ($_POST['codigo'] ?? ''));
@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $_SESSION['alta_pendiente'] = ['via' => 'correo', 'email' => $email, 'en' => time()];
             unset($_SESSION['codigo_email']);
-            redirigir('/completar-registro.php');
+            redirigir(url('completar-registro'));
         }
 
         $error = $resultado;
@@ -97,7 +97,7 @@ require __DIR__ . '/includes/layout.php';
 
   <div class="correo-fijo">
     <span><?= e($email) ?></span>
-    <a href="<?= URL_BASE ?>/login.php"><?= et('codigo.editar') ?></a>
+    <a href="<?= e(url('login')) ?>"><?= et('codigo.editar') ?></a>
   </div>
 
   <form method="post" novalidate>

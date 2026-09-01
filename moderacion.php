@@ -171,7 +171,7 @@ require __DIR__ . '/includes/layout.php';
           </form>
         <?php endif; ?>
 
-        <a class="btn-barra" href="<?= URL_BASE ?>/evento-editar.php?id=<?= (int) $p['id'] ?>">Editar</a>
+        <a class="btn-barra" href="<?= e(urlEditarEvento($p)) ?>">Editar</a>
 
         <form method="post" onsubmit="return confirm('¿Eliminar «<?= e(addslashes($p['titulo'])) ?>»? No se puede deshacer.');">
           <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">

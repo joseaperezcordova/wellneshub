@@ -105,7 +105,7 @@ function exigirSesion(): array
         // pulsa «Publicar actividad» sin sesión aterriza en la portada después del
         // login y tiene que volver a buscar el botón.
         guardarDestinoLogin((string) ($_SERVER['REQUEST_URI'] ?? '/'));
-        redirigir('/login.php');
+        redirigir(url('login'));
     }
 
     return $u;

@@ -32,7 +32,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/google.php';
 
-if (haySesion()) redirigir('/');
+if (haySesion()) redirigir(url('inicio'));
 
 /** Cuánto vale una alta a medias, en minutos. */
 const ALTA_PENDIENTE_MIN = 30;
@@ -42,7 +42,7 @@ $pendiente = $_SESSION['alta_pendiente'] ?? null;
 if (!is_array($pendiente)
     || (time() - (int) ($pendiente['en'] ?? 0)) > ALTA_PENDIENTE_MIN * 60) {
     unset($_SESSION['alta_pendiente']);
-    redirigir('/login.php');
+    redirigir(url('login'));
 }
 
 $viaGoogle = ($pendiente['via'] ?? '') === 'google';

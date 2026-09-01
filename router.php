@@ -79,6 +79,34 @@ foreach (['actividad/' => 'es', 'activity/' => 'en'] as $prefijoEvento => $idiom
 }
 
 /*
+ * Contactar al organizador, reportar una actividad y editarla: tres páginas
+ * más que actúan sobre una actividad por su id, con el mismo motivo que el
+ * bloque de arriba —tantas direcciones como actividades haya—. Aquí no hace
+ * falta slug: no son direcciones para compartir ni indexar, así que el
+ * número solo basta. urlContactar()/urlReportar()/urlEditarEvento(), en
+ * includes/config.php, generan estas mismas direcciones.
+ */
+foreach ([
+    'contactar/'         => ['es', 'contactar.php'],
+    'contact-organizer/' => ['en', 'contactar.php'],
+    'reportar/'           => ['es', 'reportar.php'],
+    'report/'             => ['en', 'reportar.php'],
+    'editar-actividad/'   => ['es', 'evento-editar.php'],
+    'edit-activity/'      => ['en', 'evento-editar.php'],
+] as $prefijoAccion => [$idiomaAccion, $archivoAccion]) {
+    if (strpos($ruta, $prefijoAccion) !== 0) continue;
+
+    $idParte = substr($ruta, strlen($prefijoAccion));
+
+    if (preg_match('/^\d+$/', $idParte)) {
+        $_GET['id'] = $idParte;
+        $GLOBALS['idioma'] = $idiomaAccion;
+        require __DIR__ . '/' . $archivoAccion;
+        exit;
+    }
+}
+
+/*
  * Buscar la dirección en el mapa. Se recorre entero porque una misma cadena
  * puede ser de un idioma o de otro —"blog" vale para los dos— y hay que saber
  * en cuál se encontró: de ahí sale el idioma de toda la petición.

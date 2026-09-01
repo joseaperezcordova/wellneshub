@@ -268,7 +268,7 @@ require __DIR__ . '/includes/layout.php';
         <?php endif; ?>
 
         <?php if (puedeEditarEvento($ev, $u)): ?>
-          <a class="btn-barra" href="<?= URL_BASE ?>/evento-editar.php?id=<?= (int) $ev['id'] ?>"><?= et('ficha.btn.editar') ?></a>
+          <a class="btn-barra" href="<?= e(urlEditarEvento($ev)) ?>"><?= et('ficha.btn.editar') ?></a>
         <?php endif; ?>
 
         <?php if (esAdmin($u) && $ev['situacion'] === 'publicado'): ?>
@@ -403,7 +403,7 @@ require __DIR__ . '/includes/layout.php';
          onclick="whTrack('clic_reservar', <?= e(json_encode(['id' => (int) $ev['id']])) ?>)"><?= et('ficha.btn.reservar') ?></a>
 
     <?php elseif ($ev['accion_principal'] === 'informacion'): ?>
-      <a class="btn-principal btn-boletos" href="<?= URL_BASE ?>/contactar.php?id=<?= (int) $ev['id'] ?>"
+      <a class="btn-principal btn-boletos" href="<?= e(urlContactar($ev)) ?>"
          onclick="whTrack('clic_contactar', <?= e(json_encode(['id' => (int) $ev['id']])) ?>)"><?= et('ficha.btn.contactar') ?></a>
     <?php endif; ?>
 
@@ -438,7 +438,7 @@ require __DIR__ . '/includes/layout.php';
            Pedir cuenta aquí no filtra bots —esos sí se registran—, filtra
            personas. Discreto al pie, que es donde se busca cuando hace falta. -->
       <div class="ficha-reportar">
-        <a href="<?= URL_BASE ?>/reportar.php?id=<?= (int) $ev['id'] ?>"><?= et('ficha.reportar') ?></a>
+        <a href="<?= e(urlReportar($ev)) ?>"><?= et('ficha.reportar') ?></a>
       </div>
     <?php endif; ?>
   </div>
