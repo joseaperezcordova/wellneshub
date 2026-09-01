@@ -367,6 +367,29 @@ function buscarEvento(int $id): ?array
 }
 
 /**
+ * El título de la actividad en el idioma actual, con reserva al español.
+ *
+ * REQ-00002 fase 5: la versión en inglés la escribe el organizador —campo
+ * `titulo_en`, opcional—, no se traduce sola. Si no la rellenó, quien vea la
+ * ficha en inglés sigue leyendo el título en español: es mejor eso que un
+ * campo vacío o un título a medias.
+ */
+function tituloEvento(array $ev, ?string $idioma = null): string
+{
+    $idioma = $idioma ?? idiomaActual();
+
+    return ($idioma === 'en' && !empty($ev['titulo_en'])) ? $ev['titulo_en'] : $ev['titulo'];
+}
+
+/** Igual que tituloEvento(), para `descripcion`/`descripcion_en`. */
+function descripcionEvento(array $ev, ?string $idioma = null): string
+{
+    $idioma = $idioma ?? idiomaActual();
+
+    return ($idioma === 'en' && !empty($ev['descripcion_en'])) ? $ev['descripcion_en'] : $ev['descripcion'];
+}
+
+/**
  * La agenda pública: publicados y que no hayan terminado todavía.
  *
  * El corte usa COALESCE(fecha_fin, fecha_inicio) para que un retiro de cinco
@@ -639,8 +662,10 @@ function etiquetasCampos(): array
 {
     return [
         'titulo'          => t('evento.form.titulo_label'),
+        'titulo_en'       => t('evento.form.titulo_en_label'),
         'categorias'      => t('evento.form.categorias_label'),
         'descripcion'     => t('evento.form.descripcion_label'),
+        'descripcion_en'  => t('evento.form.descripcion_en_label'),
         'ciudad'          => t('evento.form.ciudad_label'),
         'entidad'         => t('evento.form.estado_label'),
         'lugar'           => t('evento.form.lugar_label'),
@@ -700,6 +725,23 @@ function validarEvento(array $in): array
     } elseif (mb_strlen($e['descripcion']) > 2000) {
         $errores['descripcion'] = t('evento.valida.descripcion_larga');
     }
+
+    /*
+     * Versión en inglés, opcional (REQ-00002 fase 5): la escribe el
+     * organizador, no se traduce sola. Sin mínimo —a diferencia de arriba—,
+     * porque dejarla vacía es una opción válida y no un error.
+     */
+    $e['titulo_en'] = trim((string) ($in['titulo_en'] ?? ''));
+    if (mb_strlen($e['titulo_en']) > 160) {
+        $errores['titulo_en'] = t('evento.valida.titulo_en_largo');
+    }
+    if ($e['titulo_en'] === '') $e['titulo_en'] = null;
+
+    $e['descripcion_en'] = trim((string) ($in['descripcion_en'] ?? ''));
+    if (mb_strlen($e['descripcion_en']) > 2000) {
+        $errores['descripcion_en'] = t('evento.valida.descripcion_en_larga');
+    }
+    if ($e['descripcion_en'] === '') $e['descripcion_en'] = null;
 
     /*
      * Una o varias categorías (checkboxes "categorias[]"), no ya un único
@@ -1051,15 +1093,15 @@ function crearEvento(array $e, int $usuarioId): int
 
     $pdo->prepare(
         'INSERT INTO eventos
-           (usuario_id, titulo, slug, descripcion, categoria, tipo_actividad,
+           (usuario_id, titulo, titulo_en, slug, descripcion, descripcion_en, categoria, tipo_actividad,
             frecuencia, hora_recurrente, hora_fin_recurrente,
             ciudad, entidad, lugar, direccion, mapa_url, latitud, longitud, fecha_inicio, fecha_fin,
             gratuito, precio, forma_pago, cupo_maximo,
             url_boletos, url_reserva, sitio_web, accion_principal,
             imagen_url, color, situacion)
-         VALUES (?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
+         VALUES (?, ?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
     )->execute([
-        $usuarioId, $e['titulo'], $e['descripcion'], $e['categoria'],
+        $usuarioId, $e['titulo'], $e['titulo_en'], $e['descripcion'], $e['descripcion_en'], $e['categoria'],
         $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
         $e['ciudad'], $e['entidad'], $e['lugar'], $e['direccion'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
@@ -1112,7 +1154,11 @@ function avisarAdminsNuevaActividad(array $ev): void
             . 'Organiza:   ' . ($ev['organizador'] ?? '') . "\n"
             . 'Ciudad:     ' . $ev['ciudad'] . ', ' . $ev['entidad'] . "\n\n"
             . "Todavía es un borrador: nadie más la ve hasta que su organizador la publique.\n\n"
-            . urlEvento($ev) . "\n";
+            // Español fijo: el resto del correo también lo está, y el enlace
+            // no debería cambiar de prefijo solo porque quien publicó lo hizo
+            // desde el formulario en inglés (evento-nuevo.php sí tiene ruta
+            // propia en /en; este correo no tiene mecanismo de idioma propio).
+            . urlEvento($ev, 'es') . "\n";
 
     foreach ($admins as $a) {
         enviarCorreo($a['email'], 'Nueva actividad creada: ' . $ev['titulo'], $cuerpo);
@@ -1123,7 +1169,7 @@ function actualizarEvento(array $e, int $id): void
 {
     db()->prepare(
         'UPDATE eventos SET
-            titulo = ?, slug = ?, descripcion = ?, categoria = ?,
+            titulo = ?, titulo_en = ?, slug = ?, descripcion = ?, descripcion_en = ?, categoria = ?,
             tipo_actividad = ?, frecuencia = ?, hora_recurrente = ?, hora_fin_recurrente = ?,
             ciudad = ?,
             entidad = ?, lugar = ?, direccion = ?, mapa_url = ?, latitud = ?, longitud = ?,
@@ -1133,7 +1179,7 @@ function actualizarEvento(array $e, int $id): void
             imagen_url = ?, color = ?
           WHERE id = ?'
     )->execute([
-        $e['titulo'], generarSlug($e['titulo'], $id), $e['descripcion'],
+        $e['titulo'], $e['titulo_en'], generarSlug($e['titulo'], $id), $e['descripcion'], $e['descripcion_en'],
         $e['categoria'], $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
         $e['ciudad'], $e['entidad'], $e['lugar'], $e['direccion'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
@@ -1433,7 +1479,7 @@ function eventoParaTarjeta(array $ev): array
 
     return [
         'id'    => (int) $ev['id'],
-        't'     => $ev['titulo'],
+        't'     => tituloEvento($ev),
         'cat'   => $ev['categoria'],
         'city'  => $ev['ciudad'] . ', ' . $ev['entidad'],
         'org'   => $ev['organizador'] ?? '',
@@ -1513,8 +1559,8 @@ function datosEstructuradosEvento(array $ev): array
     $datos = [
         '@context'            => 'https://schema.org',
         '@type'               => 'Event',
-        'name'                => $ev['titulo'],
-        'description'         => $ev['descripcion'],
+        'name'                => tituloEvento($ev),
+        'description'         => descripcionEvento($ev),
         'startDate'           => fechaIso($ev['fecha_inicio']),
         'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendedMode',
         'eventStatus'         => 'https://schema.org/EventScheduled',

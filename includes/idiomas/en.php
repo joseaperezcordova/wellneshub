@@ -185,6 +185,13 @@ return [
     'evento.form.descripcion_placeholder' => 'Describe your activity. Include what attendees will learn, who it is for, what is included, and any other important details.',
     'evento.form.descripcion_ayuda'  => 'Shown exactly as written on the activity page. Line breaks are kept.',
 
+    'evento.form.titulo_en_label'    => 'Title in English',
+    'evento.form.titulo_en_placeholder' => 'Cenote Sunrise — Yoga and Sound',
+    'evento.form.titulo_en_ayuda'    => 'Only shown to people viewing the site in English. If left blank, they\'ll see the Spanish title.',
+    'evento.form.descripcion_en_label' => 'Description in English',
+    'evento.form.descripcion_en_placeholder' => 'Describe your activity in English...',
+    'evento.form.descripcion_en_ayuda' => 'Only shown to people viewing the site in English. If left blank, they\'ll see the Spanish description.',
+
     'evento.form.seccion2'           => '2. Date and time',
     'evento.form.dia_unico'          => 'One-day activity',
     'evento.form.termina_otro_dia'   => 'Ends on a different day',
@@ -323,6 +330,8 @@ return [
     'evento.valida.url_invalida'      => 'That address doesn\'t look valid. Start with https://',
     'evento.valida.boletos_falta'     => 'Add the link where tickets are purchased.',
     'evento.valida.reserva_falta'     => 'Add the link where the spot is booked.',
+    'evento.valida.titulo_en_largo'      => 'The English title can\'t be longer than 160 characters.',
+    'evento.valida.descripcion_en_larga' => 'The English description can\'t be longer than 2,000 characters.',
 
     // ---- includes/aviso-errores.php ----
     'evento.aviso.falta_uno'     => 'You still need to review',
@@ -403,6 +412,10 @@ return [
     'ficha.precio.gratis'         => 'Free',
     'ficha.precio.por_confirmar'  => 'To be confirmed',
     'ficha.precio.por_sesion'     => ' / session',
+
+    // ---- Shared activity cards (assets/js/tarjetas.js) ----
+    'tarjeta.desde'         => 'From ',
+    'tarjeta.ver_actividad' => 'See activity →',
 
     'ficha.btn.comprar_boletos' => 'Buy tickets',
     'ficha.btn.reservar'        => 'Book my spot',

@@ -173,6 +173,28 @@ if ($orgAbierta) {
   <?= $err('descripcion') ?>
 </div>
 
+<div class="campo<?= $mal('titulo_en') ?>">
+  <div class="label-fila">
+    <label for="titulo_en"><?= et('evento.form.titulo_en_label') ?> <span class="opcional"><?= et('campo.opcional') ?></span></label>
+    <span class="contador" id="contadorTituloEn"></span>
+  </div>
+  <input id="titulo_en" name="titulo_en" type="text" maxlength="160"
+         value="<?= e($v('titulo_en')) ?>" placeholder="<?= et('evento.form.titulo_en_placeholder') ?>">
+  <div class="pista"><?= et('evento.form.titulo_en_ayuda') ?></div>
+  <?= $err('titulo_en') ?>
+</div>
+
+<div class="campo<?= $mal('descripcion_en') ?>">
+  <div class="label-fila">
+    <label for="descripcion_en"><?= et('evento.form.descripcion_en_label') ?> <span class="opcional"><?= et('campo.opcional') ?></span></label>
+    <span class="contador" id="contadorDescripcionEn"></span>
+  </div>
+  <textarea id="descripcion_en" name="descripcion_en" rows="7" maxlength="2000"
+            placeholder="<?= et('evento.form.descripcion_en_placeholder') ?>"><?= e($v('descripcion_en')) ?></textarea>
+  <div class="pista"><?= et('evento.form.descripcion_en_ayuda') ?></div>
+  <?= $err('descripcion_en') ?>
+</div>
+
 <div class="form-seccion-titulo">
   <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -790,6 +812,28 @@ var EVENTO_T = <?= json_encode([
   if (!campo || !contador) return;
 
   function sync(){ contador.textContent = campo.value.length + ' / 160'; }
+  campo.addEventListener('input', sync);
+  sync();
+})();
+
+/* Mismos dos contadores, para la versión en inglés. Sin mínimo: los dos
+   campos son opcionales, así que un campo corto —o vacío— no es un error. */
+(function(){
+  var campo    = document.getElementById('titulo_en');
+  var contador = document.getElementById('contadorTituloEn');
+  if (!campo || !contador) return;
+
+  function sync(){ contador.textContent = campo.value.length + ' / 160'; }
+  campo.addEventListener('input', sync);
+  sync();
+})();
+
+(function(){
+  var campo    = document.getElementById('descripcion_en');
+  var contador = document.getElementById('contadorDescripcionEn');
+  if (!campo || !contador) return;
+
+  function sync(){ contador.textContent = campo.value.length + ' / 2000'; }
   campo.addEventListener('input', sync);
   sync();
 })();

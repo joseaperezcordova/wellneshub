@@ -203,6 +203,16 @@ return [
     'evento.form.descripcion_placeholder' => 'Describe tu actividad. Incluye qué aprenderán los asistentes, a quién está dirigida, qué incluye y cualquier información importante.',
     'evento.form.descripcion_ayuda'  => 'Se muestra tal cual en la ficha. Los saltos de línea se respetan.',
 
+    // Versión en inglés, opcional (REQ-00002 fase 5). No se traduce sola: si
+    // se deja en blanco, quien vea la ficha en inglés lee el título y la
+    // descripción en español.
+    'evento.form.titulo_en_label'    => 'Título en inglés',
+    'evento.form.titulo_en_placeholder' => 'Cenote Sunrise — Yoga and Sound',
+    'evento.form.titulo_en_ayuda'    => 'Solo se muestra a quien vea el sitio en inglés. Si lo dejas vacío, verá el título en español.',
+    'evento.form.descripcion_en_label' => 'Descripción en inglés',
+    'evento.form.descripcion_en_placeholder' => 'Describe your activity in English...',
+    'evento.form.descripcion_en_ayuda' => 'Solo se muestra a quien vea el sitio en inglés. Si la dejas vacía, verá la descripción en español.',
+
     // Sección 2
     'evento.form.seccion2'           => '2. Fecha y horario',
     'evento.form.dia_unico'          => 'Actividad de un día',
@@ -350,6 +360,8 @@ return [
     'evento.valida.url_invalida'      => 'Esa dirección no parece válida. Empieza por https://',
     'evento.valida.boletos_falta'     => 'Agrega el enlace donde se compran los boletos.',
     'evento.valida.reserva_falta'     => 'Agrega el enlace donde se reserva el lugar.',
+    'evento.valida.titulo_en_largo'      => 'El título en inglés no puede pasar de 160 caracteres.',
+    'evento.valida.descripcion_en_larga' => 'La descripción en inglés no puede pasar de 2,000 caracteres.',
 
     // ---- includes/aviso-errores.php ----
     'evento.aviso.falta_uno'     => 'Falta revisar',
@@ -430,6 +442,13 @@ return [
     'ficha.precio.gratis'         => 'Gratis',
     'ficha.precio.por_confirmar'  => 'Por confirmar',
     'ficha.precio.por_sesion'     => ' / sesión',
+
+    // ---- Tarjetas de actividad, compartidas (assets/js/tarjetas.js) ----
+    // Portada, buscador y (a futuro) relacionados: un solo archivo JS, así
+    // que necesita su traducción global y no una por página —ver TARJETA_T
+    // en includes/layout.php—.
+    'tarjeta.desde'         => 'Desde ',
+    'tarjeta.ver_actividad' => 'Ver actividad →',
 
     'ficha.btn.comprar_boletos' => 'Comprar boletos',
     'ficha.btn.reservar'        => 'Reservar mi lugar',

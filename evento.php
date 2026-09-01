@@ -75,6 +75,16 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
    —no es una página fija—, así que layout.php no puede deducirla sola. */
 $canonical = urlEvento($ev);
 
+/* Y para el hreflang y el selector de idioma (REQ-00002 fase 5): las dos
+   direcciones de esta misma actividad, una por idioma. Mismo slug, distinto
+   prefijo —ver urlEvento()—. Sin esto, urlEquivalente() no tiene cómo saber
+   que /actividad/{slug} y /activity/{slug} son la misma ficha, y el selector
+   de idioma mandaría al inicio en vez de quedarse aquí. */
+$GLOBALS['urlEquivalente'] = [
+    'es' => urlEvento($ev, 'es'),
+    'en' => urlEvento($ev, 'en'),
+];
+
 $esDueno = $u !== null && (int) $ev['usuario_id'] === (int) $u['id'];
 $mando   = $esDueno || esAdmin($u);
 $error   = '';
@@ -173,8 +183,8 @@ if ($volverAdmin) {
 }
 $vieneDeBusqueda = !$volverAdmin && isset($_GET['volver']) && $_GET['volver'] !== '';
 
-$titulo        = $ev['titulo'];
-$descripcion   = resumenParaMeta($ev['descripcion']);
+$titulo        = tituloEvento($ev);
+$descripcion   = resumenParaMeta(descripcionEvento($ev));
 $imagenOg      = urlImagen($ev['imagen_url']);
 $scriptsPagina = ['assets/js/evento.js'];
 require __DIR__ . '/includes/layout.php';
@@ -269,7 +279,7 @@ require __DIR__ . '/includes/layout.php';
         <?php endif; ?>
 
         <?php if (puedeEliminarEvento($ev, $u)): ?>
-          <form method="post" onsubmit="return confirm(<?= json_encode(sprintf(t('ficha.confirmar_eliminar'), $ev['titulo'])) ?>);">
+          <form method="post" onsubmit="return confirm(<?= json_encode(sprintf(t('ficha.confirmar_eliminar'), tituloEvento($ev))) ?>);">
             <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
             <button class="btn-barra peligro" type="submit" name="eliminar" value="1"><?= et('ficha.btn.eliminar') ?></button>
           </form>
@@ -284,7 +294,7 @@ require __DIR__ . '/includes/layout.php';
   <div class="ficha-media" style="background-color:<?= e($ev['color']) ?>;">
     <?php $imagen = urlImagen($ev['imagen_url']); ?>
     <?php if ($imagen !== null): ?>
-      <img src="<?= e($imagen) ?>" alt="<?= e($ev['titulo']) ?>" referrerpolicy="no-referrer" width="800" height="340">
+      <img src="<?= e($imagen) ?>" alt="<?= e(tituloEvento($ev)) ?>" referrerpolicy="no-referrer" width="800" height="340">
     <?php endif; ?>
     <div class="ficha-fecha">
       <span class="d"><?= e($partes['d']) ?></span>
@@ -303,7 +313,7 @@ require __DIR__ . '/includes/layout.php';
         static fn(string $c): string => trim(($catalogoIconos[$c] ?? '') . ' ' . $c),
         $categoriasFicha
     ))) ?></div>
-    <h1><?= e($ev['titulo']) ?></h1>
+    <h1><?= e(tituloEvento($ev)) ?></h1>
 
     <div class="ficha-compartir">
       <button type="button" class="btn-barra" id="btnCompartir"
@@ -311,7 +321,7 @@ require __DIR__ . '/includes/layout.php';
                        va antes de abrirla y no cuenta con qué está hecho el
                        sitio. */ ?>
               data-url="<?= e(urlEvento($ev)) ?>"
-              data-titulo="<?= e($ev['titulo']) ?>"><?= et('ficha.compartir') ?></button>
+              data-titulo="<?= e(tituloEvento($ev)) ?>"><?= et('ficha.compartir') ?></button>
       <span class="aviso-copiado" id="avisoCopiado"><?= et('ficha.enlace_copiado') ?></span>
     </div>
 
@@ -397,7 +407,7 @@ require __DIR__ . '/includes/layout.php';
          onclick="whTrack('clic_contactar', <?= e(json_encode(['id' => (int) $ev['id']])) ?>)"><?= et('ficha.btn.contactar') ?></a>
     <?php endif; ?>
 
-    <div class="ficha-desc"><?= nl2br(e($ev['descripcion'])) ?></div>
+    <div class="ficha-desc"><?= nl2br(e(descripcionEvento($ev))) ?></div>
 
     <?php
     /*
@@ -416,7 +426,7 @@ require __DIR__ . '/includes/layout.php';
     ?>
       <div class="ficha-mapa">
         <iframe src="<?= e(urlMapaEmbebido($lat, $lng)) ?>"
-                title="<?= et('ficha.mapa_titulo_prefijo') ?> <?= e($ev['titulo']) ?>"
+                title="<?= et('ficha.mapa_titulo_prefijo') ?> <?= e(tituloEvento($ev)) ?>"
                 loading="lazy" referrerpolicy="no-referrer"></iframe>
         <a class="btn-comollegar" href="<?= e(urlComoLlegar($lat, $lng)) ?>"
            target="_blank" rel="noopener"><?= et('ficha.como_llegar') ?></a>

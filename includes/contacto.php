@@ -85,7 +85,9 @@ function avisarOrganizador(array $ev, string $nombre, string $email, ?string $te
             . ($telefono !== null && $telefono !== '' ? 'Teléfono:   ' . $telefono . "\n" : '')
             . ($mensaje !== null && $mensaje !== '' ? "\nMensaje:\n" . $mensaje . "\n\n" : "\n")
             . "Para responder, contesta directamente este correo: llega a $email.\n\n"
-            . urlEvento($ev) . "\n";
+            // Español fijo, como el resto del correo: este mensaje no tiene
+            // mecanismo de idioma propio.
+            . urlEvento($ev, 'es') . "\n";
 
     enviarCorreo(
         $ev['organizador_email'],

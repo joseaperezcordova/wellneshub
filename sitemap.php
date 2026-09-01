@@ -92,11 +92,31 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
   </url>
 <?php endforeach; ?>
 <?php foreach ($eventos as $ev): ?>
+  <?php
+  /*
+   * Una entrada por idioma, cada una con las direcciones de la otra como
+   * alternativa —igual que las páginas fijas de arriba—, desde que
+   * /activity/{slug} existe (REQ-00002 fase 5). El slug es el mismo en los
+   * dos: lo único que cambia es el prefijo.
+   */
+  $urlEs = urlEvento($ev, 'es');
+  $urlEn = urlEvento($ev, 'en');
+  ?>
   <url>
     <?php /* La dirección limpia, no /evento.php?id= (REQ-00006). Es la que
              evento.php declara como canónica, y ofrecerle a Google una
              distinta de la canónica es pedirle que decida él. */ ?>
-    <loc><?= e(urlEvento($ev)) ?></loc>
+    <loc><?= e($urlEs) ?></loc>
+    <xhtml:link rel="alternate" hreflang="es" href="<?= e($urlEs) ?>"/>
+    <xhtml:link rel="alternate" hreflang="en" href="<?= e($urlEn) ?>"/>
+    <lastmod><?= e(date('Y-m-d', strtotime($ev['actualizado_en']))) ?></lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc><?= e($urlEn) ?></loc>
+    <xhtml:link rel="alternate" hreflang="es" href="<?= e($urlEs) ?>"/>
+    <xhtml:link rel="alternate" hreflang="en" href="<?= e($urlEn) ?>"/>
     <lastmod><?= e(date('Y-m-d', strtotime($ev['actualizado_en']))) ?></lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>

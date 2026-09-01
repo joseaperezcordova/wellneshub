@@ -38,7 +38,8 @@ if ($base !== '' && $base !== '/' && strpos($ruta, $base) === 0) {
 $ruta = trim($ruta, '/');
 
 /*
- * La ficha de una actividad: /actividad/{slug} (REQ-00006).
+ * La ficha de una actividad: /actividad/{slug} y /activity/{slug} (REQ-00006,
+ * y la versión inglesa desde REQ-00002 fase 5).
  *
  * Va antes del mapa de páginas porque no es una página fija: son tantas
  * direcciones como actividades haya, y ninguna se puede escribir en
@@ -57,12 +58,19 @@ $ruta = trim($ruta, '/');
  * Se pone $_GET['id'] y se incluye evento.php sin tocarla: la ficha sigue
  * funcionando igual desde aquí, desde /evento.php?id=7 y desde un POST de sus
  * propios formularios.
+ *
+ * El prefijo decide el idioma —'actividad/' es español, 'activity/' es
+ * inglés— y se deja puesto en $GLOBALS['idioma'] antes de entrar, igual que
+ * hace el mapa de páginas de más abajo para el resto del sitio.
  */
-if (strpos($ruta, 'actividad/') === 0) {
-    $slug = substr($ruta, strlen('actividad/'));
+foreach (['actividad/' => 'es', 'activity/' => 'en'] as $prefijoEvento => $idiomaEvento) {
+    if (strpos($ruta, $prefijoEvento) !== 0) continue;
+
+    $slug = substr($ruta, strlen($prefijoEvento));
 
     if (preg_match('/-(\d+)$/', $slug, $coincidencia)) {
         $_GET['id'] = $coincidencia[1];
+        $GLOBALS['idioma'] = $idiomaEvento;
         require __DIR__ . '/evento.php';
         exit;
     }

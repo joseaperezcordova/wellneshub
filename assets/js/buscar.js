@@ -99,7 +99,7 @@
     var miPeticion = ++peticion;
     var offset     = reiniciar ? 0 : cargados;
     var qs         = consulta();
-    var url        = 'buscar-datos.php' + (qs ? '?' + qs + '&' : '?') + 'offset=' + offset;
+    var url        = 'buscar-datos.php' + (qs ? '?' + qs + '&' : '?') + 'offset=' + offset + '&idioma=' + IDIOMA_ACTUAL;
 
     if (reiniciar) {
       $('resultsGrid').innerHTML = '<div class="rail-cargando">' + esc(T.buscando) + '</div>';

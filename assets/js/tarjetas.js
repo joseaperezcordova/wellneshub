@@ -40,7 +40,7 @@ function imgTarjeta(e) {
 }
 
 function precioTexto(e, prefijo) {
-  return e.free ? 'Gratis' : (e.price ? prefijo + '$' + esc(e.price) + ' MXN' : 'Por confirmar');
+  return e.free ? TARJETA_T.gratis : (e.price ? prefijo + '$' + esc(e.price) + ' MXN' : TARJETA_T.porConfirmar);
 }
 
 /* Tarjeta grande del carril de próximas actividades: fecha sobre la imagen,
@@ -57,7 +57,7 @@ function evCardHTML(e) {
     +   '<div class="ev-loc">' + esc(e.city) + '</div>'
     +   '<div class="ev-foot">'
     +     '<span class="ev-org">' + esc(e.org) + '</span>'
-    +     '<span class="ev-price ' + (e.free ? 'free' : '') + '">' + precioTexto(e, 'Desde ') + '</span>'
+    +     '<span class="ev-price ' + (e.free ? 'free' : '') + '">' + precioTexto(e, TARJETA_T.desde) + '</span>'
     +   '</div>'
     + '</div>'
     + '</a>';
@@ -85,7 +85,7 @@ function cardHTML(e, cola) {
     +   '<div class="card-city">' + esc(e.city) + '</div>'
     +   '<div class="card-foot">'
     +     '<span class="price ' + (e.free ? 'free' : '') + '">' + precioTexto(e, '') + '</span>'
-    +     '<span style="font-size:12px; color:var(--jungle);">Ver actividad →</span>'
+    +     '<span style="font-size:12px; color:var(--jungle);">' + esc(TARJETA_T.verActividad) + '</span>'
     +   '</div>'
     + '</div>'
     + '</a>';

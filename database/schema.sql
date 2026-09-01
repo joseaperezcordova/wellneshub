@@ -160,7 +160,14 @@ CREATE TABLE IF NOT EXISTS eventos (
   titulo        VARCHAR(160)  NOT NULL,
   slug          VARCHAR(190)  NOT NULL,
 
+  -- La versión en inglés (migración 21, REQ-00002 fase 5): la escribe el
+  -- organizador, no una traducción automática —el requerimiento lo prohíbe—.
+  -- Opcional; sin ella, la ficha en inglés cae al título/descripción en
+  -- español (ver evento.php).
+  titulo_en     VARCHAR(160)  NULL DEFAULT NULL,
+
   descripcion   TEXT          NOT NULL,
+  descripcion_en TEXT         NULL DEFAULT NULL,
 
   -- La categoría PRINCIPAL: la primera que eligió el organizador. Una
   -- actividad puede tener más de una (migración 20); el conjunto completo

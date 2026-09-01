@@ -142,6 +142,11 @@ require __DIR__ . '/includes/layout.php';
          sitios es la forma de que un día dejen de coincidir. */ ?>
 <script>var ORDEN_DEFECTO = <?= json_encode(ordenPorDefecto()) ?>;</script>
 
+<?php /* buscar-datos.php es un fetch() directo y no pasa por router.php, así
+         que no tiene de dónde sacar el idioma solo (REQ-00002 fase 5): se lo
+         manda buscar.js con cada petición. */ ?>
+<script>var IDIOMA_ACTUAL = <?= json_encode(idiomaActual()) ?>;</script>
+
 <?php /* buscar.js arma el título de resultados, el contador y los avisos de
          "sin resultados" en el navegador, según lo que se vaya filtrando —no
          hay recarga de página de por medio para pedírselo a PHP cada vez—.

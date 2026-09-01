@@ -160,13 +160,24 @@ function url(string $clave, ?string $idioma = null): string
  * Es lo que necesita el selector: el requerimiento pide expresamente que
  * cambiar de idioma NO devuelva al inicio mientras exista la página
  * equivalente.
+ *
+ * $GLOBALS['urlEquivalente'] es la vía de escape para páginas que no están
+ * en rutasSitio() y aun así tienen una equivalencia real —hoy, la ficha de
+ * actividad: /actividad/{slug} y /activity/{slug} son la misma actividad,
+ * pero ninguna de las dos se puede escribir en el mapa fijo porque son tantas
+ * direcciones como actividades haya. Quien la declare lo hace como
+ * ['es' => url, 'en' => url] antes de pedir layout.php.
  */
 function urlEquivalente(string $idioma): string
 {
+    if (isset($GLOBALS['urlEquivalente'][$idioma])) {
+        return $GLOBALS['urlEquivalente'][$idioma];
+    }
+
     $clave = $GLOBALS['rutaActual'] ?? null;
 
-    // Fuera del enrutado —un .php abierto directo, una ficha de actividad—
-    // no hay equivalencia declarada. Al inicio del idioma pedido.
+    // Fuera del enrutado y sin equivalencia declarada —un .php abierto
+    // directo— no hay a dónde llevar. Al inicio del idioma pedido.
     if ($clave === null || !isset(rutasSitio()[$clave])) {
         return URL_BASE . '/' . ($idioma === IDIOMA_POR_DEFECTO ? '' : $idioma);
     }

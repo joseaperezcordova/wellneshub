@@ -246,7 +246,7 @@ function assetUrl(string $ruta): string
  * Vive aquí y no en eventos.php porque la usa includes/contacto.php, que se
  * carga siempre, y eventos.php solo lo cargan las páginas que lo necesitan.
  */
-function urlEvento(array $ev): string
+function urlEvento(array $ev, ?string $idioma = null): string
 {
     $slug = trim((string) ($ev['slug'] ?? ''));
 
@@ -254,7 +254,13 @@ function urlEvento(array $ev): string
     // siendo válida porque lo único que hace falta leer es el número del final.
     if ($slug === '') $slug = 'actividad-' . (int) $ev['id'];
 
-    return URL_BASE . '/actividad/' . rawurlencode($slug);
+    // El prefijo cambia con el idioma —'actividad' o 'activity' (REQ-00002
+    // fase 5)—, pero el slug en sí se queda igual en los dos: es el título
+    // en español, que es lo único que se guarda.
+    $idioma   = $idioma ?? idiomaActual();
+    $prefijo  = $idioma === 'en' ? 'activity' : 'actividad';
+
+    return URL_BASE . '/' . $prefijo . '/' . rawurlencode($slug);
 }
 
 /**

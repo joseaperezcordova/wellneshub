@@ -109,9 +109,11 @@ $urlActualMeta = URL_BASE . (string) ($_SERVER['REQUEST_URI'] ?? '/');
  * Google ignora el par entero. x-default marca cuál servir a quien no encaja
  * en ninguno de los dos idiomas.
  *
- * Solo se emite en las páginas del enrutador. Una ficha de actividad no tiene
- * equivalente inglés declarado, y anunciar uno que no existe es peor que
- * callarse.
+ * Se emite en las páginas del enrutador, y también en las que no estando ahí
+ * declaran su propia equivalencia en $GLOBALS['urlEquivalente'] —la ficha de
+ * actividad, desde REQ-00002 fase 5— para las mismas dos etiquetas. Sin
+ * ninguna de las dos cosas, mejor callarse que anunciar una versión que no
+ * existe.
  */
 $claveRutaSeo = $GLOBALS['rutaActual'] ?? null;
 if ($claveRutaSeo !== null):
@@ -124,11 +126,13 @@ if ($claveRutaSeo !== null):
 <?php endforeach; ?>
 <link rel="alternate" hreflang="x-default" href="<?= e(url($claveRutaSeo, IDIOMA_POR_DEFECTO)) ?>">
 <?php elseif (!empty($canonical)): ?>
-<?php /* Páginas que no están en rutasSitio() y aun así tienen una dirección
-         canónica propia: la ficha de actividad, que es /actividad/{slug}. Sin
-         hreflang, porque no hay versión inglesa declarada y anunciar una que no
-         existe es peor que callarse. */ ?>
 <link rel="canonical" href="<?= e($canonical) ?>">
+<?php foreach ($GLOBALS['urlEquivalente'] ?? [] as $idiomaSeo => $urlSeo): ?>
+<link rel="alternate" hreflang="<?= e($idiomaSeo) ?>" href="<?= e($urlSeo) ?>">
+<?php endforeach; ?>
+<?php if (isset($GLOBALS['urlEquivalente'][IDIOMA_POR_DEFECTO])): ?>
+<link rel="alternate" hreflang="x-default" href="<?= e($GLOBALS['urlEquivalente'][IDIOMA_POR_DEFECTO]) ?>">
+<?php endif; ?>
 <?php endif; ?>
 <meta property="og:site_name" content="<?= et('marca.nombre') ?>">
 <meta property="og:type" content="website">
@@ -197,6 +201,15 @@ $scVerifica = trim((string) ($CONFIG['analytics']['search_console_verificacion']
     if (typeof fbq === 'function')     fbq('trackCustom', nombre, p);
     if (typeof clarity === 'function') clarity('event', nombre);
   };
+  <?php /* assets/js/tarjetas.js es un solo archivo compartido por la
+           portada, el buscador y los relacionados de la ficha: necesita su
+           traducción aquí, global, y no una por página (REQ-00002). */ ?>
+  window.TARJETA_T = <?= json_encode([
+      'gratis'        => t('ficha.precio.gratis'),
+      'porConfirmar'  => t('ficha.precio.por_confirmar'),
+      'desde'         => t('tarjeta.desde'),
+      'verActividad'  => t('tarjeta.ver_actividad'),
+  ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
   window.OMDARA_COOKIES = <?= json_encode([
       'cookie'       => CONSENTIMIENTO_COOKIE,
       'version'      => CONSENTIMIENTO_VERSION,
