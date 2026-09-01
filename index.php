@@ -44,6 +44,19 @@ $seccion       = 'inicio';
 $anchoLibre    = true;
 $scriptsPagina = ['assets/js/inicio.js', 'assets/js/buscador.js'];
 
+/*
+ * Para «/» exacto, Apache sirve este archivo directo por DirectoryIndex —la
+ * condición !-d de .htaccess excluye los directorios, y la raíz lo es—, sin
+ * pasar por router.php. Es la única página a la que le pasa esto, y
+ * layout.php necesita $GLOBALS['rutaActual'] para imprimir el canonical y el
+ * hreflang: sin esto la portada se queda sin ninguno de los dos. Con isset()
+ * porque cuando sí se llega por router.php (/en, por ejemplo) ya viene
+ * puesto, y no hay que pisarlo.
+ */
+if (!isset($GLOBALS['rutaActual'])) {
+    $GLOBALS['rutaActual'] = 'inicio';
+}
+
 require __DIR__ . '/includes/layout.php';
 ?>
 
