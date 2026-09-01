@@ -327,13 +327,13 @@ $scVerifica = trim((string) ($CONFIG['analytics']['search_console_verificacion']
       <?php else: ?>
         <!-- Sin sesión: enlace, no botón con JavaScript, para que funcione el
              clic central y el «abrir en pestaña nueva». -->
-        <a class="btn-cuenta" href="<?= URL_BASE ?>/login.php" aria-label="Entrar a mi cuenta">
+        <a class="btn-cuenta" href="<?= URL_BASE ?>/login.php" aria-label="<?= et('nav.entrar_aria') ?>">
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"
                fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
             <circle cx="12" cy="8.2" r="3.8"/>
             <path d="M4.8 20c.6-3.7 3.6-5.9 7.2-5.9s6.6 2.2 7.2 5.9"/>
           </svg>
-          <span>Entrar</span>
+          <span><?= et('nav.entrar') ?></span>
         </a>
       <?php endif; ?>
 

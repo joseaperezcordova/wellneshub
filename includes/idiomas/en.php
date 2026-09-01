@@ -34,6 +34,7 @@ return [
     'nav.publicar_corto'  => 'Post',
     'nav.publicar_sufijo' => 'an activity',
     'nav.entrar'      => 'Sign in',
+    'nav.entrar_aria' => 'Sign in to my account',
     'nav.menu'        => 'Menu',
 
     // ---- Selector de idioma ----
@@ -522,6 +523,63 @@ return [
     'reportar.motivo.no_es_wellness' => 'Not a wellness activity',
     'reportar.motivo.duplicado'      => 'Posted twice',
     'reportar.motivo.otro'           => 'Other reason',
+
+    // ---- Sign in / create account (login.php) ----
+    'login.error.google'    => 'We couldn\'t complete sign-in with Google.',
+    'login.error.state'     => 'The request couldn\'t be verified. Try again.',
+    'login.error.cancelado' => 'You canceled signing in with Google.',
+    'login.error.generico'  => 'Something went wrong. Try again.',
+
+    'login.pagina.titulo' => 'Sign in',
+    'login.h1'  => 'Sign in or create an account',
+    'login.sub' => 'No passwords: we send a code to your email. If it\'s your first time, the account is created automatically.',
+    'login.google_btn' => 'Continue with Google',
+    'login.separador'  => 'or with your email',
+    'login.campo.correo' => 'Email',
+    'login.campo.correo_placeholder' => 'youremail@example.com',
+    'login.continuar_btn' => 'Continue',
+
+    // ---- Access code (codigo.php) ----
+    'codigo.error.sesion_caducada' => 'Your session expired. Start over.',
+    'codigo.pagina.titulo' => 'Check your email',
+    'codigo.sub' => 'We sent you a one-time code. It expires in %d minutes.',
+    'codigo.editar' => 'Edit',
+    'codigo.campo.codigo' => 'One-time code',
+    'codigo.enviar_btn'   => 'Submit',
+    'codigo.reenviar_btn' => 'Resend code',
+    'codigo.pie' => 'Not arriving? Check your spam folder before requesting another one.',
+
+    // ---- Complete registration (completar-registro.php) ----
+    'registro.error.acepta_legal' => 'To create your account you must accept the Terms and Conditions and the Privacy Notice.',
+    'registro.error.no_creada'    => 'We couldn\'t create your account. Try again.',
+    'registro.pagina.titulo' => 'Complete your registration',
+    'registro.sub_google' => 'Google confirmed your email. One step left to create your account.',
+    'registro.sub_correo' => 'We verified your email. One step left to create your account.',
+    'registro.se_creara'  => 'The account will be created for',
+    'registro.crear_btn'  => 'Create my account',
+    'registro.pie_pregunta' => 'Wasn\'t you?',
+    'registro.pie_cancelar' => 'Cancel and sign out',
+
+    // ---- Shared legal checkbox (includes/casilla-legal.php) ----
+    'legal.acepto_1'   => 'I have read and accept the',
+    'legal.y'          => 'and the',
+    'legal.de_omdara'  => 'of OMDARA.',
+
+    // ---- includes/auth.php: email code and Google ----
+    'auth.correo_invalido'       => 'That email doesn\'t look right. Check it.',
+    'auth.espera_minuto'         => 'We just sent you one. Wait a minute before asking for another.',
+    'auth.demasiados_codigos'    => 'You\'ve requested too many codes. Try again in a while or sign in with Google.',
+    'auth.demasiadas_peticiones' => 'Too many requests from this connection. Try again later.',
+    'auth.error_envio'           => 'We couldn\'t send the email. Try again or sign in with Google.',
+    'auth.codigo_enviado'        => 'We sent a code to',
+    'auth.codigo_formato'        => 'The code is six digits.',
+    'auth.codigo_caducado'       => 'That code expired or was already used. Request a new one.',
+    'auth.demasiados_intentos'   => 'Too many attempts with that code. Request a new one.',
+    'auth.codigo_incorrecto_quedan' => 'Incorrect code. You have %d attempts left.',
+    'auth.codigo_incorrecto_final'  => 'Incorrect code. Request a new one.',
+    'auth.cuenta_suspendida'     => 'This account is suspended.',
+    'auth.google_sin_datos'      => 'Google didn\'t return the required data.',
+    'auth.correo_ya_registrado'  => 'That email is already registered. Sign in by requesting a code.',
 
     // ---- Consentimiento de cookies (REQ-00003) ----
     // Sí se traduce, aunque roce lo legal: es lo PRIMERO que ve quien entra, y

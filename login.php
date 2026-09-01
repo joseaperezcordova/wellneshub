@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = (string) ($_POST['email'] ?? '');
 
     if (!csrfValido($_POST['csrf'] ?? null)) {
-        $error = 'La sesión caducó. Vuelve a intentarlo.';
+        $error = t('ficha.error.sesion_caducada');
     } else {
         /*
          * La casilla se recuerda para el paso siguiente (REQ-00008).
@@ -59,12 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // concreto en sesión (por ejemplo "ese correo ya está registrado"), gana ese.
 if (!empty($_GET['error'])) {
     $mensajes = [
-        'google'    => 'No se pudo completar el acceso con Google.',
-        'state'     => 'La petición no se pudo verificar. Inténtalo otra vez.',
-        'cancelado' => 'Cancelaste el acceso con Google.',
+        'google'    => t('login.error.google'),
+        'state'     => t('login.error.state'),
+        'cancelado' => t('login.error.cancelado'),
     ];
     $clave = (string) $_GET['error'];
-    $error = isset($mensajes[$clave]) ? $mensajes[$clave] : 'Algo salió mal. Inténtalo otra vez.';
+    $error = isset($mensajes[$clave]) ? $mensajes[$clave] : t('login.error.generico');
 
     if (!empty($_SESSION['aviso_login'])) {
         $error = (string) $_SESSION['aviso_login'];
@@ -72,13 +72,13 @@ if (!empty($_GET['error'])) {
     }
 }
 
-$titulo = 'Entrar';
+$titulo = t('login.pagina.titulo');
 require __DIR__ . '/includes/layout.php';
 ?>
 
 <div class="auth-caja">
-  <h1>Entrar o crear cuenta</h1>
-  <p class="sub">Sin contraseñas: te mandamos un código al correo. Si es tu primera vez, la cuenta se crea sola.</p>
+  <h1><?= et('login.h1') ?></h1>
+  <p class="sub"><?= et('login.sub') ?></p>
 
   <?php if ($error): ?>
     <div class="aviso aviso-error"><?= e($error) ?></div>
@@ -92,21 +92,21 @@ require __DIR__ . '/includes/layout.php';
         <path fill="#FBBC05" d="M11.7 28.2c-.4-1.3-.7-2.7-.7-4.2s.3-2.9.7-4.2v-5.7H4.3C2.8 17.1 2 20.5 2 24s.8 6.9 2.3 9.9l7.4-5.7z"/>
         <path fill="#EA4335" d="M24 10.7c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4.1 30 2 24 2 15.3 2 7.8 6.9 4.3 14.1l7.4 5.7c1.7-5.2 6.6-9.1 12.3-9.1z"/>
       </svg>
-      Continuar con Google
+      <?= et('login.google_btn') ?>
     </a>
-    <div class="separador">o con tu correo</div>
+    <div class="separador"><?= et('login.separador') ?></div>
   <?php endif; ?>
 
   <form method="post" novalidate>
     <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
 
     <div class="campo">
-      <label for="email">Correo</label>
+      <label for="email"><?= et('login.campo.correo') ?></label>
       <input id="email" name="email" type="email" autocomplete="email" required autofocus
-             value="<?= e($email) ?>" placeholder="tucorreo@ejemplo.com">
+             value="<?= e($email) ?>" placeholder="<?= et('login.campo.correo_placeholder') ?>">
     </div>
 
-    <button class="btn-principal" type="submit">Continuar</button>
+    <button class="btn-principal" type="submit"><?= et('login.continuar_btn') ?></button>
 
     <?php
     /*

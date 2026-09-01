@@ -31,7 +31,7 @@ if (!empty($_SESSION['codigo_aviso'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValido($_POST['csrf'] ?? null)) {
-        $error = 'La sesión caducó. Vuelve a empezar.';
+        $error = t('codigo.error.sesion_caducada');
 
     } elseif (isset($_POST['reenviar'])) {
         [$ok, $mensaje] = solicitarCodigo($email);
@@ -80,13 +80,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$titulo = 'Revisa tu correo';
+$titulo = t('codigo.pagina.titulo');
 require __DIR__ . '/includes/layout.php';
 ?>
 
 <div class="auth-caja">
-  <h1>Revisa tu correo</h1>
-  <p class="sub">Te enviamos un código de un solo uso. Caduca en <?= CODIGO_VIGENCIA_MIN ?> minutos.</p>
+  <h1><?= et('codigo.pagina.titulo') ?></h1>
+  <p class="sub"><?= sprintf(et('codigo.sub'), CODIGO_VIGENCIA_MIN) ?></p>
 
   <?php if ($error): ?>
     <div class="aviso aviso-error"><?= e($error) ?></div>
@@ -97,14 +97,14 @@ require __DIR__ . '/includes/layout.php';
 
   <div class="correo-fijo">
     <span><?= e($email) ?></span>
-    <a href="<?= URL_BASE ?>/login.php">Editar</a>
+    <a href="<?= URL_BASE ?>/login.php"><?= et('codigo.editar') ?></a>
   </div>
 
   <form method="post" novalidate>
     <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
 
     <div class="campo">
-      <label for="codigo">Código de un solo uso</label>
+      <label for="codigo"><?= et('codigo.campo.codigo') ?></label>
       <!-- inputmode numeric saca el teclado de números en el móvil sin impedir
            pegar el código; one-time-code deja que el sistema lo autocomplete. -->
       <input id="codigo" name="codigo" class="codigo" type="text" required autofocus
@@ -112,16 +112,16 @@ require __DIR__ . '/includes/layout.php';
              pattern="[0-9 ]*" placeholder="······">
     </div>
 
-    <button class="btn-principal" type="submit">Enviar</button>
+    <button class="btn-principal" type="submit"><?= et('codigo.enviar_btn') ?></button>
   </form>
 
   <form method="post" class="reenviar-form">
     <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-    <button type="submit" name="reenviar" value="1" class="enlace-boton">Reenviar código</button>
+    <button type="submit" name="reenviar" value="1" class="enlace-boton"><?= et('codigo.reenviar_btn') ?></button>
   </form>
 
   <div class="auth-pie">
-    ¿No llega? Mira en la carpeta de spam antes de pedir otro.
+    <?= et('codigo.pie') ?>
   </div>
 </div>
 

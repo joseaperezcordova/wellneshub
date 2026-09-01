@@ -31,9 +31,9 @@ $casillaObligatoria = $casillaObligatoria ?? true;
 ?>
 <label class="casilla-legal">
   <input type="checkbox" name="acepto" value="1"<?= !empty($casillaMarcada) ? ' checked' : '' ?><?= $casillaObligatoria ? ' required' : '' ?>>
-  <span>He leído y acepto los
-    <a href="<?= e(url('terminos')) ?>" target="_blank" rel="noopener">Términos y Condiciones</a>
-    y el
-    <a href="<?= e(url('privacidad')) ?>" target="_blank" rel="noopener">Aviso de Privacidad</a>
-    de OMDARA.</span>
+  <span><?= et('legal.acepto_1') ?>
+    <a href="<?= e(url('terminos')) ?>" target="_blank" rel="noopener"><?= et('pie.terminos') ?></a>
+    <?= et('legal.y') ?>
+    <a href="<?= e(url('privacidad')) ?>" target="_blank" rel="noopener"><?= et('pie.privacidad') ?></a>
+    <?= et('legal.de_omdara') ?></span>
 </label>

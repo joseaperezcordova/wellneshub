@@ -51,14 +51,14 @@ $error     = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValido($_POST['csrf'] ?? null)) {
-        $error = 'La sesión caducó. Vuelve a empezar.';
+        $error = t('codigo.error.sesion_caducada');
 
     } elseif (empty($_POST['acepto'])) {
         // El mensaje es el del requerimiento, palabra por palabra. Y se
         // comprueba aquí y no solo con el "required" del navegador: ese se
         // salta desactivando JavaScript o mandando el POST a mano, y entonces
         // la aceptación no habría existido nunca.
-        $error = 'Para crear tu cuenta debes aceptar los Términos y Condiciones y el Aviso de Privacidad.';
+        $error = t('registro.error.acepta_legal');
 
     } else {
         /*
@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 : crearUsuarioPorCorreo($email);
 
             if ($nuevoId === null) {
-                $error = 'No se pudo crear tu cuenta. Inténtalo otra vez.';
+                $error = t('registro.error.no_creada');
             } else {
                 unset($_SESSION['alta_pendiente']);
                 registrarAceptacionLegal((int) $nuevoId);
@@ -100,17 +100,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$titulo = 'Completa tu registro';
+$titulo = t('registro.pagina.titulo');
 require __DIR__ . '/includes/layout.php';
 ?>
 
 <div class="auth-caja">
-  <h1>Completa tu registro</h1>
+  <h1><?= et('registro.pagina.titulo') ?></h1>
   <p class="sub">
     <?php if ($viaGoogle): ?>
-      Google confirmó tu correo. Falta un paso para crear tu cuenta.
+      <?= et('registro.sub_google') ?>
     <?php else: ?>
-      Verificamos tu correo. Falta un paso para crear tu cuenta.
+      <?= et('registro.sub_correo') ?>
     <?php endif; ?>
   </p>
 
@@ -123,7 +123,7 @@ require __DIR__ . '/includes/layout.php';
              tiene varias cuentas de Google abiertas no siempre sabe con cuál
              acaba de entrar, y esto se descubre semanas después. */ ?>
     <div class="alta-correo">
-      <span>Se creará la cuenta de</span>
+      <span><?= et('registro.se_creara') ?></span>
       <strong><?= e($email) ?></strong>
     </div>
   <?php endif; ?>
@@ -133,11 +133,11 @@ require __DIR__ . '/includes/layout.php';
 
     <?php require __DIR__ . '/includes/casilla-legal.php'; ?>
 
-    <button class="btn-principal" type="submit">Crear mi cuenta</button>
+    <button class="btn-principal" type="submit"><?= et('registro.crear_btn') ?></button>
   </form>
 
   <div class="auth-pie">
-    ¿No eras tú? <a href="<?= URL_BASE ?>/logout.php">Cancelar y salir</a>.
+    <?= et('registro.pie_pregunta') ?> <a href="<?= URL_BASE ?>/logout.php"><?= et('registro.pie_cancelar') ?></a>.
   </div>
 </div>
 

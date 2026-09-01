@@ -35,6 +35,7 @@ return [
     'nav.publicar_corto'  => 'Publicar',
     'nav.publicar_sufijo' => 'actividad',
     'nav.entrar'      => 'Entrar',
+    'nav.entrar_aria' => 'Entrar a mi cuenta',
     'nav.menu'        => 'Menú',
 
     // ---- Selector de idioma ----
@@ -553,6 +554,63 @@ return [
     'reportar.motivo.no_es_wellness' => 'No es una actividad de bienestar',
     'reportar.motivo.duplicado'      => 'Está publicado dos veces',
     'reportar.motivo.otro'           => 'Otro motivo',
+
+    // ---- Entrar / crear cuenta (login.php) ----
+    'login.error.google'    => 'No se pudo completar el acceso con Google.',
+    'login.error.state'     => 'La petición no se pudo verificar. Inténtalo otra vez.',
+    'login.error.cancelado' => 'Cancelaste el acceso con Google.',
+    'login.error.generico'  => 'Algo salió mal. Inténtalo otra vez.',
+
+    'login.pagina.titulo' => 'Entrar',
+    'login.h1'  => 'Entrar o crear cuenta',
+    'login.sub' => 'Sin contraseñas: te mandamos un código al correo. Si es tu primera vez, la cuenta se crea sola.',
+    'login.google_btn' => 'Continuar con Google',
+    'login.separador'  => 'o con tu correo',
+    'login.campo.correo' => 'Correo',
+    'login.campo.correo_placeholder' => 'tucorreo@ejemplo.com',
+    'login.continuar_btn' => 'Continuar',
+
+    // ---- Código de acceso (codigo.php) ----
+    'codigo.error.sesion_caducada' => 'La sesión caducó. Vuelve a empezar.',
+    'codigo.pagina.titulo' => 'Revisa tu correo',
+    'codigo.sub' => 'Te enviamos un código de un solo uso. Caduca en %d minutos.',
+    'codigo.editar' => 'Editar',
+    'codigo.campo.codigo' => 'Código de un solo uso',
+    'codigo.enviar_btn'   => 'Enviar',
+    'codigo.reenviar_btn' => 'Reenviar código',
+    'codigo.pie' => '¿No llega? Mira en la carpeta de spam antes de pedir otro.',
+
+    // ---- Completar registro (completar-registro.php) ----
+    'registro.error.acepta_legal' => 'Para crear tu cuenta debes aceptar los Términos y Condiciones y el Aviso de Privacidad.',
+    'registro.error.no_creada'    => 'No se pudo crear tu cuenta. Inténtalo otra vez.',
+    'registro.pagina.titulo' => 'Completa tu registro',
+    'registro.sub_google' => 'Google confirmó tu correo. Falta un paso para crear tu cuenta.',
+    'registro.sub_correo' => 'Verificamos tu correo. Falta un paso para crear tu cuenta.',
+    'registro.se_creara'  => 'Se creará la cuenta de',
+    'registro.crear_btn'  => 'Crear mi cuenta',
+    'registro.pie_pregunta' => '¿No eras tú?',
+    'registro.pie_cancelar' => 'Cancelar y salir',
+
+    // ---- Casilla legal, compartida (includes/casilla-legal.php) ----
+    'legal.acepto_1'   => 'He leído y acepto los',
+    'legal.y'          => 'y el',
+    'legal.de_omdara'  => 'de OMDARA.',
+
+    // ---- includes/auth.php: código por correo y Google ----
+    'auth.correo_invalido'       => 'Ese correo no tiene buena pinta. Revísalo.',
+    'auth.espera_minuto'         => 'Acabamos de enviarte uno. Espera un minuto antes de pedir otro.',
+    'auth.demasiados_codigos'    => 'Has pedido demasiados códigos. Prueba dentro de un rato o entra con Google.',
+    'auth.demasiadas_peticiones' => 'Demasiadas peticiones desde esta conexión. Prueba más tarde.',
+    'auth.error_envio'           => 'No pudimos enviar el correo. Inténtalo otra vez o entra con Google.',
+    'auth.codigo_enviado'        => 'Te enviamos un código a',
+    'auth.codigo_formato'        => 'El código son seis cifras.',
+    'auth.codigo_caducado'       => 'Ese código caducó o ya se usó. Pide uno nuevo.',
+    'auth.demasiados_intentos'   => 'Demasiados intentos con ese código. Pide uno nuevo.',
+    'auth.codigo_incorrecto_quedan' => 'Código incorrecto. Te quedan %d intentos.',
+    'auth.codigo_incorrecto_final'  => 'Código incorrecto. Pide uno nuevo.',
+    'auth.cuenta_suspendida'     => 'Esta cuenta está suspendida.',
+    'auth.google_sin_datos'      => 'Google no devolvió los datos necesarios.',
+    'auth.correo_ya_registrado'  => 'Ese correo ya está registrado. Entra pidiendo un código.',
 
     // ---- Consentimiento de cookies (REQ-00003) ----
     // El requerimiento escribe la marca en minúsculas; aquí va OMDARA, que es

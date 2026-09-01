@@ -240,7 +240,7 @@ function resolverPorCorreo(string $email): array
     if (!$u) return ['nueva', ''];
 
     if ($u['estado'] !== 'activo') {
-        return ['error', 'Esta cuenta está suspendida.'];
+        return ['error', t('auth.cuenta_suspendida')];
     }
 
     // Cuenta que venía de Google sin verificar, o de antes de esto.
@@ -451,7 +451,7 @@ function solicitarCodigo(string $email): array
     $email = mb_strtolower(trim($email));
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 190) {
-        return [false, 'Ese correo no tiene buena pinta. Revísalo.'];
+        return [false, t('auth.correo_invalido')];
     }
 
     $pdo = db();
@@ -471,10 +471,10 @@ function solicitarCodigo(string $email): array
     $porCorreo = $st->fetch();
 
     if ((int) $porCorreo['recientes'] > 0) {
-        return [false, 'Acabamos de enviarte uno. Espera un minuto antes de pedir otro.'];
+        return [false, t('auth.espera_minuto')];
     }
     if ((int) $porCorreo['total'] >= CODIGO_MAX_POR_HORA) {
-        return [false, 'Has pedido demasiados códigos. Prueba dentro de un rato o entra con Google.'];
+        return [false, t('auth.demasiados_codigos')];
     }
 
     // Freno por IP: sin esto, el de arriba se esquiva pidiendo códigos a mil
@@ -487,7 +487,7 @@ function solicitarCodigo(string $email): array
     $st->execute([ipBinaria()]);
 
     if ((int) $st->fetchColumn() >= CODIGO_MAX_IP_HORA) {
-        return [false, 'Demasiadas peticiones desde esta conexión. Prueba más tarde.'];
+        return [false, t('auth.demasiadas_peticiones')];
     }
 
     // Un código vivo por correo: al pedir uno nuevo, el anterior deja de valer.
@@ -512,10 +512,10 @@ function solicitarCodigo(string $email): array
         // para que no cuente contra el límite por hora: si no, un problema del
         // servidor de correo dejaría a la persona sin poder reintentar.
         $pdo->prepare('DELETE FROM codigos_acceso WHERE id = ?')->execute([$id]);
-        return [false, 'No pudimos enviar el correo. Inténtalo otra vez o entra con Google.'];
+        return [false, t('auth.error_envio')];
     }
 
-    return [true, 'Te enviamos un código a ' . $email];
+    return [true, t('auth.codigo_enviado') . ' ' . $email];
 }
 
 /**
@@ -536,7 +536,7 @@ function verificarCodigo(string $email, string $codigo): array
     $codigo = preg_replace('/\D+/', '', $codigo);
 
     if (strlen((string) $codigo) !== 6) {
-        return ['error', 'El código son seis cifras.'];
+        return ['error', t('auth.codigo_formato')];
     }
 
     $pdo = db();
@@ -551,12 +551,12 @@ function verificarCodigo(string $email, string $codigo): array
     $fila = $st->fetch();
 
     if (!$fila) {
-        return ['error', 'Ese código caducó o ya se usó. Pide uno nuevo.'];
+        return ['error', t('auth.codigo_caducado')];
     }
 
     if ((int) $fila['intentos'] >= CODIGO_MAX_INTENTOS) {
         $pdo->prepare('UPDATE codigos_acceso SET usado_en = NOW() WHERE id = ?')->execute([$fila['id']]);
-        return ['error', 'Demasiados intentos con ese código. Pide uno nuevo.'];
+        return ['error', t('auth.demasiados_intentos')];
     }
 
     // El intento se cuenta ANTES de comprobar. Contarlo después deja la puerta
@@ -567,8 +567,8 @@ function verificarCodigo(string $email, string $codigo): array
     if (!password_verify((string) $codigo, $fila['codigo_hash'])) {
         $quedan = CODIGO_MAX_INTENTOS - ((int) $fila['intentos'] + 1);
         return [false, $quedan > 0
-            ? "Código incorrecto. Te quedan $quedan intentos."
-            : 'Código incorrecto. Pide uno nuevo.'];
+            ? sprintf(t('auth.codigo_incorrecto_quedan'), $quedan)
+            : t('auth.codigo_incorrecto_final')];
     }
 
     $pdo->prepare('UPDATE codigos_acceso SET usado_en = NOW() WHERE id = ?')->execute([$fila['id']]);
@@ -604,7 +604,7 @@ function resolverGoogle(array $perfil): array
     $email = mb_strtolower(trim((string) ($perfil['email'] ?? '')));
 
     if ($sub === '' || $email === '') {
-        return ['error', 'Google no devolvió los datos necesarios.'];
+        return ['error', t('auth.google_sin_datos')];
     }
 
     $pdo = db();
@@ -619,7 +619,7 @@ function resolverGoogle(array $perfil): array
     $st->execute([$sub]);
 
     if ($u = $st->fetch()) {
-        if ($u['estado'] !== 'activo') return ['error', 'Esta cuenta está suspendida.'];
+        if ($u['estado'] !== 'activo') return ['error', t('auth.cuenta_suspendida')];
         return ['entra', (string) $u['id']];
     }
 
@@ -633,12 +633,12 @@ function resolverGoogle(array $perfil): array
     $verificado = !empty($perfil['email_verified']);
 
     if ($existente && !$verificado) {
-        return ['error', 'Ese correo ya está registrado. Entra pidiendo un código.'];
+        return ['error', t('auth.correo_ya_registrado')];
     }
 
     if (!$existente) return ['nueva', ''];
 
-    if ($existente['estado'] !== 'activo') return ['error', 'Esta cuenta está suspendida.'];
+    if ($existente['estado'] !== 'activo') return ['error', t('auth.cuenta_suspendida')];
 
     $usuarioId = (int) $existente['id'];
 
@@ -659,7 +659,7 @@ function resolverGoogle(array $perfil): array
     } catch (Throwable $ex) {
         $pdo->rollBack();
         error_log('Enlace con Google fallido: ' . $ex->getMessage());
-        return ['error', 'No se pudo completar el acceso con Google.'];
+        return ['error', t('login.error.google')];
     }
 
     return ['entra', (string) $usuarioId];
