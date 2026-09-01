@@ -1,4 +1,4 @@
-# OMDARA. Actualizar la línea Sitemap si el dominio cambia (ver
+# OMDARA. Actualizar la línea Sitemap si el dominio vuelve a cambiar (ver
 # includes/config.local.example.php sobre el subdominio de desarrollo).
 User-agent: *
 Disallow: /admin.php
@@ -20,4 +20,4 @@ Disallow: /buscar-datos.php
 Disallow: /diagnostico-correo.php
 Disallow: /includes/
 
-Sitemap: https://wellnesshubmx.jpcorelab.com/sitemap.php
+Sitemap: https://omdara.com.mx/sitemap.php

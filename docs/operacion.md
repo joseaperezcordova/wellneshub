@@ -33,10 +33,10 @@ porque no hay consola donde revisar la configuración de PHP a mano.
 
 ## Dominio
 
-El sitio vive hoy en un subdominio de desarrollo
-(`wellnesshubmx.jpcorelab.com`), a la espera de que se decida el dominio
-final. Cuando eso pase, hay una lista concreta de cosas que tocar — no es
-solo apuntar el DNS:
+El dominio final es `omdara.com.mx`, sin `www.` (2026-09-01) — dejó de vivir
+en el subdominio de desarrollo (`wellnesshubmx.jpcorelab.com`), que se queda
+solo como entorno de pruebas. El cambio de dominio trae una lista concreta de
+cosas que tocar — no es solo apuntar el DNS:
 
 1. **DNS**: apuntar el dominio (o subdominio) final al hosting — normalmente
    un registro `A` o `CNAME` según lo que pida el proveedor de hosting.
@@ -46,20 +46,22 @@ solo apuntar el DNS:
 3. **`config.local.php` en el servidor**: revisar `url_base` — debería
    seguir vacío (se autodetecta), así que en teoría no hay nada que tocar
    aquí, pero vale la pena confirmarlo después del cambio.
-4. **Google Cloud Console**: agregar la nueva URI de redireccionamiento
+4. **`robots.txt`**: la línea `Sitemap:` está escrita a mano y no se
+   autodetecta — hay que actualizarla si el dominio vuelve a cambiar. Ver el
+   aviso al principio del archivo.
+5. **Google Cloud Console**: agregar la nueva URI de redireccionamiento
    (`https://tudominio.com/google-callback.php`) — el login con Google se
    rompe si no se hace este paso.
-5. **Search Console**: es por dominio, así que hay que volver a verificar la
+6. **Search Console**: es por dominio, así que hay que volver a verificar la
    propiedad nueva — la verificación del subdominio de desarrollo no se
    traslada sola.
-6. **Meta Pixel**, si se llega a usar Conversions API: su verificación de
+7. **Meta Pixel**, si se llega a usar Conversions API: su verificación de
    dominio tampoco se traslada sola.
-7. **Canónico `www.` vs. sin `www.`**: decidir cuál es el host "de verdad" y
-   redirigir el otro — el subdominio de desarrollo responde igual con y sin
-   `www.`, que es justamente lo que causó un `redirect_uri_mismatch` con
-   Google durante el desarrollo. No conviene resolver esto en el subdominio
-   que de todas formas va a desaparecer; se resuelve directo en el dominio
-   final.
+
+El canónico quedó resuelto como **sin `www.`** — si algún día se sirve
+también con `www.`, falta redirigirlo al dominio sin `www.` (el subdominio de
+desarrollo respondía igual con y sin `www.`, que fue justo lo que causó un
+`redirect_uri_mismatch` con Google durante el desarrollo).
 
 GA4, Clarity y Meta Pixel (si se usa) **no** dependen del dominio — sus IDs
 siguen funcionando igual tras el cambio, sin tocar `config.local.php`.
