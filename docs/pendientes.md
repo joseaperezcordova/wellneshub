@@ -297,7 +297,7 @@ el pie —que salen en todas las páginas— están traducidos.
 
 | Fase | Alcance | Depende de |
 |---|---|---|
-| 2 | Portada — **hecho, 2026-09-01** — falta buscador y filtros (`buscar.php` sigue sin `t()/et()`) | Textos EN |
+| 2 | Portada y buscador — **hecho, 2026-09-01** | Textos EN |
 | 3 | Formulario de actividad: 40+ etiquetas y mensajes de validación | Textos EN |
 | 4 | Ficha de actividad, contacto, login y correos | Textos EN |
 | 5 | Contenido dinámico: título y descripción de cada actividad | Migración de base |
@@ -322,11 +322,12 @@ esperar ese entregable —decisión explícita del 2026-09-01, no un cambio de
 la regla para el resto de páginas.
 
 **Sobre promover a producción:** el requerimiento prohíbe la traducción
-parcial, y hoy el inglés cubre el armazón y la portada pero no el resto del
-cuerpo de las páginas — no está cerrado ni la fase 2 completa. El sitio ya
-vive en el dominio final (`omdara.com.mx`, ver `docs/operacion.md`); esta nota
-queda para que quede claro que esa promoción se hizo sin cerrar esta parte del
-requerimiento, no para sugerir que ya se cumplió.
+parcial, y hoy el inglés cubre el armazón, la portada y el buscador (fase 2
+completa) pero no el resto del cuerpo de las páginas —fases 3 a 5 siguen sin
+empezar—. El sitio ya vive en el dominio final (`omdara.com.mx`, ver
+`docs/operacion.md`); esta nota queda para que quede claro que esa promoción
+se hizo sin cerrar esta parte del requerimiento, no para sugerir que ya se
+cumplió.
 
 ---
 
