@@ -284,7 +284,7 @@ require __DIR__ . '/includes/layout.php';
   <div class="ficha-media" style="background-color:<?= e($ev['color']) ?>;">
     <?php $imagen = urlImagen($ev['imagen_url']); ?>
     <?php if ($imagen !== null): ?>
-      <img src="<?= e($imagen) ?>" alt="<?= e($ev['titulo']) ?>" referrerpolicy="no-referrer">
+      <img src="<?= e($imagen) ?>" alt="<?= e($ev['titulo']) ?>" referrerpolicy="no-referrer" width="800" height="340">
     <?php endif; ?>
     <div class="ficha-fecha">
       <span class="d"><?= e($partes['d']) ?></span>
