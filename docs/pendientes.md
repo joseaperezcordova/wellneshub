@@ -297,15 +297,15 @@ el pie —que salen en todas las páginas— están traducidos.
 
 | Fase | Alcance | Depende de |
 |---|---|---|
-| 2 | Portada, buscador y filtros | Textos EN |
+| 2 | Portada — **hecho, 2026-09-01** — falta buscador y filtros (`buscar.php` sigue sin `t()/et()`) | Textos EN |
 | 3 | Formulario de actividad: 40+ etiquetas y mensajes de validación | Textos EN |
 | 4 | Ficha de actividad, contacto, login y correos | Textos EN |
 | 5 | Contenido dinámico: título y descripción de cada actividad | Migración de base |
 
-**Las 23 categorías** son caso aparte. Se guardan en `eventos.categoria` como
-texto en español, así que traducirlas es añadir la etiqueta inglesa en
-`categoriasMenu()` —que ya separa «clave que se guarda» de «etiqueta que se
-lee»— sin tocar ni una fila.
+**Las 23 categorías — hecho, 2026-09-01.** `categoriasMenu()` acepta idioma
+y devuelve la etiqueta inglesa sin tocar `eventos.categoria` ni el `?cat=` de
+las direcciones, que se quedan en español siempre. Se traduce sola en
+cualquier página que la use (portada, `buscar.php`, el formulario de alta).
 
 **La fase 5 necesita una migración**: columnas para título y descripción en
 inglés, más un comportamiento de reserva cuando el organizador no las rellene.
@@ -316,11 +316,17 @@ el organizador.
 REQ-00002 declara como dependencia y todavía no se han entregado. En
 `includes/idiomas/en.php` está traducida la interfaz funcional —navegación,
 botones, etiquetas—; falta el texto editorial: el lema de la marca y las meta
-descriptions de cada página.
+descriptions de cada página. La portada es la primera excepción: su copy
+editorial (título del hero, subtítulo, textos del carrusel) se tradujo sin
+esperar ese entregable —decisión explícita del 2026-09-01, no un cambio de
+la regla para el resto de páginas.
 
-**Mientras tanto no se promueve a producción.** El requerimiento prohíbe la
-traducción parcial, y hoy el inglés cubre el armazón pero no el cuerpo de las
-páginas. Vive en pruebas hasta cerrar la fase 4.
+**Sobre promover a producción:** el requerimiento prohíbe la traducción
+parcial, y hoy el inglés cubre el armazón y la portada pero no el resto del
+cuerpo de las páginas — no está cerrado ni la fase 2 completa. El sitio ya
+vive en el dominio final (`omdara.com.mx`, ver `docs/operacion.md`); esta nota
+queda para que quede claro que esa promoción se hizo sin cerrar esta parte del
+requerimiento, no para sugerir que ya se cumplió.
 
 ---
 
