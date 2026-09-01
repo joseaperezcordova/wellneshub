@@ -394,7 +394,7 @@
   .catitem .ic{
     width:58px; height:58px; border-radius:50%; border:1px solid var(--line);
     background:var(--paper); display:flex; align-items:center; justify-content:center;
-    font-size:22px; color:var(--ink); transition:background .15s, border-color .15s, transform .15s;
+    font-size:22px; color:var(--terracota-texto); transition:background .15s, border-color .15s, transform .15s;
   }
   /* El tamaño del emoji (font-size, arriba) no toca al SVG: un icono de
      línea necesita su propio ancho/alto, y currentColor es lo que hace que
