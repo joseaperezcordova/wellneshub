@@ -599,6 +599,14 @@ return [
     'codigo.reenviar_btn' => 'Reenviar código',
     'codigo.pie' => '¿No llega? Mira en la carpeta de spam antes de pedir otro.',
 
+    // ---- Correo del código de acceso (includes/correo.php) ----
+    // La página que lo pide (login.php, codigo.php) ya sabe su propio idioma
+    // por tener ruta /en propia; este correo va a cualquier visitante, no a
+    // un organizador o admin fijo, así que sí sigue el idioma de quien lo pidió
+    // —al revés que motivosContacto() y los demás avisos internos—.
+    'correo.codigo.asunto' => '{codigo} es tu código para entrar en {marca}',
+    'correo.codigo.cuerpo' => "Tu código para entrar en {marca} es:\n\n    {codigo}\n\nCaduca en {minutos} minutos y sirve una sola vez.\n\nSi no has pedido este código, no hagas nada: sin él nadie entra, y el\ncódigo deja de valer solo. Nadie de {marca} te lo va a pedir por teléfono,\npor WhatsApp ni por correo.\n\n--\n{marca} · Directorio de actividades wellness en México",
+
     // ---- Completar registro (completar-registro.php) ----
     'registro.error.acepta_legal' => 'Para crear tu cuenta debes aceptar los Términos y Condiciones y el Aviso de Privacidad.',
     'registro.error.no_creada'    => 'No se pudo crear tu cuenta. Inténtalo otra vez.',

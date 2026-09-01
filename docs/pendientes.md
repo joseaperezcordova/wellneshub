@@ -299,7 +299,7 @@ el pie —que salen en todas las páginas— están traducidos.
 |---|---|---|
 | 2 | Portada y buscador — **hecho, 2026-09-01** | Textos EN |
 | 3 | Formulario de actividad — **hecho, 2026-09-01** (`evento-editar.php` con ruta `/edit-activity/{id}` propia desde el mismo día, ver nota) | Textos EN |
-| 4 | Ficha, contacto/reportar y login/registro — **hecho, 2026-09-01**. Correos aparte, ver nota | Textos EN |
+| 4 | Ficha, contacto/reportar y login/registro — **hecho, 2026-09-01**. Correo de código de acceso también; los de organizador/admin se quedan en español a propósito, ver nota | Textos EN |
 | 5 | Contenido dinámico: título y descripción de cada actividad — **hecho, 2026-09-01** | Migración de base |
 
 **Las 23 categorías — hecho, 2026-09-01.** `categoriasMenu()` acepta idioma
@@ -365,12 +365,29 @@ de un solo uso para que `google-callback.php` lo recupere a la vuelta —y con
 `resolverGoogle()` (`includes/auth.php`) salen en el idioma correcto en vez
 de en español fijo.
 
-**Los correos quedaron fuera de la fase 4, a propósito.** Sus plantillas
-(`includes/correo.php`, `includes/contacto.php`) siguen en español fijo. No
-es solo falta de texto: hoy no existe ningún mecanismo que decida en qué
-idioma mandar un correo —no se guarda el idioma de quien lo recibe—, así que
-antes de traducirlos hace falta decidir esa regla (¿el idioma del navegador
-al pedir el código? ¿el de la página desde la que se originó el mensaje?).
+**Los correos a organizadores y administradores se quedan en español fijo, a
+propósito** (`includes/correo.php`, `includes/contacto.php`,
+`includes/eventos.php`, `includes/moderacion.php`): van siempre a la misma
+gente del negocio, así que traducirlos según el idioma de quien disparó el
+aviso —el visitante que escribió el formulario— produciría un correo mitad
+inglés mitad español para quien siempre lee en español. No es una traducción
+que falte: es una decisión ya tomada.
+
+**El código de acceso sí se tradujo, 2026-09-01.** Era la única plantilla que
+sí depende del idioma de quien la recibe —va a cualquier visitante que
+intente entrar, no a un organizador o admin fijo—, y el motivo por el que
+seguía bloqueada ya no aplicaba: hacía falta saber el idioma de la página que
+disparó el correo, y desde que `login.php` y `codigo.php` tienen ruta `/en`
+propia (ver arriba), `idiomaActual()` en `enviarCodigoAcceso()`
+(`includes/correo.php`) ya refleja el idioma real de quien lo pidió. Las
+llaves nuevas son `correo.codigo.asunto`/`correo.codigo.cuerpo`, con
+`{codigo}`/`{minutos}`/`{marca}` como marcadores —`strtr()` y no `sprintf()`,
+porque `{marca}` se repite dentro del cuerpo y el orden posicional se
+volvía frágil—. Probado de punta a punta con un POST real a `/sign-in`: en
+entorno local el correo no se manda de verdad, se escribe en el log de
+Apache («=== CORREO (no enviado, entorno local) ===»), y ahí se confirmó el
+asunto y cuerpo completos en inglés.
+
 Se encontró y evitó un caso real de fuga de idioma en el camino:
 `motivosContacto()`, que alimenta tanto el formulario como el correo de
 aviso a los admins, ahora fija español explícito para el correo
@@ -387,9 +404,11 @@ la regla para el resto de páginas.
 
 **Sobre promover a producción:** el requerimiento prohíbe la traducción
 parcial. Hoy el inglés cubre el armazón, la portada, el buscador, el
-formulario de actividad, la ficha, contacto/reportar, login/registro y el
-contenido bilingüe por actividad —fases 2 a 5 completas—, pero no los
-correos (ver nota arriba). El sitio ya vive en el dominio final
+formulario de actividad, la ficha, contacto/reportar, login/registro, el
+contenido bilingüe por actividad y el correo del código de acceso —fases 2 a
+5 completas—, salvo los correos a organizadores y administradores, que se
+quedan en español a propósito (ver nota arriba). El sitio ya vive en el
+dominio final
 (`omdara.com.mx`, ver `docs/operacion.md`); esta nota queda para que quede
 claro que esa promoción se hizo sin cerrar esta parte del requerimiento, no
 para sugerir que ya se cumplió.

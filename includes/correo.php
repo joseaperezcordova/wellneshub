@@ -137,6 +137,13 @@ function enviarCorreo(string $para, string $asunto, string $cuerpo, ?string $res
  * El código va también en el asunto para que se lea en la notificación del
  * móvil sin abrir nada. Es deliberado: quien ve el mensaje ya lo tiene, y quien
  * no tiene acceso al buzón no ve ni la notificación.
+ *
+ * A DIFERENCIA de los avisos a organizadores y administradores (motivosContacto()
+ * y compañía, que fijan español explícito porque van siempre a la misma persona
+ * del negocio), este correo va a cualquier visitante que intente entrar —así
+ * que SÍ sigue su idioma. Se puede porque login.php y codigo.php, que son
+ * quienes disparan este correo, ya tienen ruta /en propia: idiomaActual() aquí
+ * refleja de verdad el idioma de la página que lo pidió.
  */
 function enviarCodigoAcceso(string $para, string $codigo, int $minutos): bool
 {
@@ -146,22 +153,10 @@ function enviarCodigoAcceso(string $para, string $codigo, int $minutos): bool
     // spam, que comparan justo eso.
     [, $marca] = correoRemitente();
 
-    $asunto = $codigo . ' es tu código para entrar en ' . $marca;
+    $reemplazos = ['{codigo}' => $codigo, '{minutos}' => (string) $minutos, '{marca}' => $marca];
 
-    $cuerpo = <<<TEXTO
-Tu código para entrar en $marca es:
-
-    $codigo
-
-Caduca en $minutos minutos y sirve una sola vez.
-
-Si no has pedido este código, no hagas nada: sin él nadie entra, y el
-código deja de valer solo. Nadie de $marca te lo va a pedir por teléfono,
-por WhatsApp ni por correo.
-
---
-$marca · Directorio de actividades wellness en México
-TEXTO;
+    $asunto = strtr(t('correo.codigo.asunto'), $reemplazos);
+    $cuerpo = strtr(t('correo.codigo.cuerpo'), $reemplazos);
 
     return enviarCorreo($para, $asunto, $cuerpo);
 }

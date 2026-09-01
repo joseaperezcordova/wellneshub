@@ -562,6 +562,10 @@ return [
     'codigo.reenviar_btn' => 'Resend code',
     'codigo.pie' => 'Not arriving? Check your spam folder before requesting another one.',
 
+    // ---- Access code email (includes/correo.php) ----
+    'correo.codigo.asunto' => '{codigo} is your code to sign in to {marca}',
+    'correo.codigo.cuerpo' => "Your code to sign in to {marca} is:\n\n    {codigo}\n\nIt expires in {minutos} minutes and works only once.\n\nIf you didn't request this code, you can ignore this message: without it\nno one can sign in, and the code will expire on its own. No one from\n{marca} will ever ask you for it by phone, WhatsApp, or email.\n\n--\n{marca} · Wellness activity directory in Mexico",
+
     // ---- Complete registration (completar-registro.php) ----
     'registro.error.acepta_legal' => 'To create your account you must accept the Terms and Conditions and the Privacy Notice.',
     'registro.error.no_creada'    => 'We couldn\'t create your account. Try again.',
