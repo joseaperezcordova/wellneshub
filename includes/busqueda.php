@@ -42,6 +42,16 @@ function fechasBusqueda(): array
  */
 function ordenesBusqueda(): array
 {
+    // La clave es la que viaja en ?orden= y la que valida filtrosDesdePeticion();
+    // solo la etiqueta cambia con el idioma, igual que en categoriasMenu().
+    if (idiomaActual() === 'en') {
+        return [
+            'fecha'  => 'Upcoming',
+            'nuevos' => 'Recently posted',
+            'precio' => 'Price: low to high',
+        ];
+    }
+
     return [
         'fecha'  => 'Próximas',
         'nuevos' => 'Recién publicadas',

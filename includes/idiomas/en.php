@@ -69,6 +69,7 @@ return [
     // español en una página inglesa. Las meta descriptions quedan pendientes:
     // son texto SEO y el requerimiento las declara como entregable aparte.
     'pagina.inicio.titulo'        => 'Wellness activities directory in Mexico',
+    'pagina.buscar.titulo'        => 'Search activities',
     'pagina.como_funciona.titulo' => 'How it works',
     'pagina.faq.titulo'           => 'Frequently asked questions',
     'pagina.terminos.titulo'      => 'Terms and Conditions',
@@ -109,6 +110,42 @@ return [
     'inicio.proximas.titulo'     => 'Upcoming activities',
     'inicio.proximas.ver_todas'  => 'See all activities →',
     'inicio.proximas.mas_aria'   => 'See more activities',
+
+    // ---- Search (buscar.php) ----
+    'buscar.eyebrow'                 => 'Search activities',
+    'buscar.filtros.nombre'          => 'Name',
+    'buscar.filtros.nombre_placeholder' => 'Retreat, cenote, moon…',
+    'buscar.filtros.estado'          => 'State',
+    'buscar.filtros.todos_estados'   => 'All states',
+    'buscar.filtros.ciudad'          => 'City',
+    'buscar.filtros.todas_ciudades'  => 'All cities',
+    'buscar.filtros.fecha'           => 'Date',
+    'buscar.filtros.categoria'       => 'Category',
+    'buscar.filtros.precio'          => 'Price',
+    'buscar.filtros.solo_gratuitas'  => 'Free only',
+    'buscar.filtros.quitar'          => 'Clear filters',
+    'buscar.orden_aria'              => 'Sort results',
+    'buscar.cargar_mas'              => 'Load more activities',
+
+    'buscar.js.todas'            => 'All activities',
+    'buscar.js.actividades'      => 'Activities',
+    'buscar.js.gratuitas'        => 'Free activities',
+    'buscar.js.en'               => ' in ',
+    'buscar.js.finde'            => ' this weekend',
+    'buscar.js.7dias'            => ' in the next 7 days',
+    'buscar.js.mes'              => ' this month',
+    'buscar.js.sin_coincidencias'=> 'No matching activities',
+    'buscar.js.una_encontrada'   => '1 activity found',
+    'buscar.js.de_total'         => ' of ',
+    'buscar.js.actividades_sufijo' => ' activities',
+    'buscar.js.encontradas_sufijo' => ' activities found',
+    'buscar.js.vacio_directorio' => 'No activities have been published yet.',
+    'buscar.js.sin_resultados'   => 'No activities match your search.',
+    'buscar.js.buscando'         => 'Searching…',
+    'buscar.js.cargando'         => 'Loading…',
+    'buscar.js.error'            => 'We could not load the search. Please try again.',
+
+    'tarjetas.publicar_primera'  => 'Post the first one',
 
     // ---- Consentimiento de cookies (REQ-00003) ----
     // Sí se traduce, aunque roce lo legal: es lo PRIMERO que ve quien entra, y

@@ -36,8 +36,8 @@ $ubicaciones      = ubicacionesConActividad();
 $entidadesFiltro  = $ubicaciones['entidades'];
 $ciudadesFiltro   = $ubicaciones['ciudades'];
 
-$titulo        = 'Buscar actividades';
-$descripcion   = 'Busca actividades de bienestar en México por ciudad, fecha y categoría: retiros, festivales, yoga, breathwork y más.';
+$titulo        = t('pagina.buscar.titulo');
+$descripcion   = t('pagina.buscar.meta');
 $anchoLibre    = true;
 
 /*
@@ -57,8 +57,8 @@ require __DIR__ . '/includes/layout.php';
 
 <section class="wrap block">
   <div class="results-heading">
-    <div class="eyebrow" id="resultsEyebrow">Buscar actividades</div>
-    <div class="block-head"><h1 id="resultsTitle">Todas las actividades</h1></div>
+    <div class="eyebrow" id="resultsEyebrow"><?= et('buscar.eyebrow') ?></div>
+    <div class="block-head"><h1 id="resultsTitle"><?= et('buscar.js.todas') ?></h1></div>
   </div>
 
   <div class="results-layout">
@@ -67,30 +67,30 @@ require __DIR__ . '/includes/layout.php';
              casilla no podía hacer otra cosa que mentir. Vuelve el día que el
              formulario de alta lo pregunte. */ ?>
     <aside class="filters">
-      <h4><label for="fTexto">Nombre</label></h4>
-      <input id="fTexto" type="search" placeholder="Retiro, cenote, luna…"
+      <h4><label for="fTexto"><?= et('buscar.filtros.nombre') ?></label></h4>
+      <input id="fTexto" type="search" placeholder="<?= et('buscar.filtros.nombre_placeholder') ?>"
              autocomplete="off" value="<?= e($filtros['texto']) ?>">
 
-      <h4><label for="fEstado">Estado</label></h4>
+      <h4><label for="fEstado"><?= et('buscar.filtros.estado') ?></label></h4>
       <select id="fEstado">
-        <option value="">Todos los estados</option>
+        <option value=""><?= et('buscar.filtros.todos_estados') ?></option>
         <?php foreach ($entidadesFiltro as $en): ?>
           <option value="<?= e($en) ?>"<?= $en === $filtros['entidad'] ? ' selected' : '' ?>><?= e($en) ?></option>
         <?php endforeach; ?>
       </select>
 
-      <h4><label for="fCiudad">Ciudad</label></h4>
+      <h4><label for="fCiudad"><?= et('buscar.filtros.ciudad') ?></label></h4>
       <select id="fCiudad">
-        <option value="">Todas las ciudades</option>
+        <option value=""><?= et('buscar.filtros.todas_ciudades') ?></option>
         <?php foreach ($ciudadesFiltro as $c): ?>
           <option value="<?= e($c) ?>"<?= $c === $filtros['ciudad'] ? ' selected' : '' ?>><?= e($c) ?></option>
         <?php endforeach; ?>
       </select>
 
-      <h4><label for="fFecha">Fecha</label></h4>
+      <h4><label for="fFecha"><?= et('buscar.filtros.fecha') ?></label></h4>
       <select id="fFecha">
-        <?php foreach (['' => 'Cualquier fecha', 'finde' => 'Este fin de semana',
-                        '7dias' => 'Próximos 7 días', 'mes' => 'Este mes'] as $clave => $texto): ?>
+        <?php foreach (['' => t('inicio.buscador.cuando_cualquiera'), 'finde' => t('inicio.buscador.cuando_finde'),
+                        '7dias' => t('inicio.buscador.cuando_7dias'), 'mes' => t('inicio.buscador.cuando_mes')] as $clave => $texto): ?>
           <option value="<?= e($clave) ?>"<?= $clave === $filtros['fecha'] ? ' selected' : '' ?>><?= e($texto) ?></option>
         <?php endforeach; ?>
       </select>
@@ -99,7 +99,7 @@ require __DIR__ . '/includes/layout.php';
                valida el formulario de alta. Escritas a mano en los dos sitios,
                una categoría nueva aparecía aquí y no se podía elegir al
                publicar —o al revés. */ ?>
-      <h4>Categoría</h4>
+      <h4><?= et('buscar.filtros.categoria') ?></h4>
       <div class="checklist" id="fCats">
         <?php foreach (categoriasMenu() as $catNombre => $catDatos): ?>
           <label>
@@ -110,12 +110,12 @@ require __DIR__ . '/includes/layout.php';
         <?php endforeach; ?>
       </div>
 
-      <h4>Precio</h4>
+      <h4><?= et('buscar.filtros.precio') ?></h4>
       <div class="checklist">
-        <label><input type="checkbox" id="fGratis"<?= $filtros['gratis'] ? ' checked' : '' ?>> Solo gratuitas</label>
+        <label><input type="checkbox" id="fGratis"<?= $filtros['gratis'] ? ' checked' : '' ?>> <?= et('buscar.filtros.solo_gratuitas') ?></label>
       </div>
 
-      <button type="button" class="filtros-limpiar" id="fLimpiar" hidden>Quitar filtros</button>
+      <button type="button" class="filtros-limpiar" id="fLimpiar" hidden><?= et('buscar.filtros.quitar') ?></button>
     </aside>
 
     <div>
@@ -125,14 +125,14 @@ require __DIR__ . '/includes/layout.php';
                  también de donde sale el whitelist de la dirección. Escritas
                  aquí a mano, reordenar el menú podía cambiar sin querer cuál
                  era el orden por defecto —lo era la primera de la otra lista. */ ?>
-        <select class="sortsel" id="fOrden" aria-label="Ordenar resultados">
+        <select class="sortsel" id="fOrden" aria-label="<?= et('buscar.orden_aria') ?>">
           <?php foreach (ordenesBusqueda() as $clave => $texto): ?>
             <option value="<?= e($clave) ?>"<?= $clave === $filtros['orden'] ? ' selected' : '' ?>><?= e($texto) ?></option>
           <?php endforeach; ?>
         </select>
       </div>
       <div class="results-grid" id="resultsGrid"></div>
-      <button type="button" class="btn-cargar-mas" id="btnCargarMas" hidden>Cargar más actividades</button>
+      <button type="button" class="btn-cargar-mas" id="btnCargarMas" hidden><?= et('buscar.cargar_mas') ?></button>
     </div>
   </div>
 </section>
@@ -141,5 +141,35 @@ require __DIR__ . '/includes/layout.php';
          no escribirlo en la dirección, y tenerlo escrito a mano en los dos
          sitios es la forma de que un día dejen de coincidir. */ ?>
 <script>var ORDEN_DEFECTO = <?= json_encode(ordenPorDefecto()) ?>;</script>
+
+<?php /* buscar.js arma el título de resultados, el contador y los avisos de
+         "sin resultados" en el navegador, según lo que se vaya filtrando —no
+         hay recarga de página de por medio para pedírselo a PHP cada vez—.
+         Sin este objeto esos textos se quedarían fijos en español pase lo que
+         pase con la dirección /activities. */ ?>
+<script>
+var BUSCAR_T = <?= json_encode([
+    'todas'             => t('buscar.js.todas'),
+    'actividades'       => t('buscar.js.actividades'),
+    'gratuitas'         => t('buscar.js.gratuitas'),
+    'en'                => t('buscar.js.en'),
+    'findeSufijo'       => t('buscar.js.finde'),
+    'sieteDiasSufijo'   => t('buscar.js.7dias'),
+    'mesSufijo'         => t('buscar.js.mes'),
+    'sinCoincidencias'  => t('buscar.js.sin_coincidencias'),
+    'unaEncontrada'     => t('buscar.js.una_encontrada'),
+    'deTotal'           => t('buscar.js.de_total'),
+    'actividadesSufijo' => t('buscar.js.actividades_sufijo'),
+    'encontradasSufijo' => t('buscar.js.encontradas_sufijo'),
+    'vacioDirectorio'   => t('buscar.js.vacio_directorio'),
+    'sinResultados'     => t('buscar.js.sin_resultados'),
+    'buscando'          => t('buscar.js.buscando'),
+    'cargando'          => t('buscar.js.cargando'),
+    'cargarMas'         => t('buscar.cargar_mas'),
+    'quitarFiltros'     => t('buscar.filtros.quitar'),
+    'publicarPrimera'   => t('tarjetas.publicar_primera'),
+    'error'             => t('buscar.js.error'),
+], JSON_UNESCAPED_UNICODE) ?>;
+</script>
 
 <?php pie(); ?>

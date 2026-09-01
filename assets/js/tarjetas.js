@@ -94,17 +94,17 @@ function cardHTML(e, cola) {
 /* Con la base vacía, un carril sin nada parece la página rota. Se dice que no
    hay actividades y se invita a publicar, que es justo lo que hace falta al
    principio. */
-function vacioHTML(mensaje) {
+function vacioHTML(mensaje, boton) {
   return '<div class="rail-vacio">'
     + '<p>' + esc(mensaje) + '</p>'
-    + '<a class="btn-vacio" href="' + RUEDA.base + '/evento-nuevo.php">Publicar la primera</a>'
+    + '<a class="btn-vacio" href="' + RUEDA.base + '/evento-nuevo.php">' + esc(boton) + '</a>'
     + '</div>';
 }
 
-function pintar(id, trozos, mensajeVacio) {
+function pintar(id, trozos, mensajeVacio, botonVacio) {
   var caja = document.getElementById(id);
   if (!caja) return;
-  caja.innerHTML = trozos.length ? trozos.join('') : (mensajeVacio ? vacioHTML(mensajeVacio) : '');
+  caja.innerHTML = trozos.length ? trozos.join('') : (mensajeVacio ? vacioHTML(mensajeVacio, botonVacio) : '');
 }
 
 /* ---------- carriles horizontales ----------

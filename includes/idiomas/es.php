@@ -65,6 +65,8 @@ return [
     // ---- Títulos y descripciones de las páginas estáticas ----
     'pagina.inicio.titulo'        => 'Directorio de actividades wellness en México',
     'pagina.inicio.meta'          => 'Encuentra retiros, festivales y círculos de bienestar en todo México: yoga, breathwork, sound healing, temazcal y más. Publica tu actividad gratis.',
+    'pagina.buscar.titulo'        => 'Buscar actividades',
+    'pagina.buscar.meta'          => 'Busca actividades de bienestar en México por ciudad, fecha y categoría: retiros, festivales, yoga, breathwork y más.',
     'pagina.como_funciona.titulo' => 'Cómo funciona',
     'pagina.como_funciona.meta'   => 'Cómo encontrar actividades de bienestar en OMDARA y cómo publicar la tuya si eres organizador.',
     'pagina.faq.titulo'           => 'Preguntas frecuentes',
@@ -113,6 +115,48 @@ return [
     'inicio.proximas.titulo'     => 'Próximas actividades',
     'inicio.proximas.ver_todas'  => 'Ver todas las actividades →',
     'inicio.proximas.mas_aria'   => 'Ver más actividades',
+
+    // ---- Buscar (buscar.php) ----
+    'buscar.eyebrow'                 => 'Buscar actividades',
+    'buscar.filtros.nombre'          => 'Nombre',
+    'buscar.filtros.nombre_placeholder' => 'Retiro, cenote, luna…',
+    'buscar.filtros.estado'          => 'Estado',
+    'buscar.filtros.todos_estados'   => 'Todos los estados',
+    'buscar.filtros.ciudad'          => 'Ciudad',
+    'buscar.filtros.todas_ciudades'  => 'Todas las ciudades',
+    'buscar.filtros.fecha'           => 'Fecha',
+    'buscar.filtros.categoria'       => 'Categoría',
+    'buscar.filtros.precio'          => 'Precio',
+    'buscar.filtros.solo_gratuitas'  => 'Solo gratuitas',
+    'buscar.filtros.quitar'          => 'Quitar filtros',
+    'buscar.orden_aria'              => 'Ordenar resultados',
+    'buscar.cargar_mas'              => 'Cargar más actividades',
+
+    // Las que sigue lee assets/js/buscar.js —vía el objeto BUSCAR_T que
+    // imprime buscar.php—, no PHP: el título de resultados, el contador y
+    // los mensajes de "sin resultados" se arman en el navegador según lo que
+    // se vaya filtrando, sin recargar la página.
+    'buscar.js.todas'            => 'Todas las actividades',
+    'buscar.js.actividades'      => 'Actividades',
+    'buscar.js.gratuitas'        => 'Actividades gratuitas',
+    'buscar.js.en'               => ' en ',
+    'buscar.js.finde'            => ' este fin de semana',
+    'buscar.js.7dias'            => ' en los próximos 7 días',
+    'buscar.js.mes'              => ' este mes',
+    'buscar.js.sin_coincidencias'=> 'Ninguna actividad coincide',
+    'buscar.js.una_encontrada'   => '1 actividad encontrada',
+    'buscar.js.de_total'         => ' de ',
+    'buscar.js.actividades_sufijo' => ' actividades',
+    'buscar.js.encontradas_sufijo' => ' actividades encontradas',
+    'buscar.js.vacio_directorio' => 'Todavía no hay actividades publicadas.',
+    'buscar.js.sin_resultados'   => 'Ninguna actividad coincide con lo que buscas.',
+    'buscar.js.buscando'         => 'Buscando…',
+    'buscar.js.cargando'         => 'Cargando…',
+    'buscar.js.error'            => 'No se pudo cargar la búsqueda. Inténtalo de nuevo.',
+
+    // El botón del aviso "todavía no hay actividades" —vacioHTML() en
+    // tarjetas.js—, compartido por la portada y el buscador.
+    'tarjetas.publicar_primera'  => 'Publicar la primera',
 
     // ---- Consentimiento de cookies (REQ-00003) ----
     // El requerimiento escribe la marca en minúsculas; aquí va OMDARA, que es

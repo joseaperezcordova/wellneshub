@@ -287,6 +287,12 @@ if (seccionVisible('blog')): ?>
 <script>
   var EVENTOS = <?= json_encode($eventosJs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
                                           | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+  // Lo que necesita inicio.js para el aviso de "todavía no hay actividades"
+  // del carril —ver vacioHTML() en tarjetas.js—, en el idioma de la página.
+  var INICIO_T = <?= json_encode([
+      'vacio'           => t('buscar.js.vacio_directorio'),
+      'publicarPrimera' => t('tarjetas.publicar_primera'),
+  ], JSON_UNESCAPED_UNICODE) ?>;
 </script>
 
 <?php pie(); ?>

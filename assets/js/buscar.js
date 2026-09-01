@@ -23,6 +23,9 @@
   var $ = function (id) { return document.getElementById(id); };
   if (!$('resultsGrid')) return;
 
+  // Lo imprime buscar.php, en el idioma de la página —ver BUSCAR_T ahí—.
+  var T = window.BUSCAR_T;
+
   var PAGINA = 24;
 
   var estado    = {texto: '', entidad: '', ciudad: '', fecha: '', cats: [], gratis: false, orden: 'fecha'};
@@ -38,11 +41,11 @@
        ya estaba en el navegador; ahora lo dice hayFiltros(): sin ningún filtro
        puesto, cero resultados solo puede significar que el directorio está
        vacío. */
-    if (!hayFiltros()) return vacioHTML('Todavía no hay actividades publicadas.');
+    if (!hayFiltros()) return vacioHTML(T.vacioDirectorio, T.publicarPrimera);
 
     return '<div class="rail-vacio">'
-      + '<p>Ninguna actividad coincide con lo que buscas.</p>'
-      + '<button type="button" class="btn-vacio" id="vaciarFiltros">Quitar filtros</button>'
+      + '<p>' + esc(T.sinResultados) + '</p>'
+      + '<button type="button" class="btn-vacio" id="vaciarFiltros">' + esc(T.quitarFiltros) + '</button>'
       + '</div>';
   }
 
@@ -74,13 +77,13 @@
 
   function pintarConteo() {
     if (total === 0) {
-      $('resultsCount').textContent = 'Ninguna actividad coincide';
+      $('resultsCount').textContent = T.sinCoincidencias;
     } else if (total === 1) {
-      $('resultsCount').textContent = '1 actividad encontrada';
+      $('resultsCount').textContent = T.unaEncontrada;
     } else if (cargados < total) {
-      $('resultsCount').textContent = cargados + ' de ' + total + ' actividades';
+      $('resultsCount').textContent = cargados + T.deTotal + total + T.actividadesSufijo;
     } else {
-      $('resultsCount').textContent = total + ' actividades encontradas';
+      $('resultsCount').textContent = total + T.encontradasSufijo;
     }
 
     var boton = $('btnCargarMas');
@@ -99,11 +102,11 @@
     var url        = 'buscar-datos.php' + (qs ? '?' + qs + '&' : '?') + 'offset=' + offset;
 
     if (reiniciar) {
-      $('resultsGrid').innerHTML = '<div class="rail-cargando">Buscando…</div>';
+      $('resultsGrid').innerHTML = '<div class="rail-cargando">' + esc(T.buscando) + '</div>';
       $('btnCargarMas').hidden = true;
     } else {
       $('btnCargarMas').disabled = true;
-      $('btnCargarMas').textContent = 'Cargando…';
+      $('btnCargarMas').textContent = T.cargando;
     }
 
     fetch(url)
@@ -133,12 +136,12 @@
 
         var boton = $('btnCargarMas');
         boton.disabled = false;
-        boton.textContent = 'Cargar más actividades';
+        boton.textContent = T.cargarMas;
       })
       .catch(function () {
         if (miPeticion !== peticion) return;
         if (reiniciar) {
-          $('resultsGrid').innerHTML = '<div class="rail-vacio"><p>No se pudo cargar la búsqueda. Inténtalo de nuevo.</p></div>';
+          $('resultsGrid').innerHTML = '<div class="rail-vacio"><p>' + esc(T.error) + '</p></div>';
         }
       });
 
@@ -182,14 +185,14 @@
   /* El título dice lo que se pidió. «Todas las actividades» encima de una lista
      que no son todas es la clase de detalle que hace dudar de la página entera. */
   function resumen() {
-    if (!hayFiltros()) return 'Todas las actividades';
+    if (!hayFiltros()) return T.todas;
 
-    var que    = estado.cats.length === 1 ? estado.cats[0] : 'Actividades';
+    var que    = estado.cats.length === 1 ? estado.cats[0] : T.actividades;
     var donde  = estado.ciudad || estado.entidad;
-    var cuando = {finde: ' este fin de semana', '7dias': ' en los próximos 7 días', mes: ' este mes'};
+    var cuando = {finde: T.findeSufijo, '7dias': T.sieteDiasSufijo, mes: T.mesSufijo};
 
-    return (estado.gratis && que === 'Actividades' ? 'Actividades gratuitas' : que)
-         + (donde ? ' en ' + donde : '')
+    return (estado.gratis && que === T.actividades ? T.gratuitas : que)
+         + (donde ? T.en + donde : '')
          + (cuando[estado.fecha] || '');
   }
 

@@ -6,7 +6,8 @@
   'use strict';
 
   /* ---------- el carril de próximas actividades ---------- */
-  pintar('proximosRail', EVENTOS.map(evCardHTML), 'Todavía no hay actividades publicadas.');
+  // INICIO_T lo imprime index.php, en el idioma de la página.
+  pintar('proximosRail', EVENTOS.map(evCardHTML), INICIO_T.vacio, INICIO_T.publicarPrimera);
 
   carril('catrail', 'catnext');
   carril('proximosRail', 'evnext');
