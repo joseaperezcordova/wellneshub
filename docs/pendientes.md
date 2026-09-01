@@ -153,70 +153,45 @@ persona (ver 2e).
 
 ---
 
-### 2b. Ejecutar la migración 15 (teléfono en los mensajes al organizador)
+### 2b/2d/2f/2h/2j. Rodeos de las migraciones 15, 16, 17, 18 y 19 — cerrado
 
-**Qué falta:** correr `database/migracion-15-telefono-en-contactos.sql` en
-phpMyAdmin, en pruebas y en producción.
+**Migraciones ejecutadas y código de compatibilidad quitado**, 2026-09-01.
+`crearContacto()` y `crearContactoSitio()` (`includes/contacto.php`),
+`registrarAceptacionLegal()` (`includes/auth.php`) y la función
+`camposContactoDisponibles()` —que filtraba qué campos enseñar en «Mi
+cuenta» y en el formulario de publicar— ya no comprueban `columnaExiste()`:
+escriben directo, y los tres sitios que llamaban a
+`camposContactoDisponibles()` (`guardarContactoOrganizador()` en
+`includes/auth.php`, `mi-cuenta.php`, `includes/form-evento.php`) pasan a
+usar `camposContactoOrganizador()` sin filtrar. `columnaExiste()`
+(`includes/db.php`) se queda sin llamadas por ahora —no estorba, y la
+próxima migración a mano lo puede volver a usar—.
 
-**Qué pasa mientras tanto:** nada visible. El formulario funciona, el teléfono
-llega al correo del organizador —que es para lo que se pide— y solo se pierde en
-la base. `crearContacto()` comprueba si la columna existe antes de escribir, para
-que publicar el código antes de aplicar la migración no tire el formulario
-entero, que es lo que pasó con las tablas la primera vez.
+> **Ojo con el entorno local de desarrollo:** al hacer esta limpieza se
+> descubrió que las migraciones 15 a 19 nunca se habían aplicado en la base
+> local de XAMPP —José las confirmó en pruebas y producción, pero esas dos
+> son entornos remotos, distintos del local—. El código limpio, sin el
+> rodeo, rompía ahí con «Unknown column». Se aplicaron las cinco migraciones
+> directo en la base local (mismo mecanismo que ya se usó para la 21) antes
+> de dar la limpieza por probada. **Vale la pena recordar esto la próxima
+> vez que se declare una migración de producción como excusa para quitar
+> una comprobación**: hay que confirmar también el entorno local antes de
+> asumirlo.
+>
+> **Además se encontró que `columnaExiste()` estaba rota de verdad en este
+> entorno** —no por la migración que faltaba, sino aparte—: su
+> `SHOW COLUMNS FROM \`tabla\` LIKE ?` fallaba con «Syntax error… near '?'»
+> en cada llamada y siempre devolvía `false`, sin importar si la columna
+> existía. Como ahora no queda ninguna llamada a esa función, no bloqueó
+> nada de esta limpieza, pero si alguna migración futura vuelve a usarla,
+> primero hay que arreglarla —probablemente cambiando a interpolar el
+> nombre de la columna, ya validado contra `[A-Za-z0-9_]+`, en vez de
+> pasarlo como parámetro del `LIKE`—.
 
-**Para cerrarlo:** ejecutar el `.sql` en los dos entornos y luego quitar el rodeo
-de `crearContacto()` en `includes/contacto.php` —el `columnaExiste()` y la rama
-sin teléfono—, que vuelve a ser un único INSERT. `columnaExiste()` en
-`includes/db.php` se queda: no estorba y la próxima migración a mano lo
-agradecerá.
-
----
-
-### 2d. Ejecutar la migración 16 (aceptación de Términos y Aviso)
-
-**Qué falta:** correr `database/migracion-16-aceptacion-legal.sql` en phpMyAdmin,
-en pruebas y en producción.
-
-**Qué pasa mientras tanto:** la casilla se pide y se exige igual —nadie crea
-cuenta sin marcarla—, pero la fecha no queda registrada y en el log aparece un
-aviso por cada alta. `registrarAceptacionLegal()` lo comprueba antes de escribir,
-por el mismo motivo que la 15: publicar el código antes de aplicar la migración
-no puede significar «nadie puede crear cuenta».
-
-**Cuanto antes mejor**, más que la 15: aquí lo que se pierde no es un dato de
-contacto, es la prueba de que alguien aceptó.
-
-**Para cerrarlo:** ejecutar el `.sql` y quitar el `columnaExiste()` de
-`registrarAceptacionLegal()` en `includes/auth.php`.
-
----
-
-### 2f. Ejecutar la migración 17 (teléfono del organizador)
-
-**Qué falta:** correr `database/migracion-17-telefono-organizador.sql` en
-phpMyAdmin, en pruebas y en producción.
-
-**Qué pasa mientras tanto:** «Mi cuenta → Información de contacto» funciona y
-deja editar el nombre; el campo de teléfono sencillamente no aparece, ni en la
-página ni en el panel de administración.
-
-**Para cerrarlo:** ejecutar el `.sql`. La comprobación vive en
-`camposContactoDisponibles()` (`includes/auth.php`) y cubre también la migración
-18, así que se quita cuando estén aplicadas las dos.
-
----
-
-### 2h. Ejecutar la migración 18 (Instagram y sitio web del organizador)
-
-**Qué falta:** correr `database/migracion-18-contacto-organizador.sql` en
-phpMyAdmin, en pruebas y en producción. Va con la 17: son la misma sección.
-
-**Qué pasa mientras tanto:** la sección «Información de contacto» del formulario
-de publicar aparece igual, pero solo con los campos cuya columna exista. Sin
-ninguna de las dos migraciones, solo se ve el nombre.
-
-**Para cerrarlo:** ejecutar el `.sql` y quitar `camposContactoDisponibles()`,
-dejando que todo use `camposContactoOrganizador()` directamente.
+Probado de punta a punta contra Apache+MySQL reales: envío de
+`/contactar/{id}` con teléfono, envío de `/contacto` con motivo, y un alta
+nueva completa por correo confirmando que `usuarios.acepto_legal_en` queda
+con fecha. Las tres pruebas insertaron y borraron sus propias filas.
 
 ---
 
@@ -413,24 +388,19 @@ dominio final
 claro que esa promoción se hizo sin cerrar esta parte del requerimiento, no
 para sugerir que ya se cumplió.
 
-**Falta correr la migración 21 en producción** (`titulo_en`/`descripcion_en`
-en `eventos`) — ver el punto siguiente para el patrón de aviso, o
-directamente `database/migracion-21-titulo-descripcion-en.sql`.
+**Migración 21 ejecutada** (`titulo_en`/`descripcion_en` en `eventos`) —
+confirmado por José el 2026-09-01, en pruebas y producción.
 
 ---
 
-### 2j. Ejecutar la migración 19 (motivo y estado en los mensajes de contacto)
+### 2j. Quitar el rodeo de la migración 19 (motivo y estado en los mensajes de contacto)
 
-**Qué falta:** correr `database/migracion-19-contacto-motivo.sql` en phpMyAdmin,
-en pruebas y en producción.
+**Migración ejecutada** — confirmado por José el 2026-09-01, en pruebas y
+producción.
 
-**Qué pasa mientras tanto:** el formulario de `/contacto` funciona entero —pide
-el motivo, pide la actividad cuando toca, y los dos van en el correo al
-administrador, que es lo que hace que alguien actúe—. Lo único que se pierde es
-guardarlos en la base, y en el panel esas columnas salen con un guion.
-
-**Para cerrarlo:** ejecutar el `.sql` y quitar el `columnaExiste()` de
-`crearContactoSitio()` en `includes/contacto.php`.
+**Qué queda:** `crearContactoSitio()` (`includes/contacto.php`) sigue
+comprobando `columnaExiste()` antes de escribir `motivo`, `actividad_nombre`
+y `estado`. Se puede quitar esa comprobación.
 
 ---
 

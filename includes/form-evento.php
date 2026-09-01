@@ -83,7 +83,7 @@ $mal = function (string $campo) use ($errores) {
  * prefijo «org_», para que quede claro de un vistazo qué se guarda dónde.
  */
 $orgFicha  = fichaDeUsuario((int) usuarioActual()['id']);
-$orgCampos = camposContactoDisponibles();
+$orgCampos = camposContactoOrganizador();
 
 /** El valor de un campo de contacto: lo recién escrito si falló, o lo guardado. */
 $ov = function (string $columna) use ($orgFicha) {

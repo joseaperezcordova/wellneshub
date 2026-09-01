@@ -45,24 +45,17 @@ function contactoRepetido(int $eventoId): bool
  */
 function crearContacto(int $eventoId, string $nombre, string $email, ?string $telefono, ?string $mensaje): void
 {
-    $conTelefono = columnaExiste('contactos', 'telefono');
+    $valores = [
+        $eventoId,
+        mb_substr($nombre, 0, 120),
+        mb_substr($email, 0, 190),
+        ($telefono !== null && $telefono !== '') ? mb_substr($telefono, 0, 30) : null,
+        ($mensaje !== null && $mensaje !== '') ? mb_substr($mensaje, 0, 1000) : null,
+        ipBinaria(),
+    ];
 
-    $columnas = 'evento_id, nombre, email, ' . ($conTelefono ? 'telefono, ' : '') . 'mensaje, ip';
-    $huecos   = $conTelefono ? '?, ?, ?, ?, ?, ?' : '?, ?, ?, ?, ?';
-
-    $valores = [$eventoId, mb_substr($nombre, 0, 120), mb_substr($email, 0, 190)];
-    if ($conTelefono) {
-        $valores[] = ($telefono !== null && $telefono !== '') ? mb_substr($telefono, 0, 30) : null;
-    }
-    $valores[] = ($mensaje !== null && $mensaje !== '') ? mb_substr($mensaje, 0, 1000) : null;
-    $valores[] = ipBinaria();
-
-    db()->prepare("INSERT INTO contactos ($columnas) VALUES ($huecos)")->execute($valores);
-
-    if (!$conTelefono && $telefono !== null && $telefono !== '') {
-        error_log('contactos.telefono no existe todavía: falta ejecutar '
-            . 'database/migracion-15-telefono-en-contactos.sql. El mensaje se guardó sin teléfono.');
-    }
+    db()->prepare('INSERT INTO contactos (evento_id, nombre, email, telefono, mensaje, ip) VALUES (?, ?, ?, ?, ?, ?)')
+        ->execute($valores);
 }
 
 /**
@@ -169,29 +162,17 @@ function estadosContacto(): array
 function crearContactoSitio(string $nombre, string $email, string $mensaje,
                             string $motivo = 'general', ?string $actividad = null): void
 {
-    $conMotivo = columnaExiste('mensajes_contacto', 'motivo');
+    $valores = [
+        mb_substr($nombre, 0, 120),
+        mb_substr($email, 0, 190),
+        isset(motivosContacto()[$motivo]) ? $motivo : 'general',
+        ($actividad !== null && trim($actividad) !== '') ? mb_substr(trim($actividad), 0, 200) : null,
+        mb_substr($mensaje, 0, 1000),
+        ipBinaria(),
+    ];
 
-    $columnas = 'nombre, email, ' . ($conMotivo ? 'motivo, actividad_nombre, ' : '') . 'mensaje, ip';
-    $huecos   = $conMotivo ? '?, ?, ?, ?, ?, ?' : '?, ?, ?, ?';
-
-    $valores = [mb_substr($nombre, 0, 120), mb_substr($email, 0, 190)];
-
-    if ($conMotivo) {
-        $valores[] = isset(motivosContacto()[$motivo]) ? $motivo : 'general';
-        $valores[] = ($actividad !== null && trim($actividad) !== '')
-            ? mb_substr(trim($actividad), 0, 200)
-            : null;
-    }
-
-    $valores[] = mb_substr($mensaje, 0, 1000);
-    $valores[] = ipBinaria();
-
-    db()->prepare("INSERT INTO mensajes_contacto ($columnas) VALUES ($huecos)")->execute($valores);
-
-    if (!$conMotivo) {
-        error_log('mensajes_contacto.motivo no existe todavía: falta ejecutar '
-            . 'database/migracion-19-contacto-motivo.sql. El mensaje se guardó sin motivo ni actividad.');
-    }
+    db()->prepare('INSERT INTO mensajes_contacto (nombre, email, motivo, actividad_nombre, mensaje, ip) VALUES (?, ?, ?, ?, ?, ?)')
+        ->execute($valores);
 }
 
 /**
@@ -203,8 +184,6 @@ function crearContactoSitio(string $nombre, string $email, string $mensaje,
  */
 function mensajesContactoRecientes(int $limite = 100): array
 {
-    // SELECT * y no una lista de columnas: hasta que se aplique la migración 19
-    // faltan tres, y una lista explícita reventaría la pestaña entera.
     $st = db()->prepare(
         'SELECT * FROM mensajes_contacto ORDER BY creado_en DESC LIMIT ' . (int) $limite
     );

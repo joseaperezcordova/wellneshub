@@ -305,25 +305,6 @@ function camposContactoOrganizador(): array
     ];
 }
 
-/**
- * Los que existen de verdad en la base ahora mismo.
- *
- * Las migraciones 17 y 18 se aplican a mano, así que entre publicar el código y
- * ejecutarlas hay un rato en el que alguna columna no está. Preguntando aquí,
- * el formulario enseña lo que puede guardar y nada más: un campo que se rellena
- * y se pierde es peor que un campo que no aparece.
- */
-function camposContactoDisponibles(): array
-{
-    $vivos = [];
-
-    foreach (camposContactoOrganizador() as $columna => $etiqueta) {
-        if (columnaExiste('usuarios', $columna)) $vivos[$columna] = $etiqueta;
-    }
-
-    return $vivos;
-}
-
 /** Deja el Instagram como @cuenta, venga como venga. */
 function normalizarInstagram(string $valor): string
 {
@@ -385,7 +366,7 @@ function guardarContactoOrganizador(int $usuarioId, array $datos): void
             ->execute([mb_substr($nombre, 0, 120), $usuarioId]);
     }
 
-    foreach (array_keys(camposContactoDisponibles()) as $columna) {
+    foreach (array_keys(camposContactoOrganizador()) as $columna) {
         $valor = trim((string) ($datos['org_' . $columna] ?? ''));
 
         if ($columna === 'instagram') $valor = normalizarInstagram($valor);
@@ -403,21 +384,9 @@ function guardarContactoOrganizador(int $usuarioId, array $datos): void
  * COALESCE y no NOW() a secas: vale la primera vez que aceptó, no la última vez
  * que se le preguntó. Si alguna vez se vuelve a pedir —porque cambien los
  * documentos— la fecha original es la que prueba el alta.
- *
- * La comprobación de columna es la misma historia que el teléfono de la
- * migración 15: las migraciones de este proyecto se ejecutan a mano, y entre
- * publicar el código y aplicarlas pasa un rato. Sin esto, ese rato sería
- * «nadie puede crear cuenta». Se prefiere perder el registro de la aceptación
- * —que se sigue exigiendo en pantalla— antes que cerrar la puerta.
  */
 function registrarAceptacionLegal(int $usuarioId): void
 {
-    if (!columnaExiste('usuarios', 'acepto_legal_en')) {
-        error_log('usuarios.acepto_legal_en no existe todavía: falta ejecutar '
-            . 'database/migracion-16-aceptacion-legal.sql. La aceptación no quedó registrada.');
-        return;
-    }
-
     db()->prepare(
         'UPDATE usuarios SET acepto_legal_en = COALESCE(acepto_legal_en, NOW()) WHERE id = ?'
     )->execute([$usuarioId]);

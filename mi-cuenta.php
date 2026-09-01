@@ -42,12 +42,8 @@ if (!$ficha) redirigir('/logout.php');
  * misma lista: WhatsApp, Instagram y sitio web. Editarlos aquí o al publicar
  * cambia lo mismo, y por eso ninguna de las dos pantallas tiene su propia idea
  * de cuáles son.
- *
- * camposContactoDisponibles() deja fuera los que su migración todavía no ha
- * creado. Un campo que se rellena y se pierde es peor que un campo que no
- * aparece.
  */
-$campos = camposContactoDisponibles();
+$campos = camposContactoOrganizador();
 
 $editando = !empty($_GET['editar']);
 $error    = '';
