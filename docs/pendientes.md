@@ -298,7 +298,7 @@ el pie —que salen en todas las páginas— están traducidos.
 | Fase | Alcance | Depende de |
 |---|---|---|
 | 2 | Portada y buscador — **hecho, 2026-09-01** | Textos EN |
-| 3 | Formulario de actividad: 40+ etiquetas y mensajes de validación | Textos EN |
+| 3 | Formulario de actividad — **hecho, 2026-09-01** (`evento-editar.php` traducido pero sin ruta `/en` propia, ver nota) | Textos EN |
 | 4 | Ficha de actividad, contacto, login y correos | Textos EN |
 | 5 | Contenido dinámico: título y descripción de cada actividad | Migración de base |
 
@@ -312,6 +312,13 @@ inglés, más un comportamiento de reserva cuando el organizador no las rellene.
 El requerimiento pide expresamente no traducir automáticamente lo que escribió
 el organizador.
 
+**`evento-editar.php` no tiene ruta limpia en `/en`**: no está en
+`rutasSitio()` —es `evento-editar.php?id=N`, no una dirección fija—, así que
+`idiomaActual()` no tiene de dónde sacar el idioma y siempre cae al español,
+aunque su texto ya está traducido en `includes/idiomas/en.php` y listo para
+cuando exista esa ruta. `evento-nuevo.php` sí tiene ruta propia
+(`/publish-an-activity`) y sí se ve en inglés.
+
 **Bloqueado por:** los textos finales ES/EN y los textos SEO, que el propio
 REQ-00002 declara como dependencia y todavía no se han entregado. En
 `includes/idiomas/en.php` está traducida la interfaz funcional —navegación,
@@ -322,9 +329,10 @@ esperar ese entregable —decisión explícita del 2026-09-01, no un cambio de
 la regla para el resto de páginas.
 
 **Sobre promover a producción:** el requerimiento prohíbe la traducción
-parcial, y hoy el inglés cubre el armazón, la portada y el buscador (fase 2
-completa) pero no el resto del cuerpo de las páginas —fases 3 a 5 siguen sin
-empezar—. El sitio ya vive en el dominio final (`omdara.com.mx`, ver
+parcial, y hoy el inglés cubre el armazón, la portada, el buscador y el
+formulario de actividad (fases 2 y 3 completas) pero no la ficha, el
+contacto, el login ni los correos —fases 4 y 5 siguen sin empezar—. El sitio
+ya vive en el dominio final (`omdara.com.mx`, ver
 `docs/operacion.md`); esta nota queda para que quede claro que esa promoción
 se hizo sin cerrar esta parte del requerimiento, no para sugerir que ya se
 cumplió.
