@@ -347,6 +347,72 @@ return [
     'evento.guia.traduccion_texto2' => 'If your activity targets both Spanish- and English-speaking participants, consider providing the relevant information in both languages within the description.',
     'evento.guia.nota'              => 'With that in mind, choose the <strong>main action</strong> below: decide what people ready to take the next step will see.',
 
+    // ---- Activity page (evento.php) ----
+    'ficha.no_encontrada.titulo'    => 'Activity not found',
+    'ficha.no_encontrada.h1'        => 'That activity doesn\'t exist',
+    'ficha.no_encontrada.texto'     => 'It may have been deleted, or it might not be published yet.',
+    'ficha.no_encontrada.ver_todas' => 'See the ones that are',
+
+    'ficha.error.sesion_caducada'   => 'Your session expired. Try again.',
+    'ficha.error.no_permiso'        => 'You can\'t do that.',
+    'ficha.error.plazo_eliminar'    => 'The deadline to delete this activity has passed. Ask an admin.',
+    'ficha.aviso.publicado'         => 'Published! It\'s now on the homepage.',
+    'ficha.aviso.oculto'            => 'Activity hidden. It no longer shows in listings.',
+    'ficha.aviso.eliminado'         => 'Activity deleted.',
+
+    'ficha.volver.admin'       => 'Back to the admin panel',
+    'ficha.volver.resultados'  => 'Back to the results',
+    'ficha.volver.todas'       => 'See all activities',
+
+    'ficha.barra.vista_previa_tit'   => 'Preview.',
+    'ficha.barra.vista_previa_texto' => 'This is how your page will look. No one else can see it yet.',
+    'ficha.barra.oculta_tit'         => 'Hidden.',
+    'ficha.barra.oculta_texto'       => 'It doesn\'t show in listings.',
+    'ficha.barra.publicada_tit'      => 'Published.',
+    'ficha.barra.puedes_eliminar'    => 'You can delete it for another',
+    'ficha.barra.mas'                => 'more.',
+    'ficha.barra.admin_sin_plazo'    => 'You\'re an admin: you can delete it even past the deadline.',
+    'ficha.barra.plazo_pasado'       => 'The deadline to delete it has passed; ask an admin if needed.',
+
+    'ficha.btn.publicar'         => 'Publish',
+    'ficha.btn.volver_publicar'  => 'Publish again',
+    'ficha.btn.editar'           => 'Edit',
+    'ficha.btn.ocultar'          => 'Hide',
+    'ficha.btn.eliminar'         => 'Delete',
+    'ficha.confirmar_eliminar'   => 'Delete "%s"? This can\'t be undone.',
+
+    'ficha.compartir'        => '↗ Share',
+    'ficha.enlace_copiado'   => 'Link copied.',
+
+    'ficha.dato.cuando'    => 'When',
+    'ficha.dato.donde'     => 'Where',
+    'ficha.dato.precio'    => 'Price',
+    'ficha.dato.organiza'  => 'Organizer',
+    'ficha.dato.cupo'      => 'Capacity',
+    'ficha.dato.personas'  => 'people',
+    'ficha.dato.mas_info'  => 'More information',
+    'ficha.ver_sitio'      => 'View site or profile →',
+
+    'ficha.del'        => 'From',
+    'ficha.al'         => 'to',
+    'ficha.hasta_el'   => 'until',
+    'ficha.horario_de' => 'from',
+    'ficha.horario_a'  => 'to',
+
+    'ficha.precio.gratis'         => 'Free',
+    'ficha.precio.por_confirmar'  => 'To be confirmed',
+    'ficha.precio.por_sesion'     => ' / session',
+
+    'ficha.btn.comprar_boletos' => 'Buy tickets',
+    'ficha.btn.reservar'        => 'Book my spot',
+    'ficha.btn.contactar'       => 'Contact the organizer',
+
+    'ficha.mapa_titulo_prefijo' => 'Map showing the location of',
+    'ficha.como_llegar'         => 'Get directions →',
+    'ficha.reportar'            => 'Report this activity',
+
+    'evento.editar.cambios_guardados' => 'Changes saved.',
+
     // ---- Consentimiento de cookies (REQ-00003) ----
     // Sí se traduce, aunque roce lo legal: es lo PRIMERO que ve quien entra, y
     // un aviso en español en la versión inglesa deja a esa persona decidiendo

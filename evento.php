@@ -21,11 +21,11 @@ $ev = buscarEvento((int) ($_GET['id'] ?? 0));
 
 if (!$ev || !puedeVerEvento($ev, $u)) {
     http_response_code(404);
-    $titulo = 'Actividad no encontrada';
+    $titulo = t('ficha.no_encontrada.titulo');
     require __DIR__ . '/includes/layout.php';
-    echo '<div class="auth-caja"><h1>Esa actividad no existe</h1>'
-       . '<p class="sub">Puede que se haya borrado o que todavía no esté publicada.</p>'
-       . '<a class="btn-principal" style="text-decoration:none; display:block; text-align:center;" href="' . URL_BASE . '/">Ver las que sí</a></div>';
+    echo '<div class="auth-caja"><h1>' . et('ficha.no_encontrada.h1') . '</h1>'
+       . '<p class="sub">' . et('ficha.no_encontrada.texto') . '</p>'
+       . '<a class="btn-principal" style="text-decoration:none; display:block; text-align:center;" href="' . URL_BASE . '/">' . et('ficha.no_encontrada.ver_todas') . '</a></div>';
     echo '<script>whTrack("404", ' . json_encode(['ruta' => (string) ($_SERVER['REQUEST_URI'] ?? '')]) . ');</script>';
     pie();
     exit;
@@ -82,11 +82,11 @@ $error   = '';
 // ---- acciones sobre la actividad -------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValido($_POST['csrf'] ?? null)) {
-        $error = 'La sesión caducó. Vuelve a intentarlo.';
+        $error = t('ficha.error.sesion_caducada');
 
     } elseif (!$mando) {
         http_response_code(403);
-        exit('No puedes hacer eso.');
+        exit(t('ficha.error.no_permiso'));
 
     } elseif (isset($_POST['publicar']) && ($ev['situacion'] !== 'oculto' || esAdmin($u))) {
         // Antes de publicar: si quien manda es todavía 'visitante', esto lo va a
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Ver palabrasVigiladas() en moderacion.php para el porqué.
         revisarAlPublicar($ev);
 
-        $_SESSION['evento_aviso'] = '¡Publicado! Ya aparece en la portada.';
+        $_SESSION['evento_aviso'] = t('ficha.aviso.publicado');
         $_SESSION['eventos_ga'] = [
             ['nombre' => 'publicar_actividad', 'params' => ['id' => (int) $ev['id'], 'categoria' => $ev['categoria']]],
         ];
@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } elseif (isset($_POST['ocultar']) && esAdmin($u)) {
         cambiarSituacionEvento((int) $ev['id'], 'oculto');
-        $_SESSION['evento_aviso'] = 'Actividad oculta. Ya no aparece en el listado.';
+        $_SESSION['evento_aviso'] = t('ficha.aviso.oculto');
         redirigir(urlEvento($ev));
 
     } elseif (isset($_POST['eliminar'])) {
@@ -124,10 +124,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // borrar sería la puerta de atrás para saltarse la regla de las 24
         // horas: quitar la ficha y volver a subirla cambiada.
         if (!puedeEliminarEvento($ev, $u)) {
-            $error = 'Ya pasó el plazo para borrar esta actividad. Pídeselo al administrador.';
+            $error = t('ficha.error.plazo_eliminar');
         } else {
             eliminarEvento((int) $ev['id']);
-            $_SESSION['evento_aviso'] = 'Actividad eliminada.';
+            $_SESSION['evento_aviso'] = t('ficha.aviso.eliminado');
             $_SESSION['eventos_ga'] = [
                 ['nombre' => 'eliminar_actividad', 'params' => ['id' => (int) $ev['id'], 'categoria' => $ev['categoria']]],
             ];
@@ -200,7 +200,7 @@ require __DIR__ . '/includes/layout.php';
 <?php endif; ?>
 
 <div class="ficha-envoltorio">
-  <a class="volver" href="<?= e($volverA) ?>">← <?= $volverAdmin ? 'Volver al panel admin' : ($vieneDeBusqueda ? 'Volver a los resultados' : 'Ver todas las actividades') ?></a>
+  <a class="volver" href="<?= e($volverA) ?>">← <?= $volverAdmin ? et('ficha.volver.admin') : ($vieneDeBusqueda ? et('ficha.volver.resultados') : et('ficha.volver.todas')) ?></a>
 </div>
 
 <?php if ($aviso): ?>
@@ -215,9 +215,9 @@ require __DIR__ . '/includes/layout.php';
     <div class="barra-inner">
       <div class="barra-texto">
         <?php if ($esBorrador): ?>
-          <strong>Vista previa.</strong> Así queda tu ficha. Todavía no la ve nadie más.
+          <strong><?= et('ficha.barra.vista_previa_tit') ?></strong> <?= et('ficha.barra.vista_previa_texto') ?>
         <?php elseif ($ev['situacion'] === 'oculto'): ?>
-          <strong>Oculta.</strong> No aparece en el listado.
+          <strong><?= et('ficha.barra.oculta_tit') ?></strong> <?= et('ficha.barra.oculta_texto') ?>
         <?php else: ?>
           <?php
           /*
@@ -231,12 +231,12 @@ require __DIR__ . '/includes/layout.php';
           $quedanEliminar = minutosRestantesEliminacion($ev);
           ?>
           <?php if ($quedanEliminar > 0): ?>
-            <strong>Publicada.</strong> Puedes eliminarla durante
-            <?= $quedanEliminar >= 60 ? intdiv($quedanEliminar, 60) . ' h ' . ($quedanEliminar % 60) . ' min' : $quedanEliminar . ' min' ?> más.
+            <strong><?= et('ficha.barra.publicada_tit') ?></strong> <?= et('ficha.barra.puedes_eliminar') ?>
+            <?= $quedanEliminar >= 60 ? intdiv($quedanEliminar, 60) . ' h ' . ($quedanEliminar % 60) . ' min' : $quedanEliminar . ' min' ?> <?= et('ficha.barra.mas') ?>
           <?php elseif (esAdmin($u)): ?>
-            <strong>Publicada.</strong> Eres administrador: puedes eliminarla aunque pasara el plazo.
+            <strong><?= et('ficha.barra.publicada_tit') ?></strong> <?= et('ficha.barra.admin_sin_plazo') ?>
           <?php else: ?>
-            <strong>Publicada.</strong> Pasó el plazo para eliminarla; pídeselo al administrador si hace falta.
+            <strong><?= et('ficha.barra.publicada_tit') ?></strong> <?= et('ficha.barra.plazo_pasado') ?>
           <?php endif; ?>
         <?php endif; ?>
       </div>
@@ -245,7 +245,7 @@ require __DIR__ . '/includes/layout.php';
         <?php if ($esBorrador): ?>
           <form method="post">
             <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-            <button class="btn-barra destacado" type="submit" name="publicar" value="1">Publicar</button>
+            <button class="btn-barra destacado" type="submit" name="publicar" value="1"><?= et('ficha.btn.publicar') ?></button>
           </form>
         <?php elseif ($ev['situacion'] === 'oculto' && esAdmin($u)): ?>
           <!-- Ocultar es una decisión de moderación, así que deshacerla también
@@ -253,25 +253,25 @@ require __DIR__ . '/includes/layout.php';
                administrador retiró, aunque siga dentro de su plazo de edición. -->
           <form method="post">
             <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-            <button class="btn-barra destacado" type="submit" name="publicar" value="1">Volver a publicar</button>
+            <button class="btn-barra destacado" type="submit" name="publicar" value="1"><?= et('ficha.btn.volver_publicar') ?></button>
           </form>
         <?php endif; ?>
 
         <?php if (puedeEditarEvento($ev, $u)): ?>
-          <a class="btn-barra" href="<?= URL_BASE ?>/evento-editar.php?id=<?= (int) $ev['id'] ?>">Editar</a>
+          <a class="btn-barra" href="<?= URL_BASE ?>/evento-editar.php?id=<?= (int) $ev['id'] ?>"><?= et('ficha.btn.editar') ?></a>
         <?php endif; ?>
 
         <?php if (esAdmin($u) && $ev['situacion'] === 'publicado'): ?>
           <form method="post">
             <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-            <button class="btn-barra" type="submit" name="ocultar" value="1">Ocultar</button>
+            <button class="btn-barra" type="submit" name="ocultar" value="1"><?= et('ficha.btn.ocultar') ?></button>
           </form>
         <?php endif; ?>
 
         <?php if (puedeEliminarEvento($ev, $u)): ?>
-          <form method="post" onsubmit="return confirm('¿Eliminar «<?= e(addslashes($ev['titulo'])) ?>»? No se puede deshacer.');">
+          <form method="post" onsubmit="return confirm(<?= json_encode(sprintf(t('ficha.confirmar_eliminar'), $ev['titulo'])) ?>);">
             <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-            <button class="btn-barra peligro" type="submit" name="eliminar" value="1">Eliminar</button>
+            <button class="btn-barra peligro" type="submit" name="eliminar" value="1"><?= et('ficha.btn.eliminar') ?></button>
           </form>
         <?php endif; ?>
       </div>
@@ -311,24 +311,24 @@ require __DIR__ . '/includes/layout.php';
                        va antes de abrirla y no cuenta con qué está hecho el
                        sitio. */ ?>
               data-url="<?= e(urlEvento($ev)) ?>"
-              data-titulo="<?= e($ev['titulo']) ?>">↗ Compartir</button>
-      <span class="aviso-copiado" id="avisoCopiado">Enlace copiado.</span>
+              data-titulo="<?= e($ev['titulo']) ?>"><?= et('ficha.compartir') ?></button>
+      <span class="aviso-copiado" id="avisoCopiado"><?= et('ficha.enlace_copiado') ?></span>
     </div>
 
     <div class="ficha-datos">
       <div class="dato">
-        <span class="k">Cuándo</span>
+        <span class="k"><?= et('ficha.dato.cuando') ?></span>
         <span class="val">
           <?php if ($ev['tipo_actividad'] === 'recurrente'): ?>
             <?= e(frecuenciasRecurrencia()[$ev['frecuencia']] ?? '') ?>
             · <?= e(substr((string) $ev['hora_recurrente'], 0, 5)) ?>–<?= e(substr((string) $ev['hora_fin_recurrente'], 0, 5)) ?>
             <br><span class="tenue">
-              Del <?= e(fechaCorta($ev['fecha_inicio'])) ?> al <?= e(fechaCorta($ev['fecha_fin'])) ?>
+              <?= et('ficha.del') ?> <?= e(fechaCorta($ev['fecha_inicio'])) ?> <?= et('ficha.al') ?> <?= e(fechaCorta($ev['fecha_fin'])) ?>
             </span>
           <?php elseif (terminaOtroDia($ev)): ?>
             <?php /* Un retiro: aquí las dos fechas completas sí hacen falta. */ ?>
             <?= e(fechaLarga($ev['fecha_inicio'])) ?>
-            <br><span class="tenue">hasta el <?= e(fechaLarga($ev['fecha_fin'])) ?></span>
+            <br><span class="tenue"><?= et('ficha.hasta_el') ?> <?= e(fechaLarga($ev['fecha_fin'])) ?></span>
           <?php else: ?>
             <?php /* De un día: la fecha una vez y el horario debajo. Ver
                      terminaOtroDia() para por qué no se pregunta por fecha_fin. */ ?>
@@ -339,7 +339,7 @@ require __DIR__ . '/includes/layout.php';
       </div>
 
       <div class="dato">
-        <span class="k">Dónde</span>
+        <span class="k"><?= et('ficha.dato.donde') ?></span>
         <span class="val">
           <?php if (!empty($ev['lugar'])): ?><?= e($ev['lugar']) ?><br><?php endif; ?>
           <?php if (!empty($ev['direccion'])): ?><span class="tenue"><?= e($ev['direccion']) ?></span><br><?php endif; ?>
@@ -348,29 +348,29 @@ require __DIR__ . '/includes/layout.php';
       </div>
 
       <div class="dato">
-        <span class="k">Precio</span>
+        <span class="k"><?= et('ficha.dato.precio') ?></span>
         <span class="val precio-grande <?= !empty($ev['gratuito']) ? 'gratis' : '' ?>">
           <?= e(precioTexto($ev)) ?>
         </span>
       </div>
 
       <div class="dato">
-        <span class="k">Organiza</span>
+        <span class="k"><?= et('ficha.dato.organiza') ?></span>
         <span class="val"><?= e($ev['organizador']) ?></span>
       </div>
 
       <?php if (!empty($ev['cupo_maximo'])): ?>
         <div class="dato">
-          <span class="k">Cupo</span>
-          <span class="val"><?= (int) $ev['cupo_maximo'] ?> personas</span>
+          <span class="k"><?= et('ficha.dato.cupo') ?></span>
+          <span class="val"><?= (int) $ev['cupo_maximo'] ?> <?= et('ficha.dato.personas') ?></span>
         </div>
       <?php endif; ?>
 
       <?php if (!empty($ev['sitio_web'])): ?>
         <div class="dato">
-          <span class="k">Más información</span>
+          <span class="k"><?= et('ficha.dato.mas_info') ?></span>
           <span class="val">
-            <a href="<?= e($ev['sitio_web']) ?>" target="_blank" rel="noopener nofollow">Ver sitio o perfil →</a>
+            <a href="<?= e($ev['sitio_web']) ?>" target="_blank" rel="noopener nofollow"><?= et('ficha.ver_sitio') ?></a>
           </span>
         </div>
       <?php endif; ?>
@@ -385,16 +385,16 @@ require __DIR__ . '/includes/layout.php';
     <?php if ($ev['accion_principal'] === 'boletos' && !empty($ev['url_boletos'])): ?>
       <a class="btn-principal btn-boletos" href="<?= URL_BASE ?>/salida.php?id=<?= (int) $ev['id'] ?>&tipo=boletos"
          target="_blank" rel="noopener nofollow"
-         onclick="whTrack('clic_boletos', <?= e(json_encode(['id' => (int) $ev['id']])) ?>)">Comprar boletos</a>
+         onclick="whTrack('clic_boletos', <?= e(json_encode(['id' => (int) $ev['id']])) ?>)"><?= et('ficha.btn.comprar_boletos') ?></a>
 
     <?php elseif ($ev['accion_principal'] === 'reservar' && !empty($ev['url_reserva'])): ?>
       <a class="btn-principal btn-boletos" href="<?= URL_BASE ?>/salida.php?id=<?= (int) $ev['id'] ?>&tipo=reservar"
          target="_blank" rel="noopener nofollow"
-         onclick="whTrack('clic_reservar', <?= e(json_encode(['id' => (int) $ev['id']])) ?>)">Reservar mi lugar</a>
+         onclick="whTrack('clic_reservar', <?= e(json_encode(['id' => (int) $ev['id']])) ?>)"><?= et('ficha.btn.reservar') ?></a>
 
     <?php elseif ($ev['accion_principal'] === 'informacion'): ?>
       <a class="btn-principal btn-boletos" href="<?= URL_BASE ?>/contactar.php?id=<?= (int) $ev['id'] ?>"
-         onclick="whTrack('clic_contactar', <?= e(json_encode(['id' => (int) $ev['id']])) ?>)">Contactar al organizador</a>
+         onclick="whTrack('clic_contactar', <?= e(json_encode(['id' => (int) $ev['id']])) ?>)"><?= et('ficha.btn.contactar') ?></a>
     <?php endif; ?>
 
     <div class="ficha-desc"><?= nl2br(e($ev['descripcion'])) ?></div>
@@ -416,10 +416,10 @@ require __DIR__ . '/includes/layout.php';
     ?>
       <div class="ficha-mapa">
         <iframe src="<?= e(urlMapaEmbebido($lat, $lng)) ?>"
-                title="Mapa con la ubicación de <?= e($ev['titulo']) ?>"
+                title="<?= et('ficha.mapa_titulo_prefijo') ?> <?= e($ev['titulo']) ?>"
                 loading="lazy" referrerpolicy="no-referrer"></iframe>
         <a class="btn-comollegar" href="<?= e(urlComoLlegar($lat, $lng)) ?>"
-           target="_blank" rel="noopener">Cómo llegar →</a>
+           target="_blank" rel="noopener"><?= et('ficha.como_llegar') ?></a>
       </div>
     <?php endif; ?>
 
@@ -428,7 +428,7 @@ require __DIR__ . '/includes/layout.php';
            Pedir cuenta aquí no filtra bots —esos sí se registran—, filtra
            personas. Discreto al pie, que es donde se busca cuando hace falta. -->
       <div class="ficha-reportar">
-        <a href="<?= URL_BASE ?>/reportar.php?id=<?= (int) $ev['id'] ?>">Reportar esta actividad</a>
+        <a href="<?= URL_BASE ?>/reportar.php?id=<?= (int) $ev['id'] ?>"><?= et('ficha.reportar') ?></a>
       </div>
     <?php endif; ?>
   </div>

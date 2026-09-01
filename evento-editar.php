@@ -84,7 +84,7 @@ if ($puede && postDesbordado()) {
             // mal escrito es justo lo que se viene a hacer a «editar».
             guardarContactoOrganizador((int) $u['id'], $_POST);
 
-            $_SESSION['evento_aviso'] = 'Cambios guardados.';
+            $_SESSION['evento_aviso'] = t('evento.editar.cambios_guardados');
             $_SESSION['eventos_ga'] = [
                 ['nombre' => 'editar_actividad', 'params' => ['id' => (int) $ev['id'], 'categoria' => $e['categoria']]],
             ];

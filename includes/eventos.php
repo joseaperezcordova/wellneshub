@@ -1364,7 +1364,8 @@ function horarioDelDia(array $ev): string
 
     if (empty($ev['fecha_fin'])) return $desde;
 
-    return 'de ' . $desde . ' a ' . date('H:i', (int) strtotime((string) $ev['fecha_fin']));
+    return t('ficha.horario_de') . ' ' . $desde . ' ' . t('ficha.horario_a') . ' '
+        . date('H:i', (int) strtotime((string) $ev['fecha_fin']));
 }
 
 /**
@@ -1405,15 +1406,15 @@ function resumenParaMeta(string $texto, int $limite = 160): string
 
 function precioTexto(array $ev): string
 {
-    if (!empty($ev['gratuito']))    return 'Gratis';
-    if ($ev['precio'] === null)     return 'Por confirmar';
+    if (!empty($ev['gratuito']))    return t('ficha.precio.gratis');
+    if ($ev['precio'] === null)     return t('ficha.precio.por_confirmar');
 
     $texto = '$' . number_format((float) $ev['precio'], 0, '.', ',') . ' MXN';
 
     // Importa sobre todo en una recurrente: "$400" solo, sin aclarar, no dice
     // si es por toda la serie de sesiones o por cada una.
     if ($ev['forma_pago'] === 'sesion') {
-        $texto .= ' / sesión';
+        $texto .= t('ficha.precio.por_sesion');
     }
 
     return $texto;

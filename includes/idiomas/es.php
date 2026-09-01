@@ -374,6 +374,74 @@ return [
     'evento.guia.traduccion_texto2' => 'Si tu actividad está dirigida a participantes en español e inglés, considera proporcionar la información relevante en ambos idiomas dentro de la descripción.',
     'evento.guia.nota'              => 'Con esto en mente, elige la <strong>acción principal</strong> más abajo: decide qué verán quienes quieran dar el siguiente paso.',
 
+    // ---- Ficha de actividad (evento.php) ----
+    'ficha.no_encontrada.titulo'    => 'Actividad no encontrada',
+    'ficha.no_encontrada.h1'        => 'Esa actividad no existe',
+    'ficha.no_encontrada.texto'     => 'Puede que se haya borrado o que todavía no esté publicada.',
+    'ficha.no_encontrada.ver_todas' => 'Ver las que sí',
+
+    'ficha.error.sesion_caducada'   => 'La sesión caducó. Vuelve a intentarlo.',
+    'ficha.error.no_permiso'        => 'No puedes hacer eso.',
+    'ficha.error.plazo_eliminar'    => 'Ya pasó el plazo para borrar esta actividad. Pídeselo al administrador.',
+    'ficha.aviso.publicado'         => '¡Publicado! Ya aparece en la portada.',
+    'ficha.aviso.oculto'            => 'Actividad oculta. Ya no aparece en el listado.',
+    'ficha.aviso.eliminado'         => 'Actividad eliminada.',
+
+    'ficha.volver.admin'       => 'Volver al panel admin',
+    'ficha.volver.resultados'  => 'Volver a los resultados',
+    'ficha.volver.todas'       => 'Ver todas las actividades',
+
+    'ficha.barra.vista_previa_tit'   => 'Vista previa.',
+    'ficha.barra.vista_previa_texto' => 'Así queda tu ficha. Todavía no la ve nadie más.',
+    'ficha.barra.oculta_tit'         => 'Oculta.',
+    'ficha.barra.oculta_texto'       => 'No aparece en el listado.',
+    'ficha.barra.publicada_tit'      => 'Publicada.',
+    'ficha.barra.puedes_eliminar'    => 'Puedes eliminarla durante',
+    'ficha.barra.mas'                => 'más.',
+    'ficha.barra.admin_sin_plazo'    => 'Eres administrador: puedes eliminarla aunque pasara el plazo.',
+    'ficha.barra.plazo_pasado'       => 'Pasó el plazo para eliminarla; pídeselo al administrador si hace falta.',
+
+    'ficha.btn.publicar'         => 'Publicar',
+    'ficha.btn.volver_publicar'  => 'Volver a publicar',
+    'ficha.btn.editar'           => 'Editar',
+    'ficha.btn.ocultar'          => 'Ocultar',
+    'ficha.btn.eliminar'         => 'Eliminar',
+    'ficha.confirmar_eliminar'   => '¿Eliminar «%s»? No se puede deshacer.',
+
+    'ficha.compartir'        => '↗ Compartir',
+    'ficha.enlace_copiado'   => 'Enlace copiado.',
+
+    'ficha.dato.cuando'    => 'Cuándo',
+    'ficha.dato.donde'     => 'Dónde',
+    'ficha.dato.precio'    => 'Precio',
+    'ficha.dato.organiza'  => 'Organiza',
+    'ficha.dato.cupo'      => 'Cupo',
+    'ficha.dato.personas'  => 'personas',
+    'ficha.dato.mas_info'  => 'Más información',
+    'ficha.ver_sitio'      => 'Ver sitio o perfil →',
+
+    'ficha.del'        => 'Del',
+    'ficha.al'         => 'al',
+    'ficha.hasta_el'   => 'hasta el',
+    'ficha.horario_de' => 'de',
+    'ficha.horario_a'  => 'a',
+
+    'ficha.precio.gratis'         => 'Gratis',
+    'ficha.precio.por_confirmar'  => 'Por confirmar',
+    'ficha.precio.por_sesion'     => ' / sesión',
+
+    'ficha.btn.comprar_boletos' => 'Comprar boletos',
+    'ficha.btn.reservar'        => 'Reservar mi lugar',
+    'ficha.btn.contactar'       => 'Contactar al organizador',
+
+    'ficha.mapa_titulo_prefijo' => 'Mapa con la ubicación de',
+    'ficha.como_llegar'         => 'Cómo llegar →',
+    'ficha.reportar'            => 'Reportar esta actividad',
+
+    // Mensaje de la sesión que evento-editar.php deja para cuando se vuelve
+    // a la ficha tras guardar cambios.
+    'evento.editar.cambios_guardados' => 'Cambios guardados.',
+
     // ---- Consentimiento de cookies (REQ-00003) ----
     // El requerimiento escribe la marca en minúsculas; aquí va OMDARA, que es
     // como se escribe en el resto del sitio. Un banner que llama a la marca de
