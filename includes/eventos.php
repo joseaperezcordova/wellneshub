@@ -95,6 +95,74 @@ function categorias(): array
 }
 
 /**
+ * Los iconos de línea del carril de categorías de la portada —el diseño
+ * original antes de que el emoji entrara como marcador de posición—.
+ *
+ * SOLO para ese carril: el desplegable del formulario, la ficha y el filtro
+ * del buscador siguen leyendo el emoji de categoriasMenu(), que ahí funciona
+ * bien —es un solo carácter, cabe en una etiqueta de texto— y un SVG entero
+ * no. Mezclar los dos formatos en una sola lista habría obligado a tratar el
+ * emoji como HTML en sitios donde hoy se escapa como texto plano.
+ *
+ * Cada trazo es un <path>/<circle> sencillo, mismo grosor y estilo que ya usan
+ * los iconos de las secciones del formulario (viewBox 24×24, stroke-width
+ * 1.8, remates redondeados): no es un juego de iconos importado, es dibujado
+ * a mano con la misma regla visual que el resto del sitio.
+ *
+ * @return array<string, string> nombre de categoría => SVG completo
+ */
+function iconosLineaCategoria(): array
+{
+    $svg = static function (string $trazos): string {
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
+             . 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $trazos . '</svg>';
+    };
+
+    return [
+        'Yoga'               => $svg('<circle cx="12" cy="5" r="2"/><path d="M12 7.2v4.3"/>'
+            . '<path d="M7 19c0-4 2-6 5-6.5M17 19c0-4-2-6-5-6.5"/><path d="M7 19h10"/>'),
+        'Meditación'         => $svg('<path d="M6 18c0-7 4-11 11-11-1 8-4 12-11 11z"/><path d="M8 16c3-3 5-6 8-8"/>'),
+        'Pilates'            => $svg('<circle cx="12" cy="12" r="7"/><path d="M12 12a3 3 0 1 0 3-3"/>'),
+        'Breathwork'         => $svg('<path d="M4 9c2-2 4-2 6 0s4 2 6 0 4-2 4 0"/>'
+            . '<path d="M4 15c2-2 4-2 6 0s4 2 6 0 4-2 4 0"/>'),
+        'Sound Healing'      => $svg('<path d="M6 15c0 3 3 4.5 6 4.5s6-1.5 6-4.5"/><path d="M4 15h16"/>'
+            . '<path d="M9 9c1-1.5 5-1.5 6 0M7.5 6.5c1.8-2.3 7.2-2.3 9 0"/>'),
+        'Tai Chi'            => $svg('<circle cx="12" cy="12" r="7.5"/>'
+            . '<path d="M12 4.5a3.75 3.75 0 0 1 0 7.5 3.75 3.75 0 0 0 0 7.5"/>'
+            . '<circle cx="12" cy="8.25" r="1" fill="currentColor" stroke="none"/>'
+            . '<circle cx="12" cy="15.75" r="1" fill="currentColor" stroke="none"/>'),
+        'Qi Gong'            => $svg('<path d="M8 5c4 2 4 6 0 8s-4 6 0 8"/><path d="M14 5c4 2 4 6 0 8s-4 6 0 8"/>'),
+
+        'Temazcal'           => $svg('<path d="M4 18a8 8 0 0 1 16 0"/><path d="M4 18h16"/>'
+            . '<path d="M10 8c-1 1-1 2 0 3M14 6c-1 1-1 2 0 3"/>'),
+        'Ceremonia de Cacao' => $svg('<path d="M12 4c4 2 6 6 6 10a6 6 0 0 1-12 0c0-4 2-8 6-10z"/><path d="M12 4v16"/>'),
+        'Ecstatic Dance'     => $svg('<circle cx="12" cy="5.5" r="2"/>'
+            . '<path d="M12 7.5v6M12 9l-5-3M12 9l5-3M12 13.5l-4 5.5M12 13.5l4 5.5"/>'),
+
+        'Senderismo'         => $svg('<path d="M3 18l6-10 4 6 2-3 6 7z"/><circle cx="9" cy="6" r="1.4"/>'),
+        'Running'            => $svg('<circle cx="15" cy="5.5" r="1.8"/>'
+            . '<path d="M8 19l3-4 2-3-1.5-4-3.5 1.5M13 12l3 2 3-1M9 15l-3.5 4"/>'),
+        'Carreras'           => $svg('<path d="M6 20V4"/><path d="M6 5h5l-1.5 2.5L11 10H6"/>'),
+        'Ciclismo'           => $svg('<circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/>'
+            . '<path d="M6 17l5-9 7 9M11 8h3"/>'),
+        'Triatlón'           => $svg('<path d="M3 18c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/>'
+            . '<circle cx="12" cy="8" r="2"/><path d="M9 12l3-2 3 2"/>'),
+        'Surf'               => $svg('<path d="M3 15c3-4 6-4 9 0s6 4 9 0"/><path d="M6 19l12-10"/>'),
+
+        'Nutrición'          => $svg('<path d="M12 8c3-2 6 0 6 4.5S15 20 12 20s-6-3-6-7.5S9 6 12 8z"/>'
+            . '<path d="M12 8V5.5M12 5.5c0-1 .8-1.5 2-1.5"/>'),
+        'Ayurveda'           => $svg('<path d="M12 20v-9"/>'
+            . '<path d="M12 11c0-4 3-6 6-6 0 4-2 6-6 6zM12 14c0-3-2.5-5-5-5 0 3 2 5 5 5z"/>'),
+        'Spa'                => $svg('<path d="M12 4c3 4.5 5 8 5 10.5a5 5 0 0 1-10 0C7 12 9 8.5 12 4z"/>'),
+        'Cold Plunge'        => $svg('<path d="M12 3v18M4.5 7.5l15 9M19.5 7.5l-15 9"/>'
+            . '<path d="M12 3l-1.5 2M12 3l1.5 2M12 21l-1.5-2M12 21l1.5-2"/>'),
+        'Biohacking'         => $svg('<path d="M13 3L6 13h5l-1 8 7-10h-5z"/>'),
+        'Longevidad'         => $svg('<path d="M6 3h12M6 21h12"/>'
+            . '<path d="M7 3c0 4 3 6 5 8 2-2 5-4 5-8M7 21c0-4 3-6 5-8 2 2 5 4 5 8"/>'),
+    ];
+}
+
+/**
  * Los colores de la paleta que puede llevar la tarjeta sin imagen.
  *
  * Van escritos y no como var(--x) porque el valor elegido se guarda en la

@@ -171,9 +171,11 @@ require __DIR__ . '/includes/layout.php';
   </div>
 </section>
 
-<!-- Los emoji son marcadores de posicion, igual que las imagenes: cuando haya
-     un juego de iconos de linea se sustituye el contenido de .ic y nada mas
-     cambia. -->
+<?php /* El emoji fue marcador de posición hasta que volvió el set de iconos
+         de línea original —ver iconosLineaCategoria() en includes/eventos.php—.
+         Si alguna categoría nueva no tuviera todavía su icono dibujado, cae al
+         emoji de categoriasMenu() en vez de dejar el círculo vacío. */ ?>
+<?php $iconosLinea = iconosLineaCategoria(); ?>
 <section class="catbar">
   <div class="catbar-inner">
     <span class="eyebrow">Explora por categoría</span>
@@ -184,7 +186,7 @@ require __DIR__ . '/includes/layout.php';
                  abrir en otra pestaña e indexar. */ ?>
         <?php foreach (categoriasMenu() as $catNombre => $catDatos): ?>
           <a class="catitem" href="<?= e(url('actividades')) ?>?cat=<?= urlencode($catNombre) ?>">
-            <span class="ic"><?= e($catDatos[0]) ?></span>
+            <span class="ic"><?= $iconosLinea[$catNombre] ?? e($catDatos[0]) ?></span>
             <span class="lbl"><?= e($catDatos[1]) ?></span>
           </a>
         <?php endforeach; ?>
