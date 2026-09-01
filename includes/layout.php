@@ -78,6 +78,9 @@ function enlaceMenu(string $claveRuta, string $claveTexto, string $clave, string
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= e($titulo ?? t('marca.nombre')) ?> · <?= et('marca.nombre') ?></title>
+<link rel="icon" type="image/svg+xml" href="<?= URL_BASE ?>/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="<?= URL_BASE ?>/favicon.png">
+<link rel="apple-touch-icon" href="<?= URL_BASE ?>/apple-touch-icon.png">
 <?php
 /*
  * Meta description + Open Graph/Twitter Card. Cada página puede fijar
