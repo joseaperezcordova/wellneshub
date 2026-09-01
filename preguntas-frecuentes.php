@@ -189,7 +189,7 @@ require __DIR__ . '/includes/layout.php';
   <div class="block-head">
     <div>
       <div class="eyebrow">Ayuda</div>
-      <h2 style="margin-top:6px;">Preguntas frecuentes</h2>
+      <h1 style="margin-top:6px;">Preguntas frecuentes</h1>
     </div>
   </div>
 

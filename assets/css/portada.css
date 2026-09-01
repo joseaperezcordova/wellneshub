@@ -471,7 +471,7 @@
   /* ---------- section shells ---------- */
   section.block{padding-top:50px; padding-bottom:50px;}
   .block-head{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:22px; gap:16px; flex-wrap:wrap;}
-  .block-head h2{font-size:26px;}
+  .block-head h1,.block-head h2{font-size:26px;}
   .block-head a.more{font-size:13px; color:var(--jungle); border-bottom:1px solid var(--jungle); flex-shrink:0;}
 
   /* ---------- chips (ciudades) ---------- */

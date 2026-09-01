@@ -97,7 +97,7 @@ require __DIR__ . '/includes/layout.php';
   <div class="block-head">
     <div>
       <div class="eyebrow">Para organizadores</div>
-      <h2 style="margin-top:6px;">Publica tu actividad gratis</h2>
+      <h1 style="margin-top:6px;">Publica tu actividad gratis</h1>
     </div>
   </div>
 

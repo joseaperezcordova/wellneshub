@@ -58,7 +58,7 @@ require __DIR__ . '/includes/layout.php';
 <section class="wrap block">
   <div class="results-heading">
     <div class="eyebrow" id="resultsEyebrow">Buscar actividades</div>
-    <div class="block-head"><h2 id="resultsTitle">Todas las actividades</h2></div>
+    <div class="block-head"><h1 id="resultsTitle">Todas las actividades</h1></div>
   </div>
 
   <div class="results-layout">
