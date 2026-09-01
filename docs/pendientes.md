@@ -22,11 +22,27 @@ dónde iba.
 y WhatsApp. El requerimiento REQ-00003 las deja como
 `[Agregar URLs definitivas de cada red social]`.
 
-**Dónde:** `includes/layout.php`, en el bloque `.foot-redes` del pie. Los tres
-iconos están puestos y maquetados, con `aria-label` y `rel="nofollow"`; solo el
-`href` está en `#`.
+**El código ya está listo, 2026-09-01** — mismo patrón que el correo público
+(punto 2): una llave `'redes'` en `includes/config.local.php` (con su
+ejemplo en `config.local.example.php`), fuera de git y distinta por
+entorno. `includes/layout.php` valida cada URL con `FILTER_VALIDATE_URL` y
+solo pinta el icono correspondiente si hay una válida; si las tres siguen
+vacías, `.foot-redes` no se pinta en absoluto. Ya no queda `href="#"` en
+ningún caso —un enlace muerto es peor para accesibilidad y SEO que no
+mostrar el icono—.
 
-**Para cerrarlo:** sustituir los tres `href="#"` por la URL de cada perfil.
+**Para cerrarlo:** poner las tres URLs (o las que existan) en
+`includes/config.local.php`, en **los dos entornos**:
+
+```php
+'redes' => [
+    'instagram' => 'https://instagram.com/...',
+    'facebook'  => 'https://facebook.com/...',
+    'whatsapp'  => 'https://wa.me/521...',
+],
+```
+
+No hace falta tocar código: en cuanto tenga valor, el icono aparece solo.
 
 ---
 

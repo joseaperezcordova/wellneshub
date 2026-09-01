@@ -417,12 +417,21 @@ function pie(): void
       <div class="logo-text" style="color:var(--blanco);"><?= et('marca.nombre') ?></div>
       <p class="foot-lema"><?= et('pie.lema') ?></p>
 
-      <?php /* Las direcciones de las redes todavía no existen: el requerimiento
-               las deja como «[Agregar URLs definitivas]». Van con rel="nofollow"
-               y aria-label porque un icono suelto no le dice nada a un lector de
-               pantalla. En cuanto haya perfiles, se sustituye el "#". */ ?>
+      <?php
+      /*
+       * Las direcciones salen de config.local.php —'redes', el mismo patrón
+       * que 'correo.contacto'—: distinto en cada entorno y fuera de git.
+       * Sin URL no se pinta el icono: un enlace muerto a "#" es peor para
+       * accesibilidad y SEO que simplemente no mostrarlo.
+       */
+      $redInstagram = filter_var(trim((string) ($GLOBALS['CONFIG']['redes']['instagram'] ?? '')), FILTER_VALIDATE_URL) ?: '';
+      $redFacebook  = filter_var(trim((string) ($GLOBALS['CONFIG']['redes']['facebook']  ?? '')), FILTER_VALIDATE_URL) ?: '';
+      $redWhatsapp  = filter_var(trim((string) ($GLOBALS['CONFIG']['redes']['whatsapp']  ?? '')), FILTER_VALIDATE_URL) ?: '';
+      ?>
+      <?php if ($redInstagram || $redFacebook || $redWhatsapp): ?>
       <div class="foot-redes">
-        <a href="#" aria-label="<?= et('pie.instagram') ?>" target="_blank" rel="noopener nofollow">
+        <?php if ($redInstagram): ?>
+        <a href="<?= e($redInstagram) ?>" aria-label="<?= et('pie.instagram') ?>" target="_blank" rel="noopener nofollow">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="3" y="3" width="18" height="18" rx="5"/>
@@ -430,20 +439,26 @@ function pie(): void
             <circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/>
           </svg>
         </a>
-        <a href="#" aria-label="<?= et('pie.facebook') ?>" target="_blank" rel="noopener nofollow">
+        <?php endif; ?>
+        <?php if ($redFacebook): ?>
+        <a href="<?= e($redFacebook) ?>" aria-label="<?= et('pie.facebook') ?>" target="_blank" rel="noopener nofollow">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M14.5 8.5h2.2V5.4h-2.6c-2.3 0-3.7 1.4-3.7 3.8v1.6H8.2v3.1h2.2V21h3.3v-7.1h2.4l.4-3.1h-2.8V9.6c0-.8.3-1.1.8-1.1z"/>
           </svg>
         </a>
-        <a href="#" aria-label="<?= et('pie.whatsapp') ?>" target="_blank" rel="noopener nofollow">
+        <?php endif; ?>
+        <?php if ($redWhatsapp): ?>
+        <a href="<?= e($redWhatsapp) ?>" aria-label="<?= et('pie.whatsapp') ?>" target="_blank" rel="noopener nofollow">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M3.5 20.5l1.3-4.2A8.2 8.2 0 1 1 8 19.3z"/>
             <path d="M9.2 9c.2 1.6 1.6 4.2 4.1 5.2.7.3 1.3-.2 1.5-.7"/>
           </svg>
         </a>
+        <?php endif; ?>
       </div>
+      <?php endif; ?>
     </div>
 
     <div>

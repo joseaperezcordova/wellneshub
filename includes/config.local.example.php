@@ -84,6 +84,17 @@ return [
         'contacto'  => '',
     ],
 
+    // ---- Redes sociales -----------------------------------------------------
+    // Los tres iconos del pie (REQ-00003). Déjalos vacíos mientras no exista el
+    // perfil correspondiente: includes/layout.php no pinta el icono si no hay
+    // dirección, en vez de dejar un enlace muerto a "#" —eso es peor para
+    // accesibilidad y para SEO que simplemente no mostrarlo—.
+    'redes' => [
+        'instagram' => '',
+        'facebook'  => '',
+        'whatsapp'  => '',
+    ],
+
     // ---- Captcha del formulario de reportes -------------------------------
     // OPCIONAL. Sin claves, el formulario sigue defendido por el campo trampa y
     // el reloj, que no dependen de nadie. Estas claves son una capa encima.
