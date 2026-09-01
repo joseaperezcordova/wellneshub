@@ -216,10 +216,10 @@ function coloresEvento(): array
 function frecuenciasRecurrencia(): array
 {
     return [
-        'diaria'    => 'Diaria',
-        'semanal'   => 'Semanal',
-        'quincenal' => 'Quincenal',
-        'mensual'   => 'Mensual',
+        'diaria'    => t('evento.frecuencia.diaria'),
+        'semanal'   => t('evento.frecuencia.semanal'),
+        'quincenal' => t('evento.frecuencia.quincenal'),
+        'mensual'   => t('evento.frecuencia.mensual'),
     ];
 }
 
@@ -231,9 +231,9 @@ function frecuenciasRecurrencia(): array
 function accionesPrincipales(): array
 {
     return [
-        'informacion' => 'Contactar al organizador',
-        'boletos'     => 'Comprar boletos',
-        'reservar'    => 'Reservar lugar',
+        'informacion' => t('evento.form.accion_contactar'),
+        'boletos'     => t('evento.form.accion_comprar'),
+        'reservar'    => t('evento.form.accion_reservar'),
     ];
 }
 
@@ -638,42 +638,42 @@ function usuariosTodos(): array
 function etiquetasCampos(): array
 {
     return [
-        'titulo'          => 'Título de la actividad',
-        'categorias'      => 'Categorías',
-        'descripcion'     => 'Descripción',
-        'ciudad'          => 'Ciudad',
-        'entidad'         => 'Estado',
-        'lugar'           => 'Nombre del lugar',
-        'direccion'       => 'Dirección',
-        'mapa_url'        => 'Enlace de Google Maps',
+        'titulo'          => t('evento.form.titulo_label'),
+        'categorias'      => t('evento.form.categorias_label'),
+        'descripcion'     => t('evento.form.descripcion_label'),
+        'ciudad'          => t('evento.form.ciudad_label'),
+        'entidad'         => t('evento.form.estado_label'),
+        'lugar'           => t('evento.form.lugar_label'),
+        'direccion'       => t('evento.form.direccion_label'),
+        'mapa_url'        => t('evento.campo.mapa_url'),
 
         // No es un campo de la actividad —vive en la cuenta del organizador,
         // ver guardarContactoOrganizador() en includes/auth.php— pero
         // REQ-000-XX lo volvió obligatorio en el formulario, así que necesita
         // su propia etiqueta aquí igual que cualquier otro campo requerido.
-        'org_nombre'      => 'Nombre del organizador',
+        'org_nombre'      => t('evento.form.organizador_nombre_label'),
 
         // Actividad de un día.
-        'fecha_unica'        => 'Fecha',
-        'hora_inicio_unica'  => 'Hora de inicio',
-        'hora_fin_unica'     => 'Hora de fin',
-        'fecha_fin_unica'    => 'Fecha de fin',
+        'fecha_unica'        => t('evento.form.fecha_label'),
+        'hora_inicio_unica'  => t('evento.form.hora_inicio_label'),
+        'hora_fin_unica'     => t('evento.form.hora_fin_label'),
+        'fecha_fin_unica'    => t('evento.campo.fecha_fin_unica'),
 
         // Actividad recurrente.
-        'fecha_inicio_rec'   => 'Fecha de inicio',
-        'fecha_fin_rec'      => 'Fecha de fin',
-        'frecuencia'         => 'Frecuencia',
-        'hora_recurrente'    => 'Hora de inicio',
-        'hora_fin_recurrente' => 'Hora de fin',
+        'fecha_inicio_rec'   => t('evento.form.fecha_inicio_label'),
+        'fecha_fin_rec'      => t('evento.form.fecha_fin_label'),
+        'frecuencia'         => t('evento.form.frecuencia_label'),
+        'hora_recurrente'    => t('evento.form.hora_inicio_label'),
+        'hora_fin_recurrente' => t('evento.form.hora_fin_label'),
 
-        'precio'          => 'Precio',
-        'forma_pago'      => 'Forma de pago',
-        'cupo_maximo'     => 'Cupo máximo',
-        'url_boletos'     => 'URL de compra',
-        'url_reserva'     => 'URL de reserva',
-        'sitio_web'       => 'Sitio web o enlace',
-        'accion_principal' => 'Acción principal',
-        'imagen'          => 'Imagen',
+        'precio'          => t('evento.campo.precio'),
+        'forma_pago'      => t('evento.form.forma_pago_label'),
+        'cupo_maximo'     => t('evento.campo.cupo_maximo'),
+        'url_boletos'     => t('evento.form.url_compra_label'),
+        'url_reserva'     => t('evento.form.url_reserva_label'),
+        'sitio_web'       => t('evento.campo.sitio_web'),
+        'accion_principal' => t('evento.campo.accion_principal'),
+        'imagen'          => t('evento.campo.imagen'),
     ];
 }
 
@@ -689,16 +689,16 @@ function validarEvento(array $in): array
 
     $e['titulo'] = trim((string) ($in['titulo'] ?? ''));
     if (mb_strlen($e['titulo']) < 5) {
-        $errores['titulo'] = 'El título necesita al menos 5 caracteres.';
+        $errores['titulo'] = t('evento.valida.titulo_corto');
     } elseif (mb_strlen($e['titulo']) > 160) {
-        $errores['titulo'] = 'El título no puede pasar de 160 caracteres.';
+        $errores['titulo'] = t('evento.valida.titulo_largo');
     }
 
     $e['descripcion'] = trim((string) ($in['descripcion'] ?? ''));
     if (mb_strlen($e['descripcion']) < 50) {
-        $errores['descripcion'] = 'Agrega una descripción más completa (mínimo 50 caracteres).';
+        $errores['descripcion'] = t('evento.valida.descripcion_corta');
     } elseif (mb_strlen($e['descripcion']) > 2000) {
-        $errores['descripcion'] = 'La descripción no puede pasar de 2,000 caracteres.';
+        $errores['descripcion'] = t('evento.valida.descripcion_larga');
     }
 
     /*
@@ -715,9 +715,9 @@ function validarEvento(array $in): array
     $categoriasValidas  = array_values(array_intersect($catalogoCategorias, $categoriasEntrada));
 
     if (!$categoriasValidas) {
-        $errores['categorias'] = 'Elige al menos una categoría de la lista.';
+        $errores['categorias'] = t('evento.valida.categoria_falta');
     } elseif (count($categoriasValidas) > EVENTO_CATEGORIAS_MAX) {
-        $errores['categorias'] = 'Elige como máximo ' . EVENTO_CATEGORIAS_MAX . ' categorías.';
+        $errores['categorias'] = sprintf(t('evento.valida.categoria_max'), EVENTO_CATEGORIAS_MAX);
     }
 
     $e['categorias'] = array_slice($categoriasValidas, 0, EVENTO_CATEGORIAS_MAX);
@@ -725,25 +725,25 @@ function validarEvento(array $in): array
 
     $e['entidad'] = trim((string) ($in['entidad'] ?? ''));
     if (!in_array($e['entidad'], estadosMexico(), true)) {
-        $errores['entidad'] = 'Elige un estado de la lista.';
+        $errores['entidad'] = t('evento.valida.estado_falta');
     }
 
     $e['ciudad'] = trim((string) ($in['ciudad'] ?? ''));
     $municipiosDelEstado = municipiosPorEstado()[$e['entidad']] ?? [];
     if (!in_array($e['ciudad'], $municipiosDelEstado, true)) {
         $errores['ciudad'] = $e['entidad'] === ''
-            ? 'Elige primero el estado.'
-            : 'Elige una ciudad de la lista.';
+            ? t('evento.valida.ciudad_sin_estado')
+            : t('evento.valida.ciudad_falta');
     }
 
     $e['lugar'] = trim((string) ($in['lugar'] ?? ''));
-    if ($e['lugar'] === '') $errores['lugar'] = 'Falta el lugar donde se realiza.';
+    if ($e['lugar'] === '') $errores['lugar'] = t('evento.valida.lugar_falta');
 
     // Aparte del nombre del lugar: la calle y número, para quien quiera
     // corregir o completar lo que puso el geocoding automático.
     $e['direccion'] = trim((string) ($in['direccion'] ?? ''));
     if (mb_strlen($e['direccion']) > 255) {
-        $errores['direccion'] = 'La dirección no puede pasar de 255 caracteres.';
+        $errores['direccion'] = t('evento.valida.direccion_larga');
     }
     if ($e['direccion'] === '') $e['direccion'] = null;
 
@@ -784,32 +784,32 @@ function validarEvento(array $in): array
     if ($e['tipo_actividad'] === 'recurrente') {
         $e['frecuencia'] = (string) ($in['frecuencia'] ?? '');
         if (!isset(frecuenciasRecurrencia()[$e['frecuencia']])) {
-            $errores['frecuencia'] = 'Elige cada cuánto se repite.';
+            $errores['frecuencia'] = t('evento.valida.frecuencia_falta');
             $e['frecuencia'] = null;
         }
 
         $e['hora_recurrente'] = $horaValida(trim((string) ($in['hora_recurrente'] ?? '')));
         if ($e['hora_recurrente'] === null) {
-            $errores['hora_recurrente'] = 'Pon la hora a la que empieza cada sesión.';
+            $errores['hora_recurrente'] = t('evento.valida.hora_inicio_sesion_falta');
         }
 
         $e['hora_fin_recurrente'] = $horaValida(trim((string) ($in['hora_fin_recurrente'] ?? '')));
         if ($e['hora_fin_recurrente'] === null) {
-            $errores['hora_fin_recurrente'] = 'Pon la hora a la que termina cada sesión.';
+            $errores['hora_fin_recurrente'] = t('evento.valida.hora_fin_sesion_falta');
         } elseif ($e['hora_recurrente'] !== null && $e['hora_fin_recurrente'] <= $e['hora_recurrente']) {
-            $errores['hora_fin_recurrente'] = 'El final no puede ser antes que el inicio.';
+            $errores['hora_fin_recurrente'] = t('evento.valida.hora_fin_antes_inicio');
         }
 
         $inicioRec = trim((string) ($in['fecha_inicio_rec'] ?? ''));
         $inicioRecValido = ($inicioRec !== '' && strtotime($inicioRec) !== false) ? $inicioRec : null;
         if ($inicioRecValido === null) {
-            $errores['fecha_inicio_rec'] = 'Pon la fecha en la que empieza a repetirse.';
+            $errores['fecha_inicio_rec'] = t('evento.valida.fecha_inicio_rec_falta');
         }
 
         $finRec = trim((string) ($in['fecha_fin_rec'] ?? ''));
         $finRecValido = ($finRec !== '' && strtotime($finRec) !== false) ? $finRec : null;
         if ($finRecValido === null) {
-            $errores['fecha_fin_rec'] = 'Pon la fecha en la que termina de repetirse.';
+            $errores['fecha_fin_rec'] = t('evento.valida.fecha_fin_rec_falta');
         }
 
         $e['fecha_inicio'] = ($inicioRecValido !== null && $e['hora_recurrente'] !== null)
@@ -820,7 +820,7 @@ function validarEvento(array $in): array
 
         if ($e['fecha_fin'] !== null && $e['fecha_inicio'] !== null
             && strtotime($e['fecha_fin']) < strtotime($e['fecha_inicio'])) {
-            $errores['fecha_fin_rec'] = 'El final no puede ser anterior al principio.';
+            $errores['fecha_fin_rec'] = t('evento.valida.fecha_fin_antes_inicio');
         }
     } else {
         $e['frecuencia']          = null;
@@ -830,17 +830,17 @@ function validarEvento(array $in): array
         $fechaUnica = trim((string) ($in['fecha_unica'] ?? ''));
         $fechaUnicaValida = ($fechaUnica !== '' && strtotime($fechaUnica) !== false) ? $fechaUnica : null;
         if ($fechaUnicaValida === null) {
-            $errores['fecha_unica'] = 'Pon la fecha de la actividad.';
+            $errores['fecha_unica'] = t('evento.valida.fecha_falta');
         }
 
         $horaIniValida = $horaValida(trim((string) ($in['hora_inicio_unica'] ?? '')));
         if ($horaIniValida === null) {
-            $errores['hora_inicio_unica'] = 'Pon la hora de inicio.';
+            $errores['hora_inicio_unica'] = t('evento.valida.hora_inicio_falta');
         }
 
         $horaFinValida = $horaValida(trim((string) ($in['hora_fin_unica'] ?? '')));
         if ($horaFinValida === null) {
-            $errores['hora_fin_unica'] = 'Pon la hora de fin.';
+            $errores['hora_fin_unica'] = t('evento.valida.hora_fin_falta');
         }
 
         // El día de término es opcional: sin él, se asume el mismo día de inicio.
@@ -856,7 +856,7 @@ function validarEvento(array $in): array
 
         if ($e['fecha_fin'] !== null && $e['fecha_inicio'] !== null
             && strtotime($e['fecha_fin']) < strtotime($e['fecha_inicio'])) {
-            $errores['hora_fin_unica'] = 'El final no puede ser anterior al principio.';
+            $errores['hora_fin_unica'] = t('evento.valida.fecha_fin_antes_inicio');
         }
     }
 
@@ -878,7 +878,7 @@ function validarEvento(array $in): array
 
         if ($termina !== null && strtotime($termina) < time()) {
             $campo = $recurrente ? 'fecha_fin_rec' : 'fecha_unica';
-            $errores[$campo] = 'Esa fecha ya pasó, así que la actividad no aparecería en el listado.';
+            $errores[$campo] = t('evento.valida.fecha_pasada');
         }
     }
 
@@ -891,10 +891,10 @@ function validarEvento(array $in): array
         $precio = str_replace([',', ' '], '', (string) ($in['precio'] ?? ''));
 
         if ($precio === '') {
-            $errores['precio'] = 'Pon el precio, o marca que es sin costo.';
+            $errores['precio'] = t('evento.valida.precio_falta');
             $e['precio'] = null;
         } elseif (!is_numeric($precio) || (float) $precio < 0) {
-            $errores['precio'] = 'El precio tiene que ser un número.';
+            $errores['precio'] = t('evento.valida.precio_invalido');
             $e['precio'] = null;
         } else {
             $e['precio'] = round((float) $precio, 2);
@@ -902,7 +902,7 @@ function validarEvento(array $in): array
 
         $e['forma_pago'] = (string) ($in['forma_pago'] ?? '');
         if (!in_array($e['forma_pago'], ['completa', 'sesion'], true)) {
-            $errores['forma_pago'] = 'Elige si el precio es por toda la actividad o por sesión.';
+            $errores['forma_pago'] = t('evento.valida.forma_pago_falta');
             $e['forma_pago'] = null;
         }
     }
@@ -914,7 +914,7 @@ function validarEvento(array $in): array
     $e['cupo_maximo'] = null;
     if ($cupo !== '') {
         if (!ctype_digit($cupo) || (int) $cupo < 1) {
-            $errores['cupo_maximo'] = 'El cupo tiene que ser un número entero mayor que cero.';
+            $errores['cupo_maximo'] = t('evento.valida.cupo_invalido');
         } else {
             $e['cupo_maximo'] = (int) $cupo;
         }
@@ -922,32 +922,32 @@ function validarEvento(array $in): array
 
     $e['accion_principal'] = (string) ($in['accion_principal'] ?? '');
     if (!isset(accionesPrincipales()[$e['accion_principal']])) {
-        $errores['accion_principal'] = 'Elige qué esperas que haga quien vea la ficha.';
+        $errores['accion_principal'] = t('evento.valida.accion_falta');
     }
 
     // Cada acción principal pide su propio enlace. Solo es obligatorio el de
     // la acción elegida: el otro puede quedar vacío sin que bloquee el envío.
     $e['url_boletos'] = urlValida((string) ($in['url_boletos'] ?? ''));
     if ($e['url_boletos'] === false) {
-        $errores['url_boletos'] = 'Esa dirección no parece válida. Empieza por https://';
+        $errores['url_boletos'] = t('evento.valida.url_invalida');
         $e['url_boletos'] = null;
     } elseif ($e['url_boletos'] === null && $e['accion_principal'] === 'boletos') {
-        $errores['url_boletos'] = 'Agrega el enlace donde se compran los boletos.';
+        $errores['url_boletos'] = t('evento.valida.boletos_falta');
     }
 
     $e['url_reserva'] = urlValida((string) ($in['url_reserva'] ?? ''));
     if ($e['url_reserva'] === false) {
-        $errores['url_reserva'] = 'Esa dirección no parece válida. Empieza por https://';
+        $errores['url_reserva'] = t('evento.valida.url_invalida');
         $e['url_reserva'] = null;
     } elseif ($e['url_reserva'] === null && $e['accion_principal'] === 'reservar') {
-        $errores['url_reserva'] = 'Agrega el enlace donde se reserva el lugar.';
+        $errores['url_reserva'] = t('evento.valida.reserva_falta');
     }
 
     // Igual que url_boletos, pero sin obligación ninguna de rellenarlo: es
     // informativo y puede llevarse aunque los otros enlaces también estén llenos.
     $e['sitio_web'] = urlValida((string) ($in['sitio_web'] ?? ''));
     if ($e['sitio_web'] === false) {
-        $errores['sitio_web'] = 'Esa dirección no parece válida. Empieza por https://';
+        $errores['sitio_web'] = t('evento.valida.url_invalida');
         $e['sitio_web'] = null;
     }
 

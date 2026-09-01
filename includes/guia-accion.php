@@ -8,24 +8,24 @@
 declare(strict_types=1);
 ?>
 <aside class="guia-lateral">
-  <h2>Guía rápida</h2>
+  <h2><?= et('evento.guia.titulo') ?></h2>
 
   <div class="guia-item">
-    <h3>Contactar al organizador</h3>
-    <p>Centraliza las solicitudes de tus interesados. Los usuarios completarán un formulario con sus dudas y recibirás la información directamente en tu correo electrónico.</p>
-    <div class="ejemplos">Ejemplos: certificaciones, programas, retiros, actividades gratuitas.</div>
+    <h3><?= et('evento.guia.contactar_titulo') ?></h3>
+    <p><?= et('evento.guia.contactar_texto') ?></p>
+    <div class="ejemplos"><?= et('evento.guia.contactar_ejemplos') ?></div>
   </div>
 
   <div class="guia-item">
-    <h3>Comprar boletos</h3>
-    <p>Utilízalo cuando exista un enlace externo donde el participante pueda realizar el pago o la inscripción.</p>
-    <div class="ejemplos">Ejemplos: Eventbrite, Boletia, Ticketmaster, sitio web propio, landing page de pago.</div>
+    <h3><?= et('evento.guia.comprar_titulo') ?></h3>
+    <p><?= et('evento.guia.comprar_texto') ?></p>
+    <div class="ejemplos"><?= et('evento.guia.comprar_ejemplos') ?></div>
   </div>
 
   <div class="guia-item">
-    <h3>Reservar lugar</h3>
-    <p>Ideal para actividades con cupo limitado o registro previo, aunque no exista compra directa de boletos.</p>
-    <div class="ejemplos">Ejemplos: Google Forms, WhatsApp, Calendly, formulario propio, landing page de registro.</div>
+    <h3><?= et('evento.guia.reservar_titulo') ?></h3>
+    <p><?= et('evento.guia.reservar_texto') ?></p>
+    <div class="ejemplos"><?= et('evento.guia.reservar_ejemplos') ?></div>
   </div>
 
   <?php /* Aviso de traducción (REQ-00010). Va aquí y no en el campo de
@@ -35,15 +35,12 @@ declare(strict_types=1);
            escribe cada organizador no se traduce solo —y traducirlo por su
            cuenta sería poner palabras en su boca. */ ?>
   <div class="guia-aviso">
-    <h3>Importante sobre la traducción</h3>
-    <p>La traducción de OMDARA no modifica ni traduce automáticamente los textos que tú ingreses
-       en la descripción de tu actividad. La descripción, instrucciones, condiciones y demás
-       contenido personalizado permanecerán tal como los hayas escrito.</p>
-    <p>Si tu actividad está dirigida a participantes en español e inglés, considera proporcionar
-       la información relevante en ambos idiomas dentro de la descripción.</p>
+    <h3><?= et('evento.guia.traduccion_titulo') ?></h3>
+    <p><?= et('evento.guia.traduccion_texto1') ?></p>
+    <p><?= et('evento.guia.traduccion_texto2') ?></p>
   </div>
 
   <div class="guia-nota">
-    Con esto en mente, elige la <strong>acción principal</strong> más abajo: decide qué verán quienes quieran dar el siguiente paso.
+    <?= t('evento.guia.nota') ?>
   </div>
 </aside>

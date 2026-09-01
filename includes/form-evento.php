@@ -131,22 +131,22 @@ if ($orgAbierta) {
     <path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>
     <path d="M14 3v4h4"/>
   </svg>
-  <h2>1. Información general</h2>
+  <h2><?= et('evento.form.seccion1') ?></h2>
 </div>
 
 <div class="campo<?= $mal('titulo') ?>">
   <div class="label-fila">
-    <label for="titulo">Título de la actividad</label>
+    <label for="titulo"><?= et('evento.form.titulo_label') ?></label>
     <span class="contador" id="contadorTitulo"></span>
   </div>
   <input id="titulo" name="titulo" type="text" required maxlength="160"
-         value="<?= e($v('titulo')) ?>" placeholder="Amanecer en el Cenote — Yoga y Sonido">
+         value="<?= e($v('titulo')) ?>" placeholder="<?= et('evento.form.titulo_placeholder') ?>">
   <?= $err('titulo') ?>
 </div>
 
 <div class="campo<?= $mal('categorias') ?>">
   <div class="label-fila">
-    <label>Categorías <span class="pista" style="font-weight:400;">elige hasta <?= EVENTO_CATEGORIAS_MAX ?></span></label>
+    <label><?= et('evento.form.categorias_label') ?> <span class="pista" style="font-weight:400;"><?= et('evento.form.categorias_pista') ?> <?= EVENTO_CATEGORIAS_MAX ?></span></label>
     <span class="contador" id="contadorCategorias"></span>
   </div>
   <div class="checklist categorias-grid" id="categoriasGrupo">
@@ -154,22 +154,22 @@ if ($orgAbierta) {
       <label>
         <input type="checkbox" name="categorias[]" value="<?= e($catNombre) ?>"
                <?= in_array($catNombre, $categoriasSeleccionadas, true) ? 'checked' : '' ?>>
-        <?= e($catDatos[0] . '  ' . $catNombre) ?>
+        <?= e($catDatos[0] . '  ' . $catDatos[1]) ?>
       </label>
     <?php endforeach; ?>
   </div>
-  <div class="pista">De las que marques, la que quede más arriba en la lista es la principal: la que se ve en la tarjeta de la portada.</div>
+  <div class="pista"><?= et('evento.form.categorias_ayuda') ?></div>
   <?= $err('categorias') ?>
 </div>
 
 <div class="campo<?= $mal('descripcion') ?>">
   <div class="label-fila">
-    <label for="descripcion">Descripción</label>
+    <label for="descripcion"><?= et('evento.form.descripcion_label') ?></label>
     <span class="contador" id="contadorDescripcion"></span>
   </div>
   <textarea id="descripcion" name="descripcion" rows="7" required minlength="50" maxlength="2000"
-            placeholder="Describe tu actividad. Incluye qué aprenderán los asistentes, a quién está dirigida, qué incluye y cualquier información importante."><?= e($v('descripcion')) ?></textarea>
-  <div class="pista">Se muestra tal cual en la ficha. Los saltos de línea se respetan.</div>
+            placeholder="<?= et('evento.form.descripcion_placeholder') ?>"><?= e($v('descripcion')) ?></textarea>
+  <div class="pista"><?= et('evento.form.descripcion_ayuda') ?></div>
   <?= $err('descripcion') ?>
 </div>
 
@@ -180,7 +180,7 @@ if ($orgAbierta) {
     <path d="M3.5 9.5h17"/>
     <path d="M8 3v4M16 3v4"/>
   </svg>
-  <h2>2. Fecha y horario</h2>
+  <h2><?= et('evento.form.seccion2') ?></h2>
 </div>
 
 <div class="tipo-fecha-grupo">
@@ -193,34 +193,34 @@ if ($orgAbierta) {
         <path d="M3.5 9.5h17"/>
         <path d="M8 3v4M16 3v4"/>
       </svg>
-      <span>Actividad de un día</span>
+      <span><?= et('evento.form.dia_unico') ?></span>
     </label>
     <div class="tipo-fecha-campos">
       <div class="campo<?= $mal('fecha_unica') ?>">
-        <label for="fecha_unica">Fecha</label>
+        <label for="fecha_unica"><?= et('evento.form.fecha_label') ?></label>
         <input id="fecha_unica" name="fecha_unica" type="date" <?= $esRecurrente ? '' : 'required' ?>
                value="<?= e($esRecurrente ? '' : $fechaSoloInput('fecha_inicio')) ?>">
         <?= $err('fecha_unica') ?>
       </div>
       <div class="campo-fila">
         <div class="campo<?= $mal('hora_inicio_unica') ?>">
-          <label for="hora_inicio_unica">Hora de inicio</label>
+          <label for="hora_inicio_unica"><?= et('evento.form.hora_inicio_label') ?></label>
           <input id="hora_inicio_unica" name="hora_inicio_unica" type="time" <?= $esRecurrente ? '' : 'required' ?>
                  value="<?= e($esRecurrente ? '' : $horaDeFecha('fecha_inicio')) ?>">
           <?= $err('hora_inicio_unica') ?>
         </div>
         <div class="campo<?= $mal('hora_fin_unica') ?>">
-          <label for="hora_fin_unica">Hora de fin</label>
+          <label for="hora_fin_unica"><?= et('evento.form.hora_fin_label') ?></label>
           <input id="hora_fin_unica" name="hora_fin_unica" type="time" <?= $esRecurrente ? '' : 'required' ?>
                  value="<?= e($esRecurrente ? '' : $horaDeFecha('fecha_fin')) ?>">
           <?= $err('hora_fin_unica') ?>
         </div>
       </div>
       <div class="campo">
-        <label for="fecha_fin_unica">Termina otro día <span class="opcional">opcional</span></label>
+        <label for="fecha_fin_unica"><?= et('evento.form.termina_otro_dia') ?> <span class="opcional"><?= et('campo.opcional') ?></span></label>
         <input id="fecha_fin_unica" name="fecha_fin_unica" type="date"
                value="<?= e((!$esRecurrente && $fechaSoloInput('fecha_fin') !== '' && $fechaSoloInput('fecha_fin') !== $fechaSoloInput('fecha_inicio')) ? $fechaSoloInput('fecha_fin') : '') ?>">
-        <div class="pista">Para retiros de varios días. Si no se pone, se asume el mismo día.</div>
+        <div class="pista"><?= et('evento.form.termina_otro_dia_ayuda') ?></div>
       </div>
     </div>
   </div>
@@ -235,27 +235,27 @@ if ($orgAbierta) {
         <path d="M20 17H7a3 3 0 0 1-3-3v-1"/>
         <path d="M7 20l-3-3 3-3"/>
       </svg>
-      <span>Actividad recurrente</span>
+      <span><?= et('evento.form.recurrente') ?></span>
     </label>
     <div class="tipo-fecha-campos">
       <div class="campo-fila">
         <div class="campo<?= $mal('fecha_inicio_rec') ?>">
-          <label for="fecha_inicio_rec">Fecha de inicio</label>
+          <label for="fecha_inicio_rec"><?= et('evento.form.fecha_inicio_label') ?></label>
           <input id="fecha_inicio_rec" name="fecha_inicio_rec" type="date" <?= $esRecurrente ? 'required' : '' ?>
                  value="<?= e($esRecurrente ? $fechaSoloInput('fecha_inicio') : '') ?>">
           <?= $err('fecha_inicio_rec') ?>
         </div>
         <div class="campo<?= $mal('fecha_fin_rec') ?>">
-          <label for="fecha_fin_rec">Fecha de fin</label>
+          <label for="fecha_fin_rec"><?= et('evento.form.fecha_fin_label') ?></label>
           <input id="fecha_fin_rec" name="fecha_fin_rec" type="date" <?= $esRecurrente ? 'required' : '' ?>
                  value="<?= e($esRecurrente ? $fechaSoloInput('fecha_fin') : '') ?>">
           <?= $err('fecha_fin_rec') ?>
         </div>
       </div>
       <div class="campo<?= $mal('frecuencia') ?>">
-        <label for="frecuencia">Frecuencia</label>
+        <label for="frecuencia"><?= et('evento.form.frecuencia_label') ?></label>
         <select id="frecuencia" name="frecuencia" <?= $esRecurrente ? 'required' : '' ?>>
-          <option value="">Selecciona una frecuencia</option>
+          <option value=""><?= et('evento.form.frecuencia_placeholder') ?></option>
           <?php foreach (frecuenciasRecurrencia() as $clave => $etiqueta): ?>
             <option value="<?= e($clave) ?>" <?= $v('frecuencia') === $clave ? 'selected' : '' ?>><?= e($etiqueta) ?></option>
           <?php endforeach; ?>
@@ -264,13 +264,13 @@ if ($orgAbierta) {
       </div>
       <div class="campo-fila">
         <div class="campo<?= $mal('hora_recurrente') ?>">
-          <label for="hora_recurrente">Hora de inicio</label>
+          <label for="hora_recurrente"><?= et('evento.form.hora_inicio_label') ?></label>
           <input id="hora_recurrente" name="hora_recurrente" type="time" <?= $esRecurrente ? 'required' : '' ?>
                  value="<?= e($horaInput()) ?>">
           <?= $err('hora_recurrente') ?>
         </div>
         <div class="campo<?= $mal('hora_fin_recurrente') ?>">
-          <label for="hora_fin_recurrente">Hora de fin</label>
+          <label for="hora_fin_recurrente"><?= et('evento.form.hora_fin_label') ?></label>
           <input id="hora_fin_recurrente" name="hora_fin_recurrente" type="time" <?= $esRecurrente ? 'required' : '' ?>
                  value="<?= e($horaFinRecurrenteInput()) ?>">
           <?= $err('hora_fin_recurrente') ?>
@@ -286,14 +286,14 @@ if ($orgAbierta) {
     <path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/>
     <circle cx="12" cy="9" r="2.5"/>
   </svg>
-  <h2>3. Ubicación</h2>
+  <h2><?= et('evento.form.seccion3') ?></h2>
 </div>
 
 <div class="campo-fila campo-fila-3">
   <div class="campo<?= $mal('entidad') ?>">
-    <label for="entidad">Estado</label>
+    <label for="entidad"><?= et('evento.form.estado_label') ?></label>
     <select id="entidad" name="entidad" required>
-      <option value="">Selecciona un estado</option>
+      <option value=""><?= et('evento.form.estado_placeholder') ?></option>
       <?php foreach (estadosMexico() as $estado): ?>
         <option value="<?= e($estado) ?>" <?= $v('entidad') === $estado ? 'selected' : '' ?>><?= e($estado) ?></option>
       <?php endforeach; ?>
@@ -301,9 +301,9 @@ if ($orgAbierta) {
     <?= $err('entidad') ?>
   </div>
   <div class="campo<?= $mal('ciudad') ?>" id="campoCiudad">
-    <label for="ciudad">Ciudad</label>
+    <label for="ciudad"><?= et('evento.form.ciudad_label') ?></label>
     <input id="ciudad" name="ciudad" type="text" required autocomplete="off"
-           list="listaCiudades" placeholder="Escribe para buscar…"
+           list="listaCiudades" placeholder="<?= et('evento.form.ciudad_placeholder') ?>"
            value="<?= e($v('ciudad')) ?>">
     <datalist id="listaCiudades">
       <?php foreach (municipiosPorEstado()[$v('entidad')] ?? [] as $municipio): ?>
@@ -313,30 +313,30 @@ if ($orgAbierta) {
     <?= $err('ciudad') ?>
   </div>
   <div class="campo<?= $mal('lugar') ?>" id="campoLugar">
-    <label for="lugar">Nombre del lugar</label>
+    <label for="lugar"><?= et('evento.form.lugar_label') ?></label>
     <input id="lugar" name="lugar" type="text" required maxlength="160"
-           value="<?= e($v('lugar')) ?>" placeholder="Ej. Centro Holístico Luz">
+           value="<?= e($v('lugar')) ?>" placeholder="<?= et('evento.form.lugar_placeholder') ?>">
     <?= $err('lugar') ?>
   </div>
 </div>
 
 <div class="campo<?= $mal('direccion') ?>">
-  <label for="direccion">Dirección <span class="opcional">opcional</span></label>
+  <label for="direccion"><?= et('evento.form.direccion_label') ?> <span class="opcional"><?= et('campo.opcional') ?></span></label>
   <input id="direccion" name="direccion" type="text" maxlength="255"
-         value="<?= e($v('direccion')) ?>" placeholder="Calle, número, colonia">
-  <div class="pista">Se completa sola al mover el pin; corrígela si hace falta.</div>
+         value="<?= e($v('direccion')) ?>" placeholder="<?= et('evento.form.direccion_placeholder') ?>">
+  <div class="pista"><?= et('evento.form.direccion_ayuda') ?></div>
   <?= $err('direccion') ?>
 </div>
 
 <div class="campo">
   <div id="mapaInteractivo" class="mapa-interactivo" data-lat="<?= e($v('latitud')) ?>" data-lng="<?= e($v('longitud')) ?>"></div>
-  <div class="aviso aviso-info" style="margin:10px 0 0;">Arrastra el pin para ajustar la ubicación exacta del lugar. Ciudad, estado y dirección se completan solos.</div>
+  <div class="aviso aviso-info" style="margin:10px 0 0;"><?= et('evento.form.mapa_ayuda') ?></div>
 
   <div class="enlace-maps-grupo">
-    <label for="enlaceMapsPegado">¿Tienes el enlace de Google Maps del lugar? Pégalo y movemos el pin por ti</label>
+    <label for="enlaceMapsPegado"><?= et('evento.form.maps_enlace_label') ?></label>
     <div class="enlace-maps-fila">
-      <input type="text" id="enlaceMapsPegado" placeholder="https://maps.app.goo.gl/…">
-      <button type="button" id="enlaceMapsBoton">Usar enlace</button>
+      <input type="text" id="enlaceMapsPegado" placeholder="<?= et('evento.form.maps_enlace_placeholder') ?>">
+      <button type="button" id="enlaceMapsBoton"><?= et('evento.form.maps_usar_enlace') ?></button>
     </div>
     <div id="enlaceMapsMensaje" class="aviso" hidden></div>
   </div>
@@ -367,7 +367,7 @@ if ($orgAbierta) {
     <path d="M12.5 3H20a1 1 0 0 1 1 1v7.5a1 1 0 0 1-.3.7l-9 9a1 1 0 0 1-1.4 0l-7.5-7.5a1 1 0 0 1 0-1.4l9-9a1 1 0 0 1 .7-.3z"/>
     <circle cx="16.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>
   </svg>
-  <h2>4. Precio</h2>
+  <h2><?= et('evento.form.seccion4') ?></h2>
 </div>
 
 <?php $esDePago = isset($e['gratuito']) ? empty($e['gratuito']) : false; ?>
@@ -381,7 +381,7 @@ if ($orgAbierta) {
         <circle cx="12" cy="12" r="9"/>
         <path d="M7 7l10 10"/>
       </svg>
-      <span class="precio-titulo">Sin costo</span>
+      <span class="precio-titulo"><?= et('evento.form.sin_costo') ?></span>
     </label>
     <label class="precio-op">
       <input type="radio" name="precio_modo" value="de_pago" id="precioDePago" <?= $esDePago ? 'checked' : '' ?>>
@@ -390,24 +390,24 @@ if ($orgAbierta) {
         <path d="M12.5 3H20a1 1 0 0 1 1 1v7.5a1 1 0 0 1-.3.7l-9 9a1 1 0 0 1-1.4 0l-7.5-7.5a1 1 0 0 1 0-1.4l9-9a1 1 0 0 1 .7-.3z"/>
         <circle cx="16.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>
       </svg>
-      <span class="precio-titulo">De pago</span>
+      <span class="precio-titulo"><?= et('evento.form.de_pago') ?></span>
     </label>
   </div>
 </div>
 
 <div id="bloquePago">
   <div class="campo<?= $mal('forma_pago') ?>">
-    <label for="forma_pago">Forma de pago</label>
+    <label for="forma_pago"><?= et('evento.form.forma_pago_label') ?></label>
     <select id="forma_pago" name="forma_pago" <?= $esDePago ? 'required' : '' ?>>
-      <option value="">Selecciona una opción</option>
-      <option value="completa" <?= $v('forma_pago') === 'completa' ? 'selected' : '' ?>>Actividad completa</option>
-      <option value="sesion" <?= $v('forma_pago') === 'sesion' ? 'selected' : '' ?>>Por sesión</option>
+      <option value=""><?= et('evento.form.forma_pago_placeholder') ?></option>
+      <option value="completa" <?= $v('forma_pago') === 'completa' ? 'selected' : '' ?>><?= et('evento.form.forma_pago_completa') ?></option>
+      <option value="sesion" <?= $v('forma_pago') === 'sesion' ? 'selected' : '' ?>><?= et('evento.form.forma_pago_sesion') ?></option>
     </select>
     <?= $err('forma_pago') ?>
   </div>
 
   <div class="campo<?= $mal('precio') ?>" id="campoPrecio">
-    <label for="precio">Precio por persona (MXN)</label>
+    <label for="precio"><?= et('evento.form.precio_label') ?></label>
     <input id="precio" name="precio" type="text" inputmode="decimal"
            value="<?= e($v('precio')) ?>" placeholder="2450">
     <?= $err('precio') ?>
@@ -422,13 +422,13 @@ if ($orgAbierta) {
     <circle cx="17" cy="9" r="2.6"/>
     <path d="M15.2 14.6c2.2.4 3.9 2.2 4.3 5.4"/>
   </svg>
-  <h2>5. Cupo máximo <span class="opcional">opcional</span></h2>
+  <h2><?= et('evento.form.seccion5') ?> <span class="opcional"><?= et('campo.opcional') ?></span></h2>
 </div>
 
 <div class="campo<?= $mal('cupo_maximo') ?>">
-  <label for="cupo_maximo">Número máximo de participantes</label>
+  <label for="cupo_maximo"><?= et('evento.form.cupo_label') ?></label>
   <input id="cupo_maximo" name="cupo_maximo" type="text" inputmode="numeric" maxlength="6"
-         value="<?= e($v('cupo_maximo')) ?>" placeholder="Ej. 20">
+         value="<?= e($v('cupo_maximo')) ?>" placeholder="<?= et('evento.form.cupo_placeholder') ?>">
   <?= $err('cupo_maximo') ?>
 </div>
 
@@ -439,7 +439,7 @@ if ($orgAbierta) {
     <circle cx="8.5" cy="9.5" r="1.6"/>
     <path d="M21 16l-5.5-5.5a1.5 1.5 0 0 0-2.1 0L4 19"/>
   </svg>
-  <h2>6. Imagen de la actividad <span class="opcional">opcional</span></h2>
+  <h2><?= et('evento.form.seccion6') ?> <span class="opcional"><?= et('campo.opcional') ?></span></h2>
 </div>
 
 <div class="campo<?= $mal('imagen') ?>">
@@ -459,13 +459,13 @@ if ($orgAbierta) {
   <?php if ($imagenActual !== null): ?>
     <input type="hidden" name="imagen_previa" value="<?= e((string) $imagenGuardada) ?>">
     <div class="imagen-actual">
-      <img src="<?= e($imagenActual) ?>" alt="Imagen de la actividad">
+      <img src="<?= e($imagenActual) ?>" alt="<?= et('evento.form.imagen_alt') ?>">
       <?php if (esImagenEnVuelo($imagenGuardada)): ?>
-        <div class="pista">Esta es la que acabas de elegir. Sigue puesta: no hace falta que la busques otra vez.</div>
+        <div class="pista"><?= et('evento.form.imagen_elegida') ?></div>
       <?php endif; ?>
       <label class="check">
         <input type="checkbox" name="quitar_imagen" value="1">
-        <span>Quitar esta imagen</span>
+        <span><?= et('evento.form.quitar_imagen') ?></span>
       </label>
     </div>
   <?php endif; ?>
@@ -476,14 +476,14 @@ if ($orgAbierta) {
       <path d="M7 18a4.5 4.5 0 0 1-.5-8.97A5.5 5.5 0 0 1 17.2 8.05 4 4 0 0 1 17 16"/>
       <path d="M12 12v7M9 15l3-3 3 3"/>
     </svg>
-    <span class="imagen-dropzone-texto">Subir imagen</span>
+    <span class="imagen-dropzone-texto"><?= et('evento.form.subir_imagen') ?></span>
     <span class="imagen-dropzone-nombre" id="imagenNombre"></span>
   </label>
   <input id="imagen" name="imagen" type="file" accept="image/jpeg,image/png,image/webp" class="imagen-input-oculto">
 
   <div class="pista">
-    JPG, PNG o WebP. Máx. <?= round(IMAGEN_MAX_BYTES / 1048576) ?> MB. Recomendado: 1200 × 800 px.
-    <?= $imagenActual !== null ? 'Elige otra solo si quieres cambiarla.' : 'Si no agregas imagen, se muestra un color de fondo predeterminado en la tarjeta pública.' ?>
+    <?= et('evento.form.imagen_pista_1') ?> <?= round(IMAGEN_MAX_BYTES / 1048576) ?> <?= et('evento.form.imagen_pista_2') ?>
+    <?= $imagenActual !== null ? et('evento.form.imagen_pista_cambiar') : et('evento.form.imagen_pista_sin') ?>
   </div>
   <?= $err('imagen') ?>
 </div>
@@ -494,7 +494,7 @@ if ($orgAbierta) {
     <circle cx="12" cy="8.2" r="3.8"/>
     <path d="M4.8 20c.6-3.7 3.6-5.9 7.2-5.9s6.6 2.2 7.2 5.9"/>
   </svg>
-  <h2>7. Información de contacto</h2>
+  <h2><?= et('evento.form.seccion7') ?></h2>
 </div>
 
 <?php
@@ -511,7 +511,7 @@ if ($orgAbierta) {
  */
 ?>
 <details class="contacto-org"<?= $orgAbierta ? ' open' : '' ?>>
-  <summary>Datos del organizador</summary>
+  <summary><?= et('evento.form.datos_organizador') ?></summary>
 
   <div class="contacto-org-cuerpo">
     <?php if ($orgHayGuardado && !$orgEditado): ?>
@@ -522,9 +522,9 @@ if ($orgAbierta) {
                funciona; con JavaScript, solo el resumen hasta que se pide
                editar. */ ?>
       <div class="contacto-org-guardado" id="orgGuardado">
-        <div class="contacto-org-tit">Usar la información guardada</div>
+        <div class="contacto-org-tit"><?= et('evento.form.usar_guardado') ?></div>
         <div class="contacto-org-lista">
-          <div><span>Nombre</span><strong><?= e($orgNombre) ?></strong></div>
+          <div><span><?= et('evento.form.nombre_label') ?></span><strong><?= e($orgNombre) ?></strong></div>
           <?php foreach ($orgCampos as $columna => $etiqueta): ?>
             <?php $valorOrg = trim((string) ($orgFicha[$columna] ?? '')); ?>
             <?php if ($valorOrg !== ''): ?>
@@ -532,43 +532,43 @@ if ($orgAbierta) {
             <?php endif; ?>
           <?php endforeach; ?>
         </div>
-        <button type="button" class="actionbtn" id="orgEditar">Editar</button>
+        <button type="button" class="actionbtn" id="orgEditar"><?= et('evento.form.editar_btn') ?></button>
       </div>
     <?php endif; ?>
 
     <div class="contacto-org-campos" id="orgCampos">
       <div class="campo<?= $mal('org_nombre') ?>">
-        <label for="org_nombre">Nombre del organizador <span class="requerido">obligatorio</span></label>
+        <label for="org_nombre"><?= et('evento.form.organizador_nombre_label') ?> <span class="requerido"><?= et('campo.obligatorio') ?></span></label>
         <input id="org_nombre" name="org_nombre" type="text" maxlength="120" required
-               value="<?= e($orgNombre) ?>" placeholder="Yoga Baja">
-        <div class="pista">Es el nombre que aparece como organizador en tus actividades.</div>
+               value="<?= e($orgNombre) ?>" placeholder="<?= et('evento.form.organizador_nombre_placeholder') ?>">
+        <div class="pista"><?= et('evento.form.organizador_nombre_ayuda') ?></div>
         <?= $err('org_nombre') ?>
       </div>
 
       <?php foreach ($orgCampos as $columna => $etiqueta): ?>
         <?php
         $marcador = [
-            'telefono'  => '+52 612 123 4567',
-            'instagram' => '@tucuenta',
-            'sitio_web' => 'https://tusitio.com',
+            'telefono'  => t('evento.form.telefono_placeholder'),
+            'instagram' => t('evento.form.instagram_placeholder'),
+            'sitio_web' => t('evento.form.sitio_web_placeholder'),
         ][$columna] ?? '';
         ?>
         <div class="campo">
-          <label for="org_<?= e($columna) ?>"><?= e($etiqueta) ?> <span class="opcional">opcional</span></label>
+          <label for="org_<?= e($columna) ?>"><?= e($etiqueta) ?> <span class="opcional"><?= et('campo.opcional') ?></span></label>
           <input id="org_<?= e($columna) ?>" name="org_<?= e($columna) ?>"
                  type="<?= $columna === 'telefono' ? 'tel' : 'text' ?>"
                  maxlength="<?= $columna === 'sitio_web' ? 500 : 120 ?>"
                  value="<?= e($ov($columna)) ?>" placeholder="<?= e($marcador) ?>">
           <?php if ($columna === 'sitio_web'): ?>
-            <div class="pista">El tuyo, no el de esta actividad — ese va aquí abajo.</div>
+            <div class="pista"><?= et('evento.form.sitio_web_org_ayuda') ?></div>
           <?php endif; ?>
         </div>
       <?php endforeach; ?>
     </div>
 
     <div class="pista contacto-org-nota">
-      Esta información se guardará para facilitar tus próximas publicaciones.
-      Puedes cambiarla cuando quieras desde <strong>Mi cuenta</strong>.
+      <?= et('evento.form.contacto_nota_1') ?>
+      <strong><?= et('evento.form.contacto_nota_cuenta') ?></strong>.
     </div>
   </div>
 </details>
@@ -581,10 +581,10 @@ if ($orgAbierta) {
  * clic que no tiene nada que ver con él.
  */ ?>
 <div class="campo<?= $mal('sitio_web') ?>" style="margin-top:14px;">
-  <label for="sitio_web">Sitio web o enlace de la actividad <span class="opcional">opcional</span></label>
+  <label for="sitio_web"><?= et('evento.form.sitio_web_actividad_label') ?> <span class="opcional"><?= et('campo.opcional') ?></span></label>
   <input id="sitio_web" name="sitio_web" type="url" maxlength="500"
-         value="<?= e($v('sitio_web')) ?>" placeholder="https://tusitio.com">
-  <div class="pista">Comparte un sitio web o perfil de redes sociales para que los interesados conozcan más sobre esta actividad —no el tuyo, ese va arriba—.</div>
+         value="<?= e($v('sitio_web')) ?>" placeholder="<?= et('evento.form.sitio_web_placeholder') ?>">
+  <div class="pista"><?= et('evento.form.sitio_web_actividad_ayuda') ?></div>
   <?= $err('sitio_web') ?>
 </div>
 
@@ -595,11 +595,11 @@ if ($orgAbierta) {
     <path d="M16 9a3.5 3.5 0 0 1 0 6"/>
     <path d="M18.5 6.5a7 7 0 0 1 0 11"/>
   </svg>
-  <h2>8. Acción principal *</h2>
+  <h2><?= et('evento.form.seccion8') ?> *</h2>
 </div>
 
 <div class="campo<?= $mal('accion_principal') ?>">
-  <div class="pista" style="margin:0 0 10px;">Elige la acción principal que verán las personas en tu actividad.</div>
+  <div class="pista" style="margin:0 0 10px;"><?= et('evento.form.accion_ayuda') ?></div>
 
   <div class="accion-grupo">
     <div class="accion-tarjeta">
@@ -615,7 +615,7 @@ if ($orgAbierta) {
                  corto, lo mismo que la guía de la derecha explica entero: leer
                  dos veces lo mismo con distintas palabras hace dudar de si son
                  dos cosas distintas. La guía se queda; esto se va. */ ?>
-        <span class="accion-titulo">Contactar al organizador</span>
+        <span class="accion-titulo"><?= et('evento.form.accion_contactar') ?></span>
       </label>
     </div>
 
@@ -628,11 +628,11 @@ if ($orgAbierta) {
           <path d="M20.5 9.5a2 2 0 0 1 0-3.9V4.5a1 1 0 0 0-1-1h-15a1 1 0 0 0-1 1v1.1a2 2 0 0 1 0 3.9v1a2 2 0 0 1 0 3.9v1.1a1 1 0 0 0 1 1h15a1 1 0 0 0 1-1v-1.1a2 2 0 0 1 0-3.9z"/>
           <path d="M9.5 4v16" stroke-dasharray="2 2"/>
         </svg>
-        <span class="accion-titulo">Comprar boletos</span>
+        <span class="accion-titulo"><?= et('evento.form.accion_comprar') ?></span>
       </label>
       <div class="accion-campos">
         <div class="campo<?= $mal('url_boletos') ?>">
-          <label for="url_boletos">URL de compra <span class="obligatorio-si">*</span></label>
+          <label for="url_boletos"><?= et('evento.form.url_compra_label') ?> <span class="obligatorio-si">*</span></label>
           <input id="url_boletos" name="url_boletos" type="url" maxlength="500"
                  value="<?= e($v('url_boletos')) ?>" placeholder="https://…">
           <?= $err('url_boletos') ?>
@@ -650,11 +650,11 @@ if ($orgAbierta) {
           <path d="M3.5 9.5h17"/>
           <path d="M8 3v4M16 3v4"/>
         </svg>
-        <span class="accion-titulo">Reservar lugar</span>
+        <span class="accion-titulo"><?= et('evento.form.accion_reservar') ?></span>
       </label>
       <div class="accion-campos">
         <div class="campo<?= $mal('url_reserva') ?>">
-          <label for="url_reserva">URL de reserva <span class="obligatorio-si">*</span></label>
+          <label for="url_reserva"><?= et('evento.form.url_reserva_label') ?> <span class="obligatorio-si">*</span></label>
           <input id="url_reserva" name="url_reserva" type="url" maxlength="500"
                  value="<?= e($v('url_reserva')) ?>" placeholder="https://…">
           <?= $err('url_reserva') ?>
@@ -667,7 +667,7 @@ if ($orgAbierta) {
 </div>
 
 <div class="campo">
-  <label>Color de la tarjeta</label>
+  <label><?= et('evento.form.color_label') ?></label>
   <div class="colores">
     <?php $colorElegido = $v('color', coloresEvento()[0]); ?>
     <?php foreach (coloresEvento() as $color): ?>
@@ -678,7 +678,7 @@ if ($orgAbierta) {
       </label>
     <?php endforeach; ?>
   </div>
-  <div class="pista">Se usa cuando no hay imagen, igual que en el diseño de la portada.</div>
+  <div class="pista"><?= et('evento.form.color_ayuda') ?></div>
 </div>
 
 <button class="btn-principal" type="submit"><?= e($textoBoton) ?></button>
@@ -689,6 +689,23 @@ if ($orgAbierta) {
          ciudad se quedaría sin repoblarse al cambiar de estado. */ ?>
 <script>
 var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPED_UNICODE) ?>;
+
+// Los mensajes del mapa interactivo (geocodificación y "enlace de Google
+// Maps") se arman en el navegador, no en PHP, así que necesitan su propio
+// idioma aquí igual que BUSCAR_T en buscar.php.
+var EVENTO_T = <?= json_encode([
+    'mapaPegarEnlace'   => t('evento.mapa.pegar_enlace'),
+    'mapaBuscando'      => t('evento.mapa.buscando'),
+    'mapaCompleto'      => t('evento.mapa.completo'),
+    'mapaIncompleto'    => t('evento.mapa.incompleto'),
+    'mapaNoUbicada'     => t('evento.mapa.no_ubicada'),
+    'mapaEncontrada'    => t('evento.mapa.encontrada'),
+    'mapaErrorDireccion'=> t('evento.mapa.error_direccion'),
+    'mapaEnlaceListo'   => t('evento.mapa.enlace_listo'),
+    'mapaEnlaceErrorGenerico'  => t('evento.mapa.enlace_error_generico'),
+    'mapaEnlaceErrorComprobar'=> t('evento.mapa.enlace_error_comprobar'),
+    'mapaUsarEnlace'    => t('evento.mapa.usar_enlace'),
+], JSON_UNESCAPED_UNICODE) ?>;
 </script>
 
 <script>
@@ -947,9 +964,7 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
         }
 
         if (geocodingMsg) {
-          geocodingMsg.textContent = completo
-            ? 'Completamos ciudad, estado y/o dirección a partir del mapa. Revisa que estén bien.'
-            : 'No pudimos adivinar la ubicación exacta desde el mapa. Complétala a mano.';
+          geocodingMsg.textContent = completo ? EVENTO_T.mapaCompleto : EVENTO_T.mapaIncompleto;
           geocodingMsg.hidden = false;
         }
       })
@@ -1023,7 +1038,7 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
       .then(function(resp){ return resp.json(); })
       .then(function(resultados){
         if (!resultados.length) {
-          geocodingMsg.textContent = 'No pudimos ubicar esa dirección en el mapa. Ajusta el pin a mano.';
+          geocodingMsg.textContent = EVENTO_T.mapaNoUbicada;
           geocodingMsg.className = 'aviso aviso-error';
           geocodingMsg.hidden = false;
           return;
@@ -1034,12 +1049,12 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
         pin.setLatLng(punto);
         fijarPunto(punto);
 
-        geocodingMsg.textContent = 'Encontramos la dirección y movimos el pin. Ajústalo si no quedó exacto.';
+        geocodingMsg.textContent = EVENTO_T.mapaEncontrada;
         geocodingMsg.className = 'aviso aviso-info';
         geocodingMsg.hidden = false;
       })
       .catch(function(){
-        geocodingMsg.textContent = 'No pudimos comprobar esa dirección. Ajusta el pin a mano si hace falta.';
+        geocodingMsg.textContent = EVENTO_T.mapaErrorDireccion;
         geocodingMsg.className = 'aviso aviso-error';
         geocodingMsg.hidden = false;
       });
@@ -1068,12 +1083,12 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
     enlaceBoton.addEventListener('click', function(){
       var url = enlaceInput.value.trim();
       if (!url) {
-        mostrarMensajeEnlace('Pega primero un enlace de Google Maps.', 'error');
+        mostrarMensajeEnlace(EVENTO_T.mapaPegarEnlace, 'error');
         return;
       }
 
       enlaceBoton.disabled = true;
-      enlaceBoton.textContent = 'Buscando…';
+      enlaceBoton.textContent = EVENTO_T.mapaBuscando;
 
       var datos = new URLSearchParams();
       datos.set('enlace', url);
@@ -1083,7 +1098,7 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
         .then(function(resp){ return resp.json(); })
         .then(function(json){
           if (!json.ok) {
-            mostrarMensajeEnlace(json.error || 'No se pudo leer ese enlace.', 'error');
+            mostrarMensajeEnlace(json.error || EVENTO_T.mapaEnlaceErrorGenerico, 'error');
             return;
           }
 
@@ -1092,14 +1107,14 @@ var MUNICIPIOS_POR_ESTADO = <?= json_encode(municipiosPorEstado(), JSON_UNESCAPE
           pin.setLatLng(punto);
           fijarPunto(punto);
           geocodificarInverso(punto.lat, punto.lng);
-          mostrarMensajeEnlace('Listo, movimos el pin a esa ubicación. Ajústalo si hace falta.', 'ok');
+          mostrarMensajeEnlace(EVENTO_T.mapaEnlaceListo, 'ok');
         })
         .catch(function(){
-          mostrarMensajeEnlace('No se pudo comprobar el enlace. Inténtalo de nuevo.', 'error');
+          mostrarMensajeEnlace(EVENTO_T.mapaEnlaceErrorComprobar, 'error');
         })
         .finally(function(){
           enlaceBoton.disabled = false;
-          enlaceBoton.textContent = 'Usar enlace';
+          enlaceBoton.textContent = EVENTO_T.mapaUsarEnlace;
         });
     });
   }

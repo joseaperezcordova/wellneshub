@@ -25,11 +25,11 @@ if ($ev && !puedeVerEvento($ev, $u)) {
 
 if (!$ev) {
     http_response_code(404);
-    $titulo = 'Actividad no encontrada';
+    $titulo = t('evento.editar.no_encontrada_titulo');
     require __DIR__ . '/includes/layout.php';
-    echo '<div class="auth-caja"><h1>Esa actividad no existe</h1>'
-       . '<p class="sub">Puede que se haya borrado.</p>'
-       . '<a class="btn-principal" style="text-decoration:none; display:block; text-align:center;" href="' . URL_BASE . '/">Volver al inicio</a></div>';
+    echo '<div class="auth-caja"><h1>' . et('evento.editar.no_encontrada_h1') . '</h1>'
+       . '<p class="sub">' . et('evento.editar.no_encontrada_texto') . '</p>'
+       . '<a class="btn-principal" style="text-decoration:none; display:block; text-align:center;" href="' . URL_BASE . '/">' . et('evento.editar.volver_inicio') . '</a></div>';
     echo '<script>whTrack("404", ' . json_encode(['ruta' => (string) ($_SERVER['REQUEST_URI'] ?? '')]) . ');</script>';
     pie();
     exit;
@@ -41,7 +41,7 @@ $e       = $ev;
 $errores = [];
 
 if ($puede && postDesbordado()) {
-    $errores['general'] = 'La imagen pesa más de lo que admite el servidor. Prueba con una más ligera.';
+    $errores['general'] = t('evento.error.imagen_pesada');
 
 } elseif ($puede && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // La que ya tiene guardada. No mandar archivo significa «déjala como está»,
@@ -49,7 +49,7 @@ if ($puede && postDesbordado()) {
     $imagenPrevia = $ev['imagen_url'];
 
     if (!csrfValido($_POST['csrf'] ?? null)) {
-        $errores['general'] = 'La sesión caducó. Vuelve a enviarlo.';
+        $errores['general'] = t('evento.error.sesion_caducada');
         $e = $_POST;
         $e['imagen_url'] = imagenArrastrada($_POST['imagen_previa'] ?? null, $imagenPrevia);
     } else {
@@ -61,11 +61,11 @@ if ($puede && postDesbordado()) {
         }
 
         if (!nombreOrganizadorValido($_POST)) {
-            $errores['org_nombre'] = 'Falta el nombre del organizador.';
+            $errores['org_nombre'] = t('evento.error.falta_organizador');
         }
 
         if (!$errores && eventoDuplicado((int) $ev['usuario_id'], $e['entidad'], $e['ciudad'], $e['categoria'], $e['fecha_inicio'], (int) $ev['id'])) {
-            $errores['general'] = 'Ya tienes otra actividad de "' . $e['categoria'] . '" en ' . $e['ciudad'] . ', ' . $e['entidad'] . ' para ese mismo día. Si es una repetición sin querer, revisa tus actividades; si es otra cosa, cambia la fecha, la ciudad o la categoría.';
+            $errores['general'] = sprintf(t('evento.error.duplicado'), $e['categoria'], $e['ciudad'], $e['entidad']);
         }
 
         if (!$errores) {
@@ -109,7 +109,7 @@ if ($puede && postDesbordado()) {
     }
 }
 
-$titulo = 'Editar actividad';
+$titulo = t('evento.editar.titulo');
 $mapaInteractivo = true;
 require __DIR__ . '/includes/layout.php';
 ?>
@@ -118,21 +118,19 @@ require __DIR__ . '/includes/layout.php';
 
 <div class="auth-caja caja-ancha">
 
-  <h1>No puedes editar esta actividad</h1>
+  <h1><?= et('evento.editar.no_puede_titulo') ?></h1>
   <p class="sub">«<?= e($ev['titulo']) ?>»</p>
 
   <div class="aviso aviso-error">
-    Solo quien la organiza o un administrador pueden corregirla.
+    <?= et('evento.editar.no_puede_aviso') ?>
   </div>
 
   <p style="font-size:14px; line-height:1.6;">
-    Si es tuya y crees que esto es un error, entra con la misma cuenta con la
-    que la publicaste. Si quieres pedir un cambio en una actividad de otra
-    persona, contacta al organizador desde su ficha.
+    <?= et('evento.editar.no_puede_texto') ?>
   </p>
 
   <a class="btn-principal" style="text-decoration:none; display:block; text-align:center;"
-     href="<?= e(urlEvento($ev)) ?>">Volver a la ficha</a>
+     href="<?= e(urlEvento($ev)) ?>"><?= et('evento.editar.volver_ficha') ?></a>
 
 </div>
 
@@ -142,16 +140,16 @@ require __DIR__ . '/includes/layout.php';
   <div class="auth-caja caja-ancha">
 
     <?php $volverAdmin = ($_GET['volver'] ?? '') === 'admin' && esAdmin($u); ?>
-    <a class="volver" href="<?= e($volverAdmin ? URL_BASE . '/admin.php' : urlEvento($ev)) ?>">← <?= $volverAdmin ? 'Volver al panel admin' : 'Volver a la ficha' ?></a>
+    <a class="volver" href="<?= e($volverAdmin ? URL_BASE . '/admin.php' : urlEvento($ev)) ?>">← <?= $volverAdmin ? et('evento.editar.volver_admin') : et('evento.editar.volver_ficha') ?></a>
 
-    <h1>Editar actividad</h1>
+    <h1><?= et('evento.editar.titulo') ?></h1>
     <?php if ($ev['situacion'] === 'borrador'): ?>
-      <p class="sub">Es un borrador: no la ve nadie más que tú hasta que la publiques.</p>
+      <p class="sub"><?= et('evento.editar.borrador_sub') ?></p>
     <?php elseif ($ev['situacion'] === 'oculto'): ?>
-      <p class="sub">Oculta por moderación. No aparece en el listado, pero puedes corregirla igual.</p>
+      <p class="sub"><?= et('evento.editar.oculto_sub') ?></p>
     <?php else: ?>
       <p class="sub">
-        Publicada. Se actualizó por última vez el <?= e(fechaLarga($ev['actualizado_en'])) ?>.
+        <?= et('evento.editar.publicado_sub') ?> <?= e(fechaLarga($ev['actualizado_en'])) ?>.
       </p>
     <?php endif; ?>
 
@@ -162,7 +160,7 @@ require __DIR__ . '/includes/layout.php';
 
     <form method="post" enctype="multipart/form-data" novalidate>
       <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-      <?php $textoBoton = 'Guardar cambios'; require __DIR__ . '/includes/form-evento.php'; ?>
+      <?php $textoBoton = t('evento.editar.boton'); require __DIR__ . '/includes/form-evento.php'; ?>
     </form>
 
     <?php /* Mismas comprobaciones que ya hace evento.php al recibir el POST
@@ -172,7 +170,7 @@ require __DIR__ . '/includes/layout.php';
       <?php if ($ev['situacion'] === 'oculto' && esAdmin($u)): ?>
         <form method="post" action="<?= e(urlEvento($ev)) ?>">
           <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-          <button class="btn-barra destacado" type="submit" name="publicar" value="1">Volver a publicar</button>
+          <button class="btn-barra destacado" type="submit" name="publicar" value="1"><?= et('evento.editar.volver_publicar') ?></button>
         </form>
       <?php endif; ?>
 
@@ -183,9 +181,9 @@ require __DIR__ . '/includes/layout.php';
                vez de simplemente no ofrecérselo. */ ?>
       <?php if (puedeEliminarEvento($ev, $u)): ?>
         <form method="post" action="<?= e(urlEvento($ev)) ?>"
-              onsubmit="return confirm('¿Eliminar «<?= e(addslashes($ev['titulo'])) ?>»? No se puede deshacer.');">
+              onsubmit="return confirm(<?= json_encode(sprintf(t('evento.editar.confirmar_eliminar'), $ev['titulo'])) ?>);">
           <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-          <button class="btn-barra peligro" type="submit" name="eliminar" value="1">Eliminar actividad</button>
+          <button class="btn-barra peligro" type="submit" name="eliminar" value="1"><?= et('evento.editar.eliminar') ?></button>
         </form>
       <?php endif; ?>
     </div>

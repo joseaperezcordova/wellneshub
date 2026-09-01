@@ -301,7 +301,7 @@ function camposContactoOrganizador(): array
     return [
         'telefono'  => 'WhatsApp',
         'instagram' => 'Instagram',
-        'sitio_web' => 'Sitio web',
+        'sitio_web' => t('evento.campo.sitio_web_organizador'),
     ];
 }
 

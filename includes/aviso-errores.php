@@ -31,11 +31,11 @@ if (!empty($errores['general'])): ?>
 ?>
   <div class="aviso aviso-error">
     <?php if (count($fallidos) === 1): ?>
-      Falta revisar <strong><a href="#<?= e(array_key_first($fallidos)) ?>"><?= e(reset($fallidos)) ?></a></strong>.
+      <?= et('evento.aviso.falta_uno') ?> <strong><a href="#<?= e(array_key_first($fallidos)) ?>"><?= e(reset($fallidos)) ?></a></strong>.
     <?php else: ?>
-      Faltan por revisar
+      <?= et('evento.aviso.faltan_varios') ?>
       <?php $i = 0; foreach ($fallidos as $campo => $etiqueta): $i++; ?>
-        <?php if ($i > 1): ?><?= $i === count($fallidos) ? ' y ' : ', ' ?><?php endif; ?>
+        <?php if ($i > 1): ?><?= $i === count($fallidos) ? et('evento.aviso.y') : ', ' ?><?php endif; ?>
         <strong><a href="#<?= e($campo) ?>"><?= e($etiqueta) ?></a></strong>
       <?php endforeach; ?>.
     <?php endif; ?>

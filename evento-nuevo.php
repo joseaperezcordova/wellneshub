@@ -20,11 +20,11 @@ if (postDesbordado()) {
     // Se comprueba antes que el CSRF: con el cuerpo descartado tampoco llega el
     // token, y el mensaje "la sesión caducó" mandaría a buscar el problema al
     // sitio equivocado.
-    $errores['general'] = 'La imagen pesa más de lo que admite el servidor. Prueba con una más ligera.';
+    $errores['general'] = t('evento.error.imagen_pesada');
 
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValido($_POST['csrf'] ?? null)) {
-        $errores['general'] = 'La sesión caducó. Vuelve a enviarlo.';
+        $errores['general'] = t('evento.error.sesion_caducada');
         $e = $_POST;
         $e['imagen_url'] = imagenArrastrada($_POST['imagen_previa'] ?? null, null);
     } else {
@@ -36,11 +36,11 @@ if (postDesbordado()) {
         }
 
         if (!nombreOrganizadorValido($_POST)) {
-            $errores['org_nombre'] = 'Falta el nombre del organizador.';
+            $errores['org_nombre'] = t('evento.error.falta_organizador');
         }
 
         if (!$errores && eventoDuplicado((int) $u['id'], $e['entidad'], $e['ciudad'], $e['categoria'], $e['fecha_inicio'])) {
-            $errores['general'] = 'Ya tienes otra actividad de "' . $e['categoria'] . '" en ' . $e['ciudad'] . ', ' . $e['entidad'] . ' para ese mismo día. Si es una repetición sin querer, revisa tus actividades; si es otra cosa, cambia la fecha, la ciudad o la categoría.';
+            $errores['general'] = sprintf(t('evento.error.duplicado'), $e['categoria'], $e['ciudad'], $e['entidad']);
         }
 
         if (!$errores) {
@@ -96,15 +96,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && random_int(1, 20) === 1) {
     limpiarImagenesHuerfanas();
 }
 
-$titulo = 'Publicar una actividad';
+$titulo = t('evento.nuevo.titulo');
 $mapaInteractivo = true;
 require __DIR__ . '/includes/layout.php';
 ?>
 
 <div class="form-con-guia">
   <div class="auth-caja caja-ancha">
-    <h1>Publicar una actividad</h1>
-    <p class="sub">Rellena la ficha. Antes de publicarla la vas a ver tal como la verá la gente.</p>
+    <h1><?= et('evento.nuevo.titulo') ?></h1>
+    <p class="sub"><?= et('evento.nuevo.sub') ?></p>
 
     <?php require __DIR__ . '/includes/aviso-errores.php'; ?>
     <?php if ($errores): ?>
@@ -113,7 +113,7 @@ require __DIR__ . '/includes/layout.php';
 
     <form method="post" enctype="multipart/form-data" novalidate>
       <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-      <?php $textoBoton = 'Ver la vista previa'; require __DIR__ . '/includes/form-evento.php'; ?>
+      <?php $textoBoton = t('evento.nuevo.boton'); require __DIR__ . '/includes/form-evento.php'; ?>
     </form>
   </div>
 

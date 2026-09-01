@@ -158,6 +158,222 @@ return [
     // tarjetas.js—, compartido por la portada y el buscador.
     'tarjetas.publicar_primera'  => 'Publicar la primera',
 
+    // ---- Formulario de actividad (includes/form-evento.php) ----
+    // Etiquetas que forma y etiquetasCampos() —el aviso de errores— comparten
+    // por ser el mismo texto en los dos sitios. Donde el texto real difiere
+    // —«Fecha de fin» en el aviso vs. «Termina otro día» en el campo—, cada
+    // uno tiene la suya, más abajo.
+    // Usadas junto a cualquier etiqueta de campo, en cualquier formulario.
+    'campo.opcional'    => 'opcional',
+    'campo.obligatorio' => 'obligatorio',
+
+    'evento.form.titulo_label'       => 'Título de la actividad',
+    'evento.form.categorias_label'   => 'Categorías',
+    'evento.form.descripcion_label'  => 'Descripción',
+    'evento.form.estado_label'       => 'Estado',
+    'evento.form.ciudad_label'       => 'Ciudad',
+    'evento.form.lugar_label'        => 'Nombre del lugar',
+    'evento.form.direccion_label'    => 'Dirección',
+    'evento.form.organizador_nombre_label' => 'Nombre del organizador',
+    'evento.form.fecha_label'        => 'Fecha',
+    'evento.form.hora_inicio_label'  => 'Hora de inicio',
+    'evento.form.hora_fin_label'     => 'Hora de fin',
+    'evento.form.fecha_inicio_label' => 'Fecha de inicio',
+    'evento.form.fecha_fin_label'    => 'Fecha de fin',
+    'evento.form.frecuencia_label'   => 'Frecuencia',
+    'evento.form.forma_pago_label'   => 'Forma de pago',
+    'evento.form.url_compra_label'   => 'URL de compra',
+    'evento.form.url_reserva_label'  => 'URL de reserva',
+
+    // Solo para el aviso de errores: el texto real del campo es distinto.
+    'evento.campo.mapa_url'          => 'Enlace de Google Maps',
+    'evento.campo.fecha_fin_unica'   => 'Fecha de fin',
+    'evento.campo.precio'            => 'Precio',
+    'evento.campo.cupo_maximo'       => 'Cupo máximo',
+    'evento.campo.sitio_web'         => 'Sitio web o enlace',
+    'evento.campo.accion_principal'  => 'Acción principal',
+    'evento.campo.imagen'            => 'Imagen',
+
+    // Sección 1
+    'evento.form.seccion1'           => '1. Información general',
+    'evento.form.titulo_placeholder' => 'Amanecer en el Cenote — Yoga y Sonido',
+    'evento.form.categorias_pista'   => 'elige hasta',
+    'evento.form.categorias_ayuda'   => 'De las que marques, la que quede más arriba en la lista es la principal: la que se ve en la tarjeta de la portada.',
+    'evento.form.descripcion_placeholder' => 'Describe tu actividad. Incluye qué aprenderán los asistentes, a quién está dirigida, qué incluye y cualquier información importante.',
+    'evento.form.descripcion_ayuda'  => 'Se muestra tal cual en la ficha. Los saltos de línea se respetan.',
+
+    // Sección 2
+    'evento.form.seccion2'           => '2. Fecha y horario',
+    'evento.form.dia_unico'          => 'Actividad de un día',
+    'evento.form.termina_otro_dia'   => 'Termina otro día',
+    'evento.form.termina_otro_dia_ayuda' => 'Para retiros de varios días. Si no se pone, se asume el mismo día.',
+    'evento.form.recurrente'         => 'Actividad recurrente',
+    'evento.form.frecuencia_placeholder' => 'Selecciona una frecuencia',
+    'evento.frecuencia.diaria'    => 'Diaria',
+    'evento.frecuencia.semanal'   => 'Semanal',
+    'evento.frecuencia.quincenal' => 'Quincenal',
+    'evento.frecuencia.mensual'   => 'Mensual',
+
+    // Sección 3
+    'evento.form.seccion3'           => '3. Ubicación',
+    'evento.form.estado_placeholder' => 'Selecciona un estado',
+    'evento.form.ciudad_placeholder' => 'Escribe para buscar…',
+    'evento.form.lugar_placeholder'  => 'Ej. Centro Holístico Luz',
+    'evento.form.direccion_placeholder' => 'Calle, número, colonia',
+    'evento.form.direccion_ayuda'    => 'Se completa sola al mover el pin; corrígela si hace falta.',
+    'evento.form.mapa_ayuda'         => 'Arrastra el pin para ajustar la ubicación exacta del lugar. Ciudad, estado y dirección se completan solos.',
+    'evento.form.maps_enlace_label'  => '¿Tienes el enlace de Google Maps del lugar? Pégalo y movemos el pin por ti',
+    'evento.form.maps_enlace_placeholder' => 'https://maps.app.goo.gl/…',
+    'evento.form.maps_usar_enlace'   => 'Usar enlace',
+
+    // Sección 4
+    'evento.form.seccion4'           => '4. Precio',
+    'evento.form.sin_costo'          => 'Sin costo',
+    'evento.form.de_pago'            => 'De pago',
+    'evento.form.forma_pago_placeholder' => 'Selecciona una opción',
+    'evento.form.forma_pago_completa'=> 'Actividad completa',
+    'evento.form.forma_pago_sesion'  => 'Por sesión',
+    'evento.form.precio_label'       => 'Precio por persona (MXN)',
+
+    // Sección 5
+    'evento.form.seccion5'           => '5. Cupo máximo',
+    'evento.form.cupo_label'         => 'Número máximo de participantes',
+    'evento.form.cupo_placeholder'   => 'Ej. 20',
+
+    // Sección 6
+    'evento.form.seccion6'           => '6. Imagen de la actividad',
+    'evento.form.imagen_alt'         => 'Imagen de la actividad',
+    'evento.form.imagen_elegida'     => 'Esta es la que acabas de elegir. Sigue puesta: no hace falta que la busques otra vez.',
+    'evento.form.quitar_imagen'      => 'Quitar esta imagen',
+    'evento.form.subir_imagen'       => 'Subir imagen',
+    'evento.form.imagen_pista_1'     => 'JPG, PNG o WebP. Máx.',
+    'evento.form.imagen_pista_2'     => 'MB. Recomendado: 1200 × 800 px.',
+    'evento.form.imagen_pista_cambiar' => 'Elige otra solo si quieres cambiarla.',
+    'evento.form.imagen_pista_sin'   => 'Si no agregas imagen, se muestra un color de fondo predeterminado en la tarjeta pública.',
+
+    // Sección 7
+    'evento.form.seccion7'           => '7. Información de contacto',
+    'evento.form.datos_organizador'  => 'Datos del organizador',
+    'evento.form.usar_guardado'      => 'Usar la información guardada',
+    'evento.form.nombre_label'       => 'Nombre',
+    'evento.form.organizador_nombre_placeholder' => 'Yoga Baja',
+    'evento.form.organizador_nombre_ayuda' => 'Es el nombre que aparece como organizador en tus actividades.',
+    'evento.form.editar_btn'         => 'Editar',
+    'evento.form.telefono_placeholder' => '+52 612 123 4567',
+    'evento.form.instagram_placeholder' => '@tucuenta',
+    'evento.form.sitio_web_placeholder' => 'https://tusitio.com',
+    'evento.form.sitio_web_org_ayuda'   => 'El tuyo, no el de esta actividad — ese va aquí abajo.',
+    'evento.form.contacto_nota_1'    => 'Esta información se guardará para facilitar tus próximas publicaciones. Puedes cambiarla cuando quieras desde',
+    'evento.form.contacto_nota_cuenta' => 'Mi cuenta',
+    'evento.form.sitio_web_actividad_label' => 'Sitio web o enlace de la actividad',
+    'evento.form.sitio_web_actividad_ayuda' => 'Comparte un sitio web o perfil de redes sociales para que los interesados conozcan más sobre esta actividad —no el tuyo, ese va arriba—.',
+
+    // Sección 8
+    'evento.form.seccion8'           => '8. Acción principal',
+    'evento.form.accion_ayuda'       => 'Elige la acción principal que verán las personas en tu actividad.',
+    'evento.form.accion_contactar'   => 'Contactar al organizador',
+    'evento.form.accion_comprar'     => 'Comprar boletos',
+    'evento.form.accion_reservar'    => 'Reservar lugar',
+    'evento.form.color_label'        => 'Color de la tarjeta',
+    'evento.form.color_ayuda'        => 'Se usa cuando no hay imagen, igual que en el diseño de la portada.',
+
+    // Mensajes dinámicos del mapa interactivo (JS)
+    'evento.mapa.pegar_enlace'       => 'Pega primero un enlace de Google Maps.',
+    'evento.mapa.buscando'           => 'Buscando…',
+    'evento.mapa.completo'           => 'Completamos ciudad, estado y/o dirección a partir del mapa. Revisa que estén bien.',
+    'evento.mapa.incompleto'         => 'No pudimos adivinar la ubicación exacta desde el mapa. Complétala a mano.',
+    'evento.mapa.no_ubicada'         => 'No pudimos ubicar esa dirección en el mapa. Ajusta el pin a mano.',
+    'evento.mapa.encontrada'         => 'Encontramos la dirección y movimos el pin. Ajústalo si no quedó exacto.',
+    'evento.mapa.error_direccion'    => 'No pudimos comprobar esa dirección. Ajusta el pin a mano si hace falta.',
+    'evento.mapa.enlace_listo'       => 'Listo, movimos el pin a esa ubicación. Ajústalo si hace falta.',
+    'evento.mapa.enlace_error_generico' => 'No se pudo leer ese enlace.',
+    'evento.mapa.enlace_error_comprobar' => 'No se pudo comprobar el enlace. Inténtalo de nuevo.',
+    'evento.mapa.usar_enlace'        => 'Usar enlace',
+
+    // ---- evento-nuevo.php / evento-editar.php ----
+    'evento.nuevo.titulo'    => 'Publicar una actividad',
+    'evento.nuevo.sub'       => 'Rellena la ficha. Antes de publicarla la vas a ver tal como la verá la gente.',
+    'evento.nuevo.boton'     => 'Ver la vista previa',
+    'evento.editar.titulo'   => 'Editar actividad',
+    'evento.editar.boton'    => 'Guardar cambios',
+    'evento.editar.borrador_sub'  => 'Es un borrador: no la ve nadie más que tú hasta que la publiques.',
+    'evento.editar.oculto_sub'    => 'Oculta por moderación. No aparece en el listado, pero puedes corregirla igual.',
+    'evento.editar.publicado_sub' => 'Publicada. Se actualizó por última vez el',
+    'evento.editar.no_puede_titulo' => 'No puedes editar esta actividad',
+    'evento.editar.no_puede_aviso'  => 'Solo quien la organiza o un administrador pueden corregirla.',
+    'evento.editar.no_puede_texto'  => 'Si es tuya y crees que esto es un error, entra con la misma cuenta con la que la publicaste. Si quieres pedir un cambio en una actividad de otra persona, contacta al organizador desde su ficha.',
+    'evento.editar.volver_ficha'    => 'Volver a la ficha',
+    'evento.editar.volver_admin'    => 'Volver al panel admin',
+    'evento.editar.volver_publicar' => 'Volver a publicar',
+    'evento.editar.eliminar'        => 'Eliminar actividad',
+    'evento.editar.confirmar_eliminar' => '¿Eliminar «%s»? No se puede deshacer.',
+    'evento.editar.no_encontrada_titulo' => 'Actividad no encontrada',
+    'evento.editar.no_encontrada_h1'     => 'Esa actividad no existe',
+    'evento.editar.no_encontrada_texto'  => 'Puede que se haya borrado.',
+    'evento.editar.volver_inicio'        => 'Volver al inicio',
+
+    // Mensajes generales de error, compartidos por alta y edición
+    'evento.error.imagen_pesada'    => 'La imagen pesa más de lo que admite el servidor. Prueba con una más ligera.',
+    'evento.error.sesion_caducada'  => 'La sesión caducó. Vuelve a enviarlo.',
+    'evento.error.duplicado'        => 'Ya tienes otra actividad de "%s" en %s, %s para ese mismo día. Si es una repetición sin querer, revisa tus actividades; si es otra cosa, cambia la fecha, la ciudad o la categoría.',
+    'evento.error.falta_organizador'=> 'Falta el nombre del organizador.',
+
+    // ---- validarEvento(), includes/eventos.php ----
+    'evento.valida.titulo_corto'      => 'El título necesita al menos 5 caracteres.',
+    'evento.valida.titulo_largo'      => 'El título no puede pasar de 160 caracteres.',
+    'evento.valida.descripcion_corta' => 'Agrega una descripción más completa (mínimo 50 caracteres).',
+    'evento.valida.descripcion_larga' => 'La descripción no puede pasar de 2,000 caracteres.',
+    'evento.valida.categoria_falta'   => 'Elige al menos una categoría de la lista.',
+    'evento.valida.categoria_max'     => 'Elige como máximo %d categorías.',
+    'evento.valida.estado_falta'      => 'Elige un estado de la lista.',
+    'evento.valida.ciudad_sin_estado' => 'Elige primero el estado.',
+    'evento.valida.ciudad_falta'      => 'Elige una ciudad de la lista.',
+    'evento.valida.lugar_falta'       => 'Falta el lugar donde se realiza.',
+    'evento.valida.direccion_larga'   => 'La dirección no puede pasar de 255 caracteres.',
+    'evento.valida.frecuencia_falta'  => 'Elige cada cuánto se repite.',
+    'evento.valida.hora_inicio_sesion_falta' => 'Pon la hora a la que empieza cada sesión.',
+    'evento.valida.hora_fin_sesion_falta'    => 'Pon la hora a la que termina cada sesión.',
+    'evento.valida.hora_fin_antes_inicio'    => 'El final no puede ser antes que el inicio.',
+    'evento.valida.fecha_inicio_rec_falta'   => 'Pon la fecha en la que empieza a repetirse.',
+    'evento.valida.fecha_fin_rec_falta'      => 'Pon la fecha en la que termina de repetirse.',
+    'evento.valida.fecha_fin_antes_inicio'   => 'El final no puede ser anterior al principio.',
+    'evento.valida.fecha_falta'       => 'Pon la fecha de la actividad.',
+    'evento.valida.hora_inicio_falta' => 'Pon la hora de inicio.',
+    'evento.valida.hora_fin_falta'    => 'Pon la hora de fin.',
+    'evento.valida.fecha_pasada'      => 'Esa fecha ya pasó, así que la actividad no aparecería en el listado.',
+    'evento.valida.precio_falta'      => 'Pon el precio, o marca que es sin costo.',
+    'evento.valida.precio_invalido'   => 'El precio tiene que ser un número.',
+    'evento.valida.forma_pago_falta'  => 'Elige si el precio es por toda la actividad o por sesión.',
+    'evento.valida.cupo_invalido'     => 'El cupo tiene que ser un número entero mayor que cero.',
+    'evento.valida.accion_falta'      => 'Elige qué esperas que haga quien vea la ficha.',
+    'evento.valida.url_invalida'      => 'Esa dirección no parece válida. Empieza por https://',
+    'evento.valida.boletos_falta'     => 'Agrega el enlace donde se compran los boletos.',
+    'evento.valida.reserva_falta'     => 'Agrega el enlace donde se reserva el lugar.',
+
+    // ---- includes/aviso-errores.php ----
+    'evento.aviso.falta_uno'     => 'Falta revisar',
+    'evento.aviso.faltan_varios' => 'Faltan por revisar',
+    'evento.aviso.y'             => ' y ',
+
+    // ---- includes/auth.php ----
+    'evento.campo.sitio_web_organizador' => 'Sitio web',
+
+    // ---- includes/guia-accion.php ----
+    'evento.guia.titulo'            => 'Guía rápida',
+    'evento.guia.contactar_titulo'  => 'Contactar al organizador',
+    'evento.guia.contactar_texto'   => 'Centraliza las solicitudes de tus interesados. Los usuarios completarán un formulario con sus dudas y recibirás la información directamente en tu correo electrónico.',
+    'evento.guia.contactar_ejemplos'=> 'Ejemplos: certificaciones, programas, retiros, actividades gratuitas.',
+    'evento.guia.comprar_titulo'    => 'Comprar boletos',
+    'evento.guia.comprar_texto'     => 'Utilízalo cuando exista un enlace externo donde el participante pueda realizar el pago o la inscripción.',
+    'evento.guia.comprar_ejemplos'  => 'Ejemplos: Eventbrite, Boletia, Ticketmaster, sitio web propio, landing page de pago.',
+    'evento.guia.reservar_titulo'   => 'Reservar lugar',
+    'evento.guia.reservar_texto'    => 'Ideal para actividades con cupo limitado o registro previo, aunque no exista compra directa de boletos.',
+    'evento.guia.reservar_ejemplos' => 'Ejemplos: Google Forms, WhatsApp, Calendly, formulario propio, landing page de registro.',
+    'evento.guia.traduccion_titulo' => 'Importante sobre la traducción',
+    'evento.guia.traduccion_texto1' => 'La traducción de OMDARA no modifica ni traduce automáticamente los textos que tú ingreses en la descripción de tu actividad. La descripción, instrucciones, condiciones y demás contenido personalizado permanecerán tal como los hayas escrito.',
+    'evento.guia.traduccion_texto2' => 'Si tu actividad está dirigida a participantes en español e inglés, considera proporcionar la información relevante en ambos idiomas dentro de la descripción.',
+    'evento.guia.nota'              => 'Con esto en mente, elige la <strong>acción principal</strong> más abajo: decide qué verán quienes quieran dar el siguiente paso.',
+
     // ---- Consentimiento de cookies (REQ-00003) ----
     // El requerimiento escribe la marca en minúsculas; aquí va OMDARA, que es
     // como se escribe en el resto del sitio. Un banner que llama a la marca de
