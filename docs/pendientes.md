@@ -299,7 +299,7 @@ el pie —que salen en todas las páginas— están traducidos.
 |---|---|---|
 | 2 | Portada y buscador — **hecho, 2026-09-01** | Textos EN |
 | 3 | Formulario de actividad — **hecho, 2026-09-01** (`evento-editar.php` traducido pero sin ruta `/en` propia, ver nota) | Textos EN |
-| 4 | Ficha de actividad, contacto, login y correos | Textos EN |
+| 4 | Ficha, contacto/reportar y login/registro — **hecho, 2026-09-01**. Correos aparte, ver nota | Textos EN |
 | 5 | Contenido dinámico: título y descripción de cada actividad | Migración de base |
 
 **Las 23 categorías — hecho, 2026-09-01.** `categoriasMenu()` acepta idioma
@@ -312,12 +312,25 @@ inglés, más un comportamiento de reserva cuando el organizador no las rellene.
 El requerimiento pide expresamente no traducir automáticamente lo que escribió
 el organizador.
 
-**`evento-editar.php` no tiene ruta limpia en `/en`**: no está en
-`rutasSitio()` —es `evento-editar.php?id=N`, no una dirección fija—, así que
-`idiomaActual()` no tiene de dónde sacar el idioma y siempre cae al español,
-aunque su texto ya está traducido en `includes/idiomas/en.php` y listo para
-cuando exista esa ruta. `evento-nuevo.php` sí tiene ruta propia
-(`/publish-an-activity`) y sí se ve en inglés.
+**Varias páginas de la fase 4 no tienen ruta limpia en `/en`**: `evento.php`,
+`evento-editar.php`, `contactar.php`, `reportar.php`, `login.php`,
+`codigo.php` y `completar-registro.php` no están en `rutasSitio()` —son por
+`?id=N` o no tienen dirección fija propia—, así que `idiomaActual()` no
+tiene de dónde sacar el idioma y siempre cae al español, aunque su texto ya
+está traducido en `includes/idiomas/en.php` y listo para cuando existan esas
+rutas. `evento-nuevo.php` y `contacto.php` sí tienen ruta propia
+(`/publish-an-activity`, `/contact`) y sí se ven en inglés.
+
+**Los correos quedaron fuera de la fase 4, a propósito.** Sus plantillas
+(`includes/correo.php`, `includes/contacto.php`) siguen en español fijo. No
+es solo falta de texto: hoy no existe ningún mecanismo que decida en qué
+idioma mandar un correo —no se guarda el idioma de quien lo recibe—, así que
+antes de traducirlos hace falta decidir esa regla (¿el idioma del navegador
+al pedir el código? ¿el de la página desde la que se originó el mensaje?).
+Se encontró y evitó un caso real de fuga de idioma en el camino:
+`motivosContacto()`, que alimenta tanto el formulario como el correo de
+aviso a los admins, ahora fija español explícito para el correo
+(`t($clave, 'es')`) en vez de heredar el idioma de quien escribió.
 
 **Bloqueado por:** los textos finales ES/EN y los textos SEO, que el propio
 REQ-00002 declara como dependencia y todavía no se han entregado. En
@@ -329,10 +342,10 @@ esperar ese entregable —decisión explícita del 2026-09-01, no un cambio de
 la regla para el resto de páginas.
 
 **Sobre promover a producción:** el requerimiento prohíbe la traducción
-parcial, y hoy el inglés cubre el armazón, la portada, el buscador y el
-formulario de actividad (fases 2 y 3 completas) pero no la ficha, el
-contacto, el login ni los correos —fases 4 y 5 siguen sin empezar—. El sitio
-ya vive en el dominio final (`omdara.com.mx`, ver
+parcial. Hoy el inglés cubre el armazón, la portada, el buscador, el
+formulario de actividad, la ficha, contacto/reportar y login/registro
+—fases 2 a 4 completas—, pero no los correos (parte de la fase 4, ver nota
+arriba) ni la fase 5. El sitio ya vive en el dominio final (`omdara.com.mx`, ver
 `docs/operacion.md`); esta nota queda para que quede claro que esa promoción
 se hizo sin cerrar esta parte del requerimiento, no para sugerir que ya se
 cumplió.
