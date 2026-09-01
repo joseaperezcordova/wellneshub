@@ -38,8 +38,8 @@ $lugares = array_values(array_unique(array_merge(
 )));
 sort($lugares, SORT_NATURAL | SORT_FLAG_CASE);
 
-$titulo        = 'Directorio de actividades wellness en México';
-$descripcion   = 'Encuentra retiros, festivales y círculos de bienestar en todo México: yoga, breathwork, sound healing, temazcal y más. Publica tu actividad gratis.';
+$titulo        = t('pagina.inicio.titulo');
+$descripcion   = t('pagina.inicio.meta');
 $seccion       = 'inicio';
 $anchoLibre    = true;
 $scriptsPagina = ['assets/js/inicio.js', 'assets/js/buscador.js'];
@@ -75,40 +75,40 @@ require __DIR__ . '/includes/layout.php';
       <div class="slide activa" aria-hidden="false">
         <div class="hero-media m1"></div>
         <div class="hero-scrim"></div>
-        <div class="slide-chip"><span class="cat">Sound Healing</span> Amanecer en el Cenote · Tulum</div>
+        <div class="slide-chip"><span class="cat"><?= et('inicio.hero.slide1_cat') ?></span> <?= et('inicio.hero.slide1_texto') ?></div>
       </div>
       <div class="slide" aria-hidden="true">
         <div class="hero-media m2"></div>
         <div class="hero-scrim"></div>
-        <div class="slide-chip"><span class="cat">Festival</span> Festival Holístico Raíz · CDMX</div>
+        <div class="slide-chip"><span class="cat"><?= et('inicio.hero.slide2_cat') ?></span> <?= et('inicio.hero.slide2_texto') ?></div>
       </div>
       <div class="slide" aria-hidden="true">
         <div class="hero-media m3"></div>
         <div class="hero-scrim"></div>
-        <div class="slide-chip"><span class="cat">Breathwork</span> Bajo las estrellas · San Miguel</div>
+        <div class="slide-chip"><span class="cat"><?= et('inicio.hero.slide3_cat') ?></span> <?= et('inicio.hero.slide3_texto') ?></div>
       </div>
       <div class="slide" aria-hidden="true">
         <div class="hero-media m4"></div>
         <div class="hero-scrim"></div>
-        <div class="slide-chip"><span class="cat">Retiro</span> Silencio Vipassana · Oaxaca</div>
+        <div class="slide-chip"><span class="cat"><?= et('inicio.hero.slide4_cat') ?></span> <?= et('inicio.hero.slide4_texto') ?></div>
       </div>
     </div>
 
     <div class="cctrl">
       <div class="cdots" id="cdots">
-        <button type="button" aria-current="true"  aria-label="Ver imagen 1"></button>
-        <button type="button" aria-current="false" aria-label="Ver imagen 2"></button>
-        <button type="button" aria-current="false" aria-label="Ver imagen 3"></button>
-        <button type="button" aria-current="false" aria-label="Ver imagen 4"></button>
+        <button type="button" aria-current="true"  aria-label="<?= et('inicio.hero.ver_imagen') ?> 1"></button>
+        <button type="button" aria-current="false" aria-label="<?= et('inicio.hero.ver_imagen') ?> 2"></button>
+        <button type="button" aria-current="false" aria-label="<?= et('inicio.hero.ver_imagen') ?> 3"></button>
+        <button type="button" aria-current="false" aria-label="<?= et('inicio.hero.ver_imagen') ?> 4"></button>
       </div>
-      <button type="button" class="cnav" id="cprev" aria-label="Imagen anterior">‹</button>
-      <button type="button" class="cnav" id="cnext" aria-label="Imagen siguiente">›</button>
+      <button type="button" class="cnav" id="cprev" aria-label="<?= et('inicio.hero.imagen_anterior') ?>">‹</button>
+      <button type="button" class="cnav" id="cnext" aria-label="<?= et('inicio.hero.imagen_siguiente') ?>">›</button>
     </div>
 
     <div class="hero-content">
-      <div class="eyebrow">Directorio de actividades · México</div>
-      <h1>Encuentra tu próximo <em>retiro, festival o círculo</em> de bienestar</h1>
-      <p class="sub">Retiros de yoga, breathwork, sound healing y festivales holísticos, reunidos en un solo lugar — sin buscar por veinte cuentas de Instagram distintas.</p>
+      <div class="eyebrow"><?= et('inicio.hero.eyebrow') ?></div>
+      <h1><?= t('inicio.hero.titulo') ?></h1>
+      <p class="sub"><?= et('inicio.hero.sub') ?></p>
     </div>
   </div>
 
@@ -124,8 +124,8 @@ require __DIR__ . '/includes/layout.php';
              ciudad aparte. */ ?>
     <form class="buscador" method="get" action="<?= e(url('actividades')) ?>">
       <div class="bcampo">
-        <label for="bDonde">Dónde</label>
-        <input id="bDonde" name="q" type="text" placeholder="Tulum, CDMX, Oaxaca…"
+        <label for="bDonde"><?= et('inicio.buscador.donde_label') ?></label>
+        <input id="bDonde" name="q" type="text" placeholder="<?= et('inicio.buscador.donde_placeholder') ?>"
                autocomplete="off" list="lugaresConEventos">
         <?php /* El datalist propone solo sitios donde hay algo. Es la forma
                  barata de que nadie teclee una ciudad vacía.
@@ -146,30 +146,30 @@ require __DIR__ . '/includes/layout.php';
       </div>
       <div class="bsep" aria-hidden="true"></div>
       <div class="bcampo">
-        <label for="bCuando">Cuándo</label>
+        <label for="bCuando"><?= et('inicio.buscador.cuando_label') ?></label>
         <select id="bCuando" name="fecha">
-          <option value="">Cualquier fecha</option>
-          <option value="finde">Este fin de semana</option>
-          <option value="7dias">Próximos 7 días</option>
-          <option value="mes">Este mes</option>
+          <option value=""><?= et('inicio.buscador.cuando_cualquiera') ?></option>
+          <option value="finde"><?= et('inicio.buscador.cuando_finde') ?></option>
+          <option value="7dias"><?= et('inicio.buscador.cuando_7dias') ?></option>
+          <option value="mes"><?= et('inicio.buscador.cuando_mes') ?></option>
         </select>
       </div>
       <div class="bsep" aria-hidden="true"></div>
       <div class="bcampo">
-        <label for="bQue">Qué</label>
+        <label for="bQue"><?= et('inicio.buscador.que_label') ?></label>
         <?php /* Las prácticas salen de categoriasMenu(), la misma lista que
                  valida el formulario de alta. Escritas a mano aquí, este
                  desplegable ofrecía Retiro y Festival y se dejaba fuera
                  Temazcal, Cacao, Ceremonia, Ecstatic Dance y Pilates: buscar
                  por ellas era imposible desde la portada. */ ?>
         <select id="bQue" name="cat">
-          <option value="">Cualquier práctica</option>
+          <option value=""><?= et('inicio.buscador.que_cualquiera') ?></option>
           <?php foreach (categoriasMenu() as $catNombre => $catDatos): ?>
             <option value="<?= e($catNombre) ?>"><?= e($catDatos[1]) ?></option>
           <?php endforeach; ?>
         </select>
       </div>
-      <button type="submit" aria-label="Buscar actividades">
+      <button type="submit" aria-label="<?= et('inicio.buscador.boton_aria') ?>">
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20.2 20.2l-4-4"/></svg>
       </button>
     </form>
@@ -178,7 +178,7 @@ require __DIR__ . '/includes/layout.php';
       <?php /* Sin sesión no tiene sentido llevarlo al panel: primero hay que
                saber quién es. Va al login, que ya trae la vía de entrada. */ ?>
       <a class="ghostlink" href="<?= URL_BASE ?><?= $u ? '/mis-eventos.php' : '/login.php' ?>">
-        ¿Organizas actividades? Publica la tuya →
+        <?= et('inicio.publica.enlace') ?>
       </a>
     </div>
   </div>
@@ -191,7 +191,7 @@ require __DIR__ . '/includes/layout.php';
 <?php $iconosLinea = iconosLineaCategoria(); ?>
 <section class="catbar">
   <div class="catbar-inner">
-    <span class="eyebrow">Explora por categoría</span>
+    <span class="eyebrow"><?= et('inicio.categorias.eyebrow') ?></span>
     <div class="catrail-wrap">
       <div class="catrail" id="catrail">
         <?php /* Enlaces y no botones: cada categoría tiene ahora su propia
@@ -204,7 +204,7 @@ require __DIR__ . '/includes/layout.php';
           </a>
         <?php endforeach; ?>
       </div>
-      <button type="button" class="catnext" id="catnext" aria-label="Ver más categorías">›</button>
+      <button type="button" class="catnext" id="catnext" aria-label="<?= et('inicio.categorias.mas_aria') ?>">›</button>
     </div>
   </div>
 </section>
@@ -214,12 +214,12 @@ require __DIR__ . '/includes/layout.php';
      cada una antes de entrar — que es lo que se le pide a un directorio. -->
 <section class="block wrap">
   <div class="block-head">
-    <h2>Próximas actividades</h2>
-    <a class="more" href="<?= e(url('actividades')) ?>">Ver todas las actividades →</a>
+    <h2><?= et('inicio.proximas.titulo') ?></h2>
+    <a class="more" href="<?= e(url('actividades')) ?>"><?= et('inicio.proximas.ver_todas') ?></a>
   </div>
   <div class="evrail-wrap">
     <div class="evrail" id="proximosRail"></div>
-    <button type="button" class="evnext" id="evnext" aria-label="Ver más actividades">›</button>
+    <button type="button" class="evnext" id="evnext" aria-label="<?= et('inicio.proximas.mas_aria') ?>">›</button>
   </div>
 </section>
 

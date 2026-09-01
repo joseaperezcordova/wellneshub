@@ -63,6 +63,8 @@ return [
     'pie.whatsapp'     => 'OMDARA en WhatsApp',
 
     // ---- Títulos y descripciones de las páginas estáticas ----
+    'pagina.inicio.titulo'        => 'Directorio de actividades wellness en México',
+    'pagina.inicio.meta'          => 'Encuentra retiros, festivales y círculos de bienestar en todo México: yoga, breathwork, sound healing, temazcal y más. Publica tu actividad gratis.',
     'pagina.como_funciona.titulo' => 'Cómo funciona',
     'pagina.como_funciona.meta'   => 'Cómo encontrar actividades de bienestar en OMDARA y cómo publicar la tuya si eres organizador.',
     'pagina.faq.titulo'           => 'Preguntas frecuentes',
@@ -74,6 +76,43 @@ return [
     'pagina.cookies.titulo'       => 'Política de Cookies',
     'pagina.cookies.meta'         => 'Qué cookies usa OMDARA, para qué sirven y cómo desactivarlas.',
     'pagina.404.titulo'           => 'Página no encontrada',
+
+    // ---- Portada ----
+    'inicio.hero.eyebrow'      => 'Directorio de actividades · México',
+    'inicio.hero.titulo'       => 'Encuentra tu próximo <em>retiro, festival o círculo</em> de bienestar',
+    'inicio.hero.sub'          => 'Retiros de yoga, breathwork, sound healing y festivales holísticos, reunidos en un solo lugar — sin buscar por veinte cuentas de Instagram distintas.',
+    'inicio.hero.imagen_anterior' => 'Imagen anterior',
+    'inicio.hero.imagen_siguiente' => 'Imagen siguiente',
+    'inicio.hero.ver_imagen'   => 'Ver imagen',
+    // Las cuatro escenas del carrusel: son ambientación, no actividades reales
+    // —ver el comentario al inicio de index.php—, así que su texto se traduce
+    // como cualquier otro, sin depender de datos.
+    'inicio.hero.slide1_cat'   => 'Sound Healing',
+    'inicio.hero.slide1_texto' => 'Amanecer en el Cenote · Tulum',
+    'inicio.hero.slide2_cat'   => 'Festival',
+    'inicio.hero.slide2_texto' => 'Festival Holístico Raíz · CDMX',
+    'inicio.hero.slide3_cat'   => 'Breathwork',
+    'inicio.hero.slide3_texto' => 'Bajo las estrellas · San Miguel',
+    'inicio.hero.slide4_cat'   => 'Retiro',
+    'inicio.hero.slide4_texto' => 'Silencio Vipassana · Oaxaca',
+
+    'inicio.buscador.donde_label'       => 'Dónde',
+    'inicio.buscador.donde_placeholder' => 'Tulum, CDMX, Oaxaca…',
+    'inicio.buscador.cuando_label'      => 'Cuándo',
+    'inicio.buscador.cuando_cualquiera' => 'Cualquier fecha',
+    'inicio.buscador.cuando_finde'      => 'Este fin de semana',
+    'inicio.buscador.cuando_7dias'      => 'Próximos 7 días',
+    'inicio.buscador.cuando_mes'        => 'Este mes',
+    'inicio.buscador.que_label'         => 'Qué',
+    'inicio.buscador.que_cualquiera'    => 'Cualquier práctica',
+    'inicio.buscador.boton_aria'        => 'Buscar actividades',
+
+    'inicio.publica.enlace'      => '¿Organizas actividades? Publica la tuya →',
+    'inicio.categorias.eyebrow'  => 'Explora por categoría',
+    'inicio.categorias.mas_aria' => 'Ver más categorías',
+    'inicio.proximas.titulo'     => 'Próximas actividades',
+    'inicio.proximas.ver_todas'  => 'Ver todas las actividades →',
+    'inicio.proximas.mas_aria'   => 'Ver más actividades',
 
     // ---- Consentimiento de cookies (REQ-00003) ----
     // El requerimiento escribe la marca en minúsculas; aquí va OMDARA, que es

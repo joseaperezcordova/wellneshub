@@ -40,18 +40,20 @@ const EVENTO_CATEGORIAS_MAX = 3;
  * sitios, una categoría nueva aparecía en el menú y no se podía elegir al
  * publicar, o al revés.
  */
-function categoriasMenu(): array
+function categoriasMenu(?string $idioma = null): array
 {
-    // La clave es el nombre que se guarda en la base; la etiqueta es lo que se
-    // lee en el menú. Hoy coinciden todas, pero siguen separadas porque son dos
-    // cosas distintas: cambiar cómo se lee una categoría en pantalla no debería
-    // obligar a tocar lo que hay guardado en miles de filas.
+    // La clave es el nombre que se guarda en la base —siempre en español, en
+    // las dos versiones del sitio: traducir lo que hay guardado en miles de
+    // filas está fuera de alcance (docs/pendientes.md, REQ-00002 fase 5)—; la
+    // etiqueta es lo que se lee en el menú, y esa sí cambia con el idioma.
     //
     // El orden no es alfabético a propósito: el carril de la portada se lee de
     // izquierda a derecha y casi nadie llega al final, así que va agrupado por
     // parentesco —práctica, ceremonia, aire libre, cuidado del cuerpo— y lo más
     // buscado primero.
-    return [
+    $idioma = $idioma ?? idiomaActual();
+
+    $es = [
         // Práctica
         'Yoga'               => ['🧘',  'Yoga'],
         'Meditación'         => ['🌿',  'Meditación'],
@@ -82,6 +84,28 @@ function categoriasMenu(): array
         'Biohacking'         => ['⚡',  'Biohacking'],
         'Longevidad'         => ['⏳',  'Longevidad'],
     ];
+
+    if ($idioma !== 'en') return $es;
+
+    // Solo la etiqueta cambia; la clave —lo que se guarda y lo que llega en
+    // ?cat=— se queda en español siempre, arriba.
+    $etiquetasEn = [
+        'Yoga' => 'Yoga', 'Meditación' => 'Meditation', 'Pilates' => 'Pilates',
+        'Breathwork' => 'Breathwork', 'Sound Healing' => 'Sound Healing',
+        'Tai Chi' => 'Tai Chi', 'Qi Gong' => 'Qi Gong', 'Temazcal' => 'Temazcal',
+        'Ceremonia de Cacao' => 'Cacao Ceremony', 'Ecstatic Dance' => 'Ecstatic Dance',
+        'Senderismo' => 'Hiking', 'Running' => 'Running', 'Carreras' => 'Races',
+        'Ciclismo' => 'Cycling', 'Triatlón' => 'Triathlon', 'Surf' => 'Surf',
+        'Nutrición' => 'Nutrition', 'Ayurveda' => 'Ayurveda', 'Spa' => 'Spa',
+        'Cold Plunge' => 'Cold Plunge', 'Biohacking' => 'Biohacking',
+        'Longevidad' => 'Longevity',
+    ];
+
+    $en = [];
+    foreach ($es as $nombre => $datos) {
+        $en[$nombre] = [$datos[0], $etiquetasEn[$nombre]];
+    }
+    return $en;
 }
 
 /** nombre => icono. Para el desplegable del formulario y para la ficha. */

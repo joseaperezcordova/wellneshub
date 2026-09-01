@@ -68,12 +68,47 @@ return [
     // Los títulos sí, porque sin ellos la pestaña del navegador saldría en
     // español en una página inglesa. Las meta descriptions quedan pendientes:
     // son texto SEO y el requerimiento las declara como entregable aparte.
+    'pagina.inicio.titulo'        => 'Wellness activities directory in Mexico',
     'pagina.como_funciona.titulo' => 'How it works',
     'pagina.faq.titulo'           => 'Frequently asked questions',
     'pagina.terminos.titulo'      => 'Terms and Conditions',
     'pagina.privacidad.titulo'    => 'Privacy Notice',
     'pagina.cookies.titulo'       => 'Cookie Policy',
     'pagina.404.titulo'           => 'Page not found',
+
+    // ---- Homepage ----
+    'inicio.hero.eyebrow'      => 'Activity directory · Mexico',
+    'inicio.hero.titulo'       => 'Find your next <em>retreat, festival or circle</em> of wellbeing',
+    'inicio.hero.sub'          => 'Yoga retreats, breathwork, sound healing and holistic festivals, all in one place — no more digging through twenty different Instagram accounts.',
+    'inicio.hero.imagen_anterior' => 'Previous image',
+    'inicio.hero.imagen_siguiente' => 'Next image',
+    'inicio.hero.ver_imagen'   => 'View image',
+    'inicio.hero.slide1_cat'   => 'Sound Healing',
+    'inicio.hero.slide1_texto' => 'Cenote Sunrise · Tulum',
+    'inicio.hero.slide2_cat'   => 'Festival',
+    'inicio.hero.slide2_texto' => 'Raíz Holistic Festival · Mexico City',
+    'inicio.hero.slide3_cat'   => 'Breathwork',
+    'inicio.hero.slide3_texto' => 'Under the Stars · San Miguel',
+    'inicio.hero.slide4_cat'   => 'Retreat',
+    'inicio.hero.slide4_texto' => 'Silent Vipassana · Oaxaca',
+
+    'inicio.buscador.donde_label'       => 'Where',
+    'inicio.buscador.donde_placeholder' => 'Tulum, Mexico City, Oaxaca…',
+    'inicio.buscador.cuando_label'      => 'When',
+    'inicio.buscador.cuando_cualquiera' => 'Any date',
+    'inicio.buscador.cuando_finde'      => 'This weekend',
+    'inicio.buscador.cuando_7dias'      => 'Next 7 days',
+    'inicio.buscador.cuando_mes'        => 'This month',
+    'inicio.buscador.que_label'         => 'What',
+    'inicio.buscador.que_cualquiera'    => 'Any practice',
+    'inicio.buscador.boton_aria'        => 'Search activities',
+
+    'inicio.publica.enlace'      => 'Do you host activities? Post yours →',
+    'inicio.categorias.eyebrow'  => 'Explore by category',
+    'inicio.categorias.mas_aria' => 'See more categories',
+    'inicio.proximas.titulo'     => 'Upcoming activities',
+    'inicio.proximas.ver_todas'  => 'See all activities →',
+    'inicio.proximas.mas_aria'   => 'See more activities',
 
     // ---- Consentimiento de cookies (REQ-00003) ----
     // Sí se traduce, aunque roce lo legal: es lo PRIMERO que ve quien entra, y
