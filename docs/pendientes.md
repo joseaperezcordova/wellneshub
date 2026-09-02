@@ -112,8 +112,32 @@ en dos sitios más (`.contacto-correo a`, `.evergreen-note a`) porque la regla
 global `a{color:inherit; text-decoration:none}` deja cualquier dirección
 impresa así indistinguible del texto plano.
 
-**Dos preguntas del cliente siguen sin responder** —ninguna de las dos
-entregas del requerimiento las aclaró—:
+**El enrutamiento del formulario `/contacto` según el motivo — cerrado,
+2026-09-02.** El cliente lo completó en dos mensajes seguidos:
+
+| Motivo | Destino |
+|---|---|
+| Pregunta general | **Solo** `hola@` |
+| Soy organizador | **Solo** `hola@` |
+| Problema con una actividad | Administradores **+** `soporte@` |
+| Problema con mi cuenta | Administradores **+** `soporte@` |
+| Reportar contenido | Administradores **+** `soporte@` |
+| Otro | Administradores **+** `soporte@` |
+
+`motivosAHola()` (`includes/contacto.php`) es la única fuente de la primera
+fila: los dos motivos que van solo a `hola@`, sin avisar a nadie más. Todo lo
+demás cae en `avisarContactoSitio()` (antes `avisarAdminsContactoSitio()`,
+renombrada porque ya no siempre avisa solo a administradores): a los
+administradores de siempre y, si `soporte@` ya está configurado, **también**
+a `soporte@` —el cliente pidió «además de», no «en vez de»—.
+
+Mientras ninguno de los dos buzones institucionales esté configurado, el
+comportamiento es exactamente el de antes de este cambio: todo llega a los
+administradores y nada se pierde. En cuanto se configure `hola@`, los dos
+primeros motivos dejan de avisar a los administradores —es la única
+excepción a «nunca se pierde», y es la que el cliente pidió explícitamente—.
+
+**Dos preguntas del cliente siguen sin responder**:
 1. Qué son los «botones de contacto general» y la «sección de información
    general» donde debería ir `hola@` (item 1 original). No hay un botón ni
    una sección con ese nombre hoy; hace falta que digan qué pantalla es.

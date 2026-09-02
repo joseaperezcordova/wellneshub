@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $actividad = motivoPideActividad($motivo) ? trim($actividad) : null;
 
             crearContactoSitio($nombre, $email, $mensaje, $motivo, $actividad);
-            avisarAdminsContactoSitio($nombre, $email, $mensaje, $motivo, $actividad);
+            avisarContactoSitio($nombre, $email, $mensaje, $motivo, $actividad);
             $enviado = true;
         }
     }

@@ -193,7 +193,29 @@ function mensajesContactoRecientes(int $limite = 100): array
 }
 
 /**
- * Avisa a los administradores de un mensaje del contacto general.
+ * Los motivos cuyo mensaje va SOLO a hola@omdara, sin avisar a los
+ * administradores —«Pregunta general» y «Soy organizador», confirmado por el
+ * cliente el 2026-09-02—. Los demás son el resto de motivosContacto(): van a
+ * los administradores Y, si ya está configurado, también a soporte@omdara
+ * —confirmado el mismo día, en un segundo mensaje—.
+ */
+function motivosAHola(): array
+{
+    return ['general', 'organizador'];
+}
+
+/**
+ * Avisa del mensaje del contacto general: a hola@ si el motivo es de los
+ * suyos y ya está configurado, o a los administradores —y de paso a
+ * soporte@, si está configurado— en cualquier otro caso.
+ *
+ * ANTES avisaba siempre a los administradores, motivo el que fuera —el
+ * requerimiento del cliente es precisamente enrutar por hola@/soporte@ según
+ * lo que elija quien escribe—. Los dos buzones institucionales pueden no
+ * estar configurados todavía (config.local.php vacío), así que nunca se deja
+ * de avisar a los administradores salvo en el único caso que el cliente
+ * marcó como «solo hola@»: mientras ese buzón no exista, ahí también cae en
+ * los administradores, para que el mensaje nunca se pierda.
  *
  * Sin el filtro de avisarAdministradores() —agrupar y espaciar—: ese existe
  * porque muchas personas distintas pueden reportar el MISMO evento, y ahí
@@ -201,14 +223,27 @@ function mensajesContactoRecientes(int $limite = 100): array
  * propio; agruparlos sería perder el mensaje de alguien por llegar el mismo
  * día que el de otro.
  */
-function avisarAdminsContactoSitio(string $nombre, string $email, string $mensaje,
-                                   string $motivo = 'general', ?string $actividad = null): void
+function avisarContactoSitio(string $nombre, string $email, string $mensaje,
+                             string $motivo = 'general', ?string $actividad = null): void
 {
-    $admins = db()->query(
-        'SELECT email FROM usuarios WHERE rol = "admin" AND estado = "activo"'
-    )->fetchAll();
+    if (in_array($motivo, motivosAHola(), true) && correoContacto() !== '') {
+        $destinatarios = [correoContacto()];
+    } else {
+        $destinatarios = array_column(
+            db()->query('SELECT email FROM usuarios WHERE rol = "admin" AND estado = "activo"')->fetchAll(),
+            'email'
+        );
 
-    if (!$admins) {
+        // Solo para los motivos que NO son de hola@: soporte@ se suma a los
+        // administradores, no los sustituye —el cliente pidió «además de»—.
+        if (!in_array($motivo, motivosAHola(), true) && correoSoporte() !== '') {
+            $destinatarios[] = correoSoporte();
+        }
+
+        $destinatarios = array_unique($destinatarios);
+    }
+
+    if (!$destinatarios) {
         error_log('Mensaje de contacto general recibido y no hay ningún administrador a quien avisar.');
         return;
     }
@@ -233,7 +268,7 @@ function avisarAdminsContactoSitio(string $nombre, string $email, string $mensaj
     // un reporte de contenido.
     $asunto = '[' . $motivoTexto . '] ' . $nombre . ' te escribió desde OMDARA';
 
-    foreach ($admins as $a) {
-        enviarCorreo($a['email'], $asunto, $cuerpo, $email);
+    foreach ($destinatarios as $destinatario) {
+        enviarCorreo($destinatario, $asunto, $cuerpo, $email);
     }
 }
