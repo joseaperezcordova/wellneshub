@@ -31,6 +31,11 @@
 declare(strict_types=1);
 require_once __DIR__ . '/includes/config.php';
 
+// Punto 7 de docs/pendientes.md: ver el porqué en redirigirSiEsDirecto().
+// Solo en GET, así que el formulario de este mismo archivo sigue
+// funcionando igual mientras se sirva por el .php.
+redirigirSiEsDirecto(url('contacto'));
+
 /** Lo que se considera un mensaje y no un tanteo. */
 const CONTACTO_SITIO_MIN = 10;
 const CONTACTO_SITIO_MAX = 1000;

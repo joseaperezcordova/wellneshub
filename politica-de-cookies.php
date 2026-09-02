@@ -31,6 +31,9 @@
 declare(strict_types=1);
 require_once __DIR__ . '/includes/config.php';
 
+// Punto 7 de docs/pendientes.md: ver el porqué en redirigirSiEsDirecto().
+redirigirSiEsDirecto(url('cookies'));
+
 $titulo      = t('pagina.cookies.titulo');
 $descripcion = t('pagina.cookies.meta');
 $anchoLibre  = true;

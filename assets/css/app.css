@@ -12,34 +12,30 @@
  * Ahora portada.css solo declara sus nombres de rol (--ink, --paper,
  * --marigold...) apuntando a estos, asi que la paleta se cambia en un sitio.
  *
- * LOS NOMBRES SON DE LA PALETA VIEJA Y NO MIENTEN POR CAPRICHO
+ * LOS NOMBRES YA NO MIENTEN (renombrado 2026-09-02, punto 5 de
+ * docs/pendientes.md)
  *
- * --verde vale hoy negro, y --petroleo vale un negro cálido para texto —de
- * la paleta OMDARA original solo --terracota volvió a valer, literalmente,
- * terracota, en el cambio a blanco/negro/naranja—. Renombrar los ocho
- * tokens obliga a tocar ~400 reglas de portada.css y este archivo, y
- * mezclaria "cambiar los colores" con "cambiar como se llaman": dos revisiones
- * distintas en un solo diff, donde un error de color se esconde detras de mil
- * lineas de renombrado. El renombrado va aparte; el comentario de cada token
- * dice que papel cumple ahora.
+ * Hasta hace poco estos ocho tokens seguían llamándose como en la paleta
+ * OMDARA original —verde bosque, petróleo— aunque el cambio a blanco/negro/
+ * naranja los hubiera dejado valiendo otra cosa: --verde era negro,
+ * --petroleo era el negro cálido de texto. Solo --terracota había vuelto a
+ * valer, literalmente, terracota. Este commit renombra los ocho para que el
+ * nombre y el valor coincidan, SIN TOCAR NI UN HEX: es un cambio de cómo se
+ * llaman, no de qué color es cada uno —mezclar las dos cosas habría
+ * escondido un error de color detrás de las ~400 líneas que tocaba el
+ * renombrado—. Lo que cambió, línea por línea, está en el historial de git;
+ * aquí solo queda el resultado.
  */
 :root{
   /* ---- Paleta OMDARA ----
      Blanco y negro como base, con un solo acento: naranja quemado, y solo
-     para lo que pide accion —los CTA—, no como segundo color de identidad.
-     Mismos ocho nombres de siempre (ver el comentario de arriba del
-     archivo): --terracota vuelve a valer, literalmente, terracota.
-
-     Cada valor de aqui es mas contrastado que el que reemplaza —se
-     recalculo con la formula WCAG antes de fijarlo—, asi que ninguno de los
-     ajustes de opacidad para texto tenue hechos antes en este mismo
-     proyecto se rompe: todos quedan con MAS margen que antes, no menos. */
+     para lo que pide accion —los CTA—, no como segundo color de identidad. */
   --fondo:#F7F7F5;        /* BLANCO ROTO · fondo general, nunca blanco puro */
-  --verde:#161616;        /* NEGRO  · color principal de marca              */
-  --verde-claro:#4A4A47;  /* GRIS   · acciones secundarias                  */
+  --negro:#161616;        /* NEGRO  · color principal de marca              */
+  --negro-claro:#4A4A47;  /* GRIS   · acciones secundarias                  */
   --arena:#EDEDE9;        /* GRIS CLARO · fondos suaves y bloques           */
   --terracota:#B5551F;    /* NARANJA · el unico acento: los CTA             */
-  --petroleo:#221F1B;     /* TEXTO  · texto principal                       */
+  --texto:#221F1B;        /* TEXTO  · texto principal                       */
   --gris:#5A5A56;         /* MUTED  · texto secundario                      */
 
   --blanco:#FFFFFF;       /* WHITE  · cards, formularios, superficies       */
@@ -49,7 +45,7 @@
   /* Las tarjetas del panel admin, sobre el fondo negro. DERIVADO: gris muy
      oscuro para despegar la tarjeta del fondo sin salirse de la escala de
      grises. */
-  --petroleo-suave:#2A2A27;
+  --texto-suave:#2A2A27;
 
   /* El naranja, en sus tres papeles —"no tan brillante" pedia justo esto:
      un tono quemado, no un naranja vivo de acento publicitario.
@@ -67,9 +63,9 @@
   /* Los degradados de las tarjetas de la portada. DERIVADOS: una escala de
      grises entre el blanco roto y el negro, con paradas intermedias para
      que el degradado tenga pasos y no un salto brusco. */
-  --verde-agua:#3A3A37;
-  --verde-hondo:#0E0E0E;
-  --petroleo-hondo:#0B0B0A;
+  --negro-agua:#3A3A37;
+  --negro-hondo:#0E0E0E;
+  --texto-hondo:#0B0B0A;
 
   /* Divisores y bordes: grises neutros, ya sin matiz verde. --linea es la
      del borde y --linea-suave la del divisor. */
@@ -80,7 +76,7 @@
      A proposito NO se tocan con el resto de la paleta: son color funcional
      —error, exito, aviso, info—, no identidad de marca, y cambiarlos a
      escala de grises les quitaria justo lo que los hace reconocibles de un
-     vistazo. Antes --exito reutilizaba el hex de --verde-claro y --info el
+     vistazo. Antes --exito reutilizaba el hex de --negro-claro y --info el
      de --terracota porque coincidian por casualidad; ahora que las dos
      cambiaron de familia de color, --exito e --info llevan su propio valor
      escrito, ya no atado a lo que le pase al resto de la paleta. */
@@ -105,7 +101,7 @@
 
 *{box-sizing:border-box;}
 body{
-  margin:0; background:var(--fondo); color:var(--petroleo);
+  margin:0; background:var(--fondo); color:var(--texto);
   font-family:'Inter',sans-serif; font-size:15px; line-height:1.55;
   -webkit-font-smoothing:antialiased;
 }
@@ -119,7 +115,7 @@ input,select{font-family:inherit; font-size:14px;}
 /* Cabecera en verde bosque, texto en blanco. El borde inferior no puede ser
    --linea: ese gris esta pensado para fondo claro y sobre el bosque no se ve. */
 .topbar{
-  background:var(--verde); border-bottom:1px solid rgba(255,255,255,0.14);
+  background:var(--negro); border-bottom:1px solid rgba(255,255,255,0.14);
   position:sticky; top:0; z-index:40; color:var(--blanco);
 }
 .topbar-inner{
@@ -127,12 +123,12 @@ input,select{font-family:inherit; font-size:14px;}
   padding:14px 28px; max-width:1180px; margin:0 auto;
 }
 .logo{display:flex; align-items:center; gap:10px;}
-/* Sobre fondo verde bosque el cuarto de --petroleo (texto, casi negro) se
+/* Sobre fondo verde bosque el cuarto de --texto (texto, casi negro) se
    perdia contra el fondo; pasa a blanco. */
 .logo-mark{
   width:30px; height:30px; border-radius:50%; flex-shrink:0;
   background:conic-gradient(var(--terracota) 0deg 90deg, var(--blanco) 90deg 180deg,
-                            var(--verde-claro) 180deg 270deg, var(--arena) 270deg 360deg);
+                            var(--negro-claro) 180deg 270deg, var(--arena) 270deg 360deg);
 }
 .logo-text{font-family:'Fraunces',serif; font-weight:600; font-size:19px; line-height:1.1; color:var(--blanco);}
 .logo-text small{
@@ -141,7 +137,7 @@ input,select{font-family:inherit; font-size:14px;}
 }
 .mainnav{display:flex; gap:4px;}
 .mainnav a{padding:8px 14px; font-size:13.5px; border-radius:20px; color:var(--blanco); transition:background .15s, color .15s;}
-.mainnav a:hover{background:var(--arena); color:var(--verde);}
+.mainnav a:hover{background:var(--arena); color:var(--negro);}
 @media(max-width:820px){ .mainnav{display:none;} .topbar-inner{padding:12px 18px;} }
 
 .topbar-right{display:flex; align-items:center; gap:10px;}
@@ -151,10 +147,10 @@ input,select{font-family:inherit; font-size:14px;}
 .btn-cuenta{
   display:flex; align-items:center; gap:8px;
   border:1px solid var(--linea); border-radius:999px; padding:7px 16px 7px 13px;
-  font-size:13.5px; color:var(--petroleo); background:var(--blanco);
+  font-size:13.5px; color:var(--texto); background:var(--blanco);
   transition:border-color .15s, background .15s;
 }
-.btn-cuenta:hover{border-color:var(--verde); background:var(--arena-suave);}
+.btn-cuenta:hover{border-color:var(--negro); background:var(--arena-suave);}
 @media(max-width:520px){ .btn-cuenta span{display:none;} .btn-cuenta{padding:8px;} }
 
 /* Menú de cuenta con <details>: se abre y se cierra sin una línea de JS, y el
@@ -166,11 +162,11 @@ input,select{font-family:inherit; font-size:14px;}
   width:36px; height:36px; border-radius:50%; object-fit:cover;
   border:1px solid var(--linea); display:block;
 }
-/* Va dentro de la cabecera, que ahora es verde bosque: con --verde de fondo
+/* Va dentro de la cabecera, que ahora es verde bosque: con --negro de fondo
    el circulo desaparecia contra ella. El verde natural si despega. */
 .avatar-letra{
   display:flex; align-items:center; justify-content:center;
-  background:var(--verde-claro); color:var(--blanco);
+  background:var(--negro-claro); color:var(--blanco);
   font-family:'Fraunces',serif; font-size:16px;
 }
 /* OJO CON EL COLOR DE TEXTO: es obligatorio, no decorativo.
@@ -182,7 +178,7 @@ input,select{font-family:inherit; font-size:14px;}
    La regla vale para cualquier cosa clara que se cuelgue de la cabecera. */
 .cuenta-menu{
   position:absolute; right:0; top:calc(100% + 10px); min-width:230px;
-  background:var(--blanco); color:var(--petroleo);
+  background:var(--blanco); color:var(--texto);
   border:1px solid var(--linea); border-radius:12px;
   box-shadow:0 14px 34px rgba(22,22,22,.16); padding:6px; z-index:50;
 }
@@ -209,13 +205,13 @@ input,select{font-family:inherit; font-size:14px;}
 .campo{margin-bottom:16px;}
 .campo label{
   display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px;
-  letter-spacing:.1em; text-transform:uppercase; color:var(--verde); margin-bottom:6px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--negro); margin-bottom:6px;
 }
 .campo input{
   width:100%; border:1px solid var(--linea); background:var(--arena-suave);
-  border-radius:9px; padding:11px 13px; font-size:14.5px; color:var(--petroleo);
+  border-radius:9px; padding:11px 13px; font-size:14.5px; color:var(--texto);
 }
-.campo input:focus{outline:none; border-color:var(--verde); background:var(--blanco);}
+.campo input:focus{outline:none; border-color:var(--negro); background:var(--blanco);}
 .campo .pista{font-size:11.5px; opacity:.8; margin-top:5px;}
 
 /* Título y descripción llevan el contador junto a la etiqueta, arriba del
@@ -224,7 +220,7 @@ input,select{font-family:inherit; font-size:14px;}
 .campo .label-fila label{margin-bottom:0;}
 .campo .label-fila .contador{
   flex-shrink:0; font-family:'IBM Plex Mono',monospace; font-size:10px;
-  letter-spacing:.05em; color:var(--verde); opacity:.92;
+  letter-spacing:.05em; color:var(--negro); opacity:.92;
   font-variant-numeric:tabular-nums; white-space:nowrap;
 }
 .campo .label-fila .contador.corto{color:var(--terracota-texto); opacity:1;}
@@ -237,7 +233,7 @@ input,select{font-family:inherit; font-size:14px;}
 .btn-principal:hover{background:var(--terracota-viva);}
 
 /* Separador "o" */
-.separador{display:flex; align-items:center; gap:12px; margin:22px 0; color:var(--petroleo); opacity:.8; font-size:12px;}
+.separador{display:flex; align-items:center; gap:12px; margin:22px 0; color:var(--texto); opacity:.8; font-size:12px;}
 .separador::before, .separador::after{content:""; flex:1; height:1px; background:var(--linea);}
 
 /* Botón de Google. Fondo blanco y borde gris: es como Google exige que se
@@ -245,14 +241,14 @@ input,select{font-family:inherit; font-size:14px;}
 .btn-google{
   display:flex; align-items:center; justify-content:center; gap:11px; width:100%;
   background:var(--blanco); border:1px solid var(--linea); border-radius:999px;
-  padding:12px; font-size:14px; font-weight:500; color:var(--petroleo);
+  padding:12px; font-size:14px; font-weight:500; color:var(--texto);
   transition:background .15s, border-color .15s;
 }
-.btn-google:hover{background:var(--arena-suave); border-color:var(--verde);}
+.btn-google:hover{background:var(--arena-suave); border-color:var(--negro);}
 .btn-google svg{flex-shrink:0;}
 
 .auth-pie{text-align:center; font-size:13.5px; margin-top:22px; padding-top:18px; border-top:1px solid var(--linea-suave);}
-.auth-pie a{color:var(--verde); border-bottom:1px solid var(--verde);}
+.auth-pie a{color:var(--negro); border-bottom:1px solid var(--negro);}
 .auth-pie a:hover{color:var(--terracota-texto); border-bottom-color:var(--terracota-texto);}
 
 /* ------------------------------------------------- paso del código ------- */
@@ -265,7 +261,7 @@ input,select{font-family:inherit; font-size:14px;}
   border-radius:9px; padding:11px 13px; margin-bottom:16px; font-size:14px;
 }
 .correo-fijo span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-.correo-fijo a{color:var(--verde); font-weight:600; font-size:13.5px; flex-shrink:0;}
+.correo-fijo a{color:var(--negro); font-weight:600; font-size:13.5px; flex-shrink:0;}
 .correo-fijo a:hover{color:var(--terracota-texto);}
 
 /* Seis cifras separadas y en monoespaciada: así se comparan de un vistazo con
@@ -279,7 +275,7 @@ input,select{font-family:inherit; font-size:14px;}
 .reenviar-form{text-align:center; margin-top:14px;}
 .enlace-boton{
   background:none; border:none; padding:4px; font-size:13.5px; font-weight:600;
-  color:var(--verde); text-decoration:underline; text-underline-offset:3px;
+  color:var(--negro); text-decoration:underline; text-underline-offset:3px;
 }
 .enlace-boton:hover{color:var(--terracota-texto);}
 
@@ -315,7 +311,7 @@ input,select{font-family:inherit; font-size:14px;}
 .form-seccion-titulo svg{color:var(--terracota); flex-shrink:0;}
 .form-seccion-titulo h2{
   font-family:'Inter',sans-serif; font-size:14.5px; font-weight:600;
-  color:var(--petroleo); margin:0;
+  color:var(--texto); margin:0;
 }
 
 /* De un día / recurrente: dos tarjetas lado a lado, cada una con sus propios
@@ -332,7 +328,7 @@ input,select{font-family:inherit; font-size:14px;}
 .tipo-fecha-header{
   display:flex; align-items:center; gap:8px; cursor:pointer; margin:0 0 14px;
   font-family:'Inter',sans-serif; font-size:13.5px; font-weight:600;
-  letter-spacing:0; text-transform:none; color:var(--petroleo);
+  letter-spacing:0; text-transform:none; color:var(--texto);
 }
 .tipo-fecha-header input{position:absolute; opacity:0; width:0; height:0;}
 .tipo-fecha-header svg{flex-shrink:0; opacity:.55;}
@@ -349,7 +345,7 @@ input,select{font-family:inherit; font-size:14px;}
   display:grid; grid-template-columns:auto 1fr; align-items:center; gap:9px;
   padding:12px 13px; border:1px solid var(--linea); border-radius:10px; cursor:pointer;
   font-family:'Inter',sans-serif; letter-spacing:0; text-transform:none;
-  color:var(--petroleo); margin:0;
+  color:var(--texto); margin:0;
 }
 .campo label.precio-op input{position:absolute; opacity:0; width:0; height:0;}
 .campo label.precio-op .precio-icono{opacity:.55;}
@@ -377,7 +373,7 @@ input,select{font-family:inherit; font-size:14px;}
 .accion-header{
   display:grid; grid-template-columns:auto 1fr; align-items:start; gap:4px 9px;
   cursor:pointer; margin:0; font-family:'Inter',sans-serif; letter-spacing:0;
-  text-transform:none; color:var(--petroleo);
+  text-transform:none; color:var(--texto);
 }
 .accion-header input{position:absolute; opacity:0; width:0; height:0;}
 .accion-icono{grid-row:1; flex-shrink:0; opacity:.55;}
@@ -409,7 +405,7 @@ input,select{font-family:inherit; font-size:14px;}
 }
 .guia-item{margin-bottom:20px;}
 .guia-item:last-of-type{margin-bottom:0;}
-.guia-item h3{font-size:14px; margin:0 0 5px; color:var(--verde);}
+.guia-item h3{font-size:14px; margin:0 0 5px; color:var(--negro);}
 .guia-item p{font-size:12.5px; line-height:1.55; opacity:.8; margin:0 0 6px;}
 .guia-item .ejemplos{font-size:11.5px; line-height:1.5; opacity:.82;}
 /* El aviso de traduccion (REQ-00010). Se separa de los tres bloques de accion
@@ -421,7 +417,7 @@ input,select{font-family:inherit; font-size:14px;}
   background:var(--aviso-fondo); border:1px solid var(--aviso-linea);
 }
 .guia-aviso h3{font-size:13px; margin:0 0 6px; color:var(--aviso);}
-.guia-aviso p{font-size:12px; line-height:1.55; margin:0 0 8px; color:var(--petroleo);}
+.guia-aviso p{font-size:12px; line-height:1.55; margin:0 0 8px; color:var(--texto);}
 .guia-aviso p:last-child{margin-bottom:0;}
 
 .guia-nota{
@@ -444,11 +440,11 @@ input,select{font-family:inherit; font-size:14px;}
 
 .campo textarea, .campo select{
   width:100%; border:1px solid var(--linea); background:var(--arena-suave);
-  border-radius:9px; padding:11px 13px; font-size:14.5px; color:var(--petroleo);
+  border-radius:9px; padding:11px 13px; font-size:14.5px; color:var(--texto);
   font-family:inherit; line-height:1.55;
 }
 .campo textarea:focus, .campo select:focus{
-  outline:none; border-color:var(--verde); background:var(--blanco);
+  outline:none; border-color:var(--negro); background:var(--blanco);
 }
 .campo textarea{resize:vertical; min-height:120px;}
 
@@ -513,7 +509,7 @@ input,select{font-family:inherit; font-size:14px;}
 
 .campo label.check{
   display:flex; align-items:center; gap:9px; font-family:'Inter',sans-serif;
-  font-size:14.5px; letter-spacing:0; text-transform:none; color:var(--petroleo);
+  font-size:14.5px; letter-spacing:0; text-transform:none; color:var(--texto);
   cursor:pointer; margin:0;
 }
 .campo label.check input{width:auto; margin:0;}
@@ -545,7 +541,7 @@ input,select{font-family:inherit; font-size:14px;}
    control para poner imagen. Donde :has() no exista, no pasa nada mas que
    seguir como estaba. */
 .campo:has(.imagen-input-oculto:focus-visible) .imagen-dropzone{
-  border-color:var(--verde); background:var(--blanco);
+  border-color:var(--negro); background:var(--blanco);
   outline:2px solid var(--terracota-texto); outline-offset:2px;
 }
 .imagen-dropzone{
@@ -555,10 +551,10 @@ input,select{font-family:inherit; font-size:14px;}
   transition:border-color .15s, background .15s;
 }
 .imagen-dropzone:hover, .imagen-dropzone:focus-within{
-  border-color:var(--verde); background:var(--blanco);
+  border-color:var(--negro); background:var(--blanco);
 }
-.imagen-dropzone svg{color:var(--verde); opacity:.7;}
-.imagen-dropzone-texto{font-size:13.5px; font-weight:600; color:var(--petroleo);}
+.imagen-dropzone svg{color:var(--negro); opacity:.7;}
+.imagen-dropzone-texto{font-size:13.5px; font-weight:600; color:var(--texto);}
 .imagen-dropzone-nombre{font-size:12px; opacity:.8; word-break:break-all;}
 
 .imagen-actual{
@@ -573,7 +569,7 @@ input,select{font-family:inherit; font-size:14px;}
    pistas: es una buena noticia —la foto no se perdió— y quien acaba de ver un
    formulario lleno de errores no está leyendo el texto pequeño. */
 .imagen-actual .pista{
-  color:var(--verde); opacity:1; margin:0 0 10px;
+  color:var(--negro); opacity:1; margin:0 0 10px;
   font-size:12.5px; font-weight:500;
 }
 
@@ -587,7 +583,7 @@ input,select{font-family:inherit; font-size:14px;}
   border:2px solid transparent; box-shadow:0 0 0 1px var(--linea) inset;
 }
 .color-op input:checked + span{
-  border-color:var(--petroleo); box-shadow:0 0 0 2px var(--blanco) inset;
+  border-color:var(--texto); box-shadow:0 0 0 2px var(--blanco) inset;
 }
 .color-op input:focus-visible + span{outline:2px solid var(--terracota-texto); outline-offset:2px;}
 
@@ -595,7 +591,7 @@ input,select{font-family:inherit; font-size:14px;}
 /* Solo la ve quien puede tocar el evento. Va pegada arriba porque es donde se
    mira al llegar desde el formulario, que es cuando hay que decidir publicar. */
 .barra-gestion{background:var(--arena); border-bottom:1px solid var(--linea);}
-.barra-gestion.es-borrador{background:var(--arena-suave); border-bottom:2px dashed var(--verde-claro);}
+.barra-gestion.es-borrador{background:var(--arena-suave); border-bottom:2px dashed var(--negro-claro);}
 .barra-inner{
   max-width:900px; margin:0 auto; padding:13px 22px; display:flex;
   align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
@@ -606,9 +602,9 @@ input,select{font-family:inherit; font-size:14px;}
 .btn-barra{
   display:inline-block; background:var(--blanco); border:1px solid var(--linea);
   border-radius:999px; padding:8px 16px; font-size:13px; font-weight:600;
-  color:var(--petroleo);
+  color:var(--texto);
 }
-.btn-barra:hover{border-color:var(--verde);}
+.btn-barra:hover{border-color:var(--negro);}
 .btn-barra.destacado{background:var(--terracota); border-color:var(--terracota); color:var(--tinta-boton);}
 .btn-barra.destacado:hover{background:var(--terracota-viva);}
 .btn-barra.peligro{color:var(--error);}
@@ -621,7 +617,7 @@ input,select{font-family:inherit; font-size:14px;}
 /* La vuelta a los resultados. Va arriba del todo y no al pie: quien entra a una
    ficha, mira la fecha y decide que no, quiere salir sin recorrer la página
    entera. */
-.volver{display:inline-block; font-size:13px; color:var(--verde); padding:4px 0;}
+.volver{display:inline-block; font-size:13px; color:var(--negro); padding:4px 0;}
 .volver:hover{text-decoration:underline;}
 
 /* ---------------------------------------------------------------- mapa --- */
@@ -637,10 +633,10 @@ input,select{font-family:inherit; font-size:14px;}
 
 .btn-comollegar{
   display:inline-block; margin-top:12px; padding:10px 20px;
-  background:var(--verde); color:var(--blanco);
+  background:var(--negro); color:var(--blanco);
   border-radius:999px; font-size:13.5px; font-weight:600;
 }
-.btn-comollegar:hover{background:var(--petroleo);}
+.btn-comollegar:hover{background:var(--texto);}
 
 /* El mapa arrastrable del formulario. El alto es fijo porque Leaflet no
    sabe medirse solo: sin uno, el contenedor colapsa a 0px y el mapa no
@@ -668,20 +664,20 @@ input,select{font-family:inherit; font-size:14px;}
 .enlace-maps-grupo{margin-top:14px;}
 .enlace-maps-grupo label{
   display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px;
-  letter-spacing:.1em; text-transform:uppercase; color:var(--verde); margin-bottom:6px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--negro); margin-bottom:6px;
 }
 .enlace-maps-fila{display:flex; gap:8px;}
 .enlace-maps-fila input{
   flex:1; min-width:0; border:1px solid var(--linea); background:var(--arena-suave);
-  border-radius:9px; padding:11px 13px; font-size:14.5px; color:var(--petroleo);
+  border-radius:9px; padding:11px 13px; font-size:14.5px; color:var(--texto);
 }
-.enlace-maps-fila input:focus{outline:none; border-color:var(--verde); background:var(--blanco);}
+.enlace-maps-fila input:focus{outline:none; border-color:var(--negro); background:var(--blanco);}
 .enlace-maps-fila button{
-  flex-shrink:0; background:var(--blanco); border:1px solid var(--verde); color:var(--verde);
+  flex-shrink:0; background:var(--blanco); border:1px solid var(--negro); color:var(--negro);
   border-radius:9px; padding:0 16px; font-size:13.5px; font-weight:600; white-space:nowrap;
   transition:background .15s, color .15s;
 }
-.enlace-maps-fila button:hover{background:var(--verde); color:var(--blanco);}
+.enlace-maps-fila button:hover{background:var(--negro); color:var(--blanco);}
 .enlace-maps-fila button:disabled{opacity:.55; pointer-events:none;}
 .enlace-maps-grupo .aviso{margin:10px 0 0; padding:9px 13px; font-size:12.5px;}
 
@@ -699,19 +695,19 @@ input,select{font-family:inherit; font-size:14px;}
 .ficha-fecha .d{display:block; font-family:'Fraunces',serif; font-size:24px;}
 .ficha-fecha .m{
   display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px;
-  letter-spacing:.12em; color:var(--verde);
+  letter-spacing:.12em; color:var(--negro);
 }
 
 .ficha-cuerpo{margin-top:26px;}
 .ficha-cat{
   font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--verde); margin-bottom:8px;
+  text-transform:uppercase; color:var(--negro); margin-bottom:8px;
 }
 .ficha-cuerpo h1{font-size:34px; line-height:1.15;}
 @media(max-width:640px){ .ficha-cuerpo h1{font-size:26px;} }
 
 .ficha-compartir{display:flex; align-items:center; gap:10px; margin-top:14px;}
-.ficha-compartir .aviso-copiado{font-size:12.5px; color:var(--verde); display:none;}
+.ficha-compartir .aviso-copiado{font-size:12.5px; color:var(--negro); display:none;}
 .ficha-compartir .aviso-copiado.show{display:inline;}
 
 .ficha-datos{
@@ -727,7 +723,7 @@ input,select{font-family:inherit; font-size:14px;}
 .ficha-datos .val{font-size:14.5px; line-height:1.5;}
 .ficha-datos .tenue{opacity:.8; font-size:13px;}
 .precio-grande{font-family:'IBM Plex Mono',monospace; font-size:19px;}
-.precio-grande.gratis{color:var(--verde);}
+.precio-grande.gratis{color:var(--negro);}
 
 .btn-boletos{display:block; text-align:center; text-decoration:none; max-width:320px;}
 
@@ -755,14 +751,14 @@ input,select{font-family:inherit; font-size:14px;}
   display:flex; align-items:center; gap:10px; padding:11px 13px;
   border:1px solid transparent; border-radius:9px; cursor:pointer;
   font-family:'Inter',sans-serif; font-size:14.5px; letter-spacing:0;
-  text-transform:none; color:var(--petroleo); margin:0;
+  text-transform:none; color:var(--texto); margin:0;
 }
 .campo label.motivo:hover{background:var(--arena-suave);}
 .campo label.motivo input{width:auto; margin:0; flex-shrink:0;}
 
 /* :has aún no está en todos los navegadores; donde no esté, la fila
    seleccionada simplemente no se resalta y el radio marcado sigue viéndose. */
-.campo label.motivo:has(input:checked){background:var(--arena-suave); border-color:var(--verde);}
+.campo label.motivo:has(input:checked){background:var(--arena-suave); border-color:var(--negro);}
 
 .ficha-reportar{
   margin-top:40px; padding-top:20px; border-top:1px solid var(--linea-suave);
@@ -814,7 +810,7 @@ input,select{font-family:inherit; font-size:14px;}
 .caso-acciones form{margin:0;}
 
 /* --------------------------------------------------------------- footer -- */
-footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;}
+footer{background:var(--texto); color:rgba(255,255,255,.75); margin-top:40px;}
 .foot-bottom{
   max-width:1180px; margin:0 auto; padding:20px 28px; text-align:center;
   font-size:11.5px; font-family:'IBM Plex Mono',monospace;
@@ -831,7 +827,7 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
   display:flex; align-items:center; justify-content:space-between;
   gap:22px; flex-wrap:wrap;
   padding:20px 28px;
-  background:var(--verde); color:var(--blanco);
+  background:var(--negro); color:var(--blanco);
   border-top:1px solid rgba(255,255,255,.14);
   box-shadow:0 -8px 28px rgba(34,31,27,.18);
 }
@@ -853,7 +849,7 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
    principal va en salvia con texto bosque: 11.5:1 y sigue siendo el unico
    elemento solido del banner, que es lo que lo hace principal. */
 .cookies-btn-principal{
-  background:var(--arena); color:var(--verde); border-color:var(--arena); font-weight:600;
+  background:var(--arena); color:var(--negro); border-color:var(--arena); font-weight:600;
 }
 .cookies-btn-principal:hover{background:var(--blanco); border-color:var(--blanco);}
 .cookies-btn-plano{border-color:transparent; text-decoration:underline; padding-left:8px; padding-right:8px;}
@@ -877,7 +873,7 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
   background:none; border:none; font-size:26px; line-height:1;
   color:var(--gris); padding:0 4px;
 }
-.cookies-cerrar:hover{color:var(--petroleo);}
+.cookies-cerrar:hover{color:var(--texto);}
 
 .cookies-grupo{border-top:1px solid var(--linea-suave); padding:18px 0 2px; margin-top:16px;}
 .cookies-grupo-cab{display:flex; align-items:center; justify-content:space-between; gap:14px;}
@@ -885,11 +881,11 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
 .cookies-grupo p{margin:8px 0 0; font-size:13.5px; line-height:1.6; color:var(--gris);}
 .cookies-incluye{
   font-family:'IBM Plex Mono',monospace; font-size:11.5px; margin-top:8px !important;
-  background:var(--arena-suave); border-radius:6px; padding:7px 10px; color:var(--petroleo) !important;
+  background:var(--arena-suave); border-radius:6px; padding:7px 10px; color:var(--texto) !important;
 }
 .cookies-siempre{
   font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.06em;
-  text-transform:uppercase; background:var(--arena); color:var(--verde);
+  text-transform:uppercase; background:var(--arena); color:var(--negro);
   border-radius:999px; padding:4px 11px; white-space:nowrap;
 }
 
@@ -907,7 +903,7 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
   border-radius:50%; background:var(--blanco); transition:transform .15s;
   box-shadow:0 1px 3px rgba(34,31,27,.3);
 }
-.cookies-switch input:checked + .cookies-pista{background:var(--verde-claro);}
+.cookies-switch input:checked + .cookies-pista{background:var(--negro-claro);}
 .cookies-switch input:checked + .cookies-pista::after{transform:translateX(18px);}
 .cookies-switch input:focus-visible + .cookies-pista{outline:2px solid var(--terracota-texto); outline-offset:2px;}
 .cookies-estado{
@@ -923,8 +919,8 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
   flex-wrap:wrap; margin-top:24px; padding-top:18px; border-top:1px solid var(--linea-suave);
 }
 .cookies-panel-pie a{font-size:13px; color:var(--terracota-texto); text-decoration:underline;}
-.cookies-panel-pie .cookies-btn-principal{background:var(--verde); color:var(--blanco); border-color:var(--verde);}
-.cookies-panel-pie .cookies-btn-principal:hover{background:var(--verde-agua); border-color:var(--verde-agua);}
+.cookies-panel-pie .cookies-btn-principal{background:var(--negro); color:var(--blanco); border-color:var(--negro);}
+.cookies-panel-pie .cookies-btn-principal:hover{background:var(--negro-agua); border-color:var(--negro-agua);}
 
 @media(max-width:640px){
   .cookies-banner{padding:18px 20px; gap:16px;}
@@ -978,7 +974,7 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
   flex-shrink:0; font-size:26px; line-height:1; color:var(--gris);
   padding:0 2px; margin-top:-2px;
 }
-.contacto-cerrar:hover{color:var(--petroleo);}
+.contacto-cerrar:hover{color:var(--texto);}
 
 /* El bloque que dice a que actividad se le esta escribiendo. */
 .contacto-actividad{
@@ -987,14 +983,14 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
 }
 .contacto-actividad-tit{
   font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--verde-claro); margin-bottom:5px;
+  text-transform:uppercase; color:var(--negro-claro); margin-bottom:5px;
 }
 .contacto-actividad strong{display:block; font-size:16px; line-height:1.3; margin-bottom:7px;}
 .contacto-actividad-dato{
   display:flex; align-items:baseline; gap:8px;
   font-size:13px; color:var(--gris); line-height:1.5; margin-top:3px;
 }
-.contacto-actividad-dato span{flex-shrink:0; color:var(--verde-claro);}
+.contacto-actividad-dato span{flex-shrink:0; color:var(--negro-claro);}
 
 /* «*» de campo obligatorio. No es color solo: el asterisco se ve igual sin
    distinguir colores, que es de lo que trata la marca. */
@@ -1008,18 +1004,18 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
 }
 
 .contacto-nota{
-  background:var(--arena-suave); border-left:3px solid var(--verde-claro);
+  background:var(--arena-suave); border-left:3px solid var(--negro-claro);
   border-radius:8px; padding:12px 14px; margin:4px 0 18px;
   font-size:12.5px; line-height:1.6; color:var(--gris);
 }
-.contacto-nota strong{display:block; color:var(--petroleo); margin-bottom:3px; font-size:13px;}
+.contacto-nota strong{display:block; color:var(--texto); margin-bottom:3px; font-size:13px;}
 
 .contacto-privacidad{
   display:flex; align-items:flex-start; gap:10px; cursor:pointer;
   font-size:13.5px; line-height:1.5; margin:0 0 18px;
 }
 .contacto-privacidad input{
-  flex-shrink:0; width:18px; height:18px; margin:1px 0 0; accent-color:var(--verde);
+  flex-shrink:0; width:18px; height:18px; margin:1px 0 0; accent-color:var(--negro);
 }
 .contacto-privacidad a{color:var(--terracota-texto); text-decoration:underline; text-underline-offset:2px;}
 
@@ -1035,10 +1031,10 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
 .contacto-hecho{text-align:center; padding:14px 0 6px;}
 .contacto-tick{
   width:104px; height:104px; margin:0 auto 22px; border-radius:50%;
-  background:var(--exito-fondo); color:var(--verde-claro);
+  background:var(--exito-fondo); color:var(--negro-claro);
   display:flex; align-items:center; justify-content:center;
 }
-.contacto-hecho h1{font-size:24px; color:var(--verde); margin-bottom:12px;}
+.contacto-hecho h1{font-size:24px; color:var(--negro); margin-bottom:12px;}
 .contacto-hecho p{font-size:14px; line-height:1.6; color:var(--gris); margin:0 0 6px; }
 .contacto-hecho p:last-of-type{margin-bottom:28px;}
 
@@ -1046,7 +1042,7 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
    competir, asi que un boton solido pediria un clic que no hace falta dar. */
 .btn-contorno{
   display:block; text-align:center; padding:12px 20px; border-radius:10px;
-  border:1.5px solid var(--verde); color:var(--verde); font-size:14.5px; font-weight:600;
+  border:1.5px solid var(--negro); color:var(--negro); font-size:14.5px; font-weight:600;
 }
 .btn-contorno:hover{background:var(--arena-suave);}
 
@@ -1060,10 +1056,10 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
   margin:16px 0 0;
 }
 .casilla-legal input{
-  flex-shrink:0; width:17px; height:17px; margin:1px 0 0; accent-color:var(--verde);
+  flex-shrink:0; width:17px; height:17px; margin:1px 0 0; accent-color:var(--negro);
 }
 .casilla-legal a{color:var(--terracota-texto); text-decoration:underline; text-underline-offset:2px;}
-.casilla-legal a:hover{color:var(--verde);}
+.casilla-legal a:hover{color:var(--negro);}
 
 /* En "Completa tu registro" la casilla ES el formulario, no una nota al pie del
    boton: se separa del boton y se pone en su propia caja para que no se lea por
@@ -1071,7 +1067,7 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
 .auth-caja .casilla-legal{
   background:var(--arena-suave); border:1px solid var(--linea-suave);
   border-radius:10px; padding:14px 16px; margin:0 0 18px; font-size:13.5px;
-  color:var(--petroleo);
+  color:var(--texto);
 }
 /* Salvo en la pantalla de entrar, donde vuelve a ser la nota bajo el boton. */
 form .btn-principal + .casilla-legal{
@@ -1086,7 +1082,7 @@ form .btn-principal + .casilla-legal{
   margin:0 0 20px; font-size:13.5px; line-height:1.5;
 }
 .alta-correo span{display:block; font-size:11.5px; opacity:.75;}
-.alta-correo strong{color:var(--verde); word-break:break-all;}
+.alta-correo strong{color:var(--negro); word-break:break-all;}
 
 /* ------------------------------------------------------ Mi cuenta (REQ-00009) -- */
 /* Rotulo de grupo dentro del menu de la cuenta. No es un enlace: no hay ninguna
@@ -1115,7 +1111,7 @@ form .btn-principal + .casilla-legal{
 .cuenta-dato:last-child{border-bottom:none; padding-bottom:2px;}
 .cuenta-dato .k{
   display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px;
-  letter-spacing:.1em; text-transform:uppercase; color:var(--verde); margin-bottom:5px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--negro); margin-bottom:5px;
 }
 .cuenta-dato .v{display:block; font-size:15px; word-break:break-word;}
 .cuenta-dato .vacio{opacity:.45;}
@@ -1136,7 +1132,7 @@ form .btn-principal + .casilla-legal{
 .faq{max-width:760px;}
 .faq-bloque{
   font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.12em;
-  text-transform:uppercase; color:var(--verde-claro);
+  text-transform:uppercase; color:var(--negro-claro);
   margin:34px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--linea);
 }
 .faq-bloque:first-child{margin-top:8px;}
@@ -1144,10 +1140,10 @@ form .btn-principal + .casilla-legal{
 .faq-item{border-bottom:1px solid var(--linea-suave);}
 .faq-item > summary{
   cursor:pointer; list-style:none; padding:16px 34px 16px 0; position:relative;
-  font-size:15.5px; line-height:1.45; color:var(--petroleo);
+  font-size:15.5px; line-height:1.45; color:var(--texto);
 }
 .faq-item > summary::-webkit-details-marker{display:none;}
-.faq-item > summary:hover{color:var(--verde);}
+.faq-item > summary:hover{color:var(--negro);}
 .faq-item > summary:focus-visible{outline:2px solid var(--terracota-texto); outline-offset:2px;}
 
 /* El «+» y el «−», dibujados con dos trazos y no escritos en el marcado: un
@@ -1156,11 +1152,11 @@ form .btn-principal + .casilla-legal{
 .faq-item > summary::before,
 .faq-item > summary::after{
   content:''; position:absolute; right:6px; top:50%;
-  background:var(--verde-claro); transition:transform .18s, opacity .18s;
+  background:var(--negro-claro); transition:transform .18s, opacity .18s;
 }
 .faq-item > summary::before{width:13px; height:1.8px; margin-top:-0.9px;}
 .faq-item > summary::after{width:1.8px; height:13px; margin-top:-6.5px; margin-right:5.6px;}
-.faq-item[open] > summary{color:var(--verde); font-weight:500;}
+.faq-item[open] > summary{color:var(--negro); font-weight:500;}
 /* Abierto, el trazo vertical desaparece y queda el «−». */
 .faq-item[open] > summary::after{transform:rotate(90deg); opacity:0;}
 
@@ -1190,7 +1186,7 @@ form .btn-principal + .casilla-legal{
    voz alta un lector de pantalla delante de cada linea, cinco veces seguidas. */
 .guia-motivos li::before{
   content:''; position:absolute; left:4px; top:6px; width:9px; height:5px;
-  border-left:2px solid var(--verde-claro); border-bottom:2px solid var(--verde-claro);
+  border-left:2px solid var(--negro-claro); border-bottom:2px solid var(--negro-claro);
   transform:rotate(-45deg);
 }
 
@@ -1207,7 +1203,7 @@ form .btn-principal + .casilla-legal{
 }
 .guia-num{
   flex-shrink:0; width:33px; height:33px; border-radius:50%; z-index:1;
-  background:var(--verde); color:var(--blanco);
+  background:var(--negro); color:var(--blanco);
   display:flex; align-items:center; justify-content:center;
   font-family:'IBM Plex Mono',monospace; font-size:14px;
 }
@@ -1219,7 +1215,7 @@ form .btn-principal + .casilla-legal{
   display:inline-block; width:auto; max-width:none; padding:13px 26px;
   border-radius:10px; font-size:15px; font-weight:600; text-align:center;
 }
-.btn-cta-claro{background:var(--blanco); color:var(--verde);}
+.btn-cta-claro{background:var(--blanco); color:var(--negro);}
 .btn-cta-claro:hover{background:var(--arena);}
 .btn-cta-hueco{border:1.5px solid rgba(255,255,255,.55); color:var(--blanco);}
 .btn-cta-hueco:hover{background:rgba(255,255,255,.1); border-color:var(--blanco);}
@@ -1227,7 +1223,7 @@ form .btn-principal + .casilla-legal{
 /* El cierre, a sangre y en verde bosque: se lee como final de pagina y no como
    un apartado mas de la lista. */
 .guia-cierre{
-  background:var(--verde); color:var(--blanco); margin-top:20px; padding:56px 0 60px;
+  background:var(--negro); color:var(--blanco); margin-top:20px; padding:56px 0 60px;
 }
 .guia-cierre h2{font-size:30px; line-height:1.2; color:var(--blanco); max-width:620px;}
 .guia-cierre p{
@@ -1291,7 +1287,7 @@ form .btn-principal + .casilla-legal{
 .legal-clausulas > li:last-child{border-bottom:none; margin-bottom:0;}
 .legal-clausulas > li::before{
   content:counter(clausula) '.'; position:absolute; left:0; top:1px;
-  font-family:'IBM Plex Mono',monospace; font-size:14px; color:var(--verde-claro);
+  font-family:'IBM Plex Mono',monospace; font-size:14px; color:var(--negro-claro);
 }
 .legal-clausulas h2{font-size:17.5px; line-height:1.3; margin:0 0 9px;}
 .legal-clausulas p{margin:0 0 10px; font-size:15px; line-height:1.75;}
@@ -1317,7 +1313,7 @@ form .btn-principal + .casilla-legal{
 .legal-clausulas ul li:last-child{margin-bottom:0;}
 .legal-clausulas ul li::before{
   content:''; position:absolute; left:2px; top:11px;
-  width:4px; height:4px; border-radius:50%; background:var(--verde-claro);
+  width:4px; height:4px; border-radius:50%; background:var(--negro-claro);
 }
 
 @media(max-width:640px){
@@ -1335,11 +1331,11 @@ form .btn-principal + .casilla-legal{
 .legal-apartado::before{
   content:counter(clausula) '.' counter(apartado) '.'; position:absolute; left:0; top:1px;
   font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:400;
-  color:var(--verde-claro);
+  color:var(--negro-claro);
 }
 .legal-herramienta{
   font-size:14px; margin:20px 0 8px;
-  font-family:'IBM Plex Mono',monospace; letter-spacing:.02em; color:var(--verde);
+  font-family:'IBM Plex Mono',monospace; letter-spacing:.02em; color:var(--negro);
 }
 .legal-clausulas h2 + .legal-apartado{margin-top:16px;}
 
@@ -1372,4 +1368,4 @@ form .btn-principal + .casilla-legal{
   font-size:14px; color:var(--terracota-texto);
   text-decoration:underline; text-underline-offset:3px;
 }
-.legal-otros a:hover{color:var(--verde);}
+.legal-otros a:hover{color:var(--negro);}

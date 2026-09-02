@@ -49,6 +49,12 @@ if ($ev['accion_principal'] !== 'informacion') {
     redirigir(urlEvento($ev));
 }
 
+// Punto 7 de docs/pendientes.md: ver el porqué en redirigirSiEsDirecto().
+// Después de cargar $ev, porque la dirección canónica necesita su id. Sin
+// conservar la consulta: el «?id=» de esta página ya pasó a formar parte de
+// la ruta limpia, y repetirlo dejaría un «?id=» sobrante detrás.
+redirigirSiEsDirecto(urlContactar($ev), false);
+
 // Para que el selector de idioma de la cabecera se quede en este mismo
 // formulario en vez de mandar al inicio (urlEquivalente(), includes/idioma.php).
 $GLOBALS['urlEquivalente'] = [

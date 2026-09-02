@@ -9,6 +9,12 @@
 
 declare(strict_types=1);
 require_once __DIR__ . '/includes/config.php';
+
+// Punto 7 de docs/pendientes.md. Antes de exigirSesion(): así, quien no
+// tenga sesión y entre por el .php directo vuelve ya con la dirección
+// limpia puesta cuando el login lo traiga de regreso.
+redirigirSiEsDirecto(url('publicar'));
+
 require_once __DIR__ . '/includes/eventos.php';
 
 $u = exigirSesion();

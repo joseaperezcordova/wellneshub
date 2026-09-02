@@ -20,6 +20,12 @@
 
 declare(strict_types=1);
 require_once __DIR__ . '/includes/config.php';
+
+// Punto 7 de docs/pendientes.md: quien entra por /index.php a mano —un
+// enlace viejo, no la portada real, que Apache sirve por DirectoryIndex sin
+// pasar por aquí con esa ruta— se manda a la dirección limpia.
+redirigirSiEsDirecto(url('inicio'));
+
 require_once __DIR__ . '/includes/eventos.php';
 
 $u = usuarioActual();
@@ -241,7 +247,7 @@ if (seccionVisible('blog')): ?>
              escribirlos. Los tres enlaces llevan al índice del blog, que dice
              lo mismo. Cuando haya artículos de verdad, cada uno irá al suyo. */ ?>
     <a class="card-blog" href="<?= URL_BASE ?>/blog.php">
-      <div class="b-img" style="background-color:var(--verde-claro);"></div>
+      <div class="b-img" style="background-color:var(--negro-claro);"></div>
       <div class="b-body">
         <div class="eyebrow">Guía</div>
         <h3>Cómo elegir tu primer retiro de silencio</h3>
@@ -255,7 +261,7 @@ if (seccionVisible('blog')): ?>
       </div>
     </a>
     <a class="card-blog" href="<?= URL_BASE ?>/blog.php">
-      <div class="b-img" style="background-color:var(--petroleo-suave);"></div>
+      <div class="b-img" style="background-color:var(--texto-suave);"></div>
       <div class="b-body">
         <div class="eyebrow">Prácticas</div>
         <h3>Qué esperar de tu primera ceremonia de cacao</h3>

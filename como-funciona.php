@@ -36,6 +36,9 @@
 declare(strict_types=1);
 require_once __DIR__ . '/includes/config.php';
 
+// Punto 7 de docs/pendientes.md: ver el porqué en redirigirSiEsDirecto().
+redirigirSiEsDirecto(url('como-funciona'));
+
 $titulo      = t('pagina.como_funciona.titulo');
 $descripcion = t('pagina.como_funciona.meta');
 $anchoLibre  = true;

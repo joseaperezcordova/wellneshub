@@ -19,6 +19,9 @@
 declare(strict_types=1);
 require_once __DIR__ . '/includes/config.php';
 
+// Punto 7 de docs/pendientes.md: ver el porqué en redirigirSiEsDirecto().
+redirigirSiEsDirecto(url('sobre-omdara'));
+
 $titulo      = t('pagina.sobre_omdara.titulo');
 $descripcion = t('pagina.sobre_omdara.meta');
 $anchoLibre  = true;

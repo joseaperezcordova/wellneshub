@@ -862,16 +862,31 @@ que salga.
 
 ## Deuda técnica asumida a propósito
 
-### 5. Los nombres de los tokens de color mienten
+### 5. Los nombres de los tokens de color mienten — cerrado (2026-09-02)
 
-**Qué pasa:** `--terracota` vale hoy azul (`#2878D7`) y `--petroleo` vale verde
-carbón (`#20332D`). Los nombres son de la paleta anterior.
+**Nota sobre este mismo punto:** cuando se escribió decía «`--terracota` vale
+hoy azul (`#2878D7`) y `--petroleo` vale verde carbón (`#20332D`)» — eso ya
+no correspondía a la paleta con la que se cerró: `--terracota` volvió a
+valer, literalmente, terracota (`#B5551F`) desde el cambio a blanco/negro/
+naranja, y `--petroleo` valía un negro cálido de texto (`#221F1B`), no verde
+carbón. Los que de verdad mentían eran `--verde` (valía negro) y
+`--petroleo` (no era petróleo ni verde: era el color de texto).
 
-**Por qué se dejó así:** renombrarlos obliga a tocar unas 400 reglas. Hacerlo a
-la vez que el cambio de paleta habría metido un error de color detrás de mil
-líneas de renombrado, sin forma de revisar una cosa sin la otra.
+**Hecho:** un commit que solo renombra, sin tocar ni un hex —verificado con
+`git diff`, línea por línea—. `--verde` → `--negro`, `--petroleo` → `--texto`,
+con sus variantes (`-claro`, `-agua`, `-hondo`, `-suave`) conservando el
+mismo sufijo. Alcanzó a `assets/css/app.css`, `assets/css/portada.css` y a
+`blog.php`/`index.php`, que usaban esos mismos tokens en estilos en línea
+para las tarjetas de ejemplo del blog.
 
-**Para cerrarlo:** un commit propio que solo renombre, sin cambiar ni un valor.
+**Lo que NO se tocó, a propósito:** varios comentarios sueltos por
+`assets/css/portada.css` siguen describiendo una cabecera «verde bosque» que
+ya no existe —son de antes del cambio a blanco/negro/naranja y nunca se
+actualizaron—. Corregir cada uno es una revisión de documentación aparte, no
+un renombrado de tokens; se dejan tal cual salvo el que citaba directamente
+el token renombrado. Tampoco se tocaron `docs/pase-a-produccion.html` ni
+`docs/pruebas.html`: son documentos aparte, con su propia paleta declarada
+dentro y sin relación con `assets/css/app.css`.
 
 ---
 
@@ -906,40 +921,34 @@ sufijo real de `_ga_<ID>` no se sabe hasta ver el flujo de datos.
 
 ---
 
-### 8. El acceso a las preferencias de cookies vive solo en la Política
+### 8. El acceso a las preferencias de cookies vive solo en la Política — cerrado (2026-09-02)
 
-**Qué falta:** decidir si el enlace para reabrir el panel va también en el pie.
-
-**Dónde:** hoy está en `politica-de-cookies.php`, como botón. Ponerlo en el pie
-es un `<button data-cookies="configurar">` en la columna «Legal» de
-`includes/layout.php`: el script ya escucha ese atributo en toda la página, así
-que no hace falta nada más.
-
-**Por qué no se puso ya:** REQ-00001 fija la estructura del pie columna por
-columna, y añadir una entrada que no está en ese requerimiento es cambiar algo
-que ya se aprobó. Es una línea el día que producto lo pida.
-
-> **Si se lleva al pie, hay que copiar la condición.** Desde REQ-00016 el botón
-> de la Política solo se pinta cuando `hayQueConsentir()`: sin herramientas
-> configuradas no se pinta el diálogo, y el botón no abriría nada. Un botón
-> muerto en el pie de todas las páginas es peor que uno en una sola.
+**Hecho:** `<button type="button" data-cookies="configurar">` en la columna
+«Legal» del pie (`includes/layout.php`), con la misma condición que ya usaba
+`politica-de-cookies.php` —`hayQueConsentir()`—, así que no aparece un botón
+muerto cuando no hay ninguna herramienta configurada. El script que abre el
+panel (`consentimiento.js`) ya escuchaba ese atributo en toda la página, así
+que no hizo falta tocarlo. Se le agregó su propio estilo en
+`assets/css/portada.css` —un `<button>` no hereda el aspecto de los `<a>` del
+pie—.
 
 ---
 
-### 7. Las direcciones `.php` siguen respondiendo
+### 7. Las direcciones `.php` siguen respondiendo — cerrado (2026-09-02)
 
-**Qué pasa:** `/buscar.php` y `/actividades` sirven la misma página. Lo canónico
-sería que la primera redirigiera a la segunda.
-
-**Ya no es un problema de posicionamiento.** Desde REQ-00006 las dos declaran
-`<link rel="canonical">` a `/actividades`, así que Google indexa una sola. Y la
-ficha sí redirige de verdad: `/evento.php?id=7` manda un 301 a
-`/actividad/{slug}`, porque ahí el POST se pudo separar del GET —los
-formularios de la ficha postean contra ella misma y una redirección los
-convertiría en GET, perdiendo lo enviado—.
-
-**Lo que falta:** hacer lo mismo con el resto de páginas. Requiere revisar
-formulario por formulario cuáles postean contra su propio `.php`.
-
-**Dónde:** el bloque de reescritura en `.htaccess` de la raíz, o el mismo patrón
-de `evento.php` (redirigir solo en GET).
+**Hecho:** `redirigirSiEsDirecto()` (`includes/config.php`), la misma idea que
+ya usaba `evento.php` para `/evento.php?id=7` → `/actividad/{slug}` pero
+generalizada: manda un 301 a la dirección limpia SOLO en GET —un POST
+redirigido se convierte en GET y pierde lo enviado, así que ningún formulario
+que postea contra su propia página se rompe mientras se sirva por el `.php`—.
+Se agregó a las trece páginas fijas de `rutasSitio()` (`index.php`,
+`buscar.php`, `evento-nuevo.php`, `como-funciona.php`, `sobre-omdara.php`,
+`preguntas-frecuentes.php`, `contacto.php`, `terminos-y-condiciones.php`,
+`aviso-de-privacidad.php`, `politica-de-cookies.php`, `blog.php`,
+`login.php`, `codigo.php`, `completar-registro.php`) y a las tres que dependen
+de un id y no están en `rutasSitio()` (`contactar.php`, `reportar.php`,
+`evento-editar.php`) —en esas tres, sin conservar la consulta: el `?id=` que
+traían ya pasó a formar parte de la ruta limpia, y conservarlo habría dejado
+un `?id=` sobrante detrás—. Probado con las trece direcciones + `?query`
+donde aplicaba, verificando también que la dirección limpia ya no vuelve a
+redirigir (sin bucle).

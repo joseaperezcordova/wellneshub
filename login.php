@@ -3,6 +3,9 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/google.php';
 
+// Punto 7 de docs/pendientes.md: ver el porqué en redirigirSiEsDirecto().
+redirigirSiEsDirecto(url('login'));
+
 if (haySesion()) redirigir(url('inicio'));
 
 $error = '';

@@ -33,6 +33,11 @@ if (!seccionVisible('blog')) {
     exit;
 }
 
+// Punto 7 de docs/pendientes.md: ver el porqué en redirigirSiEsDirecto().
+// Después de la comprobación de arriba: si la sección está oculta, las dos
+// direcciones dan 404 igual, y redirigir primero sería un salto de más.
+redirigirSiEsDirecto(url('blog'));
+
 $titulo      = 'Blog';
 $descripcion = 'Guías y agenda de bienestar en México: retiros de yoga, festivales holísticos y consejos para tu próxima actividad.';
 $seccion     = 'blog';
@@ -51,19 +56,19 @@ require __DIR__ . '/includes/layout.php';
 
   <div class="grid-blog">
     <div class="card-blog">
-      <div class="b-img" style="background-color:var(--petroleo-suave);"></div>
+      <div class="b-img" style="background-color:var(--texto-suave);"></div>
       <div class="b-body"><div class="eyebrow">Guía</div><h3>Los mejores retiros de yoga en Oaxaca</h3></div>
     </div>
     <div class="card-blog">
-      <div class="b-img" style="background-color:var(--verde-claro);"></div>
+      <div class="b-img" style="background-color:var(--negro-claro);"></div>
       <div class="b-body"><div class="eyebrow">Agenda</div><h3>Actividades wellness en CDMX este fin de semana</h3></div>
     </div>
     <div class="card-blog">
-      <div class="b-img" style="background-color:var(--verde);"></div>
+      <div class="b-img" style="background-color:var(--negro);"></div>
       <div class="b-body"><div class="eyebrow">Guía</div><h3>Festivales holísticos en México</h3></div>
     </div>
     <div class="card-blog">
-      <div class="b-img" style="background-color:var(--verde-claro);"></div>
+      <div class="b-img" style="background-color:var(--negro-claro);"></div>
       <div class="b-body"><div class="eyebrow">Evergreen</div><h3>Centros de bienestar por estado</h3></div>
     </div>
     <div class="card-blog">

@@ -305,3 +305,44 @@ function redirigir(string $ruta): void
     header('Location: ' . $destino);
     exit;
 }
+
+/**
+ * Manda un 301 de la dirección .php directa a la limpia (punto 7 de
+ * docs/pendientes.md). Los .php siguen existiendo y sirviendo la página —el
+ * .htaccess solo reescribe lo que NO es un archivo real—, así que sin esto
+ * /como-funciona.php y /como-funciona conviven indefinidamente como dos
+ * direcciones para lo mismo.
+ *
+ * SOLO EN GET, igual que la misma redirección en evento.php: un POST
+ * redirigido se convierte en GET y pierde lo enviado, así que un formulario
+ * que postea contra su propia página —login.php, contacto.php, el alta de
+ * actividad...— seguiría funcionando mientras se sirva por el .php.
+ *
+ * $urlCanonica ya viene resuelta —url('clave') para las páginas fijas,
+ * urlContactar($ev) y compañía para las que dependen de un id— porque la
+ * hace falta calcular distinto según la página, y esta función no tiene por
+ * qué saber cómo.
+ *
+ * $conservarConsulta se apaga para las páginas cuya dirección .php recibe el
+ * id por «?id=», como contactar.php o reportar.php: ese «?id=7» ya pasó a
+ * formar parte de la ruta limpia (/contactar/7), y conservarlo pegaría un
+ * «?id=7» sobrante detrás. Las páginas fijas si lo necesitan —un
+ * /buscar.php?cat=Yoga tiene que llegar a /actividades?cat=Yoga con el
+ * filtro puesto, no a secas—.
+ */
+function redirigirSiEsDirecto(string $urlCanonica, bool $conservarConsulta = true): void
+{
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') return;
+
+    $rutaPedida   = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
+    $rutaCanonica = (string) parse_url($urlCanonica, PHP_URL_PATH);
+
+    if ($rutaPedida === $rutaCanonica) return;
+
+    $consulta = $conservarConsulta
+        ? (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_QUERY)
+        : '';
+
+    header('Location: ' . $urlCanonica . ($consulta !== '' ? '?' . $consulta : ''), true, 301);
+    exit;
+}

@@ -505,6 +505,17 @@ function pie(): void
       <a href="<?= e(url('terminos')) ?>"><?= et('pie.terminos') ?></a>
       <a href="<?= e(url('privacidad')) ?>"><?= et('pie.privacidad') ?></a>
       <a href="<?= e(url('cookies')) ?>"><?= et('pie.cookies') ?></a>
+      <?php /*
+       * Punto 8 de docs/pendientes.md: el mismo botón que ya vive en
+       * politica-de-cookies.php, ahora también aquí para no obligar a entrar
+       * a esa página solo para cambiar de opinión. Misma condición que allá:
+       * sin herramientas configuradas no se pinta el diálogo
+       * (cookies-dialogo.php), así que el botón no abriría nada —uno muerto
+       * en el pie de todas las páginas es peor que no tenerlo—.
+       */ ?>
+      <?php if (hayQueConsentir()): ?>
+        <button type="button" data-cookies="configurar"><?= et('cookies.abrir_preferencias') ?></button>
+      <?php endif; ?>
     </div>
   </div>
 

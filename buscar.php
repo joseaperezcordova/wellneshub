@@ -21,6 +21,13 @@
 
 declare(strict_types=1);
 require_once __DIR__ . '/includes/config.php';
+
+// Punto 7 de docs/pendientes.md: quien entra por /buscar.php a mano se manda
+// a la dirección limpia. Solo en GET —redirigirSiEsDirecto() ya lo cuida—,
+// así que esto no afecta a nada que postee contra esta página: no hay nada
+// que lo haga, el filtrado vive en buscar-datos.php.
+redirigirSiEsDirecto(url('actividades'));
+
 require_once __DIR__ . '/includes/eventos.php';
 require_once __DIR__ . '/includes/busqueda.php';
 

@@ -28,6 +28,10 @@ if (!$ev || $ev['situacion'] !== 'publicado') {
     exit;
 }
 
+// Punto 7 de docs/pendientes.md: ver el porqué en redirigirSiEsDirecto().
+// Sin conservar la consulta: ver la nota igual en contactar.php.
+redirigirSiEsDirecto(urlReportar($ev), false);
+
 // Para que el selector de idioma de la cabecera se quede en este mismo
 // formulario en vez de mandar al inicio (urlEquivalente(), includes/idioma.php).
 $GLOBALS['urlEquivalente'] = [

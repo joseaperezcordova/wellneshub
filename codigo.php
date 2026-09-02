@@ -10,6 +10,9 @@
 declare(strict_types=1);
 require_once __DIR__ . '/includes/config.php';
 
+// Punto 7 de docs/pendientes.md: ver el porqué en redirigirSiEsDirecto().
+redirigirSiEsDirecto(url('codigo'));
+
 if (haySesion()) redirigir(url('inicio'));
 
 $email = (string) ($_SESSION['codigo_email'] ?? '');
