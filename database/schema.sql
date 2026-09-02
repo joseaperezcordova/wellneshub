@@ -346,11 +346,43 @@ CREATE TABLE IF NOT EXISTS reportes (
 
 
 -- Un renglón por cada mensaje enviado desde "Contactar al organizador" en la
--- ficha pública. Sirve sobre todo para el límite de envíos repetidos por IP,
--- igual que ya existe arriba para reportes.
+-- ficha pública. Sirve para el límite de envíos repetidos por IP —igual que
+-- ya existe arriba para reportes— y, desde la migración 22, para medir la
+-- interacción real entre usuarios y actividades (requerimiento del cliente,
+-- 2026-09-02): de ahí organizador_id, tipo_cta, ciudad y categoria, aparte y
+-- sin relación con una eventual base de marketing/newsletter.
 CREATE TABLE IF NOT EXISTS contactos (
   id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  evento_id   INT UNSIGNED    NOT NULL,
+
+  -- Opcional desde la migración 23: el cliente quiere el historial de
+  -- solicitudes aunque la actividad se elimine, así que la fila sobrevive con
+  -- evento_id en NULL —ver el ON DELETE SET NULL más abajo—. organizador_id,
+  -- ciudad y categoria, guardados como foto en el momento del contacto, son
+  -- los que quedan contando la historia cuando esto pasa.
+  evento_id   INT UNSIGNED    NULL DEFAULT NULL,
+
+  -- A quién le llegó la solicitud. Se podría sacar siempre con un JOIN a
+  -- eventos, pero un reporte "por organizador" no debería depender de que la
+  -- actividad exista tal cual —ver el aviso de la migración 22 sobre qué pasa
+  -- si la actividad se elimina—.
+  organizador_id INT UNSIGNED  NOT NULL,
+
+  -- Qué botón disparó esta fila. Hoy solo vale 'informacion' —el único CTA
+  -- que llega a este formulario—, explícito para cuando el reporte compare
+  -- contra los clics de "boletos"/"reservar" (tabla clics, más abajo).
+  tipo_cta    VARCHAR(20)     NOT NULL DEFAULT 'informacion',
+
+  -- Una FOTO de la actividad al momento del contacto, no un JOIN en vivo: si
+  -- el organizador la edita después, el reporte de "solicitudes por ciudad
+  -- en agosto" no cambia con retroactividad.
+  ciudad      VARCHAR(90)     NULL DEFAULT NULL,
+  categoria   VARCHAR(60)     NULL DEFAULT NULL,
+
+  -- Vacía a propósito: el cliente la pidió para "si posteriormente lo
+  -- implementas", sin definir qué estados tendría. Sin ENUM inventado, igual
+  -- que mensajes_contacto.estado (migración 19) antes de que existieran sus
+  -- cuatro valores.
+  estado      VARCHAR(20)     NULL DEFAULT NULL,
 
   nombre      VARCHAR(120)    NOT NULL,
   email       VARCHAR(190)    NOT NULL,
@@ -366,9 +398,14 @@ CREATE TABLE IF NOT EXISTS contactos (
   PRIMARY KEY (id),
   KEY idx_contactos_evento (evento_id, creado_en),
   KEY idx_contactos_ip (ip, evento_id, creado_en),
+  KEY idx_contactos_organizador (organizador_id, creado_en),
 
   CONSTRAINT fk_contacto_evento
     FOREIGN KEY (evento_id) REFERENCES eventos (id)
+    ON DELETE SET NULL ON UPDATE CASCADE,
+
+  CONSTRAINT fk_contacto_organizador
+    FOREIGN KEY (organizador_id) REFERENCES usuarios (id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

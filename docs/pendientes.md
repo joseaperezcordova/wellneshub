@@ -578,6 +578,46 @@ comprobó lo que están leyendo.
 
 ---
 
+### 2o. Ejecutar las migraciones 22 y 23 (métricas de "Contactar al organizador")
+
+**Qué falta:** correr `database/migracion-22-metricas-contacto.sql` y
+`database/migracion-23-contactos-sobreviven-actividad.sql` en phpMyAdmin, en
+pruebas y en producción, **en ese orden** —la 23 le cambia la llave foránea a
+una columna que crea la 22—.
+
+**Qué piden y por qué:** requerimiento del cliente, 2026-09-02: medir la
+interacción real entre usuarios y actividades, para poder ofrecer más
+adelante estadísticas y reportes de rendimiento por organizador. `contactos`
+—la tabla de "Contactar al organizador", que ya guardaba usuario/contacto,
+actividad y fecha/hora desde REQ-00007— gana `organizador_id`, `tipo_cta`
+(hoy siempre `'informacion'`, el único CTA que llega a este formulario),
+`ciudad` y `categoria` —una foto de la actividad al momento del contacto, no
+un JOIN en vivo, para que un reporte no cambie con retroactividad si el
+organizador edita la actividad después— y `estado` (vacía a propósito, para
+"si posteriormente lo implementas", sin inventar valores). Separado a
+propósito de una eventual base de marketing/newsletter, que necesitaría su
+propio consentimiento.
+
+La 23 resuelve algo que la 22 dejaba abierto y el cliente confirmó el mismo
+día: quiere el historial de solicitudes aunque se borre la actividad. Antes,
+`contactos` tenía `ON DELETE CASCADE` contra `eventos` —eliminar una
+actividad borraba también sus contactos, foto incluida—. Ahora `evento_id` es
+opcional y su llave pasa a `ON DELETE SET NULL`: al borrar la actividad la
+fila de contacto se queda, con `evento_id` en NULL y todo lo demás —nombre,
+organizador, ciudad, categoría, fecha— tal como quedó escrito el día del
+contacto. No hace falta tocar `eliminarEvento()` (`includes/eventos.php`):
+sigue siendo un `DELETE FROM eventos` a secas: es la base la que decide.
+
+**Qué pasa mientras tanto:** el formulario de "Contactar al organizador"
+sigue funcionando igual —nada de esto lo toca—. Antes de correr la 22, la
+tabla sigue como estaba: sin las columnas nuevas y con `ON DELETE CASCADE`
+todavía activo.
+
+**Para cerrarlo:** ejecutar los dos `.sql`, en orden, en los dos entornos.
+Ninguna requiere quitar código después.
+
+---
+
 ## Decisiones de diseño abiertas
 
 ### 2c. ¿El contacto tiene que flotar sobre la ficha?

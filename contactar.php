@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $telefono = trim($telefono) !== '' ? mb_substr(trim($telefono), 0, 30) : null;
         $mensaje  = mb_substr(trim($mensaje), 0, CONTACTO_MENSAJE_MAX);
 
-        crearContacto((int) $ev['id'], $nombre, $email, $telefono, $mensaje);
+        crearContacto($ev, $nombre, $email, $telefono, $mensaje);
         avisarOrganizador($ev, $nombre, $email, $telefono, $mensaje);
         $enviado = true;
     }

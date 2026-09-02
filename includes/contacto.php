@@ -29,24 +29,22 @@ function contactoRepetido(int $eventoId): bool
 /**
  * Guarda el mensaje.
  *
- * EL TELÉFONO SE GUARDA SI LA COLUMNA ESTÁ, Y SI NO, NO.
- *
- * Lo añade migracion-15, y las migraciones de este proyecto se ejecutan a mano
- * en phpMyAdmin: entre publicar el código y aplicarlas pasa un rato. Sin este
- * rodeo, ese rato sería el formulario de contacto devolviendo un error 500 a
- * todo el mundo —ya pasó una vez, con el sitio entero—.
- *
- * Perder el teléfono en la base mientras tanto no rompe nada: al organizador le
- * llega igual en el correo, que es para lo que se pide. Lo que no puede pasar
- * es que el mensaje no llegue.
- *
- * Cuando la migración esté aplicada en pruebas y en producción, esto vuelve a
- * ser un único INSERT con las seis columnas.
+ * Recibe la actividad entera y no solo su id (migración 22, requerimiento del
+ * cliente de 2026-09-02: medir la interacción real entre usuarios y
+ * actividades) porque organizador_id, ciudad y categoria se guardan como una
+ * FOTO del momento del contacto, no como un JOIN en vivo —si el organizador
+ * edita la actividad después, la fila ya escrita no debe cambiar con
+ * retroactividad—. tipo_cta siempre vale 'informacion' aquí: es el único CTA
+ * que llega a este formulario: la variedad la trae contactar.php mismo, que
+ * ya redirige fuera si accion_principal es otro.
  */
-function crearContacto(int $eventoId, string $nombre, string $email, ?string $telefono, ?string $mensaje): void
+function crearContacto(array $ev, string $nombre, string $email, ?string $telefono, ?string $mensaje): void
 {
     $valores = [
-        $eventoId,
+        (int) $ev['id'],
+        (int) $ev['usuario_id'],
+        (string) $ev['ciudad'],
+        (string) $ev['categoria'],
         mb_substr($nombre, 0, 120),
         mb_substr($email, 0, 190),
         ($telefono !== null && $telefono !== '') ? mb_substr($telefono, 0, 30) : null,
@@ -54,8 +52,10 @@ function crearContacto(int $eventoId, string $nombre, string $email, ?string $te
         ipBinaria(),
     ];
 
-    db()->prepare('INSERT INTO contactos (evento_id, nombre, email, telefono, mensaje, ip) VALUES (?, ?, ?, ?, ?, ?)')
-        ->execute($valores);
+    db()->prepare(
+        'INSERT INTO contactos (evento_id, organizador_id, ciudad, categoria, nombre, email, telefono, mensaje, ip)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    )->execute($valores);
 }
 
 /**
