@@ -26,6 +26,19 @@ const CODIGO_ESPERA_SEG   = 60;  // entre dos envíos al mismo correo
 const CODIGO_MAX_POR_HORA = 5;   // envíos por correo y hora
 const CODIGO_MAX_IP_HORA  = 15;  // envíos por IP y hora, sea cual sea el correo
 
+/**
+ * Cambio de correo de la cuenta (punto 18 de docs/pendientes.md): mismos
+ * números que CODIGO_* de arriba, por el mismo motivo que ya se explicó
+ * para el correo de contacto por actividad —es el mismo riesgo, un código
+ * de un solo uso de seis cifras por correo, y no hay motivo para que la
+ * ventana de intentos o de espera sea distinta aquí—.
+ */
+const CAMBIO_CORREO_VIGENCIA_MIN = 15;
+const CAMBIO_CORREO_MAX_INTENTOS = 5;
+const CAMBIO_CORREO_ESPERA_SEG   = 60;
+const CAMBIO_CORREO_MAX_POR_HORA = 5;
+const CAMBIO_CORREO_MAX_IP_HORA  = 15;
+
 
 // ---------------------------------------------------------------- sesión ----
 
@@ -670,4 +683,198 @@ function crearUsuarioConGoogle(array $perfil): ?int
     }
 
     return $usuarioId;
+}
+
+
+// ------------------------------------------- cambio de correo de la cuenta --
+// Punto 18 de docs/pendientes.md, migración 25. Mismo patrón que
+// solicitarCodigoCorreoContacto()/confirmarCodigoCorreoContacto()
+// (includes/eventos.php) para el correo de contacto por actividad, pero
+// aquí el código confirma un cambio de EMAIL DE CUENTA —la credencial con la
+// que se entra—, así que hay dos comprobaciones de más que allá no hacían
+// falta: que el correo nuevo no tenga ya cuenta, y avisar al correo viejo
+// cuando el cambio se confirma, por si no fue su dueño quien lo pidió.
+
+/** ¿Hay un código pedido y todavía vivo para esta cuenta? Si lo hay, a qué
+ *  correo se mandó. */
+function correoCambioPendiente(int $usuarioId): ?string
+{
+    $st = db()->prepare(
+        'SELECT email_nuevo FROM codigos_cambio_correo
+          WHERE usuario_id = ? AND usado_en IS NULL AND expira_en > NOW()
+       ORDER BY id DESC LIMIT 1'
+    );
+    $st->execute([$usuarioId]);
+    $email = $st->fetchColumn();
+
+    return $email !== false ? (string) $email : null;
+}
+
+/** Limpieza de códigos caducados. Mismo criterio que purgarCodigosViejos(). */
+function purgarCambiosCorreoViejos(): void
+{
+    if (random_int(1, 50) !== 1) return;
+
+    db()->prepare('DELETE FROM codigos_cambio_correo WHERE expira_en < DATE_SUB(NOW(), INTERVAL 1 DAY)')
+        ->execute();
+}
+
+/**
+ * Genera un código, lo guarda y lo manda al correo NUEVO.
+ *
+ * @return array{0:bool,1:string} [ok, mensaje para enseñar]
+ */
+function solicitarCambioCorreo(int $usuarioId, string $emailNuevo): array
+{
+    $emailNuevo = mb_strtolower(trim($emailNuevo));
+
+    if (!filter_var($emailNuevo, FILTER_VALIDATE_EMAIL) || mb_strlen($emailNuevo) > 190) {
+        return [false, t('auth.correo_invalido')];
+    }
+
+    $pdo = db();
+
+    $st = $pdo->prepare('SELECT email FROM usuarios WHERE id = ?');
+    $st->execute([$usuarioId]);
+    $actual = (string) $st->fetchColumn();
+
+    if ($emailNuevo === mb_strtolower($actual)) {
+        return [false, t('cuenta.cambio_correo.error_mismo')];
+    }
+
+    // Que no tenga ya cuenta: si dos personas acabaran compartiendo un
+    // correo, el código de acceso ya no sabría a cuál de las dos entrar.
+    $st = $pdo->prepare('SELECT COUNT(*) FROM usuarios WHERE email = ?');
+    $st->execute([$emailNuevo]);
+    if ((int) $st->fetchColumn() > 0) {
+        return [false, t('cuenta.cambio_correo.error_registrado')];
+    }
+
+    purgarCambiosCorreoViejos();
+
+    $espera = CAMBIO_CORREO_ESPERA_SEG;
+    $st = $pdo->prepare(
+        "SELECT COUNT(*) AS total,
+                COALESCE(SUM(creado_en > DATE_SUB(NOW(), INTERVAL $espera SECOND)), 0) AS recientes
+           FROM codigos_cambio_correo
+          WHERE usuario_id = ? AND creado_en > DATE_SUB(NOW(), INTERVAL 1 HOUR)"
+    );
+    $st->execute([$usuarioId]);
+    $porCuenta = $st->fetch();
+
+    if ((int) $porCuenta['recientes'] > 0) {
+        return [false, t('auth.espera_minuto')];
+    }
+    if ((int) $porCuenta['total'] >= CAMBIO_CORREO_MAX_POR_HORA) {
+        return [false, t('auth.demasiados_codigos')];
+    }
+
+    $st = $pdo->prepare(
+        'SELECT COUNT(*) FROM codigos_cambio_correo
+          WHERE ip = ? AND creado_en > DATE_SUB(NOW(), INTERVAL 1 HOUR)'
+    );
+    $st->execute([ipBinaria()]);
+    if ((int) $st->fetchColumn() >= CAMBIO_CORREO_MAX_IP_HORA) {
+        return [false, t('auth.demasiadas_peticiones')];
+    }
+
+    // Un código vivo por cuenta: pedir uno nuevo invalida el anterior.
+    $pdo->prepare('UPDATE codigos_cambio_correo SET usado_en = NOW() WHERE usuario_id = ? AND usado_en IS NULL')
+        ->execute([$usuarioId]);
+
+    $codigo   = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    $vigencia = CAMBIO_CORREO_VIGENCIA_MIN;
+
+    $pdo->prepare(
+        "INSERT INTO codigos_cambio_correo (usuario_id, email_nuevo, codigo_hash, expira_en, ip)
+         VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL $vigencia MINUTE), ?)"
+    )->execute([$usuarioId, $emailNuevo, password_hash($codigo, PASSWORD_DEFAULT), ipBinaria()]);
+
+    $id = (int) $pdo->lastInsertId();
+
+    if (!enviarCodigoCambioCorreo($emailNuevo, $codigo, $vigencia)) {
+        $pdo->prepare('DELETE FROM codigos_cambio_correo WHERE id = ?')->execute([$id]);
+        return [false, t('auth.error_envio')];
+    }
+
+    return [true, sprintf(t('cuenta.cambio_correo.enviado'), $emailNuevo)];
+}
+
+/**
+ * Comprueba el código y, si es el bueno, cambia el correo de la cuenta.
+ *
+ * Avisa al correo VIEJO justo después de cambiarlo —no antes—: es el único
+ * paso de los cuatro que detecta un secuestro (alguien que no es el dueño
+ * pidió el cambio), y solo tiene sentido si el correo viejo sigue siendo el
+ * dueño real cuando lo lee, cosa que ya no se puede comprobar después.
+ *
+ * @return array{0:bool,1:string} [ok, mensaje para enseñar]
+ */
+function confirmarCambioCorreo(int $usuarioId, string $codigo): array
+{
+    $codigo = preg_replace('/\D+/', '', $codigo);
+
+    if (strlen((string) $codigo) !== 6) {
+        return [false, t('auth.codigo_formato')];
+    }
+
+    $pdo = db();
+
+    $st = $pdo->prepare(
+        'SELECT id, email_nuevo, codigo_hash, intentos
+           FROM codigos_cambio_correo
+          WHERE usuario_id = ? AND usado_en IS NULL AND expira_en > NOW()
+       ORDER BY id DESC LIMIT 1'
+    );
+    $st->execute([$usuarioId]);
+    $fila = $st->fetch();
+
+    if (!$fila) {
+        return [false, t('auth.codigo_caducado')];
+    }
+
+    if ((int) $fila['intentos'] >= CAMBIO_CORREO_MAX_INTENTOS) {
+        $pdo->prepare('UPDATE codigos_cambio_correo SET usado_en = NOW() WHERE id = ?')->execute([$fila['id']]);
+        return [false, t('auth.demasiados_intentos')];
+    }
+
+    $pdo->prepare('UPDATE codigos_cambio_correo SET intentos = intentos + 1 WHERE id = ?')->execute([$fila['id']]);
+
+    if (!password_verify((string) $codigo, $fila['codigo_hash'])) {
+        $quedan = CAMBIO_CORREO_MAX_INTENTOS - ((int) $fila['intentos'] + 1);
+        return [false, $quedan > 0
+            ? sprintf(t('auth.codigo_incorrecto_quedan'), $quedan)
+            : t('auth.codigo_incorrecto_final')];
+    }
+
+    // Que no se haya registrado nadie más con ese correo mientras el código
+    // estaba pendiente —podían pasar hasta CAMBIO_CORREO_VIGENCIA_MIN
+    // minutos entre pedirlo y confirmarlo—.
+    $st = $pdo->prepare('SELECT COUNT(*) FROM usuarios WHERE email = ? AND id != ?');
+    $st->execute([$fila['email_nuevo'], $usuarioId]);
+    if ((int) $st->fetchColumn() > 0) {
+        $pdo->prepare('UPDATE codigos_cambio_correo SET usado_en = NOW() WHERE id = ?')->execute([$fila['id']]);
+        return [false, t('cuenta.cambio_correo.error_registrado')];
+    }
+
+    $st = $pdo->prepare('SELECT email FROM usuarios WHERE id = ?');
+    $st->execute([$usuarioId]);
+    $correoViejo = (string) $st->fetchColumn();
+
+    $pdo->prepare('UPDATE codigos_cambio_correo SET usado_en = NOW() WHERE id = ?')->execute([$fila['id']]);
+    $pdo->prepare('UPDATE usuarios SET email = ?, email_verificado_en = NOW() WHERE id = ?')
+        ->execute([$fila['email_nuevo'], $usuarioId]);
+
+    if ($correoViejo !== '' && $correoViejo !== $fila['email_nuevo']) {
+        enviarAvisoCambioCorreo($correoViejo, (string) $fila['email_nuevo']);
+    }
+
+    return [true, sprintf(t('cuenta.cambio_correo.confirmado'), $fila['email_nuevo'])];
+}
+
+/** Cancela el código pendiente, sin esperar a que caduque. */
+function cancelarCambioCorreo(int $usuarioId): void
+{
+    db()->prepare('UPDATE codigos_cambio_correo SET usado_en = NOW() WHERE usuario_id = ? AND usado_en IS NULL')
+        ->execute([$usuarioId]);
 }

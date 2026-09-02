@@ -19,14 +19,19 @@
  * gratis: sin JavaScript, con el botón «atrás» funcionando y con «Cancelar»
  * siendo un enlace de verdad.
  *
- * EL CORREO NO SE EDITA AQUÍ, Y NO ES UN DESCUIDO
+ * CAMBIAR EL CORREO ES UN FLUJO APARTE, NO UN CAMPO MÁS (punto 18 de
+ * docs/pendientes.md, migración 25)
  *
  * Es la credencial con la que se entra: aquí no hay contraseñas, y el código de
- * acceso va justo a ese buzón. Cambiarlo sin verificar antes el nuevo deja a
+ * acceso va justo a ese buzón. Cambiarlo sin verificar antes el nuevo dejaría a
  * alguien fuera de su cuenta para siempre, sin ninguna forma de recuperarla —un
- * dedazo basta—. Hacerlo bien es un flujo propio: mandar un código al correo
- * nuevo, confirmarlo, cambiarlo y avisar al viejo por si no fue su dueño quien
- * lo pidió. Está anotado en docs/pendientes.md.
+ * dedazo basta—. Por eso el campo de correo sigue disabled —no viaja en el
+ * "Guardar cambios" de siempre— y el cambio de verdad vive en sus propios
+ * botones dentro del mismo <form>: solicitarCambioCorreo() manda un código al
+ * correo NUEVO, confirmarCambioCorreo() lo verifica y recién ahí cambia
+ * usuarios.email, y avisa al correo VIEJO por si no fue su dueño quien lo
+ * pidió —el único de los cuatro pasos que detecta un secuestro—. Las tres
+ * funciones viven en includes/auth.php.
  */
 
 declare(strict_types=1);
@@ -50,6 +55,13 @@ $error    = '';
 $aviso    = '';
 $nombre   = (string) $ficha['nombre'];
 
+// Cambio de correo de la cuenta (punto 18 de docs/pendientes.md, migración
+// 25): sus tres acciones no tienen nada que ver con guardar nombre/WhatsApp/
+// Instagram/sitio web, así que se comprueban antes que ese guardado y no
+// como parte de él.
+$errorCorreo = '';
+$avisoCorreo = '';
+
 // Aviso que dejó el guardado antes de redirigir (POST-redirect-GET: sin él,
 // recargar volvería a mandar el formulario).
 if (!empty($_SESSION['cuenta_aviso'])) {
@@ -58,16 +70,34 @@ if (!empty($_SESSION['cuenta_aviso'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre   = (string) ($_POST['org_nombre'] ?? '');
     $editando = true;
 
     if (!csrfValido($_POST['csrf'] ?? null)) {
         $error = 'La sesión caducó. Vuelve a intentarlo.';
 
-    } elseif (trim($nombre) === '') {
+    } elseif (isset($_POST['enviar_codigo_cambio_correo'])) {
+        [$ok, $msg] = solicitarCambioCorreo((int) $u['id'], (string) ($_POST['correo_nuevo'] ?? ''));
+        if ($ok) { $avisoCorreo = $msg; } else { $errorCorreo = $msg; }
+
+    } elseif (isset($_POST['confirmar_codigo_cambio_correo'])) {
+        [$ok, $msg] = confirmarCambioCorreo((int) $u['id'], (string) ($_POST['codigo_cambio_correo'] ?? ''));
+        if ($ok) {
+            $avisoCorreo = $msg;
+            // Para que el correo que se enseña en esta misma respuesta ya
+            // sea el nuevo, sin esperar a la siguiente visita.
+            $ficha = fichaDeUsuario((int) $u['id']) ?? $ficha;
+        } else {
+            $errorCorreo = $msg;
+        }
+
+    } elseif (isset($_POST['cancelar_codigo_cambio_correo'])) {
+        cancelarCambioCorreo((int) $u['id']);
+
+    } elseif (trim((string) ($_POST['org_nombre'] ?? '')) === '') {
         // Sin nombre, la cabecera de su propia cuenta se lee como un error de
         // la página, y en el panel admin aparece una fila en blanco.
-        $error = 'Escribe tu nombre: es como te ven en el sitio.';
+        $nombre = (string) ($_POST['org_nombre'] ?? '');
+        $error  = 'Escribe tu nombre: es como te ven en el sitio.';
 
     } else {
         // El mismo guardado que usa el formulario de publicar, con los mismos
@@ -79,6 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirigir('/mi-cuenta.php');
     }
 }
+
+$correoPendiente = correoCambioPendiente((int) $u['id']);
 
 /** El valor de un campo: lo recién escrito si falló, o lo guardado. */
 $valorCampo = function (string $columna) use ($ficha) {
@@ -164,8 +196,13 @@ function filaCuenta(string $etiqueta, string $valor, string $pista = ''): void
                 'Solo lo ve el equipo de Omdara. No aparece en tus actividades.');
         }
 
-        filaCuenta('Correo', (string) $ficha['email'],
-            'Es con lo que entras. Para cambiarlo hay que verificar el nuevo buzón, y eso todavía no está hecho: escríbenos y lo cambiamos.');
+        filaCuenta('Correo', (string) $ficha['email'], 'Es con lo que entras.');
+
+        if ($correoPendiente !== null) {
+            echo '<div class="aviso aviso-info" style="margin-top:10px;">Tienes un cambio de correo pendiente: '
+               . 'te mandamos un código a <strong>' . e($correoPendiente) . '</strong>. '
+               . '<a href="' . URL_BASE . '/mi-cuenta.php?editar=1">Escríbelo aquí</a> para confirmarlo.</div>';
+        }
         ?>
 
       <?php else: ?>
@@ -209,9 +246,51 @@ function filaCuenta(string $etiqueta, string $valor, string $pista = ''): void
                      poder consultarlo aquí. Al estar disabled no viaja en el
                      POST, así que ni siquiera hay que ignorarlo al guardar. */ ?>
             <input id="correo-fijo" type="email" value="<?= e($ficha['email']) ?>" disabled>
-            <div class="pista">No se puede cambiar desde aquí: es la dirección a la que llega tu código
-              para entrar, y un cambio sin verificar te dejaría fuera de tu propia cuenta.</div>
+            <div class="pista">Es la dirección a la que llega tu código para entrar.</div>
           </div>
+
+          <?php /*
+           * Cambio de correo (punto 18 de docs/pendientes.md): botones de
+           * envío con su propio "name", dentro de este mismo <form> —un
+           * <form> no puede ir dentro de otro—. "formnovalidate" para que no
+           * los bloquee el "required" del nombre de arriba: pedir un código
+           * o confirmarlo no tiene nada que ver con guardar el resto de la
+           * ficha.
+           */ ?>
+          <?php if ($avisoCorreo !== ''): ?>
+            <div class="aviso aviso-ok"><?= e($avisoCorreo) ?></div>
+          <?php endif; ?>
+          <?php if ($errorCorreo !== ''): ?>
+            <div class="aviso aviso-error"><?= e($errorCorreo) ?></div>
+          <?php endif; ?>
+
+          <?php if ($correoPendiente !== null): ?>
+            <div class="campo">
+              <p class="pista">Te mandamos un código a <strong><?= e($correoPendiente) ?></strong>. Escríbelo
+                aquí para confirmarlo:</p>
+              <label for="codigo_cambio_correo">Código de 6 dígitos</label>
+              <input id="codigo_cambio_correo" name="codigo_cambio_correo" type="text" inputmode="numeric"
+                     autocomplete="one-time-code" maxlength="6" placeholder="000000">
+            </div>
+            <div class="cuenta-acciones">
+              <button class="btn-principal" type="submit" name="confirmar_codigo_cambio_correo" value="1"
+                      formnovalidate>Confirmar</button>
+              <button class="actionbtn" type="submit" name="cancelar_codigo_cambio_correo" value="1"
+                      formnovalidate>Cancelar</button>
+            </div>
+          <?php else: ?>
+            <div class="campo">
+              <label for="correo_nuevo">Cambiar correo <span class="opcional">opcional</span></label>
+              <input id="correo_nuevo" name="correo_nuevo" type="email" maxlength="190"
+                     placeholder="nuevo@correo.com">
+              <div class="pista">Te mandaremos un código a esa dirección para confirmarlo antes de
+                activarlo. Mientras no lo confirmes, sigues entrando con el de siempre.</div>
+            </div>
+            <div class="cuenta-acciones">
+              <button class="actionbtn" type="submit" name="enviar_codigo_cambio_correo" value="1"
+                      formnovalidate>Enviar código de verificación</button>
+            </div>
+          <?php endif; ?>
 
           <div class="cuenta-acciones">
             <button class="btn-principal" type="submit">Guardar cambios</button>

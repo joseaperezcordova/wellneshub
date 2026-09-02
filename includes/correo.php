@@ -214,3 +214,49 @@ function enviarCodigoCorreoContacto(string $para, string $codigo, int $minutos, 
 
     return enviarCorreo($para, $asunto, $cuerpo);
 }
+
+/**
+ * El código para confirmar el correo NUEVO de la cuenta (punto 18 de
+ * docs/pendientes.md, migración 25).
+ *
+ * Español fijo y no idiomaActual(), a diferencia del código de acceso:
+ * quien lo dispara es mi-cuenta.php, y esa página —como el resto de «Mi
+ * cuenta»— no tiene mecanismo de idioma propio todavía.
+ */
+function enviarCodigoCambioCorreo(string $para, string $codigo, int $minutos): bool
+{
+    [, $marca] = correoRemitente();
+
+    $asunto = "$codigo es tu código para confirmar tu correo nuevo en $marca";
+    $cuerpo = "Alguien —esperamos que tú— quiere cambiar el correo con el que entra a su cuenta de "
+            . "$marca a esta dirección.\n\n"
+            . "Tu código es:\n\n    $codigo\n\n"
+            . "Escríbelo en la página donde se pidió el cambio. Caduca en $minutos minutos y sirve una "
+            . "sola vez.\n\n"
+            . "Si no reconoces esto, no hagas nada: sin ese código no se activa nada, y el código deja "
+            . "de valer solo.\n\n"
+            . "--\n$marca · Directorio de actividades wellness en México";
+
+    return enviarCorreo($para, $asunto, $cuerpo);
+}
+
+/**
+ * Avisa al correo VIEJO de que el cambio ya se hizo. Es el único de los
+ * cuatro pasos que detecta un secuestro —alguien con acceso al buzón nuevo,
+ * pero no al viejo, pidiendo el cambio—, así que llega DESPUÉS de que el
+ * cambio ya es un hecho, no antes: antes de eso no hay nada que avisar.
+ */
+function enviarAvisoCambioCorreo(string $correoViejo, string $correoNuevo): bool
+{
+    [, $marca] = correoRemitente();
+
+    $asunto = "El correo de tu cuenta de $marca cambió";
+    $cuerpo = "El correo con el que entras a tu cuenta de $marca cambió de esta dirección a "
+            . "$correoNuevo.\n\n"
+            . "Si fuiste tú, no hace falta que hagas nada más.\n\n"
+            . "Si no reconoces este cambio, escríbenos de inmediato" . (correoSoporte() !== '' ? " a " . correoSoporte() : '')
+            . " para recuperar tu cuenta.\n\n"
+            . "--\n$marca · Directorio de actividades wellness en México";
+
+    return enviarCorreo($correoViejo, $asunto, $cuerpo);
+}

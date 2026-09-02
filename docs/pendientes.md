@@ -325,29 +325,44 @@ las actividades ya publicadas de quien nunca aceptó que su número saliera.
 
 ---
 
-### 2g. Cambiar el correo desde «Mi cuenta»
+### 2g / 18. Cambiar el correo desde «Mi cuenta» — cerrado (2026-09-02)
 
-**Qué falta:** el flujo para que alguien cambie su propio correo.
+**Hecho:** las cuatro piezas que pedía este punto, migración 25
+(`database/migracion-25-cambio-correo-cuenta.sql`, tabla
+`codigos_cambio_correo` — aparte de `codigos_acceso`, por el mismo motivo que
+`codigos_correo_contacto` de la migración 24: un código aquí no debe poder
+invalidar sin querer un código de acceso, ni al revés—):
 
-**Dónde:** `mi-cuenta.php`. Hoy el correo se enseña pero no se edita, y la
-página explica por qué en pantalla.
+1. `solicitarCambioCorreo()` (`includes/auth.php`) comprueba que el correo
+   nuevo no tenga ya cuenta, y que no sea el mismo que ya tiene.
+2. Manda el código al correo NUEVO (`enviarCodigoCambioCorreo()`,
+   `includes/correo.php`) y lo guarda como pendiente, sin tocar todavía
+   `usuarios.email`.
+3. `confirmarCambioCorreo()` cambia el correo solo si el código es el
+   correcto —y por si acaso alguien más se registró con ese correo mientras
+   el código estaba pendiente, lo vuelve a comprobar antes de guardar—.
+4. Avisa al correo VIEJO (`enviarAvisoCambioCorreo()`) justo después del
+   cambio, por si no fue su dueño quien lo pidió —el único de los cuatro
+   pasos que detecta un secuestro—.
 
-**Por qué no se hizo ya:** aquí no hay contraseñas — el correo *es* la
-credencial, y el código de acceso va justo a ese buzón. Un cambio sin verificar
-antes el buzón nuevo deja a esa persona fuera de su cuenta **para siempre**, sin
-ninguna forma de recuperarla: basta un dedazo. No es una validación de formato
-lo que falta, es un flujo entero.
+**Dónde:** `mi-cuenta.php`, dentro del mismo `<form>` de nombre/WhatsApp/
+Instagram/sitio web —el campo de correo sigue `disabled`, pero ahora hay
+botones de envío con su propio `name` para pedir el código, confirmarlo o
+cancelarlo, con `formnovalidate` para que el «Nombre» obligatorio no los
+bloquee—. Mismo patrón que ya se usó para el correo de contacto por
+actividad (migración 24).
 
-**Lo que hace falta para cerrarlo:**
+Probado de punta a punta contra Apache/MySQL reales: correo ya registrado
+(rechazado), mismo correo actual (rechazado), código incorrecto (avisa
+cuántos intentos quedan), código correcto (cambia el correo, marca
+`email_verificado_en`, y llega el aviso al buzón viejo) y cancelar (vuelve
+al estado inicial sin cambiar nada).
 
-1. Comprobar que el correo nuevo no tiene ya cuenta.
-2. Mandar un código **al correo nuevo** y guardar el cambio como pendiente.
-3. Cambiarlo solo al confirmar ese código.
-4. Avisar al correo viejo de que se cambió, por si no fue su dueño quien lo
-   pidió. Es el paso que suele faltar y el único que detecta un secuestro.
-
-Mientras tanto, la página dice que se escriba para cambiarlo. Es honesto, pero
-no aguanta muchos organizadores.
+**Sigue pendiente ejecutar `database/migracion-25-cambio-correo-cuenta.sql`**
+en phpMyAdmin, en pruebas y en producción —solo crea la tabla nueva, no toca
+ninguna existente—. Mientras no se corra, el campo "Cambiar correo" de «Mi
+cuenta» falla con un error de tabla desconocida en cuanto alguien intenta
+usarlo.
 
 ---
 

@@ -168,6 +168,37 @@ CREATE TABLE IF NOT EXISTS codigos_correo_contacto (
 
 
 -- ----------------------------------------------------------------------------
+--  codigos_cambio_correo (migración 25)
+--
+--  El mismo patrón que codigos_correo_contacto, otra vez aparte a propósito:
+--  un código aquí confirma un cambio de correo de UNA cuenta (usuario_id), no
+--  da acceso —no reemplaza a codigos_acceso—. Ver mi-cuenta.php y
+--  includes/auth.php (solicitarCambioCorreo(), confirmarCambioCorreo()).
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS codigos_cambio_correo (
+  id           BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  usuario_id   INT UNSIGNED     NOT NULL,
+  email_nuevo  VARCHAR(190)     NOT NULL,
+  codigo_hash  VARCHAR(255)     NOT NULL,
+
+  intentos     TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  expira_en    DATETIME         NOT NULL,
+  usado_en     DATETIME         NULL DEFAULT NULL,
+
+  ip           VARBINARY(16)    NOT NULL COMMENT 'inet_pton: vale para IPv4 e IPv6',
+  creado_en    DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+  KEY idx_cce_usuario (usuario_id, creado_en),
+  KEY idx_cce_expira (expira_en),
+
+  CONSTRAINT fk_cce_usuario
+    FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ----------------------------------------------------------------------------
 --  eventos
 --
 --  DOS NOMBRES QUE CHOCAN, Y CÓMO SE RESUELVEN

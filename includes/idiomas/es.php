@@ -667,6 +667,12 @@ return [
     'auth.google_sin_datos'      => 'Google no devolvió los datos necesarios.',
     'auth.correo_ya_registrado'  => 'Ese correo ya está registrado. Entra pidiendo un código.',
 
+    // ---- Cambio de correo de la cuenta (mi-cuenta.php, punto 18 de docs/pendientes.md) ----
+    'cuenta.cambio_correo.error_mismo'      => 'Ese ya es tu correo actual.',
+    'cuenta.cambio_correo.error_registrado' => 'Ese correo ya tiene una cuenta. Si es tuya, entra con ese correo en vez de cambiar esta.',
+    'cuenta.cambio_correo.enviado'          => 'Te enviamos un código a %s. Revisa tu bandeja.',
+    'cuenta.cambio_correo.confirmado'       => 'Listo: %s ya es el correo con el que entras.',
+
     // ---- Consentimiento de cookies (REQ-00003) ----
     // OMDARA en mayúsculas aquí, a propósito: el cliente pidió (2026-09-02)
     // bajar "OMDARA" a "Omdara" en todo el sitio EXCEPTO en los textos de la
