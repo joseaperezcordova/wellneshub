@@ -666,6 +666,39 @@ de contenido pendiente de traducir de la sección 3.
 
 ---
 
+### 2q. Preguntas frecuentes — texto del cliente (2026-09-02)
+
+**Hecho:** en el bloque «Para usuarios» de `preguntas-frecuentes.php`, la
+pregunta 1 («¿Qué es Omdara?») y la pregunta 4 («¿Omdara organiza las
+actividades?») se reemplazaron con el texto que mandó el cliente, y se
+agregaron sus dos preguntas nuevas justo después de la 4 («¿Puedo reservar o
+comprar una actividad en Omdara?» y «¿Omdara garantiza las actividades
+publicadas?»).
+
+**Pendiente de decidir — «Omdara» en vez de «OMDARA» en todo el sitio.** El
+cliente pidió explícitamente que la marca se escriba «Omdara» —solo la
+primera con mayúscula— en cualquier texto normal, y que «OMDARA» completo en
+mayúsculas quede reservado a los textos legales. Se aplicó dentro de
+`preguntas-frecuentes.php` (las dos preguntas de arriba y la respuesta de
+«¿Puedo cancelar una reserva?», que también decía «OMDARA»), pero el mismo
+«OMDARA» en mayúsculas aparece en más sitios que esta tarea no tocó:
+`como-funciona.php` (el cuerpo entero), los correos que arma el código
+(`includes/contacto.php`, `includes/eventos.php`, `includes/correo.php`),
+las meta descriptions (`includes/idiomas/es.php`/`en.php`, claves
+`pagina.*.meta`), `mi-cuenta.php`, `metricas.php` y `diagnostico-correo.php`.
+Aparte quedan, a propósito, sitios donde «OMDARA» no es texto de marca sino
+un identificador técnico que no se debe tocar —el user-agent de
+`includes/mapa.php`, la constante `OMDARA_ARRANCADO`
+(`includes/config.php`), la variable de JavaScript `OMDARA_COOKIES`
+(`includes/layout.php`)— y la duda mayor: `'marca.nombre' => 'OMDARA'`
+(`includes/idiomas/{es,en}.php`), el logotipo del sitio, que sale en la
+cabecera, el pie y el `<title>` de cada página. Cambiarlo sería una decisión
+de diseño —¿el logotipo también baja a «Omdara», o es la excepción porque es
+un wordmark y no un texto corrido?—, no solo un cambio de texto, así que se
+deja para que el cliente lo confirme antes de tocarlo.
+
+---
+
 ## Decisiones de diseño abiertas
 
 ### 2c. ¿El contacto tiene que flotar sobre la ficha?

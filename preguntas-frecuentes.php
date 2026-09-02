@@ -52,8 +52,13 @@ $categoriasTexto = implode(', ', array_keys(categoriasMenu()));
 $bloques = [
     'Para usuarios' => [
         [
-            '¿Qué es OMDARA?',
-            'Es una plataforma para descubrir actividades, clases, talleres, retiros y eventos de bienestar en un solo lugar.',
+            /*
+             * Texto del cliente, 2026-09-02: reemplaza la pregunta y respuesta
+             * anteriores tal cual las mandó.
+             */
+            '¿Qué es Omdara?',
+            'Omdara es un directorio de actividades y experiencias de bienestar que conecta a personas con '
+            . 'organizadores.',
         ],
         [
             '¿Tiene algún costo usar la plataforma?',
@@ -65,9 +70,22 @@ $bloques = [
             . 'solicitar información, reservar o comprar boletos, según corresponda.',
         ],
         [
-            '¿OMDARA organiza los eventos?',
-            'No. Somos una plataforma que conecta a los usuarios con los organizadores. Cada organizador es responsable '
-            . 'de su evento: de lo que ofrece, de sus precios y de sus condiciones.',
+            /* Texto del cliente, 2026-09-02: mismo criterio que la pregunta 1. */
+            '¿Omdara organiza las actividades?',
+            'No. Las actividades son organizadas y ofrecidas por terceros. Omdara funciona como una plataforma de '
+            . 'conexión entre usuarios y organizadores.',
+        ],
+        [
+            /* Nueva, texto del cliente, 2026-09-02. */
+            '¿Puedo reservar o comprar una actividad en Omdara?',
+            'Depende del organizador. Algunas actividades permiten solicitar información, reservar o comprar entradas '
+            . 'mediante los canales indicados en cada publicación.',
+        ],
+        [
+            /* Nueva, texto del cliente, 2026-09-02. */
+            '¿Omdara garantiza las actividades publicadas?',
+            'Omdara busca publicar información clara y verificable, pero no organiza ni presta los servicios '
+            . 'ofrecidos por los organizadores.',
         ],
         [
             '¿Cómo sé si un evento sigue disponible?',
@@ -75,7 +93,7 @@ $bloques = [
         ],
         [
             '¿Puedo cancelar una reserva?',
-            'Las cancelaciones y reembolsos dependen de las políticas de cada organizador. OMDARA no gestiona pagos ni '
+            'Las cancelaciones y reembolsos dependen de las políticas de cada organizador. Omdara no gestiona pagos ni '
             . 'reservas, así que no puede cancelarlas ni devolver un importe.',
         ],
         [
