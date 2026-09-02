@@ -645,6 +645,27 @@ Ninguna requiere quitar código después.
 
 ---
 
+### 2p. Página «Sobre Omdara» — implementada
+
+**Requerimiento del cliente, 2026-09-02:** una sección nueva en el pie
+—«Sobre Omdara», debajo de «Explora», nunca en el menú principal— que lleva a
+una página propia con misión, visión y los cinco valores, con el texto tal
+como lo mandó.
+
+**Hecho:** `sobre-omdara.php` (rutas `/sobre-omdara` y `/about-omdara`,
+`includes/idioma.php`), enlazada como columna propia del pie
+(`includes/layout.php`, entre «Explora» y «Para organizadores»; el grid del
+pie pasó de 5 a 6 columnas, `assets/css/portada.css`) y dada de alta en
+`sitemap.php`. Probado en los dos idiomas y contra el pie de la portada real.
+
+**Igual que «¿Cómo funciona?» y las tres páginas legales:** el texto no se
+corrige —es texto que compromete a la empresa—, y el cuerpo se queda en
+español a propósito; lo que sí tiene versión en inglés es el armazón —el
+título de pestaña y el enlace del pie («About Omdara»)—. Se suma a la lista
+de contenido pendiente de traducir de la sección 3.
+
+---
+
 ## Decisiones de diseño abiertas
 
 ### 2c. ¿El contacto tiene que flotar sobre la ficha?

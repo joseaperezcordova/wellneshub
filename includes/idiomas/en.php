@@ -46,6 +46,7 @@ return [
 
     // ---- Pie ----
     'pie.explora'      => 'Explore',
+    'pie.sobre_omdara' => 'About Omdara',
     'pie.organizadores'=> 'For organizers',
     'pie.ayuda'        => 'Help',
     'pie.legal'        => 'Legal',
@@ -74,6 +75,7 @@ return [
     'pagina.inicio.titulo'        => 'Wellness activities directory in Mexico',
     'pagina.buscar.titulo'        => 'Search activities',
     'pagina.como_funciona.titulo' => 'How it works',
+    'pagina.sobre_omdara.titulo'  => 'About Omdara',
     'pagina.faq.titulo'           => 'Frequently asked questions',
     'pagina.terminos.titulo'      => 'Terms and Conditions',
     'pagina.privacidad.titulo'    => 'Privacy Notice',

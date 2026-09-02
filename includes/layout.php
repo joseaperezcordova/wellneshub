@@ -466,6 +466,13 @@ function pie(): void
       <a href="<?= e(url('actividades')) ?>"><?= et('pie.actividades') ?></a>
     </div>
     <div>
+      <?php /* Columna propia y no un enlace más dentro de EXPLORA: así lo pidió
+               el cliente (2026-09-02), y solo va aquí —nunca en el menú
+               principal—. */ ?>
+      <h5><?= et('pie.sobre_omdara') ?></h5>
+      <a href="<?= e(url('sobre-omdara')) ?>"><?= et('pie.sobre_omdara') ?></a>
+    </div>
+    <div>
       <h5><?= et('pie.organizadores') ?></h5>
       <a href="<?= e(url('publicar')) ?>"><?= et('pie.publicar') ?></a>
       <a href="<?= e(url('como-funciona')) ?>"><?= et('pie.como_funciona') ?></a>

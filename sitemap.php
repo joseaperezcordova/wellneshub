@@ -36,6 +36,7 @@ $prioridades = [
     'inicio'        => ['1.0', 'daily'],
     'actividades'   => ['0.8', 'daily'],
     'como-funciona' => ['0.6', 'monthly'],
+    'sobre-omdara'  => ['0.4', 'monthly'],
     'faq'           => ['0.5', 'monthly'],
     'contacto'      => ['0.5', 'monthly'],
     'blog'          => ['0.4', 'weekly'],

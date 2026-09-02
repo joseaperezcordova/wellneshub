@@ -46,6 +46,7 @@ return [
     // ---- Pie ----
     'pie.lema'         => 'Tu guía de experiencias de bienestar en México. Conecta con actividades que nutren cuerpo, mente y alma.',
     'pie.explora'      => 'Explora',
+    'pie.sobre_omdara' => 'Sobre Omdara',
     'pie.organizadores'=> 'Para organizadores',
     'pie.ayuda'        => 'Ayuda',
     'pie.legal'        => 'Legal',
@@ -72,6 +73,8 @@ return [
     'pagina.buscar.meta'          => 'Busca actividades de bienestar en México por ciudad, fecha y categoría: retiros, festivales, yoga, breathwork y más.',
     'pagina.como_funciona.titulo' => 'Cómo funciona',
     'pagina.como_funciona.meta'   => 'Cómo encontrar actividades de bienestar en OMDARA y cómo publicar la tuya si eres organizador.',
+    'pagina.sobre_omdara.titulo'  => 'Sobre Omdara',
+    'pagina.sobre_omdara.meta'    => 'Qué es OMDARA, nuestra misión, nuestra visión y en qué creemos.',
     'pagina.faq.titulo'           => 'Preguntas frecuentes',
     'pagina.faq.meta'             => 'Dudas habituales sobre cómo publicar una actividad en OMDARA, contactar a un organizador y cómo se revisa lo que se publica.',
     'pagina.terminos.titulo'      => 'Términos y Condiciones',

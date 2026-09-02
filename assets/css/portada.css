@@ -638,12 +638,13 @@
      mismo color de marca. No --jungle-deep, que hoy vale el verde carbon del
      texto y dejaria el pie casi negro. */
   footer{background:var(--jungle); color:rgba(255,255,255,0.85); margin-top:20px;}
-  /* Cinco columnas: la marca y las cuatro de navegacion. No son iguales de
+  /* Seis columnas: la marca y las cinco de navegacion —"Sobre Omdara" se sumo
+     el 2026-09-02, entre Explora y Para organizadores—. No son iguales de
      ancho a proposito — "Terminos y Condiciones" ocupa el doble que
      "Actividades", y repartir a partes iguales parte la primera en dos lineas
      mientras la otra deja medio hueco vacio. */
-  .foot-inner{max-width:1180px; margin:0 auto; padding:48px 28px 30px; display:grid; grid-template-columns:1.5fr .9fr 1.15fr 1fr 1.2fr; gap:30px;}
-  /* En tablet las cuatro de navegacion no caben en fila, pero tres si. La
+  .foot-inner{max-width:1180px; margin:0 auto; padding:48px 28px 30px; display:grid; grid-template-columns:1.5fr .9fr 1fr 1.15fr 1fr 1.2fr; gap:30px;}
+  /* En tablet las cinco de navegacion no caben en fila, pero tres si. La
      marca pasa a ocupar el ancho completo: es la que lleva el parrafo largo y
      los iconos, y encajonada en un tercio se lee peor que nadie. */
   @media(max-width:980px){

@@ -96,6 +96,11 @@ function rutasSitio(): array
             'es' => 'como-funciona',
             'en' => 'how-it-works',
         ],
+        'sobre-omdara' => [
+            'archivo' => 'sobre-omdara.php',
+            'es' => 'sobre-omdara',
+            'en' => 'about-omdara',
+        ],
         'faq' => [
             'archivo' => 'preguntas-frecuentes.php',
             'es' => 'preguntas-frecuentes',

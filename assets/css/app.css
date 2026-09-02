@@ -1286,6 +1286,23 @@ form .btn-principal + .casilla-legal{
   .guia-acciones .btn-cta{width:100%;}
 }
 
+/* ------------------------------------------------- «Sobre Omdara» -- */
+.sobre-bloque{max-width:680px; margin:0 0 40px;}
+.sobre-bloque h2{font-size:21px; margin-bottom:10px;}
+.sobre-bloque p{font-size:15.5px; line-height:1.7; color:var(--gris); margin:0;}
+/* «Lo que creemos» no tiene el max-width:680px del resto de bloques: es una
+   parrilla y necesita todo el ancho del contenido para repartir sus cinco
+   tarjetas, que si no se apilan en una sola columna aun con sitio de sobra. */
+.valores-grid{
+  list-style:none; padding:0; margin:0; max-width:none;
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px;
+}
+.valor{
+  padding:20px; border:1px solid var(--linea); border-radius:14px; background:var(--blanco);
+}
+.valor h3{font-family:'Fraunces',serif; font-weight:500; font-size:16.5px; margin-bottom:6px;}
+.valor p{font-size:14px; line-height:1.6; color:var(--gris); margin:0;}
+
 /* ------------------------------------------- paginas legales (REQ-00014) -- */
 /* Las tres comparten cabecera y ancho. Antes cada una traia su propio bloque de
    titulo copiado, con sus margenes escritos a mano: la tercera que se tocara
