@@ -182,6 +182,12 @@ function categorias(): array
  * 1.8, remates redondeados): no es un juego de iconos importado, es dibujado
  * a mano con la misma regla visual que el resto del sitio.
  *
+ * Las 20 categorías que se agregaron el 2026-09-02 llegaron sin su icono de
+ * línea —se dibujaron aquí en la misma tanda—, y mientras tanto se veían en
+ * el carril como emoji de color, rompiendo la regla de arriba. Ya no hay
+ * ninguna categoría que dependa del `?? e($catDatos[0])` de index.php: todas
+ * tienen su entrada aquí.
+ *
  * @return array<string, string> nombre de categoría => SVG completo
  */
 function iconosLineaCategoria(): array
@@ -221,6 +227,17 @@ function iconosLineaCategoria(): array
         'Triatlón'           => $svg('<path d="M3 18c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/>'
             . '<circle cx="12" cy="8" r="2"/><path d="M9 12l3-2 3 2"/>'),
         'Surf'               => $svg('<path d="M3 15c3-4 6-4 9 0s6 4 9 0"/><path d="M6 19l12-10"/>'),
+        // Agregadas, requerimiento del cliente 2026-09-02 (nuevas categorías)
+        'Natación'           => $svg('<path d="M3 17c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/>'
+            . '<path d="M8 13l5-6 3 2-2 2.5"/>'),
+        'Paddleboard'        => $svg('<path d="M3 16c4 1.5 14 1.5 18 0"/><path d="M12 3v13"/><path d="M9 5h6"/>'),
+        'Kayak'              => $svg('<path d="M3 15c4-4 14-4 18 0-4 4-14 4-18 0z"/><path d="M6 6l12 12"/>'),
+        'Buceo'              => $svg('<path d="M6 10a6 6 0 0 1 12 0v3a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z"/>'
+            . '<path d="M9 10v3M15 10v3"/>'),
+        'Snorkeling'         => $svg('<path d="M4 12c4-4 10-4 14 0-4 4-10 4-14 0z"/><path d="M18 12l3-2.2v4.4z"/>'),
+        'Freediving'         => $svg('<path d="M12 4v6"/><path d="M12 10c-1-3-4-3-5 0-1 3 0 8 2 8s3-3 3-5"/>'
+            . '<path d="M12 10c1-3 4-3 5 0 1 3 0 8-2 8s-3-3-3-5"/>'),
+        'Escalada'           => $svg('<circle cx="12" cy="6" r="2.2"/><path d="M12 8.2v9"/><path d="M8 21h8"/>'),
 
         'Nutrición'          => $svg('<path d="M12 8c3-2 6 0 6 4.5S15 20 12 20s-6-3-6-7.5S9 6 12 8z"/>'
             . '<path d="M12 8V5.5M12 5.5c0-1 .8-1.5 2-1.5"/>'),
@@ -232,6 +249,31 @@ function iconosLineaCategoria(): array
         'Biohacking'         => $svg('<path d="M13 3L6 13h5l-1 8 7-10h-5z"/>'),
         'Longevidad'         => $svg('<path d="M6 3h12M6 21h12"/>'
             . '<path d="M7 3c0 4 3 6 5 8 2-2 5-4 5-8M7 21c0-4 3-6 5-8 2 2 5 4 5 8"/>'),
+        // Agregadas, requerimiento del cliente 2026-09-02 (nuevas categorías)
+        'Ice Bath'           => $svg('<path d="M4 13h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/>'
+            . '<path d="M4 13V9a2 2 0 0 1 2-2"/><rect x="14" y="5" width="3.2" height="3.2" rx=".5"/>'),
+        'Recuperación'       => $svg('<path d="M3 12h4l2-6 4 12 2-6h6"/>'),
+        'Medicina Holística' => $svg('<path d="M6 14a6 6 0 0 0 12 0z"/><path d="M12 14V6"/><path d="M9 8l3-2 3 2"/>'),
+
+        // Movimiento (agregadas, requerimiento del cliente 2026-09-02)
+        'Stretching'         => $svg('<circle cx="12" cy="5" r="2"/><path d="M12 7v6"/>'
+            . '<path d="M12 8l-4-4M12 8l4-4"/><path d="M12 13l-3 6M12 13l3 6"/>'),
+        'Movilidad'          => $svg('<path d="M5 12a7 7 0 0 1 12-4.9"/><path d="M17 4v4h-4"/>'
+            . '<path d="M19 12a7 7 0 0 1-12 4.9"/><path d="M7 20v-4h4"/>'),
+        'Danza'              => $svg('<circle cx="12" cy="5" r="2"/><path d="M12 7v6"/>'
+            . '<path d="M12 9l-4-1M12 9l4 2"/><path d="M12 13l-2 6M12 13l4-2 2 4"/>'),
+        'Calistenia'         => $svg('<path d="M4 6h16"/><path d="M12 6v3"/><circle cx="12" cy="10.5" r="1.6"/>'
+            . '<path d="M12 12l-3 5M12 12l3 5"/>'),
+        'Barre'              => $svg('<path d="M4 16h16"/><path d="M7 16v4M17 16v4"/><path d="M9 20c1-5 3-8 6-9"/>'),
+        'Artes Marciales'    => $svg('<path d="M3 12h18"/><path d="M9 9l-2 3 2 3M15 9l2 3-2 3"/>'),
+        'Fitness'            => $svg('<path d="M6 12h12"/><path d="M8 9v6M16 9v6"/><path d="M4 10v4M20 10v4"/>'),
+
+        // Salud mental (agregadas, requerimiento del cliente 2026-09-02)
+        'Salud Mental'       => $svg('<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>'),
+        'Coaching'           => $svg('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/>'
+            . '<circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>'),
+        'Mindfulness'        => $svg('<path d="M18.5 8A7.5 7.5 0 1 1 12 4.5"/>'),
+        'Journaling'         => $svg('<path d="M6 4h9l3 3v13H6z"/><path d="M15 4v3h3"/><path d="M9 12h6M9 15h6"/>'),
     ];
 }
 
