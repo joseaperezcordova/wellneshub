@@ -686,30 +686,41 @@ sitio, pero en una tabla aparte (`codigos_correo_contacto`) para que pedir uno
 no interfiera con el otro. Antes de confirmarlo, la actividad sigue usando el
 correo de la cuenta —nunca se activa un correo sin confirmar—.
 
-**Dónde:** `/editar-actividad/{id}` (`evento-editar.php`), sección «Correo de
-contacto de esta actividad», fuera del formulario grande porque un `<form>`
-no puede ir dentro de otro —el archivo nuevo es
-`includes/correo-contacto-evento.php`—. Las funciones viven en
-`includes/eventos.php` (`correoContactoEvento()`,
-`solicitarCodigoCorreoContacto()`, `confirmarCodigoCorreoContacto()`,
-`cancelarCodigoCorreoContacto()`, `quitarCorreoContactoEvento()`), y
-`includes/contacto.php` (`avisarOrganizador()`) ya usa
-`correoContactoEvento($ev)` en vez de `$ev['organizador_email']` a secas.
+**Dónde (actualizado 2026-09-02, segunda entrega):** ya no es una sección
+aparte. Vive dentro de la sección «8. Acción principal», en la tarjeta
+«Solicitar información» —`includes/form-evento.php`—, tal como lo pidió el
+cliente en un requerimiento aparte ("Actividad: configuración de CTA y
+contacto"). Un `<form>` no puede ir dentro de otro, así que sus botones
+("Enviar código", "Confirmar", "Cancelar") son botones de envío normales,
+con su propio `name`, dentro del mismo formulario grande; `evento-nuevo.php`
+y `evento-editar.php` leen esos `name` antes de la validación de todo lo
+demás. La casilla "Usar el correo de mi cuenta" no tiene botón propio: para
+volver al correo de la cuenta basta marcarla y guardar el formulario normal.
+El archivo aparte que existía antes (`includes/correo-contacto-evento.php`)
+se eliminó. Las funciones siguen en `includes/eventos.php`
+(`correoContactoEvento()`, `solicitarCodigoCorreoContacto()`,
+`confirmarCodigoCorreoContacto()`, `cancelarCodigoCorreoContacto()`,
+`quitarCorreoContactoEvento()`), y `includes/contacto.php`
+(`avisarOrganizador()`) sigue usando `correoContactoEvento($ev)` en vez de
+`$ev['organizador_email']` a secas.
 
 **Qué NO cambia:** el correo con el que se recibe un reporte de moderación
 (`moderacion.php`) sigue mostrando el de la cuenta del organizador, a
 propósito —para eso, administración necesita el correo real de quien es
 dueño de la cuenta, no uno que puso para enrutar mensajes de contacto—.
 
-**Alcance de esta primera entrega:** solo se puede fijar un correo de
-contacto DESPUÉS de crear la actividad (en «Editar»), no en el momento de
-publicarla por primera vez —`evento-nuevo.php` no la toca—. La actividad
-recién creada necesita su propio id antes de poder pedirle un código a un
-correo, así que hacerlo en el mismo formulario de alta habría significado
-meter esa verificación dentro de una página que también sube una imagen
-(`multipart/form-data`), una complicación aparte que no se pidió resolver
-ahora. Mientras tanto, toda actividad nueva usa el correo de la cuenta hasta
-que su organizador entra a editarla.
+**Ya no está limitado a «Editar».** La primera entrega solo lo permitía ahí,
+porque pedir un código necesita el id de la actividad. El requerimiento del
+cliente pedía además que apareciera en el alta, así que ahora
+`evento-nuevo.php` también lo resuelve: si al publicar se desmarcó "usar el
+correo de mi cuenta" y se escribió uno, el código se manda en la misma
+petición que crea la actividad —justo por eso no hay un botón "Enviar
+código" aparte en el alta: el botón "Publicar" hace las dos cosas—, y la
+redirección de después de publicar cambia de la ficha a «Editar» para que
+ahí se pueda escribir el código que se acaba de mandar. "La actividad podrá
+guardarse como borrador mientras el correo esté pendiente de verificación"
+—tal como pidió el cliente— ya era el comportamiento por diseño: crear o
+guardar la actividad nunca dependió de que el correo estuviera confirmado.
 
 **Qué pasa mientras tanto:** "Contactar al organizador" sigue funcionando
 igual —al correo de la cuenta, como siempre—. Antes de correr la migración,

@@ -243,12 +243,9 @@ return [
     'evento.form.sitio_web_actividad_ayuda' => 'Share a website or social profile so interested people can learn more about you or this activity.',
 
     // Per-activity contact email (migration 24, client 2026-09-02)
-    'evento.correo_contacto.titulo'       => 'Contact email for this activity',
-    'evento.correo_contacto.explicacion'  => '"Contact organizer" messages for this activity land here. It defaults to your account email; you can use another one once you confirm it.',
-    'evento.correo_contacto.actual_cuenta'=> 'Right now it uses your account email:',
-    'evento.correo_contacto.actual_propio'=> 'Right now it uses:',
-    'evento.correo_contacto.quitar_btn'   => 'Use my account email',
-    'evento.correo_contacto.nuevo_label'  => 'Use another email',
+    'evento.correo_contacto.campo_label'  => 'Contact email',
+    'evento.correo_contacto.usar_cuenta'  => 'Use my account email',
+    'evento.correo_contacto.info_texto'   => 'Interested people will be able to send you an information request from Omdara. You\'ll get their details and message at this email.',
     'evento.correo_contacto.nuevo_placeholder' => 'another@email.com',
     'evento.correo_contacto.enviar_btn'   => 'Send code',
     'evento.correo_contacto.pendiente_texto' => 'We sent a code to %s. Enter it here to confirm it:',
@@ -262,6 +259,7 @@ return [
     'evento.correo_contacto.error_demasiadas_ip' => 'Too many requests from this connection. Try again later.',
     'evento.correo_contacto.enviado'      => 'We sent a code to %s. Check your inbox.',
     'evento.correo_contacto.confirmado'   => 'Done: %s is now this activity\'s contact email.',
+    'evento.correo_contacto.quitado'      => 'Done: you\'re back to using your account email.',
 
     'evento.form.seccion8'           => '8. Main action',
     'evento.form.accion_ayuda'       => 'Choose the main action people will see on your activity.',

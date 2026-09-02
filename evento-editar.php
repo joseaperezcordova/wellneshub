@@ -47,10 +47,15 @@ $puede = puedeEditarEvento($ev, $u);
 $e       = $ev;
 $errores = [];
 
-// Correo de contacto de esta actividad (migración 24): fuera del formulario
-// grande a propósito —ver includes/correo-contacto-evento.php—, así que sus
-// tres acciones se comprueban antes de entrar al bloque del formulario
-// grande, y ese bloque se queda como «ninguna de las tres».
+// Correo de contacto de esta actividad (migración 24): sus botones viven
+// DENTRO del formulario grande —includes/form-evento.php, tarjeta "Solicitar
+// información" de la sección 8— pero sus tres acciones (enviar código,
+// confirmar, cancelar) no tienen nada que ver con guardar el resto de
+// campos, así que se comprueban antes de entrar al bloque que sí los valida
+// y guarda, y ese bloque se queda como «ninguna de las tres». La cuarta
+// acción posible —volver al correo de la cuenta— no tiene botón propio: se
+// resuelve con la casilla «Usar el correo de mi cuenta», más abajo, en el
+// mismo guardado normal.
 $avisoCorreoContacto = '';
 $errorCorreoContacto = '';
 
@@ -79,11 +84,6 @@ if ($puede && postDesbordado()) {
 } elseif ($puede && isset($_POST['cancelar_codigo_correo'])) {
     cancelarCodigoCorreoContacto((int) $ev['id']);
 
-} elseif ($puede && isset($_POST['quitar_codigo_correo'])) {
-    quitarCorreoContactoEvento((int) $ev['id']);
-    $ev = buscarEvento((int) $ev['id']) ?? $ev;
-    $e  = $ev;
-
 } elseif ($puede && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // La que ya tiene guardada. No mandar archivo significa «déjala como está»,
     // no «bórrala».
@@ -111,7 +111,20 @@ if ($puede && postDesbordado()) {
             borrarImagenGuardada($imagenPrevia);
         }
 
-        $_SESSION['evento_aviso'] = t('evento.editar.cambios_guardados');
+        // La casilla "Usar el correo de mi cuenta" no tiene su propio botón:
+        // se aplica al guardar, como cualquier otro campo del formulario. Si
+        // ya había un correo propio confirmado y la casilla llegó marcada,
+        // es que se quiere volver al de la cuenta —sin código, porque ese
+        // correo ya está verificado desde que se usa para entrar—.
+        $volvioAlCorreoDeCuenta = !empty($_POST['usar_correo_cuenta'])
+            && trim((string) ($ev['correo_contacto'] ?? '')) !== '';
+        if ($volvioAlCorreoDeCuenta) {
+            quitarCorreoContactoEvento((int) $ev['id']);
+        }
+
+        $_SESSION['evento_aviso'] = $volvioAlCorreoDeCuenta
+            ? t('evento.correo_contacto.quitado')
+            : t('evento.editar.cambios_guardados');
         $_SESSION['eventos_ga'] = [
             ['nombre' => 'editar_actividad', 'params' => ['id' => (int) $ev['id'], 'categoria' => $e['categoria']]],
         ];
@@ -188,13 +201,6 @@ require __DIR__ . '/includes/layout.php';
       <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
       <?php $textoBoton = t('evento.editar.boton'); require __DIR__ . '/includes/form-evento.php'; ?>
     </form>
-
-    <?php
-    $correoPendiente = correoContactoPendiente((int) $ev['id']);
-    $correoEfectivo  = correoContactoEvento($ev);
-    $tieneOverride   = trim((string) ($ev['correo_contacto'] ?? '')) !== '';
-    require __DIR__ . '/includes/correo-contacto-evento.php';
-    ?>
 
     <?php /* Mismas comprobaciones que ya hace evento.php al recibir el POST
              —permiso de admin para republicar, plazo para borrar—: estos botones

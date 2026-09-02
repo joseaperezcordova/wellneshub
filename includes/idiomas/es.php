@@ -272,12 +272,9 @@ return [
     'evento.form.sitio_web_actividad_ayuda' => 'Comparte un sitio web o perfil de redes sociales para que los interesados conozcan más sobre ti o esta actividad.',
 
     // Correo de contacto por actividad (migración 24, cliente 2026-09-02)
-    'evento.correo_contacto.titulo'       => 'Correo de contacto de esta actividad',
-    'evento.correo_contacto.explicacion'  => 'Aquí llegan los mensajes de «Contactar al organizador» de esta actividad. Por defecto es el correo de tu cuenta; puedes usar otro si lo confirmas primero.',
-    'evento.correo_contacto.actual_cuenta'=> 'Ahora mismo usa el correo de tu cuenta:',
-    'evento.correo_contacto.actual_propio'=> 'Ahora mismo usa:',
-    'evento.correo_contacto.quitar_btn'   => 'Usar el correo de mi cuenta',
-    'evento.correo_contacto.nuevo_label'  => 'Usar otro correo',
+    'evento.correo_contacto.campo_label'  => 'Correo de contacto',
+    'evento.correo_contacto.usar_cuenta'  => 'Usar el correo de mi cuenta',
+    'evento.correo_contacto.info_texto'   => 'Las personas interesadas podrán enviarte una solicitud de información desde Omdara. Recibirás sus datos y mensaje en este correo.',
     'evento.correo_contacto.nuevo_placeholder' => 'otro@correo.com',
     'evento.correo_contacto.enviar_btn'   => 'Enviar código',
     'evento.correo_contacto.pendiente_texto' => 'Te mandamos un código a %s. Escríbelo aquí para confirmarlo:',
@@ -291,6 +288,7 @@ return [
     'evento.correo_contacto.error_demasiadas_ip' => 'Demasiadas peticiones desde esta conexión. Prueba más tarde.',
     'evento.correo_contacto.enviado'      => 'Te enviamos un código a %s. Revisa tu bandeja.',
     'evento.correo_contacto.confirmado'   => 'Listo: %s ya es el correo de contacto de esta actividad.',
+    'evento.correo_contacto.quitado'      => 'Listo: vuelve a usar el correo de tu cuenta.',
 
     // Sección 8
     'evento.form.seccion8'           => '8. Acción principal',

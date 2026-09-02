@@ -43,6 +43,23 @@ if (postDesbordado()) {
             $id = crearEvento($e, (int) $u['id']);
             olvidarImagenEnVuelo($e['imagen_url']);   // ya tiene dueño
 
+            /*
+             * Correo de contacto de la actividad (migración 24). La tarjeta
+             * "Solicitar información" no trae aquí un botón "Enviar código"
+             * aparte —ver includes/form-evento.php, $puedeEnviarCodigoCorreo—
+             * porque pedir un código necesita el id de la actividad, y hasta
+             * este punto no existía. Publicar es lo que lo crea, así que
+             * publicar es también lo que manda el código, en la misma
+             * petición: si se desmarcó "usar el correo de mi cuenta" y se
+             * escribió uno, se manda ahora.
+             */
+            if (($e['accion_principal'] ?? '') === 'informacion'
+                && empty($_POST['usar_correo_cuenta'])
+                && trim((string) ($_POST['correo_contacto_nuevo'] ?? '')) !== ''
+            ) {
+                solicitarCodigoCorreoContacto($id, (string) $_POST['correo_contacto_nuevo'], $e['titulo']);
+            }
+
             // Se relee para tener el slug que acaba de generarse y el nombre
             // del organizador (el JOIN de buscarEvento()), que es lo que
             // necesita el aviso a los administradores además de la ficha.
@@ -51,9 +68,15 @@ if (postDesbordado()) {
                 avisarAdminsNuevaActividad($nuevoEvento);
             }
 
-            // Si por lo que sea no viniera, urlEvento() se apaña con el id y
-            // la dirección sigue llevando a la ficha.
-            redirigir(urlEvento($nuevoEvento ?? ['id' => $id]));
+            // Si se acaba de pedir un código, la ficha no tiene dónde
+            // escribirlo —esa pantalla la trae "Editar"—. Si no, es la
+            // ficha de siempre. Si por lo que sea no viniera $nuevoEvento,
+            // las dos funciones se apañan con el id y la dirección sigue
+            // llevando al sitio correcto.
+            $destino = correoContactoPendiente($id) !== null
+                ? urlEditarEvento($nuevoEvento ?? ['id' => $id])
+                : urlEvento($nuevoEvento ?? ['id' => $id]);
+            redirigir($destino);
         }
 
         /*

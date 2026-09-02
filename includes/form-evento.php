@@ -75,6 +75,27 @@ $mal = function (string $campo) use ($errores) {
     return isset($errores[$campo]) ? ' con-error' : '';
 };
 
+/*
+ * Correo de contacto de la actividad (migración 24, requerimiento del
+ * cliente 2026-09-02): quién recibe "Contactar al organizador" para ESTA
+ * actividad. Vive dentro de la tarjeta "Solicitar información" de la
+ * sección 8, no en un <form> aparte —un <form> no puede ir dentro de otro—,
+ * así que sus botones son botones de envío normales, con su propio "name",
+ * dentro del mismo formulario grande. evento-nuevo.php y evento-editar.php
+ * leen esos "name" ANTES de la validación de todo lo demás.
+ *
+ * $puedeEnviarCodigoCorreo: pedir un código necesita que la actividad ya
+ * tenga id —el código se guarda contra esa fila—, así que en el alta
+ * (evento-nuevo.php, $e sin 'id') no hay botón de "Enviar código" suelto: el
+ * correo alternativo que se haya escrito se manda solo, como parte de crear
+ * la actividad, si se publica con ese botón. Ver evento-nuevo.php.
+ */
+$correoCuenta            = (string) (usuarioActual()['email'] ?? '');
+$correoPendiente         = isset($e['id']) ? correoContactoPendiente((int) $e['id']) : null;
+$tieneCorreoPropio       = trim((string) ($e['correo_contacto'] ?? '')) !== '';
+$correoContactoEfectivo  = $tieneCorreoPropio ? (string) $e['correo_contacto'] : $correoCuenta;
+$puedeEnviarCodigoCorreo = isset($e['id']);
+
 ?>
 
 <div class="form-seccion-titulo">
@@ -526,6 +547,63 @@ $mal = function (string $campo) use ($errores) {
                  dos cosas distintas. La guía se queda; esto se va. */ ?>
         <span class="accion-titulo"><?= et('evento.form.accion_contactar') ?></span>
       </label>
+
+      <div class="accion-campos">
+        <div class="campo">
+          <label><?= et('evento.correo_contacto.campo_label') ?> <span class="obligatorio-si">*</span></label>
+
+          <?php if (!empty($avisoCorreoContacto ?? '')): ?>
+            <div class="aviso aviso-ok"><?= e($avisoCorreoContacto) ?></div>
+          <?php endif; ?>
+          <?php if (!empty($errorCorreoContacto ?? '')): ?>
+            <div class="aviso aviso-error"><?= e($errorCorreoContacto) ?></div>
+          <?php endif; ?>
+
+          <?php if ($correoPendiente !== null): ?>
+            <?php /* Ya se pidió un código para un correo nuevo: aquí no hay nada
+                     que elegir, solo confirmarlo o cancelarlo. */ ?>
+            <p class="pista"><?= e(sprintf(t('evento.correo_contacto.pendiente_texto'), $correoPendiente)) ?></p>
+            <div class="campo">
+              <label for="codigo_correo_contacto"><?= et('evento.correo_contacto.codigo_label') ?></label>
+              <input id="codigo_correo_contacto" name="codigo_correo_contacto" type="text" inputmode="numeric"
+                     autocomplete="one-time-code" maxlength="6"
+                     placeholder="<?= et('evento.correo_contacto.codigo_placeholder') ?>">
+            </div>
+            <div class="barra-acciones">
+              <button class="btn-barra destacado" type="submit" name="confirmar_codigo_correo" value="1"
+                      formnovalidate><?= et('evento.correo_contacto.confirmar_btn') ?></button>
+              <button class="btn-barra" type="submit" name="cancelar_codigo_correo" value="1"
+                      formnovalidate><?= et('evento.correo_contacto.cancelar_btn') ?></button>
+            </div>
+          <?php else: ?>
+            <label class="check">
+              <input type="checkbox" id="usarCorreoCuenta" name="usar_correo_cuenta" value="1"
+                     <?= $tieneCorreoPropio ? '' : 'checked' ?>>
+              <span><?= et('evento.correo_contacto.usar_cuenta') ?></span>
+            </label>
+            <div class="pista" id="correoCuentaTexto"<?= $tieneCorreoPropio ? ' hidden' : '' ?>>
+              <?= e($correoCuenta) ?>
+            </div>
+
+            <div id="correoOtroBloque"<?= $tieneCorreoPropio ? '' : ' hidden' ?>>
+              <div class="campo" style="margin-top:10px;">
+                <label for="correo_contacto_nuevo"><?= et('evento.correo_contacto.campo_label') ?> <span class="obligatorio-si">*</span></label>
+                <input id="correo_contacto_nuevo" name="correo_contacto_nuevo" type="email" maxlength="190"
+                       value="<?= e($tieneCorreoPropio ? $correoContactoEfectivo : '') ?>"
+                       placeholder="<?= et('evento.correo_contacto.nuevo_placeholder') ?>">
+              </div>
+              <?php if ($puedeEnviarCodigoCorreo): ?>
+                <div class="barra-acciones">
+                  <button class="btn-barra" type="submit" name="enviar_codigo_correo" value="1"
+                          formnovalidate><?= et('evento.correo_contacto.enviar_btn') ?></button>
+                </div>
+              <?php endif; ?>
+            </div>
+
+            <div class="pista" style="margin-top:10px;"><?= et('evento.correo_contacto.info_texto') ?></div>
+          <?php endif; ?>
+        </div>
+      </div>
     </div>
 
     <div class="accion-tarjeta">
@@ -637,25 +715,55 @@ var EVENTO_T = <?= json_encode([
   sync();
 })();
 
-/* Las tres tarjetas de "Acción principal" se ven completas a la vez, así que
-   aquí no hay nada que mostrar u ocultar. Lo único que cambia es cuál de los
-   dos enlaces es obligatorio: el de la tarjeta que no se eligió se marca
-   no-requerido para que no bloquee el envío con un campo que la persona
-   decidió no usar. "Contactar al organizador" no pide nada: el formulario de
-   contacto ya vive en contactar.php. */
+/* Solo se ven los campos de la tarjeta elegida (requerimiento del cliente,
+   2026-09-02: antes las tres tarjetas se veían completas a la vez, y solo
+   cambiaba cuál de los dos enlaces era obligatorio). Se oculta con
+   JavaScript porque de todas formas hace falta este mismo sync() para
+   decidir el required de cada campo; hacerlo también aquí no cuesta nada
+   más y evita depender de un selector CSS aparte. */
 (function(){
   var radios = document.querySelectorAll('input[name="accion_principal"]');
   var urlBoletos = document.getElementById('url_boletos');
   var urlReserva = document.getElementById('url_reserva');
+  var tarjetas = document.querySelectorAll('.accion-tarjeta');
   if (!radios.length) return;
 
   function sync(){
     var elegida = document.querySelector('input[name="accion_principal"]:checked').value;
+
+    tarjetas.forEach(function(tarjeta){
+      var campos = tarjeta.querySelector('.accion-campos');
+      if (!campos) return;
+      var esLaElegida = tarjeta.querySelector('input[name="accion_principal"]').value === elegida;
+      campos.hidden = !esLaElegida;
+    });
+
     if (urlBoletos) urlBoletos.required = elegida === 'boletos';
     if (urlReserva) urlReserva.required = elegida === 'reservar';
   }
 
   radios.forEach(function(r){ r.addEventListener('change', sync); });
+  sync();
+})();
+
+/* El correo de contacto de "Solicitar información": la casilla decide si se
+   ve el campo para escribir uno distinto. Desmarcarla es la señal de "quiero
+   usar otro", tal como lo pidió el cliente. */
+(function(){
+  var casilla = document.getElementById('usarCorreoCuenta');
+  var textoCuenta = document.getElementById('correoCuentaTexto');
+  var bloqueOtro  = document.getElementById('correoOtroBloque');
+  var campoOtro   = document.getElementById('correo_contacto_nuevo');
+  if (!casilla || !bloqueOtro) return;
+
+  function sync(){
+    var usaCuenta = casilla.checked;
+    if (textoCuenta) textoCuenta.hidden = !usaCuenta;
+    bloqueOtro.hidden = usaCuenta;
+    if (campoOtro) campoOtro.required = !usaCuenta;
+  }
+
+  casilla.addEventListener('change', sync);
   sync();
 })();
 
