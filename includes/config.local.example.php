@@ -78,10 +78,23 @@ return [
     // Déjalo vacío mientras no exista. Las dos páginas ofrecen entonces el
     // formulario de /contacto, que sí llega a los administradores. Lo que no
     // hacen es publicar el no-responder@.
+    // 'contacto' y 'soporte' son PÚBLICOS: se imprimen en el pie, en /contacto,
+    // en las FAQ y en el panel del organizador. NO pongas aquí un buzón
+    // administrativo (hosting, dominio, WordPress, recuperación de cuentas):
+    // ese es privado por requerimiento del cliente («Configuración y uso de
+    // correos de Omdara», 2026-09-02) y no tiene llave en este archivo —no
+    // hay ningún sitio en el código que lo publicaría, y así se queda—.
     'correo' => [
         'remitente' => 'no-responder@tudominio.com',
         'nombre'    => 'OMDARA',
+
+        // Dudas generales, comentarios, propuestas, alianzas.
         'contacto'  => '',
+
+        // Problemas para entrar, con la cuenta, para publicar/editar una
+        // actividad, errores dentro de la plataforma. Ver correoSoporte() en
+        // includes/correo.php.
+        'soporte'   => '',
     ],
 
     // ---- Redes sociales -----------------------------------------------------

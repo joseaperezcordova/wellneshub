@@ -648,6 +648,7 @@
   .card-blog .eyebrow{margin-bottom:6px;}
   .card-blog h3{font-size:16px; line-height:1.35;}
   .evergreen-note{margin-top:30px; border-left:3px solid var(--marigold); padding:14px 18px; background:var(--paper); font-size:13px; opacity:0.85; border-radius:0 6px 6px 0;}
+  .evergreen-note a{text-decoration:underline; text-underline-offset:2px;}
 
   /* ---------- footer ---------- */
   /* Verde bosque, igual que la cabecera: la especificacion los quiere del

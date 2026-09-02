@@ -54,6 +54,8 @@ return [
     'pie.como_funciona'=> 'How it works',
     'pie.faq'          => 'Frequently asked questions',
     'pie.contacto'     => 'Contact',
+    'pie.correo_general_label' => 'General:',
+    'pie.correo_soporte_label' => 'Support:',
     'pie.terminos'     => 'Terms and Conditions',
     'pie.privacidad'   => 'Privacy Notice',
     'pie.cookies'      => 'Cookie Policy',

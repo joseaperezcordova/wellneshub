@@ -65,6 +65,31 @@ function correoContacto(): string
 }
 
 /**
+ * El buzón de soporte técnico: problemas para entrar, con la cuenta, para
+ * publicar o editar una actividad, errores dentro de la plataforma.
+ *
+ * Es OTRO buzón, no correoContacto(): ese es para dudas generales, propuestas
+ * y alianzas —lo maneja quien lleva la relación con el público—; este es para
+ * quien resuelve fallos del sitio. Mezclarlos en uno solo habría significado
+ * que un «no puedo iniciar sesión» se pierde entre mensajes de alianzas, o al
+ * revés.
+ *
+ * Requerimiento del cliente, «Configuración y uso de correos de Omdara»
+ * (2026-09-02): PÚBLICO, a diferencia de admin@ —ver el aviso en
+ * config.local.example.php—.
+ *
+ * @return string La dirección, o cadena vacía si todavía no hay ninguna.
+ */
+function correoSoporte(): string
+{
+    global $CONFIG;
+
+    $direccion = trim((string) ($CONFIG['correo']['soporte'] ?? ''));
+
+    return filter_var($direccion, FILTER_VALIDATE_EMAIL) ? $direccion : '';
+}
+
+/**
  * Envía un correo de texto plano.
  *
  * De texto plano y no HTML a propósito: un correo con maquetación pesa más,

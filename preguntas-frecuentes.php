@@ -94,6 +94,22 @@ $bloques = [
             '¿Puedo sugerir un evento o actividad?',
             'Sí. <a href="' . e(url('contacto')) . '">Escríbenos</a> para recomendar un evento o un organizador.',
         ],
+        [
+            /*
+             * Requerimiento del cliente, «Configuración y uso de correos de
+             * Omdara» (2026-09-02): FAQ → Problemas o contacto, con soporte@
+             * para justo esta lista de casos (entrar, la cuenta, publicar o
+             * editar, errores del sitio). Si el buzón todavía no está
+             * configurado, se cae al formulario de /contacto en vez de
+             * enseñar una pregunta sin respuesta.
+             */
+            '¿Tengo un problema técnico, qué hago?',
+            '¿No puedes iniciar sesión, algo falla con tu cuenta, no logras publicar o editar una actividad, o '
+            . 'encontraste un error dentro de la plataforma? '
+            . (correoSoporte() !== ''
+                ? 'Escríbenos a <a href="mailto:' . e(correoSoporte()) . '">' . e(correoSoporte()) . '</a>.'
+                : '<a href="' . e(url('contacto')) . '">Escríbenos</a> y te ayudamos.'),
+        ],
     ],
 
     'Para organizadores' => [

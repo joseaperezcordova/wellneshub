@@ -68,41 +68,76 @@ administradores. Lo que **no** hace es publicar el `no-responder@`: un buzón qu
 nadie lee, impreso en un documento que promete atender consultas, es peor que no
 poner ninguno.
 
-**El cliente ya nombró la dirección, 2026-09-02:** `hola@omdara...`, descrita
-como el correo general público —dudas, comentarios, propuestas, alianzas— y
-pedida expresamente en el pie, en la página de Contacto y en «botones de
-contacto general». El requerimiento que llegó menciona «los correos» en plural
-y hablaba de definir cuáles son públicos, pero **solo llegó el punto 1**: si
-aparecen más buzones (soporte, no-responder), hay que revisar cuáles se
-publican antes de darlo por cerrado.
+**El cliente mandó el requerimiento completo, 2026-09-02** —«Configuración y
+uso de correos de Omdara»—, en dos entregas: primero solo el punto 1, después
+los tres. Define tres buzones:
 
-**Ya se enseña en donde el cliente lo pidió, 2026-09-02.** `correoContacto()`
-se usaba solo en la cláusula 9 de la Política de Cookies; ahora también:
+| Correo | Visibilidad | Uso |
+|---|---|---|
+| `hola@omdara...` | PÚBLICO | Dudas generales, comentarios, propuestas, alianzas |
+| `soporte@omdara...` | PÚBLICO | Login, cuenta, publicar/editar, errores del sitio |
+| `admin@omdara...` | **PRIVADO** | Hosting, dominio, WordPress, herramientas internas — **nunca en el frontend** |
 
-- **El pie**, columna «Ayuda», debajo de «Contacto» —se imprime la dirección
-  tal cual, no un «Escríbenos», para que se pueda leer y copiar sin abrir el
-  cliente de correo—.
-- **La página `/contacto`**, arriba del formulario. Va arriba y no al pie de la
-  página porque es ahí donde alguien elige entre las dos vías; ofrecerlo
-  después de rellenar cinco campos no le sirve a nadie. El formulario **no** se
-  toca: sigue pidiendo motivo y actividad, que un correo suelto pierde.
+**`admin@` no tiene llave en `config.local.php` a propósito.** No hay ningún
+sitio en el código que lo publicaría, así que no hace falta una comprobación
+para no filtrarlo: simplemente no existe la variable que alguien podría poner
+donde no debe. Es un correo para cuentas de servicios externos (hosting,
+dominio, WordPress) y uso interno, no algo que este sitio necesite leer — si
+algún día hiciera falta agregarlo aquí para un uso interno de verdad, primero
+hay que revisar que ningún `include` lo imprima antes de darlo por seguro.
 
-Las dos usan el mismo patrón que los iconos de redes: sin dirección
-configurada no se pinta nada, ni un enlace muerto. Llave nueva de catálogo
-`contacto.correo_directo` (ES/EN) y `.contacto-correo a` en `app.css`, porque
-la regla global `a{color:inherit; text-decoration:none}` dejaba la dirección
-indistinguible del texto plano.
+**`hola@` — dónde se enseña, 2026-09-02:**
+- **El pie**, columna «Ayuda», etiquetado «General:» —con dos correos en la
+  misma columna hacía falta distinguirlos; con uno solo bastaba la dirección a
+  secas—.
+- **La página `/contacto`**, arriba del formulario: «Si lo prefieres,
+  escríbenos directo a…». El formulario no se toca —pide motivo y actividad,
+  que un correo suelto pierde—.
+- La cláusula 9 de la Política de Cookies, que ya lo usaba desde antes.
 
-**Para cerrarlo:** crear el buzón en cPanel → Email Accounts y ponerlo en
-`includes/config.local.php`, en **los dos entornos**:
+**`soporte@` — dónde se enseña, 2026-09-02** (`correoSoporte()`, mismo patrón
+que `correoContacto()` en `includes/correo.php`):
+- **El pie**, misma columna, etiquetado «Soporte:».
+- **La FAQ** (`preguntas-frecuentes.php`), una pregunta nueva: «¿Tengo un
+  problema técnico, qué hago?», con exactamente los casos que el cliente
+  listó (entrar, cuenta, publicar/editar, errores). Sin el buzón configurado,
+  cae al formulario de `/contacto` en vez de una pregunta sin respuesta.
+- **El panel del organizador** (`mis-eventos.php`), una nota bajo la tabla de
+  actividades: es donde alguien se topa con un problema para publicar o
+  editar, que es justo el caso de uso.
+
+Las tres direcciones siguen el mismo patrón que los iconos de redes: sin
+configurar, no se pinta nada, nunca un enlace muerto. Se necesitó CSS nuevo
+en dos sitios más (`.contacto-correo a`, `.evergreen-note a`) porque la regla
+global `a{color:inherit; text-decoration:none}` deja cualquier dirección
+impresa así indistinguible del texto plano.
+
+**Dos preguntas del cliente siguen sin responder** —ninguna de las dos
+entregas del requerimiento las aclaró—:
+1. Qué son los «botones de contacto general» y la «sección de información
+   general» donde debería ir `hola@` (item 1 original). No hay un botón ni
+   una sección con ese nombre hoy; hace falta que digan qué pantalla es.
+2. **«Mensajes de ayuda relacionados con problemas técnicos, cuando
+   corresponda»** (item 2) se dejó fuera a propósito: el propio requerimiento
+   lo redacta como discrecional, y el candidato más claro —el mensaje
+   genérico «Algo salió mal» tras un fallo de login— es una cadena de
+   catálogo (`login.error.generico`) compartida entre ES/EN sin mecanismo
+   para insertar una dirección dentro. Si quieren que ahí también salga
+   `soporte@`, es un cambio concreto y pequeño, pero hay que decirlo.
+
+**Para cerrarlo:** crear los dos buzones PÚBLICOS en cPanel → Email Accounts
+y ponerlos en `includes/config.local.php`, en **los dos entornos**:
 
 ```php
-'correo' => ['contacto' => 'hola@…'],
+'correo' => [
+    'contacto' => 'hola@…',
+    'soporte'  => 'soporte@…',
+],
 ```
 
-No hace falta tocar código: en cuanto tenga valor aparece en los tres sitios
-—pie, `/contacto` y la cláusula 9— y el enlace de respaldo al formulario
-desaparece solo.
+No hace falta tocar código: en cuanto tengan valor aparecen solos en todos
+los sitios de arriba, y los enlaces de respaldo al formulario desaparecen
+solos.
 
 > **Ojo:** tiene que ser un buzón del dominio principal. El subdominio de
 > pruebas no tiene MX, así que ninguna dirección suya recibe correo — es el

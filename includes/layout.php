@@ -474,16 +474,23 @@ function pie(): void
       <h5><?= et('pie.ayuda') ?></h5>
       <a href="<?= e(url('faq')) ?>"><?= et('pie.faq') ?></a>
       <a href="<?= e(url('contacto')) ?>"><?= et('pie.contacto') ?></a>
-      <?php /* El correo público, que el cliente pide enseñar aquí. Se imprime la
-               dirección tal cual y no un «Escríbenos»: quien la quiere copiar la
-               ve sin abrir su cliente de correo, y quien solo quiere escribir
-               tiene el mailto igual. correoContacto() devuelve cadena vacía
-               mientras no esté configurada en config.local.php, y entonces esta
-               línea no se pinta —igual que los iconos de redes de aquí al
-               lado—: una dirección a medias en el pie de todas las páginas es
-               peor que ninguna. */ ?>
+      <?php /*
+       * Los dos correos públicos que pide el cliente, cada uno con su etiqueta
+       * corta: con uno solo bastaba la dirección a secas, pero con dos
+       * apiladas sin distinguir nadie sabe cuál usar para qué. Se imprime la
+       * dirección tal cual y no un «Escríbenos»: quien la quiere copiar la ve
+       * sin abrir su cliente de correo, y quien solo quiere escribir tiene el
+       * mailto igual. correoContacto()/correoSoporte() devuelven cadena vacía
+       * mientras no estén configuradas en config.local.php, y entonces esa
+       * línea no se pinta —igual que los iconos de redes de aquí al lado—:
+       * una dirección a medias en el pie de todas las páginas es peor que
+       * ninguna.
+       */ ?>
       <?php if (correoContacto() !== ''): ?>
-      <a href="mailto:<?= e(correoContacto()) ?>"><?= e(correoContacto()) ?></a>
+      <a href="mailto:<?= e(correoContacto()) ?>"><?= et('pie.correo_general_label') ?> <?= e(correoContacto()) ?></a>
+      <?php endif; ?>
+      <?php if (correoSoporte() !== ''): ?>
+      <a href="mailto:<?= e(correoSoporte()) ?>"><?= et('pie.correo_soporte_label') ?> <?= e(correoSoporte()) ?></a>
       <?php endif; ?>
     </div>
     <div>

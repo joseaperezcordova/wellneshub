@@ -88,6 +88,20 @@ require __DIR__ . '/includes/layout.php';
       </div>
     <?php endif; ?>
 
+    <?php /*
+     * Requerimiento del cliente, «Configuración y uso de correos de Omdara»
+     * (2026-09-02): Dashboard del organizador → Ayuda / Soporte. Este es el
+     * panel de quien publica, así que es donde se topa con problemas para
+     * publicar o editar —justo lo que soporte@ está pensado para atender—.
+     * Sin buzón configurado no se pinta nada, mismo patrón que el resto.
+     */ ?>
+    <?php if (correoSoporte() !== ''): ?>
+    <div class="evergreen-note" style="margin-top:18px;">
+      ¿Problemas para publicar, editar o algo no funciona? Escríbenos a
+      <a href="mailto:<?= e(correoSoporte()) ?>"><?= e(correoSoporte()) ?></a>.
+    </div>
+    <?php endif; ?>
+
     <?php /* La pestaña «Editar perfil» que había aquí no se movió: era un
              formulario del prototipo con los datos de otra persona escritos a
              mano —«Raíz Colectivo»— que no guardaba nada y que salía igual
