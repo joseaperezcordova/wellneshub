@@ -732,6 +732,49 @@ guardar algo falla con un error de columna desconocida.
 
 ---
 
+### 2s. SEO — títulos/metas hechos; páginas de categoría y ciudad, sin construir
+
+**Hecho (2026-09-02):** título y meta description de Inicio, Actividades
+(`/actividades`), «Cómo funciona», Preguntas Frecuentes y «Publicar una
+actividad» reescritos siguiendo el documento SEO del cliente —keyword
+principal al inicio del título, sin repetir la marca porque
+`includes/layout.php` ya agrega «· Omdara» sola al final de cada uno; en la
+meta, keyword + qué se encuentra + ubicación + beneficio—. Solo en español:
+las meta descriptions en inglés siguen pendientes de fase 5 de REQ-00002 (ver
+sección 3), y este documento del cliente estaba escrito para el mercado en
+español.
+
+**Qué NO se tocó, y por qué es la parte grande:** el mismo documento pide
+páginas propias de categoría (`/actividades/yoga/`), de ciudad
+(`/ciudades/la-paz/`) y de categoría+ciudad
+(`/actividades/yoga/todos-santos/`), cada una con su título, meta, H1 y
+decisión de index/noindex propia. Hoy esas páginas no existen: categoría y
+ciudad son nada más un filtro (`/actividades?cat=Yoga&ciudad=...`), no una
+ruta con contenido propio —`/actividades` ya se autocanoniza a la URL sin
+parámetros, así que no hay riesgo de contenido duplicado mientras tanto,
+pero tampoco hay nada que indexar por categoría o ciudad—.
+
+Construirlo es una arquitectura nueva, no un cambio de texto: rutas nuevas
+en `rutasSitio()`, una plantilla de listado que reutilice el motor de
+`buscar-datos.php` pero renderizada en servidor con H1/título/meta reales,
+un mecanismo que decida qué categorías y ciudades tienen suficiente oferta
+como para merecer página propia —el documento insiste en esto: no
+convertir las ~40 categorías ni todas las ciudades en páginas desde el
+día uno—, y sumar esas páginas a `sitemap.php`.
+
+**Bloqueado por:** una decisión de negocio, no un dato técnico. Ese
+mecanismo de «suficiente oferta» necesita mirar cuántas actividades
+publicadas hay de verdad por categoría y por ciudad —hoy la base local solo
+tiene actividades de prueba, así que esa cuenta hay que hacerla contra
+producción cuando el cliente quiera decidir el primer lote de páginas—. El
+propio documento del cliente ya propone un punto de partida razonable:
+empezar por Baja California Sur (Todos Santos, La Paz, Cabo San Lucas, San
+José del Cabo) y unas 8-10 categorías con más actividades, pero esa lista
+final la tiene que confirmar quien lleva el producto o el SEO, no inventarla
+el código.
+
+---
+
 ### 2q. Preguntas frecuentes — texto del cliente (2026-09-02)
 
 **Hecho:** en el bloque «Para usuarios» de `preguntas-frecuentes.php`, la

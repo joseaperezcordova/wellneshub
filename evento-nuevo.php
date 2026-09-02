@@ -104,7 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && random_int(1, 20) === 1) {
     limpiarImagenesHuerfanas();
 }
 
-$titulo = t('evento.nuevo.titulo');
+$titulo      = t('evento.nuevo.titulo');
+$descripcion = t('evento.nuevo.meta');
 $mapaInteractivo = true;
 require __DIR__ . '/includes/layout.php';
 ?>

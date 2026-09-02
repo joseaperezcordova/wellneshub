@@ -67,15 +67,20 @@ return [
     'pie.whatsapp'     => 'Omdara en WhatsApp',
 
     // ---- Títulos y descripciones de las páginas estáticas ----
-    'pagina.inicio.titulo'        => 'Directorio de actividades wellness en México',
-    'pagina.inicio.meta'          => 'Encuentra retiros, festivales y círculos de bienestar en todo México: yoga, breathwork, sound healing, temazcal y más. Publica tu actividad gratis.',
-    'pagina.buscar.titulo'        => 'Buscar actividades',
-    'pagina.buscar.meta'          => 'Busca actividades de bienestar en México por ciudad, fecha y categoría: retiros, festivales, yoga, breathwork y más.',
-    'pagina.como_funciona.titulo' => 'Cómo funciona',
-    'pagina.como_funciona.meta'   => 'Cómo encontrar actividades de bienestar en Omdara y cómo publicar la tuya si eres organizador.',
+    // Reescritos siguiendo la estructura SEO que mandó el cliente
+    // (2026-09-02): keyword principal al inicio, ~50-60 caracteres cuando se
+    // puede —la marca no se repite aquí porque layout.php ya la agrega sola
+    // al final de cada <title> ("· Omdara")—, y en la meta: keyword + qué
+    // encuentra + ubicación + beneficio/acción.
+    'pagina.inicio.titulo'        => 'Actividades de Bienestar en México',
+    'pagina.inicio.meta'          => 'Encuentra actividades, eventos y experiencias de bienestar en México. Explora yoga, meditación, breathwork, senderismo, temazcal, surf y más.',
+    'pagina.buscar.titulo'        => 'Actividades de Bienestar en México: Yoga, Meditación y Más',
+    'pagina.buscar.meta'          => 'Descubre actividades de bienestar cerca de ti. Filtra por ciudad, fecha, categoría y precio y encuentra tu próxima experiencia en México.',
+    'pagina.como_funciona.titulo' => 'Cómo Publicar tu Actividad de Bienestar en México',
+    'pagina.como_funciona.meta'   => 'Publica gratis tu actividad de bienestar en Omdara y llega a nuevas personas en México. Así de fácil funciona.',
     'pagina.sobre_omdara.titulo'  => 'Sobre Omdara',
     'pagina.sobre_omdara.meta'    => 'Qué es Omdara, nuestra misión, nuestra visión y en qué creemos.',
-    'pagina.faq.titulo'           => 'Preguntas frecuentes',
+    'pagina.faq.titulo'           => 'Preguntas Frecuentes sobre Actividades de Bienestar',
     'pagina.faq.meta'             => 'Dudas habituales sobre cómo publicar una actividad en OMDARA, contactar a un organizador y cómo se revisa lo que se publica.',
     'pagina.terminos.titulo'      => 'Términos y Condiciones',
     'pagina.terminos.meta'        => 'Condiciones de uso de OMDARA para visitantes y organizadores.',
@@ -313,7 +318,12 @@ return [
     'evento.mapa.usar_enlace'        => 'Usar enlace',
 
     // ---- evento-nuevo.php / evento-editar.php ----
-    'evento.nuevo.titulo'    => 'Publicar una actividad',
+    // El título sigue la misma estructura SEO que el resto de páginas
+    // estáticas (2026-09-02): esta clave hace de <title> Y de <h1> a la vez
+    // (evento-nuevo.php), así que se cuidó que también leyera bien como
+    // encabezado de página y no solo como texto de pestaña.
+    'evento.nuevo.titulo'    => 'Publicar una Actividad de Bienestar',
+    'evento.nuevo.meta'      => 'Publica gratis tu actividad, taller o retiro de bienestar en Omdara y llega a nuevas personas en México.',
     'evento.nuevo.sub'       => 'Rellena la ficha. Antes de publicarla la vas a ver tal como la verá la gente.',
     'evento.nuevo.boton'     => 'Ver la vista previa',
     'evento.editar.titulo'   => 'Editar actividad',
