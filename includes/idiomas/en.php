@@ -161,7 +161,6 @@ return [
     'evento.form.ciudad_label'       => 'City',
     'evento.form.lugar_label'        => 'Venue name',
     'evento.form.direccion_label'    => 'Address',
-    'evento.form.organizador_nombre_label' => 'Organizer name',
     'evento.form.fecha_label'        => 'Date',
     'evento.form.hora_inicio_label'  => 'Start time',
     'evento.form.hora_fin_label'     => 'End time',
@@ -239,20 +238,9 @@ return [
     'evento.form.imagen_pista_sin'   => 'If you don\'t add an image, a default background color is shown on the public card.',
 
     'evento.form.seccion7'           => '7. Contact information',
-    'evento.form.datos_organizador'  => 'Organizer details',
-    'evento.form.usar_guardado'      => 'Use the saved information',
-    'evento.form.nombre_label'       => 'Name',
-    'evento.form.organizador_nombre_placeholder' => 'Yoga Baja',
-    'evento.form.organizador_nombre_ayuda' => 'This is the name shown as the organizer on your activities.',
-    'evento.form.editar_btn'         => 'Edit',
-    'evento.form.telefono_placeholder' => '+52 612 123 4567',
-    'evento.form.instagram_placeholder' => '@youraccount',
     'evento.form.sitio_web_placeholder' => 'https://yoursite.com',
-    'evento.form.sitio_web_org_ayuda'   => 'Yours, not this activity\'s — that one goes below.',
-    'evento.form.contacto_nota_1'    => 'This information will be saved to speed up your next posts. You can change it anytime from',
-    'evento.form.contacto_nota_cuenta' => 'My account',
-    'evento.form.sitio_web_actividad_label' => 'Website or link for this activity',
-    'evento.form.sitio_web_actividad_ayuda' => 'Share a website or social profile so interested people can learn more about this activity — not yours, that one goes above.',
+    'evento.form.sitio_web_actividad_label' => 'Website or social media',
+    'evento.form.sitio_web_actividad_ayuda' => 'Share a website or social profile so interested people can learn more about you or this activity.',
 
     // Per-activity contact email (migration 24, client 2026-09-02)
     'evento.correo_contacto.titulo'       => 'Contact email for this activity',
@@ -320,7 +308,6 @@ return [
     'evento.error.imagen_pesada'    => 'The image is heavier than the server allows. Try a lighter one.',
     'evento.error.sesion_caducada'  => 'Your session expired. Send it again.',
     'evento.error.duplicado'        => 'You already have another "%s" activity in %s, %s on that same day. If this is an accidental repeat, check your activities; if not, change the date, city or category.',
-    'evento.error.falta_organizador'=> 'The organizer\'s name is missing.',
 
     // ---- validarEvento(), includes/eventos.php ----
     'evento.valida.titulo_corto'      => 'The title needs at least 5 characters.',

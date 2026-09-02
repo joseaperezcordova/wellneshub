@@ -179,7 +179,6 @@ return [
     'evento.form.ciudad_label'       => 'Ciudad',
     'evento.form.lugar_label'        => 'Nombre del lugar',
     'evento.form.direccion_label'    => 'Dirección',
-    'evento.form.organizador_nombre_label' => 'Nombre del organizador',
     'evento.form.fecha_label'        => 'Fecha',
     'evento.form.hora_inicio_label'  => 'Hora de inicio',
     'evento.form.hora_fin_label'     => 'Hora de fin',
@@ -268,20 +267,9 @@ return [
 
     // Sección 7
     'evento.form.seccion7'           => '7. Información de contacto',
-    'evento.form.datos_organizador'  => 'Datos del organizador',
-    'evento.form.usar_guardado'      => 'Usar la información guardada',
-    'evento.form.nombre_label'       => 'Nombre',
-    'evento.form.organizador_nombre_placeholder' => 'Yoga Baja',
-    'evento.form.organizador_nombre_ayuda' => 'Es el nombre que aparece como organizador en tus actividades.',
-    'evento.form.editar_btn'         => 'Editar',
-    'evento.form.telefono_placeholder' => '+52 612 123 4567',
-    'evento.form.instagram_placeholder' => '@tucuenta',
     'evento.form.sitio_web_placeholder' => 'https://tusitio.com',
-    'evento.form.sitio_web_org_ayuda'   => 'El tuyo, no el de esta actividad — ese va aquí abajo.',
-    'evento.form.contacto_nota_1'    => 'Esta información se guardará para facilitar tus próximas publicaciones. Puedes cambiarla cuando quieras desde',
-    'evento.form.contacto_nota_cuenta' => 'Mi cuenta',
-    'evento.form.sitio_web_actividad_label' => 'Sitio web o enlace de la actividad',
-    'evento.form.sitio_web_actividad_ayuda' => 'Comparte un sitio web o perfil de redes sociales para que los interesados conozcan más sobre esta actividad —no el tuyo, ese va arriba—.',
+    'evento.form.sitio_web_actividad_label' => 'Sitio web o red social',
+    'evento.form.sitio_web_actividad_ayuda' => 'Comparte un sitio web o perfil de redes sociales para que los interesados conozcan más sobre ti o esta actividad.',
 
     // Correo de contacto por actividad (migración 24, cliente 2026-09-02)
     'evento.correo_contacto.titulo'       => 'Correo de contacto de esta actividad',
@@ -352,7 +340,6 @@ return [
     'evento.error.imagen_pesada'    => 'La imagen pesa más de lo que admite el servidor. Prueba con una más ligera.',
     'evento.error.sesion_caducada'  => 'La sesión caducó. Vuelve a enviarlo.',
     'evento.error.duplicado'        => 'Ya tienes otra actividad de "%s" en %s, %s para ese mismo día. Si es una repetición sin querer, revisa tus actividades; si es otra cosa, cambia la fecha, la ciudad o la categoría.',
-    'evento.error.falta_organizador'=> 'Falta el nombre del organizador.',
 
     // ---- validarEvento(), includes/eventos.php ----
     'evento.valida.titulo_corto'      => 'El título necesita al menos 5 caracteres.',

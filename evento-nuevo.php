@@ -35,10 +35,6 @@ if (postDesbordado()) {
             $errores['imagen'] = $errorImagen;
         }
 
-        if (!nombreOrganizadorValido($_POST)) {
-            $errores['org_nombre'] = t('evento.error.falta_organizador');
-        }
-
         if (!$errores && eventoDuplicado((int) $u['id'], $e['entidad'], $e['ciudad'], $e['categoria'], $e['fecha_inicio'])) {
             $errores['general'] = sprintf(t('evento.error.duplicado'), $e['categoria'], $e['ciudad'], $e['entidad']);
         }
@@ -46,17 +42,6 @@ if (postDesbordado()) {
         if (!$errores) {
             $id = crearEvento($e, (int) $u['id']);
             olvidarImagenEnVuelo($e['imagen_url']);   // ya tiene dueño
-
-            /*
-             * Las dos cosas de golpe (REQ-00012): la actividad y los datos de
-             * contacto en su cuenta, para que la próxima vez ya estén puestos.
-             *
-             * Aquí y no antes de validar: si la actividad no se llegó a crear,
-             * guardar a medias dejaría su cuenta cambiada por un formulario que
-             * nunca se envió. Y no impide publicar —todos los campos son
-             * opcionales—, así que no hay nada que comprobar antes.
-             */
-            guardarContactoOrganizador((int) $u['id'], $_POST);
 
             // Se relee para tener el slug que acaba de generarse y el nombre
             // del organizador (el JOIN de buscarEvento()), que es lo que

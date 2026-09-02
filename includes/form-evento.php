@@ -75,54 +75,6 @@ $mal = function (string $campo) use ($errores) {
     return isset($errores[$campo]) ? ' con-error' : '';
 };
 
-/*
- * Información de contacto del organizador (REQ-00012).
- *
- * NO son campos de la actividad: viven en su cuenta y se reutilizan en todas
- * las que publique. Por eso no pasan por $v() —que lee del evento— y llevan el
- * prefijo «org_», para que quede claro de un vistazo qué se guarda dónde.
- */
-$orgFicha  = fichaDeUsuario((int) usuarioActual()['id']);
-$orgCampos = camposContactoOrganizador();
-
-/** El valor de un campo de contacto: lo recién escrito si falló, o lo guardado. */
-$ov = function (string $columna) use ($orgFicha) {
-    if (isset($_POST['org_' . $columna])) return (string) $_POST['org_' . $columna];
-
-    return (string) ($orgFicha[$columna] ?? '');
-};
-
-$orgNombre = isset($_POST['org_nombre'])
-    ? (string) $_POST['org_nombre']
-    : (string) ($orgFicha['nombre'] ?? '');
-
-/* ¿Hay algo guardado que ofrecer? El nombre no cuenta: lo tiene todo el mundo
-   desde el alta —se deduce del correo— y ofrecer «usar lo guardado» para eso
-   solo sería enseñar un resumen de un dato que nadie escribió. */
-$orgHayGuardado = false;
-foreach (array_keys($orgCampos) as $columna) {
-    if (trim((string) ($orgFicha[$columna] ?? '')) !== '') $orgHayGuardado = true;
-}
-
-/* Tras un envío fallido la sección se abre: si alguien acaba de escribir aquí y
-   el formulario falló por otro campo, cerrarla esconde lo que escribió. */
-$orgAbierta = $_SERVER['REQUEST_METHOD'] === 'POST';
-
-/* Y si lo que mandó no es lo que tenía guardado, es que lo estaba editando: el
-   resumen no se enseña, porque enseñarlo taparía sus cambios detrás de un
-   botón «Editar» y parecería que se perdieron. */
-$orgEditado = false;
-if ($orgAbierta) {
-    if (isset($_POST['org_nombre']) && trim((string) $_POST['org_nombre']) !== trim((string) ($orgFicha['nombre'] ?? ''))) {
-        $orgEditado = true;
-    }
-    foreach (array_keys($orgCampos) as $columna) {
-        if (isset($_POST['org_' . $columna])
-            && trim((string) $_POST['org_' . $columna]) !== trim((string) ($orgFicha[$columna] ?? ''))) {
-            $orgEditado = true;
-        }
-    }
-}
 ?>
 
 <div class="form-seccion-titulo">
@@ -523,86 +475,21 @@ if ($orgAbierta) {
 /*
  * REQ-000-XX fusionó lo que antes eran dos secciones numeradas —«7.
  * Información de contacto» (el organizador) y «8. Información adicional»
- * (el sitio de la actividad)— en una sola. Ya no hay un "opcional" a nivel
- * de sección: con nombre del organizador obligatorio y el resto opcional,
- * una sola etiqueta para todo el bloque mentiría sobre uno de los dos.
+ * (el sitio de la actividad)— en una sola.
  *
- * COLAPSABLE CON <details>, no con JavaScript: abre y cierra solo, el teclado
- * ya sabe manejarlo y el buscador del navegador (Ctrl+F) encuentra lo de
- * dentro aunque esté cerrado.
+ * "Datos del organizador" —el acordeón con nombre, WhatsApp, Instagram y
+ * sitio web de la CUENTA— se quitó de aquí a pedido del cliente
+ * (2026-09-02): esos mismos datos ya se piden y se editan en «Mi cuenta»
+ * (mi-cuenta.php), y tenerlos duplicados en cada publicación era pedir dos
+ * veces lo mismo. El nombre del organizador que se ve en cada ficha
+ * («Organiza: X») sigue saliendo de la cuenta —usuarios.nombre—, solo que ya
+ * no se puede tocar desde este formulario.
+ *
+ * Lo único que queda es el sitio de ESTA actividad, que nunca fue parte de
+ * la cuenta y no tiene sentido duplicar en «Mi cuenta».
  */
 ?>
-<details class="contacto-org"<?= $orgAbierta ? ' open' : '' ?>>
-  <summary><?= et('evento.form.datos_organizador') ?></summary>
-
-  <div class="contacto-org-cuerpo">
-    <?php if ($orgHayGuardado && !$orgEditado): ?>
-      <?php /* Lo guardado ya viene cargado en los campos de abajo: esto es su
-               resumen, para no tener que leer cuatro cajas de formulario para
-               comprobar que sigue siendo lo mismo de siempre. «Editar» destapa
-               los campos. Sin JavaScript se ven las dos cosas, que es feo pero
-               funciona; con JavaScript, solo el resumen hasta que se pide
-               editar. */ ?>
-      <div class="contacto-org-guardado" id="orgGuardado">
-        <div class="contacto-org-tit"><?= et('evento.form.usar_guardado') ?></div>
-        <div class="contacto-org-lista">
-          <div><span><?= et('evento.form.nombre_label') ?></span><strong><?= e($orgNombre) ?></strong></div>
-          <?php foreach ($orgCampos as $columna => $etiqueta): ?>
-            <?php $valorOrg = trim((string) ($orgFicha[$columna] ?? '')); ?>
-            <?php if ($valorOrg !== ''): ?>
-              <div><span><?= e($etiqueta) ?></span><strong><?= e($valorOrg) ?></strong></div>
-            <?php endif; ?>
-          <?php endforeach; ?>
-        </div>
-        <button type="button" class="actionbtn" id="orgEditar"><?= et('evento.form.editar_btn') ?></button>
-      </div>
-    <?php endif; ?>
-
-    <div class="contacto-org-campos" id="orgCampos">
-      <div class="campo<?= $mal('org_nombre') ?>">
-        <label for="org_nombre"><?= et('evento.form.organizador_nombre_label') ?> <span class="requerido"><?= et('campo.obligatorio') ?></span></label>
-        <input id="org_nombre" name="org_nombre" type="text" maxlength="120" required
-               value="<?= e($orgNombre) ?>" placeholder="<?= et('evento.form.organizador_nombre_placeholder') ?>">
-        <div class="pista"><?= et('evento.form.organizador_nombre_ayuda') ?></div>
-        <?= $err('org_nombre') ?>
-      </div>
-
-      <?php foreach ($orgCampos as $columna => $etiqueta): ?>
-        <?php
-        $marcador = [
-            'telefono'  => t('evento.form.telefono_placeholder'),
-            'instagram' => t('evento.form.instagram_placeholder'),
-            'sitio_web' => t('evento.form.sitio_web_placeholder'),
-        ][$columna] ?? '';
-        ?>
-        <div class="campo">
-          <label for="org_<?= e($columna) ?>"><?= e($etiqueta) ?> <span class="opcional"><?= et('campo.opcional') ?></span></label>
-          <input id="org_<?= e($columna) ?>" name="org_<?= e($columna) ?>"
-                 type="<?= $columna === 'telefono' ? 'tel' : 'text' ?>"
-                 maxlength="<?= $columna === 'sitio_web' ? 500 : 120 ?>"
-                 value="<?= e($ov($columna)) ?>" placeholder="<?= e($marcador) ?>">
-          <?php if ($columna === 'sitio_web'): ?>
-            <div class="pista"><?= et('evento.form.sitio_web_org_ayuda') ?></div>
-          <?php endif; ?>
-        </div>
-      <?php endforeach; ?>
-    </div>
-
-    <div class="pista contacto-org-nota">
-      <?= et('evento.form.contacto_nota_1') ?>
-      <strong><?= et('evento.form.contacto_nota_cuenta') ?></strong>.
-    </div>
-  </div>
-</details>
-
-<?php /*
- * Fuera del <details>, a propósito: es el sitio de ESTA actividad, no del
- * organizador —esa distinción es justo la que explica la pista de abajo—, y
- * el acordeón de arriba se llama "Datos del organizador" y por defecto
- * empieza cerrado. Metido ahí adentro, este campo se escondería detrás de un
- * clic que no tiene nada que ver con él.
- */ ?>
-<div class="campo<?= $mal('sitio_web') ?>" style="margin-top:14px;">
+<div class="campo<?= $mal('sitio_web') ?>">
   <label for="sitio_web"><?= et('evento.form.sitio_web_actividad_label') ?> <span class="opcional"><?= et('campo.opcional') ?></span></label>
   <input id="sitio_web" name="sitio_web" type="url" maxlength="500"
          value="<?= e($v('sitio_web')) ?>" placeholder="<?= et('evento.form.sitio_web_placeholder') ?>">
@@ -1163,29 +1050,5 @@ var EVENTO_T = <?= json_encode([
     });
   }
 
-  /* ---------- informacion de contacto del organizador (REQ-00012) ----------
-     Los campos ya vienen rellenos con lo que hay guardado. Esto solo decide
-     cual de las dos caras se ve: el resumen o los campos.
-
-     El resumen se esconde DESDE AQUI y no con un atributo hidden en el HTML:
-     sin JavaScript hay que poder editar igual, y un campo escondido en el
-     marcado no habria forma de destaparlo. Asi, sin JavaScript se ven las dos
-     cosas —feo, pero utilizable— y con JavaScript solo el resumen hasta que se
-     pide editar. */
-  var orgGuardado = document.getElementById('orgGuardado');
-  var orgCampos   = document.getElementById('orgCampos');
-  var orgEditar   = document.getElementById('orgEditar');
-
-  if (orgGuardado && orgCampos && orgEditar) {
-    orgCampos.hidden = true;
-
-    orgEditar.addEventListener('click', function () {
-      orgGuardado.hidden = true;
-      orgCampos.hidden   = false;
-
-      var primero = orgCampos.querySelector('input');
-      if (primero) primero.focus();
-    });
-  }
 })();
 </script>

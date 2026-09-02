@@ -96,10 +96,6 @@ if ($puede && postDesbordado()) {
         $errores['imagen'] = $errorImagen;
     }
 
-    if (!nombreOrganizadorValido($_POST)) {
-        $errores['org_nombre'] = t('evento.error.falta_organizador');
-    }
-
     if (!$errores && eventoDuplicado((int) $ev['usuario_id'], $e['entidad'], $e['ciudad'], $e['categoria'], $e['fecha_inicio'], (int) $ev['id'])) {
         $errores['general'] = sprintf(t('evento.error.duplicado'), $e['categoria'], $e['ciudad'], $e['entidad']);
     }
@@ -114,11 +110,6 @@ if ($puede && postDesbordado()) {
         if ($imagenPrevia !== null && $e['imagen_url'] !== $imagenPrevia) {
             borrarImagenGuardada($imagenPrevia);
         }
-
-        // El mismo formulario trae la sección de contacto del organizador
-        // (REQ-00012), así que también aquí se guarda: corregir un teléfono
-        // mal escrito es justo lo que se viene a hacer a «editar».
-        guardarContactoOrganizador((int) $u['id'], $_POST);
 
         $_SESSION['evento_aviso'] = t('evento.editar.cambios_guardados');
         $_SESSION['eventos_ga'] = [

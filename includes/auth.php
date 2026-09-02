@@ -334,25 +334,12 @@ function normalizarSitioWeb(string $valor): string
 }
 
 /**
- * ¿Trae el formulario un nombre de organizador con algo escrito?
+ * Guarda la información de contacto del organizador.
  *
- * REQ-000-XX lo volvió obligatorio. No hace falta consultar la cuenta: el
- * campo siempre llega precargado con el nombre que ya hubiera guardado (ver
- * form-evento.php), así que si llega vacío es porque alguien lo borró a
- * propósito —y guardarContactoOrganizador() lo dejaría tal cual estaba, sin
- * avisar de que no se guardó nada—.
- */
-function nombreOrganizadorValido(array $post): bool
-{
-    return trim((string) ($post['org_nombre'] ?? '')) !== '';
-}
-
-/**
- * Guarda la información de contacto del organizador (REQ-00012).
- *
- * Se llama al publicar y al editar una actividad: el requerimiento pide que
- * «Publicar» haga las dos cosas, crear la actividad y dejar estos datos en la
- * cuenta para no tener que volver a escribirlos.
+ * Hoy solo la llama mi-cuenta.php —hasta el 2026-09-02 también la llamaban
+ * evento-nuevo.php/evento-editar.php, con su propio acordeón «Datos del
+ * organizador» duplicando estos mismos campos; se quitó de ahí a pedido del
+ * cliente, porque «Mi cuenta» ya es donde se editan—.
  *
  * El nombre solo se cambia si viene con algo. Los demás sí se pueden vaciar a
  * propósito —quien borra su Instagram quiere borrarlo—, pero borrar el nombre

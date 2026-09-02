@@ -721,12 +721,6 @@ function etiquetasCampos(): array
         'direccion'       => t('evento.form.direccion_label'),
         'mapa_url'        => t('evento.campo.mapa_url'),
 
-        // No es un campo de la actividad —vive en la cuenta del organizador,
-        // ver guardarContactoOrganizador() en includes/auth.php— pero
-        // REQ-000-XX lo volvió obligatorio en el formulario, así que necesita
-        // su propia etiqueta aquí igual que cualquier otro campo requerido.
-        'org_nombre'      => t('evento.form.organizador_nombre_label'),
-
         // Actividad de un día.
         'fecha_unica'        => t('evento.form.fecha_label'),
         'hora_inicio_unica'  => t('evento.form.hora_inicio_label'),
