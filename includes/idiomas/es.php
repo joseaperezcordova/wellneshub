@@ -84,22 +84,21 @@ return [
 
     // ---- Portada ----
     'inicio.hero.eyebrow'      => 'Directorio de actividades · México',
-    'inicio.hero.titulo'       => 'Encuentra tu próximo <em>retiro, festival o círculo</em> de bienestar',
-    'inicio.hero.sub'          => 'Retiros de yoga, breathwork, sound healing y festivales holísticos, reunidos en un solo lugar — sin buscar por veinte cuentas de Instagram distintas.',
     'inicio.hero.imagen_anterior' => 'Imagen anterior',
     'inicio.hero.imagen_siguiente' => 'Imagen siguiente',
     'inicio.hero.ver_imagen'   => 'Ver imagen',
-    // Las cuatro escenas del carrusel: son ambientación, no actividades reales
-    // —ver el comentario al inicio de index.php—, así que su texto se traduce
-    // como cualquier otro, sin depender de datos.
-    'inicio.hero.slide1_cat'   => 'Sound Healing',
-    'inicio.hero.slide1_texto' => 'Amanecer en el Cenote · Tulum',
-    'inicio.hero.slide2_cat'   => 'Festival',
-    'inicio.hero.slide2_texto' => 'Festival Holístico Raíz · CDMX',
-    'inicio.hero.slide3_cat'   => 'Breathwork',
-    'inicio.hero.slide3_texto' => 'Bajo las estrellas · San Miguel',
-    'inicio.hero.slide4_cat'   => 'Retiro',
-    'inicio.hero.slide4_texto' => 'Silencio Vipassana · Oaxaca',
+    // Las cuatro diapositivas del carrusel: texto de cliente (2026-09-02). El
+    // titular y el subtexto rotan junto con la imagen de fondo —los lee
+    // assets/js/inicio.js desde el data-titulo/data-sub de cada .slide—; la
+    // cuarta va dirigida a quien organiza, no a quien busca, a propósito.
+    'inicio.hero.slide1_titulo' => 'Descubre actividades de bienestar en todo México.',
+    'inicio.hero.slide1_sub'    => 'Encuentra experiencias para conectar con una vida más saludable y consciente.',
+    'inicio.hero.slide2_titulo' => 'Todo el bienestar en un solo lugar.',
+    'inicio.hero.slide2_sub'    => 'Eventos, clases, talleres, retiros y experiencias para descubrir nuevas formas de cuidarte.',
+    'inicio.hero.slide3_titulo' => 'Busca. Descubre. Conecta.',
+    'inicio.hero.slide3_sub'    => 'Encuentra actividades por categoría, fecha y ubicación y conecta directamente con sus organizadores.',
+    'inicio.hero.slide4_titulo' => '¿Organizas una experiencia de bienestar?',
+    'inicio.hero.slide4_sub'    => 'Publícala en Omdara y conecta con nuevas personas.',
 
     'inicio.buscador.donde_label'       => 'Dónde',
     'inicio.buscador.donde_placeholder' => 'Tulum, CDMX, Oaxaca…',

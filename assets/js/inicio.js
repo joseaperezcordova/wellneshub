@@ -18,6 +18,8 @@
     var slides = [].slice.call(raiz.querySelectorAll('.slide'));
     var puntos = [].slice.call(document.querySelectorAll('#cdots button'));
     var banner = raiz.parentNode;
+    var heroTitulo = document.getElementById('heroTitulo');
+    var heroSub = document.getElementById('heroSub');
     var i = 0, reloj = null;
     var ESPERA = 4000;
 
@@ -34,6 +36,13 @@
       puntos.forEach(function (p, k) {
         p.setAttribute('aria-current', k === i ? 'true' : 'false');
       });
+      // El titular y el subtexto viven en la diapositiva (data-titulo/data-sub)
+      // y aquí solo se copian: así cada idioma sale ya resuelto por PHP y este
+      // archivo no necesita saber en qué idioma está la página.
+      if (heroTitulo && heroSub) {
+        heroTitulo.textContent = slides[i].dataset.titulo;
+        heroSub.textContent = slides[i].dataset.sub;
+      }
     };
 
     var parar    = function () { if (reloj) { clearInterval(reloj); reloj = null; } };

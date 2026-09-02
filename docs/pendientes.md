@@ -488,6 +488,33 @@ editorial (título del hero, subtítulo, textos del carrusel) se tradujo sin
 esperar ese entregable —decisión explícita del 2026-09-01, no un cambio de
 la regla para el resto de páginas.
 
+**Actualización 2026-09-02 — el cliente mandó el copy del carrusel y de «Cómo
+funciona».** Dos entregas de texto editorial:
+
+- **Carrusel de la portada:** 4 titulares+subtítulos nuevos, pensados como EL
+  mensaje de cada diapositiva —el cuarto dirigido a quien organiza, no a quien
+  busca—. Antes el h1/subtítulo eran fijos y solo rotaba una etiqueta pequeña
+  de esquina (ambientación, sin mensaje); implementarlo tal cual mandó el
+  cliente significaba que el h1 rotara con el carrusel, así que se preguntó y
+  se confirmó ese cambio de diseño. Hecho: `index.php` guarda cada par en
+  `data-titulo`/`data-sub` de su `.slide`, `assets/js/inicio.js` los copia a
+  `#heroTitulo`/`#heroSub` al girar, y `includes/idiomas/{es,en}.php` traen
+  las 8 llaves nuevas (`inicio.hero.slideN_titulo`/`slideN_sub`) en los dos
+  idiomas. La etiqueta de esquina (`.slide-chip`) se quitó entera —ya no tenía
+  contenido que mostrar— junto con su CSS.
+- **«Cómo funciona» (`como-funciona.php`):** los pasos y motivos que mandó el
+  cliente ya coincidían casi palabra por palabra con lo que estaba escrito —no
+  se tocaron—. Lo que sí faltaba era el «CTA final»: la franja de cierre decía
+  «Descubre. Conecta. Vive nuevas experiencias.» y ahora dice «Da visibilidad
+  a tu experiencia de bienestar. / Publica tu actividad y conecta con
+  personas que buscan nuevas experiencias.», tal como lo mandó. Esta página
+  sigue sin `t()`/`et()` —el mismo hueco de `preguntas-frecuentes.php`—, así
+  que el cambio quedó solo en español, igual que el resto de su texto.
+
+Sigue bloqueado el resto: el lema de marca y las meta descriptions de las
+demás páginas, que es lo que falta para poder decir que el inglés cubre
+también el copy editorial completo y no solo la portada.
+
 **Sobre promover a producción:** el requerimiento prohíbe la traducción
 parcial. Hoy el inglés cubre el armazón, la portada, el buscador, el
 formulario de actividad, la ficha, contacto/reportar, login/registro, el

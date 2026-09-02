@@ -136,9 +136,8 @@ require __DIR__ . '/includes/layout.php';
          para que se lea como un final y no como un apartado más. */ ?>
 <section class="guia-cierre">
   <div class="wrap">
-    <h2>Descubre. Conecta. Vive nuevas experiencias.</h2>
-    <p>OMDARA facilita el encuentro entre personas que buscan experiencias de bienestar y
-       organizadores que ofrecen actividades. Encuentra una actividad que te inspire o publica la tuya.</p>
+    <h2>Da visibilidad a tu experiencia de bienestar.</h2>
+    <p>Publica tu actividad y conecta con personas que buscan nuevas experiencias.</p>
 
     <div class="guia-acciones">
       <a class="btn-cta btn-cta-claro" href="<?= e(url('actividades')) ?>">Explorar actividades</a>

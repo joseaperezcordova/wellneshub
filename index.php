@@ -67,30 +67,31 @@ require __DIR__ . '/includes/layout.php';
          uno por un background-image y ni los controles ni el titulo se
          enteran.
 
-         El titulo de la pagina NO rota: vive fuera de las diapositivas, al
-         pie del banner. Solo cambian la imagen y la etiqueta de arriba a la
-         izquierda, que nombra la actividad que se esta viendo. Asi hay un
-         unico h1 y el mensaje del sitio no depende de donde pare el giro. -->
+         El titulo Y el subtitulo rotan con la diapositiva (texto de cliente,
+         2026-09-02): cada .slide lleva su par en data-titulo/data-sub, y
+         assets/js/inicio.js los copia a #heroTitulo/#heroSub al cambiar de
+         diapositiva. El h1 impreso aqui es el de la diapositiva 1, para que
+         quien no ejecute JavaScript siga viendo un titular completo. -->
     <div class="carrusel" id="carrusel">
-      <div class="slide activa" aria-hidden="false">
+      <div class="slide activa" aria-hidden="false"
+           data-titulo="<?= e(t('inicio.hero.slide1_titulo')) ?>" data-sub="<?= e(t('inicio.hero.slide1_sub')) ?>">
         <div class="hero-media m1"></div>
         <div class="hero-scrim"></div>
-        <div class="slide-chip"><span class="cat"><?= et('inicio.hero.slide1_cat') ?></span> <?= et('inicio.hero.slide1_texto') ?></div>
       </div>
-      <div class="slide" aria-hidden="true">
+      <div class="slide" aria-hidden="true"
+           data-titulo="<?= e(t('inicio.hero.slide2_titulo')) ?>" data-sub="<?= e(t('inicio.hero.slide2_sub')) ?>">
         <div class="hero-media m2"></div>
         <div class="hero-scrim"></div>
-        <div class="slide-chip"><span class="cat"><?= et('inicio.hero.slide2_cat') ?></span> <?= et('inicio.hero.slide2_texto') ?></div>
       </div>
-      <div class="slide" aria-hidden="true">
+      <div class="slide" aria-hidden="true"
+           data-titulo="<?= e(t('inicio.hero.slide3_titulo')) ?>" data-sub="<?= e(t('inicio.hero.slide3_sub')) ?>">
         <div class="hero-media m3"></div>
         <div class="hero-scrim"></div>
-        <div class="slide-chip"><span class="cat"><?= et('inicio.hero.slide3_cat') ?></span> <?= et('inicio.hero.slide3_texto') ?></div>
       </div>
-      <div class="slide" aria-hidden="true">
+      <div class="slide" aria-hidden="true"
+           data-titulo="<?= e(t('inicio.hero.slide4_titulo')) ?>" data-sub="<?= e(t('inicio.hero.slide4_sub')) ?>">
         <div class="hero-media m4"></div>
         <div class="hero-scrim"></div>
-        <div class="slide-chip"><span class="cat"><?= et('inicio.hero.slide4_cat') ?></span> <?= et('inicio.hero.slide4_texto') ?></div>
       </div>
     </div>
 
@@ -107,8 +108,8 @@ require __DIR__ . '/includes/layout.php';
 
     <div class="hero-content">
       <div class="eyebrow"><?= et('inicio.hero.eyebrow') ?></div>
-      <h1><?= t('inicio.hero.titulo') ?></h1>
-      <p class="sub"><?= et('inicio.hero.sub') ?></p>
+      <h1 id="heroTitulo"><?= et('inicio.hero.slide1_titulo') ?></h1>
+      <p class="sub" id="heroSub"><?= et('inicio.hero.slide1_sub') ?></p>
     </div>
   </div>
 

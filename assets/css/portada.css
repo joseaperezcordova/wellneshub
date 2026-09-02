@@ -139,26 +139,9 @@
   .slide{position:absolute; inset:0; opacity:0; transition:opacity .6s ease;}
   .slide.activa{opacity:1;}
 
-  /* Etiqueta de la diapositiva: nombra lo que se esta viendo. Va arriba a la
-     izquierda porque abajo esta el titulo y el centro lo tapa la pastilla. */
   /* En un banner a sangre, pegar los controles al borde de la ventana los deja
      lejisimos del contenido en pantallas anchas. max() los engancha a la misma
      columna que el titulo cuando hay sitio, y a 28px del borde cuando no. */
-  .slide-chip{
-    position:absolute; top:20px; left:max(28px, calc((100% - 1180px) / 2 + 28px)); z-index:2;
-    display:inline-flex; align-items:center; gap:9px; max-width:calc(100% - 200px);
-    background:rgba(22,22,22,.45); border:1px solid rgba(255,255,255,.28);
-    color:var(--paper); border-radius:999px; padding:6px 15px; font-size:12.5px;
-    backdrop-filter:blur(3px);
-  }
-  .slide-chip .cat{
-    font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em;
-    text-transform:uppercase; color:var(--terracota-palida);
-  }
-  @media(max-width:640px){
-    .slide-chip{max-width:calc(100% - 40px); font-size:11.5px; top:14px; left:14px;}
-    .slide-chip .cat{display:none;}
-  }
 
   /* Controles arriba a la derecha, la unica esquina que queda libre. */
   .cctrl{position:absolute; top:20px; right:max(28px, calc((100% - 1180px) / 2 + 28px)); z-index:4; display:flex; align-items:center; gap:10px;}
