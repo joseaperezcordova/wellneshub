@@ -81,6 +81,15 @@ function categoriasMenu(?string $idioma = null): array
         'Ceremonia de Cacao' => ['🍫',  'Ceremonia de Cacao'],
         'Ecstatic Dance'     => ['💃',  'Ecstatic Dance'],
 
+        // Movimiento (agregadas, requerimiento del cliente 2026-09-02)
+        'Stretching'         => ['🙆',  'Stretching'],
+        'Movilidad'          => ['🔄',  'Movilidad'],
+        'Danza'              => ['🕺',  'Danza'],
+        'Calistenia'         => ['🤸',  'Calistenia'],
+        'Barre'              => ['🩰',  'Barre'],
+        'Artes Marciales'    => ['🥋',  'Artes Marciales'],
+        'Fitness'            => ['🏋️',  'Fitness'],
+
         // Aire libre
         'Senderismo'         => ['🥾',  'Senderismo'],
         'Running'            => ['👟',  'Running'],
@@ -88,6 +97,14 @@ function categoriasMenu(?string $idioma = null): array
         'Ciclismo'           => ['🚴',  'Ciclismo'],
         'Triatlón'           => ['🏊',  'Triatlón'],
         'Surf'               => ['🏄',  'Surf'],
+        // Agregadas, requerimiento del cliente 2026-09-02
+        'Natación'           => ['🏊',  'Natación'],
+        'Paddleboard'        => ['🚣',  'Paddleboard'],
+        'Kayak'              => ['🛶',  'Kayak'],
+        'Buceo'              => ['🤿',  'Buceo'],
+        'Snorkeling'         => ['🐠',  'Snorkeling'],
+        'Freediving'         => ['🫁',  'Freediving'],
+        'Escalada'           => ['🧗',  'Escalada'],
 
         // Cuidado del cuerpo
         'Nutrición'          => ['🥗',  'Nutrición'],
@@ -96,6 +113,16 @@ function categoriasMenu(?string $idioma = null): array
         'Cold Plunge'        => ['🧊',  'Cold Plunge'],
         'Biohacking'         => ['⚡',  'Biohacking'],
         'Longevidad'         => ['⏳',  'Longevidad'],
+        // Agregadas, requerimiento del cliente 2026-09-02
+        'Ice Bath'           => ['🥶',  'Ice Bath'],
+        'Recuperación'       => ['🔋',  'Recuperación'],
+        'Medicina Holística' => ['⚕️',  'Medicina Holística'],
+
+        // Salud mental (agregadas, requerimiento del cliente 2026-09-02)
+        'Salud Mental'       => ['🧠',  'Salud Mental'],
+        'Coaching'           => ['🎯',  'Coaching'],
+        'Mindfulness'        => ['🕊️',  'Mindfulness'],
+        'Journaling'         => ['📓',  'Journaling'],
     ];
 
     if ($idioma !== 'en') return $es;
@@ -107,11 +134,20 @@ function categoriasMenu(?string $idioma = null): array
         'Breathwork' => 'Breathwork', 'Sound Healing' => 'Sound Healing',
         'Tai Chi' => 'Tai Chi', 'Qi Gong' => 'Qi Gong', 'Temazcal' => 'Temazcal',
         'Ceremonia de Cacao' => 'Cacao Ceremony', 'Ecstatic Dance' => 'Ecstatic Dance',
+        'Stretching' => 'Stretching', 'Movilidad' => 'Mobility', 'Danza' => 'Dance',
+        'Calistenia' => 'Calisthenics', 'Barre' => 'Barre',
+        'Artes Marciales' => 'Martial Arts', 'Fitness' => 'Fitness',
         'Senderismo' => 'Hiking', 'Running' => 'Running', 'Carreras' => 'Races',
         'Ciclismo' => 'Cycling', 'Triatlón' => 'Triathlon', 'Surf' => 'Surf',
+        'Natación' => 'Swimming', 'Paddleboard' => 'Paddleboarding', 'Kayak' => 'Kayaking',
+        'Buceo' => 'Scuba Diving', 'Snorkeling' => 'Snorkeling', 'Freediving' => 'Freediving',
+        'Escalada' => 'Climbing',
         'Nutrición' => 'Nutrition', 'Ayurveda' => 'Ayurveda', 'Spa' => 'Spa',
         'Cold Plunge' => 'Cold Plunge', 'Biohacking' => 'Biohacking',
-        'Longevidad' => 'Longevity',
+        'Longevidad' => 'Longevity', 'Ice Bath' => 'Ice Bath',
+        'Recuperación' => 'Recovery', 'Medicina Holística' => 'Holistic Medicine',
+        'Salud Mental' => 'Mental Health', 'Coaching' => 'Coaching',
+        'Mindfulness' => 'Mindfulness', 'Journaling' => 'Journaling',
     ];
 
     $en = [];
