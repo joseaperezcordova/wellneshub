@@ -283,6 +283,27 @@ return [
     'evento.form.sitio_web_actividad_label' => 'Sitio web o enlace de la actividad',
     'evento.form.sitio_web_actividad_ayuda' => 'Comparte un sitio web o perfil de redes sociales para que los interesados conozcan más sobre esta actividad —no el tuyo, ese va arriba—.',
 
+    // Correo de contacto por actividad (migración 24, cliente 2026-09-02)
+    'evento.correo_contacto.titulo'       => 'Correo de contacto de esta actividad',
+    'evento.correo_contacto.explicacion'  => 'Aquí llegan los mensajes de «Contactar al organizador» de esta actividad. Por defecto es el correo de tu cuenta; puedes usar otro si lo confirmas primero.',
+    'evento.correo_contacto.actual_cuenta'=> 'Ahora mismo usa el correo de tu cuenta:',
+    'evento.correo_contacto.actual_propio'=> 'Ahora mismo usa:',
+    'evento.correo_contacto.quitar_btn'   => 'Usar el correo de mi cuenta',
+    'evento.correo_contacto.nuevo_label'  => 'Usar otro correo',
+    'evento.correo_contacto.nuevo_placeholder' => 'otro@correo.com',
+    'evento.correo_contacto.enviar_btn'   => 'Enviar código',
+    'evento.correo_contacto.pendiente_texto' => 'Te mandamos un código a %s. Escríbelo aquí para confirmarlo:',
+    'evento.correo_contacto.codigo_label' => 'Código de 6 dígitos',
+    'evento.correo_contacto.codigo_placeholder' => '000000',
+    'evento.correo_contacto.confirmar_btn'=> 'Confirmar',
+    'evento.correo_contacto.cancelar_btn' => 'Cancelar',
+    'evento.correo_contacto.error_invalido'      => 'Ese correo no tiene buena pinta. Revísalo.',
+    'evento.correo_contacto.error_espera'        => 'Acabamos de enviar un código para esta actividad. Espera un minuto antes de pedir otro.',
+    'evento.correo_contacto.error_demasiados'    => 'Demasiados códigos pedidos para esta actividad. Prueba dentro de un rato.',
+    'evento.correo_contacto.error_demasiadas_ip' => 'Demasiadas peticiones desde esta conexión. Prueba más tarde.',
+    'evento.correo_contacto.enviado'      => 'Te enviamos un código a %s. Revisa tu bandeja.',
+    'evento.correo_contacto.confirmado'   => 'Listo: %s ya es el correo de contacto de esta actividad.',
+
     // Sección 8
     'evento.form.seccion8'           => '8. Acción principal',
     'evento.form.accion_ayuda'       => 'Elige la acción principal que verán las personas en tu actividad.',
@@ -611,6 +632,13 @@ return [
     // —al revés que motivosContacto() y los demás avisos internos—.
     'correo.codigo.asunto' => '{codigo} es tu código para entrar en {marca}',
     'correo.codigo.cuerpo' => "Tu código para entrar en {marca} es:\n\n    {codigo}\n\nCaduca en {minutos} minutos y sirve una sola vez.\n\nSi no has pedido este código, no hagas nada: sin él nadie entra, y el\ncódigo deja de valer solo. Nadie de {marca} te lo va a pedir por teléfono,\npor WhatsApp ni por correo.\n\n--\n{marca} · Directorio de actividades wellness en México",
+
+    // ---- Correo para confirmar un correo de contacto (migración 24) ----
+    // A diferencia del código de acceso, este puede llegarle a alguien que no
+    // pidió nada —quien edita la actividad puede escribir cualquier
+    // dirección—, así que el cuerpo lo dice de frente.
+    'correo.confirmar_contacto.asunto' => '{codigo} es tu código para confirmar el correo de contacto de «{actividad}»',
+    'correo.confirmar_contacto.cuerpo' => "Alguien —esperamos que tú— quiere que este correo reciba los mensajes de «Contactar al organizador» de la actividad «{actividad}» en {marca}.\n\nTu código es:\n\n    {codigo}\n\nEscríbelo en la página donde se edita esa actividad. Caduca en {minutos} minutos y sirve una sola vez.\n\nSi no reconoces esto, no hagas nada: sin ese código no se activa nada, y el\ncódigo deja de valer solo.\n\n--\n{marca} · Directorio de actividades wellness en México",
 
     // ---- Completar registro (completar-registro.php) ----
     'registro.error.acepta_legal' => 'Para crear tu cuenta debes aceptar los Términos y Condiciones y el Aviso de Privacidad.',

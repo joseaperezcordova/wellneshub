@@ -254,6 +254,27 @@ return [
     'evento.form.sitio_web_actividad_label' => 'Website or link for this activity',
     'evento.form.sitio_web_actividad_ayuda' => 'Share a website or social profile so interested people can learn more about this activity — not yours, that one goes above.',
 
+    // Per-activity contact email (migration 24, client 2026-09-02)
+    'evento.correo_contacto.titulo'       => 'Contact email for this activity',
+    'evento.correo_contacto.explicacion'  => '"Contact organizer" messages for this activity land here. It defaults to your account email; you can use another one once you confirm it.',
+    'evento.correo_contacto.actual_cuenta'=> 'Right now it uses your account email:',
+    'evento.correo_contacto.actual_propio'=> 'Right now it uses:',
+    'evento.correo_contacto.quitar_btn'   => 'Use my account email',
+    'evento.correo_contacto.nuevo_label'  => 'Use another email',
+    'evento.correo_contacto.nuevo_placeholder' => 'another@email.com',
+    'evento.correo_contacto.enviar_btn'   => 'Send code',
+    'evento.correo_contacto.pendiente_texto' => 'We sent a code to %s. Enter it here to confirm it:',
+    'evento.correo_contacto.codigo_label' => '6-digit code',
+    'evento.correo_contacto.codigo_placeholder' => '000000',
+    'evento.correo_contacto.confirmar_btn'=> 'Confirm',
+    'evento.correo_contacto.cancelar_btn' => 'Cancel',
+    'evento.correo_contacto.error_invalido'      => 'That email doesn\'t look right. Check it.',
+    'evento.correo_contacto.error_espera'        => 'We just sent a code for this activity. Wait a minute before requesting another.',
+    'evento.correo_contacto.error_demasiados'    => 'Too many codes requested for this activity. Try again in a while.',
+    'evento.correo_contacto.error_demasiadas_ip' => 'Too many requests from this connection. Try again later.',
+    'evento.correo_contacto.enviado'      => 'We sent a code to %s. Check your inbox.',
+    'evento.correo_contacto.confirmado'   => 'Done: %s is now this activity\'s contact email.',
+
     'evento.form.seccion8'           => '8. Main action',
     'evento.form.accion_ayuda'       => 'Choose the main action people will see on your activity.',
     'evento.form.accion_contactar'   => 'Contact the organizer',
@@ -568,6 +589,10 @@ return [
     // ---- Access code email (includes/correo.php) ----
     'correo.codigo.asunto' => '{codigo} is your code to sign in to {marca}',
     'correo.codigo.cuerpo' => "Your code to sign in to {marca} is:\n\n    {codigo}\n\nIt expires in {minutos} minutes and works only once.\n\nIf you didn't request this code, you can ignore this message: without it\nno one can sign in, and the code will expire on its own. No one from\n{marca} will ever ask you for it by phone, WhatsApp, or email.\n\n--\n{marca} · Wellness activity directory in Mexico",
+
+    // ---- Email to confirm a contact email (migration 24) ----
+    'correo.confirmar_contacto.asunto' => '{codigo} is your code to confirm the contact email for "{actividad}"',
+    'correo.confirmar_contacto.cuerpo' => "Someone — hopefully you — wants this email to receive \"Contact organizer\" messages for the activity \"{actividad}\" on {marca}.\n\nYour code is:\n\n    {codigo}\n\nEnter it on the page where that activity is edited. It expires in {minutos} minutes and works only once.\n\nIf you don't recognize this, you can ignore it: without that code nothing\nis activated, and the code will expire on its own.\n\n--\n{marca} · Wellness activity directory in Mexico",
 
     // ---- Complete registration (completar-registro.php) ----
     'registro.error.acepta_legal' => 'To create your account you must accept the Terms and Conditions and the Privacy Notice.',

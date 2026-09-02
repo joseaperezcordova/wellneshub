@@ -185,3 +185,32 @@ function enviarCodigoAcceso(string $para, string $codigo, int $minutos): bool
 
     return enviarCorreo($para, $asunto, $cuerpo);
 }
+
+/**
+ * El código para confirmar el correo de contacto de una actividad (migración
+ * 24, REQ del cliente 2026-09-02).
+ *
+ * A DIFERENCIA del código de acceso, este correo puede llegarle a alguien que
+ * nunca pidió nada —quien edita puede escribir cualquier dirección—, así que
+ * el cuerpo lo dice de frente y explica que sin ese código no pasa nada.
+ *
+ * Sigue el idioma de quien lo pide (idiomaActual()), igual que
+ * enviarCodigoAcceso(): quien está editando una actividad ya tiene sesión y
+ * una página con idioma real, no hace falta fijar español aquí.
+ */
+function enviarCodigoCorreoContacto(string $para, string $codigo, int $minutos, string $tituloEvento): bool
+{
+    [, $marca] = correoRemitente();
+
+    $reemplazos = [
+        '{codigo}'    => $codigo,
+        '{minutos}'   => (string) $minutos,
+        '{marca}'     => $marca,
+        '{actividad}' => $tituloEvento,
+    ];
+
+    $asunto = strtr(t('correo.confirmar_contacto.asunto'), $reemplazos);
+    $cuerpo = strtr(t('correo.confirmar_contacto.cuerpo'), $reemplazos);
+
+    return enviarCorreo($para, $asunto, $cuerpo);
+}

@@ -33,6 +33,19 @@ const EVENTO_MARGEN_ELIMINACION_H = 24;
 const EVENTO_CATEGORIAS_MAX = 3;
 
 /**
+ * El correo de contacto por actividad (migración 24, requerimiento del
+ * cliente 2026-09-02): mismos números que CODIGO_* en includes/auth.php, la
+ * verificación del correo de la cuenta —es el mismo riesgo (un código de un
+ * solo uso, seis cifras, mandado por correo) y no hay motivo para que la
+ * ventana de intentos o de espera sea distinta aquí.
+ */
+const CORREO_CONTACTO_VIGENCIA_MIN = 15;  // minutos que vale un código
+const CORREO_CONTACTO_MAX_INTENTOS = 5;   // fallos sobre un mismo código antes de anularlo
+const CORREO_CONTACTO_ESPERA_SEG   = 60;  // entre dos códigos para la misma actividad
+const CORREO_CONTACTO_MAX_POR_HORA = 5;   // códigos por actividad y hora
+const CORREO_CONTACTO_MAX_IP_HORA  = 15;  // códigos por IP y hora, sea cual sea la actividad o el correo
+
+/**
  * Las categorías, con el icono que usa el menú de la portada.
  *
  * Esta lista es la única fuente: el menú lineal de la portada se dibuja desde
@@ -1619,4 +1632,194 @@ function datosEstructuradosEvento(array $ev): array
     }
 
     return $datos;
+}
+
+
+// --------------------------------------- correo de contacto por actividad --
+// Migración 24, requerimiento del cliente (2026-09-02). Ver el comentario de
+// arriba de CORREO_CONTACTO_VIGENCIA_MIN y el de la migración para el porqué
+// de una tabla aparte de codigos_acceso.
+
+/**
+ * El correo que de verdad recibe "Contactar al organizador" para esta
+ * actividad: el que confirmó su dueño para ella, o el de su cuenta si no ha
+ * puesto ninguno —el comportamiento de siempre—.
+ *
+ * Espera la fila tal como la devuelve buscarEvento(): con correo_contacto (la
+ * columna de eventos) y organizador_email (el alias del JOIN a usuarios).
+ */
+function correoContactoEvento(array $ev): string
+{
+    $propio = trim((string) ($ev['correo_contacto'] ?? ''));
+
+    return $propio !== '' ? $propio : (string) ($ev['organizador_email'] ?? '');
+}
+
+/**
+ * ¿Hay un código pedido y todavía vivo para esta actividad? Si lo hay, a qué
+ * correo se mandó —lo necesita el formulario para saber qué pantalla enseñar
+ * y a quién le está pidiendo el código a quien lo escribe—.
+ */
+function correoContactoPendiente(int $eventoId): ?string
+{
+    $st = db()->prepare(
+        'SELECT email FROM codigos_correo_contacto
+          WHERE evento_id = ? AND usado_en IS NULL AND expira_en > NOW()
+       ORDER BY id DESC LIMIT 1'
+    );
+    $st->execute([$eventoId]);
+    $email = $st->fetchColumn();
+
+    return $email !== false ? (string) $email : null;
+}
+
+/** Limpieza de códigos caducados. Mismo criterio que purgarCodigosViejos() en
+ *  includes/auth.php: 1 de cada 50 en vez de en cada petición. */
+function purgarCodigosCorreoContactoViejos(): void
+{
+    if (random_int(1, 50) !== 1) return;
+
+    db()->prepare('DELETE FROM codigos_correo_contacto WHERE expira_en < DATE_SUB(NOW(), INTERVAL 1 DAY)')
+        ->execute();
+}
+
+/**
+ * Genera un código, lo guarda y lo manda al correo NUEVO —no al de la cuenta—.
+ *
+ * El correo puede ser cualquiera que quien edita se invente: por eso los
+ * frenos son por actividad Y por IP, igual que solicitarCodigo() en
+ * includes/auth.php frena por correo Y por IP. Sin el de IP, este formulario
+ * sería una forma barata de mandarle "confirma tu correo" a cualquier buzón
+ * ajeno con el nombre de una actividad real puesto delante.
+ *
+ * @return array{0:bool,1:string} [ok, mensaje para enseñar]
+ */
+function solicitarCodigoCorreoContacto(int $eventoId, string $email, string $tituloEvento): array
+{
+    $email = mb_strtolower(trim($email));
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 190) {
+        return [false, t('evento.correo_contacto.error_invalido')];
+    }
+
+    $pdo = db();
+    purgarCodigosCorreoContactoViejos();
+
+    $espera = CORREO_CONTACTO_ESPERA_SEG;
+    $st = $pdo->prepare(
+        "SELECT COUNT(*) AS total,
+                COALESCE(SUM(creado_en > DATE_SUB(NOW(), INTERVAL $espera SECOND)), 0) AS recientes
+           FROM codigos_correo_contacto
+          WHERE evento_id = ? AND creado_en > DATE_SUB(NOW(), INTERVAL 1 HOUR)"
+    );
+    $st->execute([$eventoId]);
+    $porActividad = $st->fetch();
+
+    if ((int) $porActividad['recientes'] > 0) {
+        return [false, t('evento.correo_contacto.error_espera')];
+    }
+    if ((int) $porActividad['total'] >= CORREO_CONTACTO_MAX_POR_HORA) {
+        return [false, t('evento.correo_contacto.error_demasiados')];
+    }
+
+    $st = $pdo->prepare(
+        'SELECT COUNT(*) FROM codigos_correo_contacto
+          WHERE ip = ? AND creado_en > DATE_SUB(NOW(), INTERVAL 1 HOUR)'
+    );
+    $st->execute([ipBinaria()]);
+
+    if ((int) $st->fetchColumn() >= CORREO_CONTACTO_MAX_IP_HORA) {
+        return [false, t('evento.correo_contacto.error_demasiadas_ip')];
+    }
+
+    // Un código vivo por actividad: pedir uno nuevo invalida el anterior,
+    // mismo motivo que en solicitarCodigo() —si no, quien pide dos seguidos
+    // para dos correos distintos tiene los dos vivos a la vez—.
+    $pdo->prepare('UPDATE codigos_correo_contacto SET usado_en = NOW() WHERE evento_id = ? AND usado_en IS NULL')
+        ->execute([$eventoId]);
+
+    $codigo   = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    $vigencia = CORREO_CONTACTO_VIGENCIA_MIN;
+
+    $pdo->prepare(
+        "INSERT INTO codigos_correo_contacto (evento_id, email, codigo_hash, expira_en, ip)
+         VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL $vigencia MINUTE), ?)"
+    )->execute([$eventoId, $email, password_hash($codigo, PASSWORD_DEFAULT), ipBinaria()]);
+
+    $id = (int) $pdo->lastInsertId();
+
+    if (!enviarCodigoCorreoContacto($email, $codigo, $vigencia, $tituloEvento)) {
+        $pdo->prepare('DELETE FROM codigos_correo_contacto WHERE id = ?')->execute([$id]);
+        return [false, t('auth.error_envio')];
+    }
+
+    return [true, sprintf(t('evento.correo_contacto.enviado'), $email)];
+}
+
+/**
+ * Comprueba el código y, si es el bueno, deja ese correo como el de contacto
+ * de la actividad.
+ *
+ * @return array{0:bool,1:string} [ok, mensaje para enseñar]
+ */
+function confirmarCodigoCorreoContacto(int $eventoId, string $codigo): array
+{
+    $codigo = preg_replace('/\D+/', '', $codigo);
+
+    if (strlen((string) $codigo) !== 6) {
+        return [false, t('auth.codigo_formato')];
+    }
+
+    $pdo = db();
+
+    $st = $pdo->prepare(
+        'SELECT id, email, codigo_hash, intentos
+           FROM codigos_correo_contacto
+          WHERE evento_id = ? AND usado_en IS NULL AND expira_en > NOW()
+       ORDER BY id DESC LIMIT 1'
+    );
+    $st->execute([$eventoId]);
+    $fila = $st->fetch();
+
+    if (!$fila) {
+        return [false, t('auth.codigo_caducado')];
+    }
+
+    if ((int) $fila['intentos'] >= CORREO_CONTACTO_MAX_INTENTOS) {
+        $pdo->prepare('UPDATE codigos_correo_contacto SET usado_en = NOW() WHERE id = ?')->execute([$fila['id']]);
+        return [false, t('auth.demasiados_intentos')];
+    }
+
+    // El intento se cuenta ANTES de comprobar, mismo motivo que en
+    // verificarCodigo() (includes/auth.php): contarlo después deja la puerta
+    // abierta a quien corte la conexión al ver que falla.
+    $pdo->prepare('UPDATE codigos_correo_contacto SET intentos = intentos + 1 WHERE id = ?')->execute([$fila['id']]);
+
+    if (!password_verify((string) $codigo, $fila['codigo_hash'])) {
+        $quedan = CORREO_CONTACTO_MAX_INTENTOS - ((int) $fila['intentos'] + 1);
+        return [false, $quedan > 0
+            ? sprintf(t('auth.codigo_incorrecto_quedan'), $quedan)
+            : t('auth.codigo_incorrecto_final')];
+    }
+
+    $pdo->prepare('UPDATE codigos_correo_contacto SET usado_en = NOW() WHERE id = ?')->execute([$fila['id']]);
+    $pdo->prepare('UPDATE eventos SET correo_contacto = ? WHERE id = ?')->execute([$fila['email'], $eventoId]);
+
+    return [true, sprintf(t('evento.correo_contacto.confirmado'), $fila['email'])];
+}
+
+/** Cancela el código pendiente, sin esperar a que caduque. Vuelve a la
+ *  pantalla de "escribe un correo" en vez de dejar colgada la de "escribe
+ *  el código" cuando quien edita se arrepiente o se equivocó al escribirlo. */
+function cancelarCodigoCorreoContacto(int $eventoId): void
+{
+    db()->prepare('UPDATE codigos_correo_contacto SET usado_en = NOW() WHERE evento_id = ? AND usado_en IS NULL')
+        ->execute([$eventoId]);
+}
+
+/** Vuelve a usar el correo de la cuenta: no hace falta código, porque ese ya
+ *  está verificado —es al que llega el código de acceso—. */
+function quitarCorreoContactoEvento(int $eventoId): void
+{
+    db()->prepare('UPDATE eventos SET correo_contacto = NULL WHERE id = ?')->execute([$eventoId]);
 }

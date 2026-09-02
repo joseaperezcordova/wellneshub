@@ -47,73 +47,101 @@ $puede = puedeEditarEvento($ev, $u);
 $e       = $ev;
 $errores = [];
 
+// Correo de contacto de esta actividad (migración 24): fuera del formulario
+// grande a propósito —ver includes/correo-contacto-evento.php—, así que sus
+// tres acciones se comprueban antes de entrar al bloque del formulario
+// grande, y ese bloque se queda como «ninguna de las tres».
+$avisoCorreoContacto = '';
+$errorCorreoContacto = '';
+
 if ($puede && postDesbordado()) {
     $errores['general'] = t('evento.error.imagen_pesada');
+
+} elseif ($puede && $_SERVER['REQUEST_METHOD'] === 'POST' && !csrfValido($_POST['csrf'] ?? null)) {
+    $errores['general'] = t('evento.error.sesion_caducada');
+    $e = $_POST;
+    $e['imagen_url'] = imagenArrastrada($_POST['imagen_previa'] ?? null, $ev['imagen_url']);
+
+} elseif ($puede && isset($_POST['enviar_codigo_correo'])) {
+    [$ok, $msg] = solicitarCodigoCorreoContacto((int) $ev['id'], (string) ($_POST['correo_contacto_nuevo'] ?? ''), $ev['titulo']);
+    if ($ok) { $avisoCorreoContacto = $msg; } else { $errorCorreoContacto = $msg; }
+
+} elseif ($puede && isset($_POST['confirmar_codigo_correo'])) {
+    [$ok, $msg] = confirmarCodigoCorreoContacto((int) $ev['id'], (string) ($_POST['codigo_correo_contacto'] ?? ''));
+    if ($ok) {
+        $avisoCorreoContacto = $msg;
+        $ev = buscarEvento((int) $ev['id']) ?? $ev;   // para que $e traiga el correo_contacto ya puesto
+        $e  = $ev;
+    } else {
+        $errorCorreoContacto = $msg;
+    }
+
+} elseif ($puede && isset($_POST['cancelar_codigo_correo'])) {
+    cancelarCodigoCorreoContacto((int) $ev['id']);
+
+} elseif ($puede && isset($_POST['quitar_codigo_correo'])) {
+    quitarCorreoContactoEvento((int) $ev['id']);
+    $ev = buscarEvento((int) $ev['id']) ?? $ev;
+    $e  = $ev;
 
 } elseif ($puede && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // La que ya tiene guardada. No mandar archivo significa «déjala como está»,
     // no «bórrala».
     $imagenPrevia = $ev['imagen_url'];
 
-    if (!csrfValido($_POST['csrf'] ?? null)) {
-        $errores['general'] = t('evento.error.sesion_caducada');
-        $e = $_POST;
-        $e['imagen_url'] = imagenArrastrada($_POST['imagen_previa'] ?? null, $imagenPrevia);
-    } else {
-        [$e, $errores] = validarEvento($_POST);
+    [$e, $errores] = validarEvento($_POST);
 
-        [$e['imagen_url'], $errorImagen] = imagenDelFormulario($_POST, $_FILES, $imagenPrevia);
-        if ($errorImagen !== null) {
-            $errores['imagen'] = $errorImagen;
-        }
-
-        if (!nombreOrganizadorValido($_POST)) {
-            $errores['org_nombre'] = t('evento.error.falta_organizador');
-        }
-
-        if (!$errores && eventoDuplicado((int) $ev['usuario_id'], $e['entidad'], $e['ciudad'], $e['categoria'], $e['fecha_inicio'], (int) $ev['id'])) {
-            $errores['general'] = sprintf(t('evento.error.duplicado'), $e['categoria'], $e['ciudad'], $e['entidad']);
-        }
-
-        if (!$errores) {
-            actualizarEvento($e, (int) $ev['id']);
-            olvidarImagenEnVuelo($e['imagen_url']);
-
-            // La anterior se borra solo cuando el cambio ya está guardado. Al
-            // revés, un fallo al actualizar dejaría la ficha apuntando a un
-            // archivo que ya no existe.
-            if ($imagenPrevia !== null && $e['imagen_url'] !== $imagenPrevia) {
-                borrarImagenGuardada($imagenPrevia);
-            }
-
-            // El mismo formulario trae la sección de contacto del organizador
-            // (REQ-00012), así que también aquí se guarda: corregir un teléfono
-            // mal escrito es justo lo que se viene a hacer a «editar».
-            guardarContactoOrganizador((int) $u['id'], $_POST);
-
-            $_SESSION['evento_aviso'] = t('evento.editar.cambios_guardados');
-            $_SESSION['eventos_ga'] = [
-                ['nombre' => 'editar_actividad', 'params' => ['id' => (int) $ev['id'], 'categoria' => $e['categoria']]],
-            ];
-
-            // Si se llegó aquí desde el panel admin, esa procedencia se lleva
-            // a la ficha para que su enlace de vuelta apunte al mismo sitio.
-            $volver = (string) ($_GET['volver'] ?? '');
-            // «?volver» y no «&volver»: la dirección limpia no lleva ya el
-            // «?id=» al que aquel se enganchaba.
-            redirigir(urlEvento($ev)
-                . ($volver !== '' ? '?volver=' . urlencode($volver) : ''));
-        }
-
-        /*
-         * Si algo falló, la foto recién subida SE QUEDA y el formulario vuelve a
-         * salir con ella puesta. Antes se borraba y se volvía a enseñar la
-         * antigua, con lo que el cambio de imagen se perdía sin avisar: parecía
-         * que no se había llegado a elegir ninguna.
-         *
-         * La guardada de la actividad no se toca hasta que el cambio esté escrito.
-         */
+    [$e['imagen_url'], $errorImagen] = imagenDelFormulario($_POST, $_FILES, $imagenPrevia);
+    if ($errorImagen !== null) {
+        $errores['imagen'] = $errorImagen;
     }
+
+    if (!nombreOrganizadorValido($_POST)) {
+        $errores['org_nombre'] = t('evento.error.falta_organizador');
+    }
+
+    if (!$errores && eventoDuplicado((int) $ev['usuario_id'], $e['entidad'], $e['ciudad'], $e['categoria'], $e['fecha_inicio'], (int) $ev['id'])) {
+        $errores['general'] = sprintf(t('evento.error.duplicado'), $e['categoria'], $e['ciudad'], $e['entidad']);
+    }
+
+    if (!$errores) {
+        actualizarEvento($e, (int) $ev['id']);
+        olvidarImagenEnVuelo($e['imagen_url']);
+
+        // La anterior se borra solo cuando el cambio ya está guardado. Al
+        // revés, un fallo al actualizar dejaría la ficha apuntando a un
+        // archivo que ya no existe.
+        if ($imagenPrevia !== null && $e['imagen_url'] !== $imagenPrevia) {
+            borrarImagenGuardada($imagenPrevia);
+        }
+
+        // El mismo formulario trae la sección de contacto del organizador
+        // (REQ-00012), así que también aquí se guarda: corregir un teléfono
+        // mal escrito es justo lo que se viene a hacer a «editar».
+        guardarContactoOrganizador((int) $u['id'], $_POST);
+
+        $_SESSION['evento_aviso'] = t('evento.editar.cambios_guardados');
+        $_SESSION['eventos_ga'] = [
+            ['nombre' => 'editar_actividad', 'params' => ['id' => (int) $ev['id'], 'categoria' => $e['categoria']]],
+        ];
+
+        // Si se llegó aquí desde el panel admin, esa procedencia se lleva
+        // a la ficha para que su enlace de vuelta apunte al mismo sitio.
+        $volver = (string) ($_GET['volver'] ?? '');
+        // «?volver» y no «&volver»: la dirección limpia no lleva ya el
+        // «?id=» al que aquel se enganchaba.
+        redirigir(urlEvento($ev)
+            . ($volver !== '' ? '?volver=' . urlencode($volver) : ''));
+    }
+
+    /*
+     * Si algo falló, la foto recién subida SE QUEDA y el formulario vuelve a
+     * salir con ella puesta. Antes se borraba y se volvía a enseñar la
+     * antigua, con lo que el cambio de imagen se perdía sin avisar: parecía
+     * que no se había llegado a elegir ninguna.
+     *
+     * La guardada de la actividad no se toca hasta que el cambio esté escrito.
+     */
 }
 
 $titulo = t('evento.editar.titulo');
@@ -169,6 +197,13 @@ require __DIR__ . '/includes/layout.php';
       <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
       <?php $textoBoton = t('evento.editar.boton'); require __DIR__ . '/includes/form-evento.php'; ?>
     </form>
+
+    <?php
+    $correoPendiente = correoContactoPendiente((int) $ev['id']);
+    $correoEfectivo  = correoContactoEvento($ev);
+    $tieneOverride   = trim((string) ($ev['correo_contacto'] ?? '')) !== '';
+    require __DIR__ . '/includes/correo-contacto-evento.php';
+    ?>
 
     <?php /* Mismas comprobaciones que ya hace evento.php al recibir el POST
              —permiso de admin para republicar, plazo para borrar—: estos botones

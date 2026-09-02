@@ -136,6 +136,38 @@ CREATE TABLE IF NOT EXISTS codigos_acceso (
 
 
 -- ----------------------------------------------------------------------------
+--  codigos_correo_contacto (migración 24)
+--
+--  El mismo patrón que codigos_acceso, aparte a propósito: un código aquí
+--  confirma el correo de contacto de UNA actividad (evento_id), no da acceso
+--  a ninguna cuenta. Mezclar las dos cosas en una sola tabla habría dejado
+--  que pedir uno invalidara sin querer el otro —"un código vivo por
+--  correo", la misma regla que usa solicitarCodigo() en includes/auth.php—.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS codigos_correo_contacto (
+  id           BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  evento_id    INT UNSIGNED     NOT NULL,
+  email        VARCHAR(190)     NOT NULL,
+  codigo_hash  VARCHAR(255)     NOT NULL,
+
+  intentos     TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  expira_en    DATETIME         NOT NULL,
+  usado_en     DATETIME         NULL DEFAULT NULL,
+
+  ip           VARBINARY(16)    NOT NULL COMMENT 'inet_pton: vale para IPv4 e IPv6',
+  creado_en    DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+  KEY idx_ccc_evento (evento_id, creado_en),
+  KEY idx_ccc_expira (expira_en),
+
+  CONSTRAINT fk_ccc_evento
+    FOREIGN KEY (evento_id) REFERENCES eventos (id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ----------------------------------------------------------------------------
 --  eventos
 --
 --  DOS NOMBRES QUE CHOCAN, Y CÓMO SE RESUELVEN
@@ -232,6 +264,14 @@ CREATE TABLE IF NOT EXISTS eventos (
   -- en la otra.
   url_boletos   VARCHAR(500)  NULL DEFAULT NULL,
   url_reserva   VARCHAR(500)  NULL DEFAULT NULL,
+  -- El correo donde ESTA actividad recibe "Contactar al organizador"
+  -- (migración 24, requerimiento del cliente 2026-09-02). NULL significa "usa
+  -- el correo de mi cuenta" —el comportamiento de siempre—; solo se rellena
+  -- cuando confirmarCodigoCorreoContacto() (includes/eventos.php) valida el
+  -- código que se manda a esa dirección. Nunca se escribe directo desde el
+  -- formulario: un correo sin confirmar aquí sería mandarle las solicitudes
+  -- de alguien a un buzón que no demostró ser suyo.
+  correo_contacto VARCHAR(190) NULL DEFAULT NULL,
   -- Aparte de los de arriba: este es un enlace informativo —sitio propio,
   -- redes— sin acción de por medio, y puede llevarse aunque los otros
   -- también estén llenos.

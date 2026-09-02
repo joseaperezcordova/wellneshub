@@ -666,6 +666,61 @@ de contenido pendiente de traducir de la sección 3.
 
 ---
 
+### 2r. Ejecutar la migración 24 (correo de contacto por actividad)
+
+**Qué falta:** correr `database/migracion-24-correo-contacto-evento.sql` en
+phpMyAdmin, en pruebas y en producción.
+
+**Qué piden y por qué:** requerimiento del cliente, 2026-09-02: separar el
+correo de la cuenta (con el que se inicia sesión) del correo donde cada
+actividad recibe "Contactar al organizador". Antes había un solo correo por
+organizador —el de su cuenta— y todas sus actividades lo compartían; ahora
+cada actividad puede tener el suyo propio —por ejemplo, la cuenta de un
+colaborador que gestiona esa actividad en particular—, con el de la cuenta
+como valor por defecto.
+
+**El cliente pidió explícitamente verificación** ("idealmente mediante un
+enlace de verificación"): un correo nuevo no se activa hasta que se confirma
+con un código de un solo uso, igual que el código de acceso para entrar al
+sitio, pero en una tabla aparte (`codigos_correo_contacto`) para que pedir uno
+no interfiera con el otro. Antes de confirmarlo, la actividad sigue usando el
+correo de la cuenta —nunca se activa un correo sin confirmar—.
+
+**Dónde:** `/editar-actividad/{id}` (`evento-editar.php`), sección «Correo de
+contacto de esta actividad», fuera del formulario grande porque un `<form>`
+no puede ir dentro de otro —el archivo nuevo es
+`includes/correo-contacto-evento.php`—. Las funciones viven en
+`includes/eventos.php` (`correoContactoEvento()`,
+`solicitarCodigoCorreoContacto()`, `confirmarCodigoCorreoContacto()`,
+`cancelarCodigoCorreoContacto()`, `quitarCorreoContactoEvento()`), y
+`includes/contacto.php` (`avisarOrganizador()`) ya usa
+`correoContactoEvento($ev)` en vez de `$ev['organizador_email']` a secas.
+
+**Qué NO cambia:** el correo con el que se recibe un reporte de moderación
+(`moderacion.php`) sigue mostrando el de la cuenta del organizador, a
+propósito —para eso, administración necesita el correo real de quien es
+dueño de la cuenta, no uno que puso para enrutar mensajes de contacto—.
+
+**Alcance de esta primera entrega:** solo se puede fijar un correo de
+contacto DESPUÉS de crear la actividad (en «Editar»), no en el momento de
+publicarla por primera vez —`evento-nuevo.php` no la toca—. La actividad
+recién creada necesita su propio id antes de poder pedirle un código a un
+correo, así que hacerlo en el mismo formulario de alta habría significado
+meter esa verificación dentro de una página que también sube una imagen
+(`multipart/form-data`), una complicación aparte que no se pidió resolver
+ahora. Mientras tanto, toda actividad nueva usa el correo de la cuenta hasta
+que su organizador entra a editarla.
+
+**Qué pasa mientras tanto:** "Contactar al organizador" sigue funcionando
+igual —al correo de la cuenta, como siempre—. Antes de correr la migración,
+la sección de "Correo de contacto de esta actividad" no aparece —depende de
+que exista la columna `eventos.correo_contacto`—, y donde sí aparece intentar
+guardar algo falla con un error de columna desconocida.
+
+**Para cerrarlo:** ejecutar el `.sql`, en los dos entornos.
+
+---
+
 ### 2q. Preguntas frecuentes — texto del cliente (2026-09-02)
 
 **Hecho:** en el bloque «Para usuarios» de `preguntas-frecuentes.php`, la

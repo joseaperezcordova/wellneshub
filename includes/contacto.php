@@ -82,8 +82,11 @@ function avisarOrganizador(array $ev, string $nombre, string $email, ?string $te
             // mecanismo de idioma propio.
             . urlEvento($ev, 'es') . "\n";
 
+    // correoContactoEvento() (includes/eventos.php): el que confirmó el
+    // organizador para ESTA actividad (migración 24), o el de su cuenta si no
+    // ha puesto ninguno.
     enviarCorreo(
-        $ev['organizador_email'],
+        correoContactoEvento($ev),
         $nombre . ' quiere contactarte por «' . $ev['titulo'] . '»',
         $cuerpo,
         $email
