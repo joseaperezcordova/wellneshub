@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 return [
     // ---- Marca ----
-    'marca.nombre'    => 'OMDARA',
+    'marca.nombre'    => 'Omdara',
     'marca.subtitulo' => 'Wellness directory MX',
 
     // ---- Cabecera ----
@@ -62,9 +62,9 @@ return [
     'pie.cookies'      => 'Cookie Policy',
     'pie.beta'         => 'Beta version: we are continuously improving the platform. If you run into a problem,',
     'pie.beta_enlace'  => 'get in touch',
-    'pie.instagram'    => 'OMDARA on Instagram',
-    'pie.facebook'     => 'OMDARA on Facebook',
-    'pie.whatsapp'     => 'OMDARA on WhatsApp',
+    'pie.instagram'    => 'Omdara on Instagram',
+    'pie.facebook'     => 'Omdara on Facebook',
+    'pie.whatsapp'     => 'Omdara on WhatsApp',
 
     // 'pie.lema' — PENDIENTE. Es texto de marca; lo entrega producto.
 
@@ -376,7 +376,7 @@ return [
     'evento.guia.reservar_texto'    => 'Ideal for activities with limited capacity or advance registration, even without a direct ticket purchase.',
     'evento.guia.reservar_ejemplos' => 'Examples: Google Forms, WhatsApp, Calendly, your own form, a registration landing page.',
     'evento.guia.traduccion_titulo' => 'Important note about translation',
-    'evento.guia.traduccion_texto1' => 'OMDARA\'s translation does not modify or automatically translate the text you enter in your activity\'s description. The description, instructions, terms and any other custom content stay exactly as you wrote them.',
+    'evento.guia.traduccion_texto1' => 'Omdara\'s translation does not modify or automatically translate the text you enter in your activity\'s description. The description, instructions, terms and any other custom content stay exactly as you wrote them.',
     'evento.guia.traduccion_texto2' => 'If your activity targets both Spanish- and English-speaking participants, consider providing the relevant information in both languages within the description.',
     'evento.guia.nota'              => 'With that in mind, choose the <strong>main action</strong> below: decide what people ready to take the next step will see.',
 
@@ -498,7 +498,7 @@ return [
     'captcha.trampa_label'       => 'Don\'t fill this in',
 
     // ---- Site contact (contacto.php) ----
-    'contacto.pagina.titulo' => 'Contact OMDARA',
+    'contacto.pagina.titulo' => 'Contact Omdara',
 
     'contacto.error.campo_obligatorio' => 'This field is required.',
     'contacto.error.correo_invalido'   => 'Enter a valid email address.',

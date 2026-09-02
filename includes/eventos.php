@@ -206,7 +206,7 @@ function iconosLineaCategoria(): array
  * columna eventos.color y se pinta con style="background-color:…": ahí no hay
  * hoja de estilos que resuelva una variable.
  *
- * SIN NARANJA, a diferencia del resto de la interfaz. El naranja de OMDARA es
+ * SIN NARANJA, a diferencia del resto de la interfaz. El naranja de Omdara es
  * el único acento —para los CTA, y debe rondar el 5% de la superficie—; un
  * carril de tarjetas en la portada es de lo más grande que se ve de una vez, y
  * bastaría con que tres organizadores lo eligieran para convertirlo en el
@@ -1161,7 +1161,7 @@ function avisarAdminsNuevaActividad(array $ev): void
         return;
     }
 
-    $cuerpo = "Se creó una actividad nueva en OMDARA.\n\n"
+    $cuerpo = "Se creó una actividad nueva en Omdara.\n\n"
             . 'Título:     ' . $ev['titulo'] . "\n"
             . 'Categoría:  ' . $ev['categoria'] . "\n"
             . 'Organiza:   ' . ($ev['organizador'] ?? '') . "\n"

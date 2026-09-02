@@ -90,7 +90,7 @@ function enlaceMenu(string $claveRuta, string $claveTexto, string $clave, string
  * descripción general del sitio, que sigue siendo mejor que no tener nada.
  */
 $descripcionMeta = trim((string) ($descripcion
-    ?? 'OMDARA — directorio de retiros, festivales y círculos de bienestar en México. Encuentra actividades de yoga, breathwork, sound healing y más, o publica la tuya.'));
+    ?? 'Omdara — directorio de retiros, festivales y círculos de bienestar en México. Encuentra actividades de yoga, breathwork, sound healing y más, o publica la tuya.'));
 $urlActualMeta = URL_BASE . (string) ($_SERVER['REQUEST_URI'] ?? '/');
 ?>
 <meta name="description" content="<?= e($descripcionMeta) ?>">

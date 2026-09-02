@@ -730,27 +730,33 @@ agregaron sus dos preguntas nuevas justo después de la 4 («¿Puedo reservar o
 comprar una actividad en Omdara?» y «¿Omdara garantiza las actividades
 publicadas?»).
 
-**Pendiente de decidir — «Omdara» en vez de «OMDARA» en todo el sitio.** El
-cliente pidió explícitamente que la marca se escriba «Omdara» —solo la
-primera con mayúscula— en cualquier texto normal, y que «OMDARA» completo en
-mayúsculas quede reservado a los textos legales. Se aplicó dentro de
-`preguntas-frecuentes.php` (las dos preguntas de arriba y la respuesta de
-«¿Puedo cancelar una reserva?», que también decía «OMDARA»), pero el mismo
-«OMDARA» en mayúsculas aparece en más sitios que esta tarea no tocó:
-`como-funciona.php` (el cuerpo entero), los correos que arma el código
-(`includes/contacto.php`, `includes/eventos.php`, `includes/correo.php`),
-las meta descriptions (`includes/idiomas/es.php`/`en.php`, claves
-`pagina.*.meta`), `mi-cuenta.php`, `metricas.php` y `diagnostico-correo.php`.
-Aparte quedan, a propósito, sitios donde «OMDARA» no es texto de marca sino
-un identificador técnico que no se debe tocar —el user-agent de
-`includes/mapa.php`, la constante `OMDARA_ARRANCADO`
-(`includes/config.php`), la variable de JavaScript `OMDARA_COOKIES`
-(`includes/layout.php`)— y la duda mayor: `'marca.nombre' => 'OMDARA'`
-(`includes/idiomas/{es,en}.php`), el logotipo del sitio, que sale en la
-cabecera, el pie y el `<title>` de cada página. Cambiarlo sería una decisión
-de diseño —¿el logotipo también baja a «Omdara», o es la excepción porque es
-un wordmark y no un texto corrido?—, no solo un cambio de texto, así que se
-deja para que el cliente lo confirme antes de tocarlo.
+**«Omdara» en vez de «OMDARA» en todo el sitio — cerrado (2026-09-02).** El
+cliente confirmó las dos dudas que quedaban abiertas: sí, el logotipo
+también baja a «Omdara» (`marca.nombre`, cabecera/pie/`<title>` de cada
+página); y las cuatro páginas que quedan en mayúsculas —«sección legal»,
+en sus palabras— son Términos y Condiciones (TYC), Preguntas Frecuentes
+(PF), Aviso de Privacidad (ADP) y Política de Cookies. En Preguntas
+Frecuentes eso significó revertir el único cambio que esta misma tarea le
+había hecho un rato antes (la respuesta de «¿Puedo cancelar una reserva?»,
+que había bajado a «Omdara» sin saber todavía que esta página cuenta como
+legal) — las dos preguntas y las dos respuestas que el cliente redactó él
+mismo con «Omdara» se dejaron tal cual las mandó, sin tocar.
+
+Bajado a «Omdara» en el resto: `marca.nombre` (`includes/idiomas/{es,en}.php`,
+con lo que también bajan `pie.instagram`/`facebook`/`whatsapp` y las meta
+descriptions de páginas no legales), `como-funciona.php`, los correos que
+arma el código (`includes/contacto.php`, `includes/eventos.php`,
+`includes/correo.php`), `mi-cuenta.php`, `metricas.php` y
+`diagnostico-correo.php`.
+
+Quedan en mayúsculas, a propósito, dos cosas distintas: las cuatro páginas
+legales de arriba —incluida `legal.de_omdara` (la casilla de aceptación,
+`includes/casilla-legal.php`) y el banner/panel de cookies
+(`includes/cookies-dialogo.php`), por ser el mismo contenido de consentimiento
+aunque se pinte flotando en cualquier página— y los sitios donde «OMDARA» no
+es texto de marca sino un identificador técnico: el user-agent de
+`includes/mapa.php`, la constante `OMDARA_ARRANCADO` (`includes/config.php`)
+y la variable de JavaScript `OMDARA_COOKIES` (`includes/layout.php`).
 
 ---
 

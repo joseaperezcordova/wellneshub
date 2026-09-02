@@ -93,7 +93,7 @@ $bloques = [
         ],
         [
             '¿Puedo cancelar una reserva?',
-            'Las cancelaciones y reembolsos dependen de las políticas de cada organizador. Omdara no gestiona pagos ni '
+            'Las cancelaciones y reembolsos dependen de las políticas de cada organizador. OMDARA no gestiona pagos ni '
             . 'reservas, así que no puede cancelarlas ni devolver un importe.',
         ],
         [

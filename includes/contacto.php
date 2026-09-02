@@ -68,7 +68,7 @@ function crearContacto(array $ev, string $nombre, string $email, ?string $telefo
  */
 function avisarOrganizador(array $ev, string $nombre, string $email, ?string $telefono, ?string $mensaje): void
 {
-    $cuerpo = "Alguien quiere contactarte por tu actividad publicada en OMDARA.\n\n"
+    $cuerpo = "Alguien quiere contactarte por tu actividad publicada en Omdara.\n\n"
             . 'Actividad:  ' . $ev['titulo'] . "\n"
             . 'Nombre:     ' . $nombre . "\n"
             . 'Correo:     ' . $email . "\n"
@@ -255,7 +255,7 @@ function avisarContactoSitio(string $nombre, string $email, string $mensaje,
     // de idioma para correos todavía (ver docs/pendientes.md, fase 4).
     $motivoTexto = motivosContacto('es')[$motivo] ?? $motivo;
 
-    $cuerpo = "Alguien escribió desde el formulario de contacto de OMDARA.\n\n"
+    $cuerpo = "Alguien escribió desde el formulario de contacto de Omdara.\n\n"
             . 'Motivo:  ' . $motivoTexto . "\n"
             . 'Nombre:  ' . $nombre . "\n"
             . 'Correo:  ' . $email . "\n"
@@ -267,9 +267,9 @@ function avisarContactoSitio(string $nombre, string $email, string $mensaje,
             . "Para responder, contesta directamente este correo: llega a $email.\n";
 
     // El motivo va también en el asunto: quien abre la bandeja decide qué mirar
-    // primero por ahí, y «te escribió desde OMDARA» no distingue una alianza de
+    // primero por ahí, y «te escribió desde Omdara» no distingue una alianza de
     // un reporte de contenido.
-    $asunto = '[' . $motivoTexto . '] ' . $nombre . ' te escribió desde OMDARA';
+    $asunto = '[' . $motivoTexto . '] ' . $nombre . ' te escribió desde Omdara';
 
     foreach ($destinatarios as $destinatario) {
         enviarCorreo($destinatario, $asunto, $cuerpo, $email);

@@ -161,7 +161,7 @@ function filaCuenta(string $etiqueta, string $valor, string $pista = ''): void
 
         foreach ($campos as $columna => $etiqueta) {
             filaCuenta($etiqueta, (string) ($ficha[$columna] ?? ''),
-                'Solo lo ve el equipo de OMDARA. No aparece en tus actividades.');
+                'Solo lo ve el equipo de Omdara. No aparece en tus actividades.');
         }
 
         filaCuenta('Correo', (string) $ficha['email'],
@@ -198,7 +198,7 @@ function filaCuenta(string $etiqueta, string $valor, string $pista = ''): void
                      type="<?= $columna === 'telefono' ? 'tel' : 'text' ?>"
                      maxlength="<?= $columna === 'sitio_web' ? 500 : 120 ?>"
                      placeholder="<?= e($marcador) ?>" value="<?= e($valorCampo($columna)) ?>">
-              <div class="pista">Solo lo ve el equipo de OMDARA, para localizarte si hay algo con alguna
+              <div class="pista">Solo lo ve el equipo de Omdara, para localizarte si hay algo con alguna
                 actividad tuya. No se publica en ninguna ficha.</div>
             </div>
           <?php endforeach; ?>

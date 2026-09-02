@@ -51,7 +51,7 @@ $pasos = [
         'Publica tu actividad',
         'Crea una cuenta y completa el formulario con la información de tu actividad: fotografías, '
         . 'descripción, fecha, horario, ubicación, precio y datos de contacto. Publicar una actividad '
-        . 'en OMDARA es gratis para los organizadores.',
+        . 'en Omdara es gratis para los organizadores.',
     ],
     [
         /*
@@ -70,7 +70,7 @@ $pasos = [
          * existe, y sobre todo hacía esperar.
          */
         'Llega a nuevas personas',
-        'En cuanto la publicas aparece en OMDARA y ya se puede encontrar en el buscador, filtrar por '
+        'En cuanto la publicas aparece en Omdara y ya se puede encontrar en el buscador, filtrar por '
         . 'ciudad o categoría y compartir con su propio enlace. Sin esperas.',
     ],
     [
@@ -101,10 +101,10 @@ require __DIR__ . '/includes/layout.php';
     </div>
   </div>
 
-  <p class="guia-intro">En OMDARA puedes publicar tus actividades sin costo y llegar a nuevas
+  <p class="guia-intro">En Omdara puedes publicar tus actividades sin costo y llegar a nuevas
      personas que buscan experiencias de bienestar.</p>
 
-  <h3 class="guia-titulo">¿Por qué publicar en OMDARA?</h3>
+  <h3 class="guia-titulo">¿Por qué publicar en Omdara?</h3>
   <ul class="guia-motivos">
     <?php foreach ($motivos as $motivo): ?>
       <li><?= e($motivo) ?></li>

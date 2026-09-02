@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 return [
     // ---- Marca ----
-    'marca.nombre'    => 'OMDARA',
+    'marca.nombre'    => 'Omdara',
     'marca.subtitulo' => 'Directorio wellness MX',
 
     // ---- Cabecera ----
@@ -62,9 +62,9 @@ return [
     'pie.cookies'      => 'Política de Cookies',
     'pie.beta'         => 'Versión beta: estamos mejorando continuamente la plataforma. Si encuentras algún problema,',
     'pie.beta_enlace'  => 'contáctanos',
-    'pie.instagram'    => 'OMDARA en Instagram',
-    'pie.facebook'     => 'OMDARA en Facebook',
-    'pie.whatsapp'     => 'OMDARA en WhatsApp',
+    'pie.instagram'    => 'Omdara en Instagram',
+    'pie.facebook'     => 'Omdara en Facebook',
+    'pie.whatsapp'     => 'Omdara en WhatsApp',
 
     // ---- Títulos y descripciones de las páginas estáticas ----
     'pagina.inicio.titulo'        => 'Directorio de actividades wellness en México',
@@ -72,9 +72,9 @@ return [
     'pagina.buscar.titulo'        => 'Buscar actividades',
     'pagina.buscar.meta'          => 'Busca actividades de bienestar en México por ciudad, fecha y categoría: retiros, festivales, yoga, breathwork y más.',
     'pagina.como_funciona.titulo' => 'Cómo funciona',
-    'pagina.como_funciona.meta'   => 'Cómo encontrar actividades de bienestar en OMDARA y cómo publicar la tuya si eres organizador.',
+    'pagina.como_funciona.meta'   => 'Cómo encontrar actividades de bienestar en Omdara y cómo publicar la tuya si eres organizador.',
     'pagina.sobre_omdara.titulo'  => 'Sobre Omdara',
-    'pagina.sobre_omdara.meta'    => 'Qué es OMDARA, nuestra misión, nuestra visión y en qué creemos.',
+    'pagina.sobre_omdara.meta'    => 'Qué es Omdara, nuestra misión, nuestra visión y en qué creemos.',
     'pagina.faq.titulo'           => 'Preguntas frecuentes',
     'pagina.faq.meta'             => 'Dudas habituales sobre cómo publicar una actividad en OMDARA, contactar a un organizador y cómo se revisa lo que se publica.',
     'pagina.terminos.titulo'      => 'Términos y Condiciones',
@@ -408,7 +408,7 @@ return [
     'evento.guia.reservar_texto'    => 'Ideal para actividades con cupo limitado o registro previo, aunque no exista compra directa de boletos.',
     'evento.guia.reservar_ejemplos' => 'Ejemplos: Google Forms, WhatsApp, Calendly, formulario propio, landing page de registro.',
     'evento.guia.traduccion_titulo' => 'Importante sobre la traducción',
-    'evento.guia.traduccion_texto1' => 'La traducción de OMDARA no modifica ni traduce automáticamente los textos que tú ingreses en la descripción de tu actividad. La descripción, instrucciones, condiciones y demás contenido personalizado permanecerán tal como los hayas escrito.',
+    'evento.guia.traduccion_texto1' => 'La traducción de Omdara no modifica ni traduce automáticamente los textos que tú ingreses en la descripción de tu actividad. La descripción, instrucciones, condiciones y demás contenido personalizado permanecerán tal como los hayas escrito.',
     'evento.guia.traduccion_texto2' => 'Si tu actividad está dirigida a participantes en español e inglés, considera proporcionar la información relevante en ambos idiomas dentro de la descripción.',
     'evento.guia.nota'              => 'Con esto en mente, elige la <strong>acción principal</strong> más abajo: decide qué verán quienes quieran dar el siguiente paso.',
 
@@ -536,7 +536,7 @@ return [
     'captcha.trampa_label'       => 'No rellenes esto',
 
     // ---- Contacto general del sitio (contacto.php) ----
-    'contacto.pagina.titulo' => 'Contacta a OMDARA',
+    'contacto.pagina.titulo' => 'Contacta a Omdara',
     'contacto.pagina.meta'   => 'Escríbenos: dudas, ayuda, problemas con una actividad o cualquier cosa que necesites consultarnos.',
 
     'contacto.error.campo_obligatorio' => 'Este campo es obligatorio.',
@@ -673,10 +673,12 @@ return [
     'auth.correo_ya_registrado'  => 'Ese correo ya está registrado. Entra pidiendo un código.',
 
     // ---- Consentimiento de cookies (REQ-00003) ----
-    // El requerimiento escribe la marca en minúsculas; aquí va OMDARA, que es
-    // como se escribe en el resto del sitio. Un banner que llama a la marca de
-    // otra forma parece de otro sitio, que es justo lo contrario de lo que
-    // tiene que transmitir el primer aviso que alguien ve.
+    // OMDARA en mayúsculas aquí, a propósito: el cliente pidió (2026-09-02)
+    // bajar "OMDARA" a "Omdara" en todo el sitio EXCEPTO en los textos de la
+    // sección legal —Términos, Aviso de Privacidad, Política de Cookies y
+    // Preguntas Frecuentes—, y este banner es contenido de esa misma familia
+    // —el resumen del consentimiento de cookies—, aunque se pinte flotando
+    // sobre cualquier página. Ver docs/pendientes.md.
     'cookies.banner.titulo' => 'Usamos cookies',
     'cookies.banner.texto'  => 'Utilizamos cookies y tecnologías similares para que OMDARA funcione correctamente, analizar cómo se utiliza la plataforma y, cuando corresponda, medir nuestras campañas de marketing. Puedes aceptar todas, rechazar las no necesarias o configurar tus preferencias.',
     'cookies.aceptar'       => 'Aceptar todas',

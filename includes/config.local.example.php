@@ -86,7 +86,7 @@ return [
     // hay ningún sitio en el código que lo publicaría, y así se queda—.
     'correo' => [
         'remitente' => 'no-responder@tudominio.com',
-        'nombre'    => 'OMDARA',
+        'nombre'    => 'Omdara',
 
         // Dudas generales, comentarios, propuestas, alianzas.
         'contacto'  => '',

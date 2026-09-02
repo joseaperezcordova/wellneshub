@@ -35,7 +35,7 @@ function correoRemitente(): array
 
     return [
         $direccion !== '' ? $direccion : 'no-responder@' . $host,
-        $nombre    !== '' ? $nombre    : 'OMDARA',
+        $nombre    !== '' ? $nombre    : 'Omdara',
     ];
 }
 
