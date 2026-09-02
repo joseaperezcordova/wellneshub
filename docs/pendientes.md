@@ -68,6 +68,31 @@ administradores. Lo que **no** hace es publicar el `no-responder@`: un buzón qu
 nadie lee, impreso en un documento que promete atender consultas, es peor que no
 poner ninguno.
 
+**El cliente ya nombró la dirección, 2026-09-02:** `hola@omdara...`, descrita
+como el correo general público —dudas, comentarios, propuestas, alianzas— y
+pedida expresamente en el pie, en la página de Contacto y en «botones de
+contacto general». El requerimiento que llegó menciona «los correos» en plural
+y hablaba de definir cuáles son públicos, pero **solo llegó el punto 1**: si
+aparecen más buzones (soporte, no-responder), hay que revisar cuáles se
+publican antes de darlo por cerrado.
+
+**Ya se enseña en donde el cliente lo pidió, 2026-09-02.** `correoContacto()`
+se usaba solo en la cláusula 9 de la Política de Cookies; ahora también:
+
+- **El pie**, columna «Ayuda», debajo de «Contacto» —se imprime la dirección
+  tal cual, no un «Escríbenos», para que se pueda leer y copiar sin abrir el
+  cliente de correo—.
+- **La página `/contacto`**, arriba del formulario. Va arriba y no al pie de la
+  página porque es ahí donde alguien elige entre las dos vías; ofrecerlo
+  después de rellenar cinco campos no le sirve a nadie. El formulario **no** se
+  toca: sigue pidiendo motivo y actividad, que un correo suelto pierde.
+
+Las dos usan el mismo patrón que los iconos de redes: sin dirección
+configurada no se pinta nada, ni un enlace muerto. Llave nueva de catálogo
+`contacto.correo_directo` (ES/EN) y `.contacto-correo a` en `app.css`, porque
+la regla global `a{color:inherit; text-decoration:none}` dejaba la dirección
+indistinguible del texto plano.
+
 **Para cerrarlo:** crear el buzón en cPanel → Email Accounts y ponerlo en
 `includes/config.local.php`, en **los dos entornos**:
 
@@ -75,12 +100,23 @@ poner ninguno.
 'correo' => ['contacto' => 'hola@…'],
 ```
 
-No hace falta tocar código: en cuanto tenga valor, la cláusula 9 lo imprime y el
-enlace al formulario desaparece solo.
+No hace falta tocar código: en cuanto tenga valor aparece en los tres sitios
+—pie, `/contacto` y la cláusula 9— y el enlace de respaldo al formulario
+desaparece solo.
 
 > **Ojo:** tiene que ser un buzón del dominio principal. El subdominio de
 > pruebas no tiene MX, así que ninguna dirección suya recibe correo — es el
-> mismo problema que ya se documentó para el remitente.
+> mismo problema que ya se documentó para el remitente. Y tiene que existir
+> ANTES de configurarlo: publicar en el pie de todas las páginas una dirección
+> que rebota es peor que no publicar ninguna.
+
+> **Lo que este cambio NO cubre:** la cláusula 5 del Aviso de Privacidad, que
+> manda ejercer los derechos ARCO «al correo electrónico de contacto de
+> omdara» sin decir cuál. Ese texto es literal y no se toca —el criterio de
+> aceptación de REQ-00015 dice «sin modificaciones»—, así que la dirección no
+> se imprime ahí aunque esté configurada. Si el cliente quiere que el correo
+> aparezca también en el Aviso, es una modificación del texto legal y entra
+> por el punto 2m, no por aquí.
 
 ---
 

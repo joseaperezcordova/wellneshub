@@ -487,6 +487,7 @@ return [
     'contacto.enviado.aviso' => 'We\'ll reply to the email you left us. If you don\'t hear back in a few days, check your spam folder.',
 
     'contacto.form.sub'            => 'Have a question, need help, or want to report a problem? Fill out the form and we\'ll get in touch.',
+    'contacto.correo_directo'      => 'If you prefer, email us directly at',
     'contacto.form.revisa_campos'  => 'Check the marked fields.',
 
     'contacto.campo.nombre' => 'Name',

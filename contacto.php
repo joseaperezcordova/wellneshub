@@ -142,6 +142,17 @@ $mal = function (string $campo) use ($errores): string {
   <h1><?= et('contacto.pagina.titulo') ?></h1>
   <p class="sub"><?= et('contacto.form.sub') ?></p>
 
+  <?php /* La alternativa al formulario, para quien prefiere escribir desde su
+           propio correo. Va ARRIBA y no al pie de la página: es aquí donde se
+           decide entre las dos vías, y ofrecerla después de haber rellenado
+           cinco campos no le sirve a nadie. El formulario se queda igual —pide
+           motivo y actividad, que un correo suelto pierde—. Sin dirección
+           configurada esto no se pinta y la página queda como estaba. */ ?>
+  <?php if (correoContacto() !== ''): ?>
+    <p class="sub contacto-correo"><?= et('contacto.correo_directo') ?>
+      <a href="mailto:<?= e(correoContacto()) ?>"><?= e(correoContacto()) ?></a>.</p>
+  <?php endif; ?>
+
   <?php if (isset($errores['general'])): ?>
     <div class="aviso aviso-error"><?= e($errores['general']) ?></div>
   <?php elseif ($errores): ?>

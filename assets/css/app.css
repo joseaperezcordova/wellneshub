@@ -1023,6 +1023,12 @@ footer{background:var(--petroleo); color:rgba(255,255,255,.75); margin-top:40px;
 }
 .contacto-privacidad a{color:var(--terracota-texto); text-decoration:underline; text-underline-offset:2px;}
 
+/* El correo público, arriba del formulario. La regla global es
+   «a{color:inherit; text-decoration:none}», así que sin esto la dirección se
+   lee como texto plano y nadie sabe que se puede pulsar. Mismo tratamiento que
+   el enlace de privacidad de aquí arriba. */
+.contacto-correo a{color:var(--terracota-texto); text-decoration:underline; text-underline-offset:2px;}
+
 .btn-enviar{display:flex; align-items:center; justify-content:center; gap:8px;}
 
 /* ---- Confirmacion ---- */

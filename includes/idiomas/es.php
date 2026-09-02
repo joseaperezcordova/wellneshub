@@ -524,6 +524,7 @@ return [
     'contacto.enviado.aviso' => 'Te responderemos al correo que nos dejaste. Si no tienes noticias en unos días, revisa tu carpeta de spam.',
 
     'contacto.form.sub'            => '¿Tienes alguna pregunta, necesitas ayuda o quieres reportar un problema? Completa el formulario y nos pondremos en contacto contigo.',
+    'contacto.correo_directo'      => 'Si lo prefieres, escríbenos directo a',
     'contacto.form.revisa_campos'  => 'Revisa los campos marcados.',
 
     'contacto.campo.nombre' => 'Nombre',
