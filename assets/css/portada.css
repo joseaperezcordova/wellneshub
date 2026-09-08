@@ -29,8 +29,8 @@
     --jungle-deep:var(--texto);
     --stone:var(--fondo);
     --paper:var(--blanco);
-    --marigold:var(--terracota);
-    --marigold-deep:var(--terracota-viva);
+    --marigold:var(--azul);
+    --marigold-deep:var(--azul-viva);
     --clay:var(--negro);
     --line:var(--linea);
     --line-soft:var(--linea-suave);
@@ -54,46 +54,39 @@
   @media(max-width:640px){.wrap{padding:0 18px;}}
 
   /* ---------- topbar ----------
-     Cabecera en verde bosque con todo el texto en blanco. Al ser oscura, el
-     borde inferior ya no puede ser --line (un gris pensado para fondo claro,
-     que aqui no se ve): se sustituye por un blanco muy diluido, que es el
-     mismo recurso que usa el footer. El azul no entra en el menu; lo dice la
-     especificacion y tiene sentido, porque el unico azul de la cabecera debe
-     ser el boton de publicar. */
+     Cabecera en blanco con texto oscuro —pedido explicito del cliente
+     2026-09-08, "nada de azul en el menu normal"—. Antes era oscura (fondo
+     --jungle, texto blanco); el borde inferior ya puede ser --line sin mas,
+     que es justo el gris pensado para fondo claro. */
   .topbar{
-    position:sticky; top:0; z-index:40; background:var(--jungle);
-    border-bottom:1px solid rgba(255,255,255,0.14);
-    color:var(--paper);
+    position:sticky; top:0; z-index:40; background:var(--paper);
+    border-bottom:1px solid var(--line);
+    color:var(--jungle);
   }
   .topbar-inner{display:flex; align-items:center; justify-content:space-between; padding:16px 28px; max-width:1180px; margin:0 auto;}
   @media(max-width:640px){ .topbar-inner{padding:14px 18px;} }
   .logo{display:flex; align-items:center; gap:10px;}
-  /* La marca sigue siendo una rueda de cuatro cuartos, pero sobre fondo verde
-     bosque el cuarto de --texto (texto, casi negro) desaparecia contra el
-     fondo. Los cuatro cuartos pasan a colores que si despegan de la cabecera:
-     salvia, verde natural, azul y blanco. */
-  .logo-mark{width:30px; height:30px; border-radius:50%; background:conic-gradient(var(--terracota) 0deg 90deg, var(--blanco) 90deg 180deg, var(--negro-claro) 180deg 270deg, var(--arena) 270deg 360deg); flex-shrink:0;}
-  .logo-text{font-family:'Fraunces',serif; font-weight:600; font-size:19px; color:var(--paper);}
-  .logo-text small{display:block; font-family:'IBM Plex Mono',monospace; font-weight:400; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--arena); opacity:0.92; margin-top:1px;}
+  .logo-mark{width:30px; height:30px; border-radius:50%; background:conic-gradient(var(--azul-texto) 0deg 90deg, var(--blanco) 90deg 180deg, var(--negro-claro) 180deg 270deg, var(--seccion) 270deg 360deg); border:1px solid var(--line); flex-shrink:0;}
+  .logo-text{font-family:'Fraunces',serif; font-weight:600; font-size:19px; color:var(--jungle);}
+  .logo-text small{display:block; font-family:'IBM Plex Mono',monospace; font-weight:400; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--negro-claro); opacity:0.92; margin-top:1px;}
   /* Eran <button> mientras las vistas se conmutaban con JavaScript. Ahora son
      enlaces a páginas de verdad, y las dos formas se estilan igual para que el
      menú no cambie de aspecto. */
   nav.mainnav{display:flex; align-items:center; gap:4px;}
   nav.mainnav button, nav.mainnav a{
-    background:none; border:none; padding:8px 14px; font-size:13.5px; color:var(--paper);
+    background:none; border:none; padding:8px 14px; font-size:13.5px; color:var(--jungle);
     border-radius:20px; transition:background .15s, color .15s;
   }
-  /* Hover y seccion actual comparten aspecto —salvia de fondo, bosque de
-     texto— porque sobre una cabecera ya verde, un fondo verde no marcaria
-     nada. El texto tiene que oscurecerse con el fondo: blanco sobre salvia
-     no se lee. */
+  /* Hover y seccion actual comparten aspecto —gris suave de fondo, mismo
+     texto oscuro—. Nada de azul aqui: el cliente lo pidio explicito para el
+     menu normal, y el unico azul de la cabecera es el boton de publicar. */
   nav.mainnav button:hover, nav.mainnav a:hover,
-  nav.mainnav button.active, nav.mainnav a.active{background:var(--arena); color:var(--jungle);}
+  nav.mainnav button.active, nav.mainnav a.active{background:var(--seccion); color:var(--jungle);}
   /* .admin-toggle se fue con el boton de «Panel admin» del menu publico. */
   .navburger{display:none; background:none;border:none;padding:6px;}
-  .navburger span{display:block; width:20px; height:2px; background:var(--paper); margin:4px 0;}
+  .navburger span{display:block; width:20px; height:2px; background:var(--jungle); margin:4px 0;}
   @media(max-width:900px){
-    nav.mainnav{position:fixed; top:64px; left:0; right:0; background:var(--jungle); flex-direction:column; align-items:stretch; padding:8px 18px 16px; border-bottom:1px solid rgba(255,255,255,0.14); display:none; gap:2px;}
+    nav.mainnav{position:fixed; top:64px; left:0; right:0; background:var(--paper); flex-direction:column; align-items:stretch; padding:8px 18px 16px; border-bottom:1px solid var(--line); display:none; gap:2px; box-shadow:0 14px 28px rgba(17,17,17,.12);}
     nav.mainnav.open{display:flex;}
     nav.mainnav button{text-align:left;}
     .navburger{display:block;}
@@ -168,8 +161,8 @@
       linear-gradient(178deg, var(--texto) 0%, var(--texto-suave) 44%, var(--negro-agua) 72%, var(--negro) 100%);}
   .m2{background:linear-gradient(176deg, var(--texto-suave) 0%, var(--negro) 46%, var(--negro-hondo) 100%);}
   .m3{background:
-      radial-gradient(circle at 24% 30%, rgba(181,85,31,.9) 0 66px, rgba(181,85,31,0) 67px),
-      linear-gradient(180deg, var(--arena) 0%, var(--terracota) 40%, var(--texto) 100%);}
+      radial-gradient(circle at 24% 30%, rgba(49,95,140,.9) 0 66px, rgba(49,95,140,0) 67px),
+      linear-gradient(180deg, var(--seccion) 0%, var(--azul-texto) 40%, var(--texto) 100%);}
   .m4{background:linear-gradient(180deg, var(--texto) 0%, var(--negro-agua) 58%, var(--negro-claro) 100%);}
   .hero-media::before{
     content:""; position:absolute; left:-8%; right:-8%; bottom:0; height:46%;
@@ -196,9 +189,9 @@
   .hero-content .eyebrow, .hero-content h1, .hero-content p.sub{max-width:680px;}
   @media(max-width:640px){ .hero-content{padding:26px 18px 56px;} }
   @media(max-height:500px){ .hero-content{padding:20px 24px 34px;} }
-  .hero .eyebrow{color:var(--terracota-palida); opacity:1;}
+  .hero .eyebrow{color:var(--azul-palida); opacity:1;}
   .hero h1{font-size:44px; margin-top:10px; color:var(--paper); text-shadow:0 2px 18px rgba(22,22,22,.4);}
-  .hero h1 em{font-style:italic; color:var(--terracota-palida);}
+  .hero h1 em{font-style:italic; color:var(--azul-palida);}
   .hero p.sub{max-width:520px; color:rgba(255,255,255,0.88); margin-top:12px; font-size:15.5px;}
   @media(max-width:640px){.hero h1{font-size:30px;}}
   @media(max-height:500px){.hero h1{font-size:28px; margin-top:6px;} .hero p.sub{margin-top:6px;}}
@@ -218,7 +211,7 @@
     box-shadow:0 14px 38px rgba(22,22,22,0.20);
   }
   .bcampo{flex:1 1 0; min-width:0; padding:8px 16px; border-radius:999px;}
-  .bcampo:hover{background:var(--arena-suave);}
+  .bcampo:hover{background:var(--hover);}
   .bcampo label{
     display:block; font-family:'IBM Plex Mono',monospace; font-size:10px;
     letter-spacing:.1em; text-transform:uppercase; color:var(--jungle); margin-bottom:2px;
@@ -230,7 +223,7 @@
   .bsep{width:1px; height:34px; background:var(--line); flex-shrink:0;}
   /* El hijo directo, que es el de la lupa. Desde REQ-00005 los campos «Cuándo»
      y «Qué» tambien llevan un <button> dentro, y con «.buscador button» los
-     tres se habrian convertido en un circulo naranja de 48px. */
+     tres se habrian convertido en un circulo azul de 48px. */
   .buscador > button{
     flex-shrink:0; width:48px; height:48px; border-radius:50%; border:none;
     background:var(--marigold); color:var(--tinta-boton);
@@ -259,7 +252,7 @@
   .bcampo{position:relative;}
   /* Mientras esta abierto, el campo se queda resaltado: sin esto, con el panel
      abierto no se ve de cual de los tres es. */
-  .bcampo.abierto{background:var(--arena-suave);}
+  .bcampo.abierto{background:var(--hover);}
 
   /* El valor visible de «Cuándo» y «Qué». Hereda el aspecto del <select> al que
      sustituye para que los tres campos sigan pareciendo el mismo campo. */
@@ -300,7 +293,7 @@
   /* «activa» es la que se elegiria ahora —con el raton encima o con las
      flechas—; «aria-selected» es la que ya esta elegida. Son cosas distintas y
      se ven distintas: el fondo marca donde estas, la negrita que ya es tuya. */
-  .bopcion.activa{background:var(--arena-suave);}
+  .bopcion.activa{background:var(--hover);}
   .bopcion[aria-selected="true"]{font-weight:600; color:var(--jungle);}
 
   /* En movil los campos son filas de ancho completo, asi que el panel tambien.
@@ -342,11 +335,11 @@
      a secas en vez de desaparecer: es la acción que da de comer al directorio y
      la mitad del tráfico llega desde el móvil. */
   .btn-publicar{
-    background:var(--terracota); color:var(--tinta-boton); border-radius:999px;
+    background:var(--azul); color:var(--tinta-boton); border-radius:999px;
     padding:9px 18px; font-size:13.5px; font-weight:600; white-space:nowrap;
     transition:background .15s;
   }
-  .btn-publicar:hover{background:var(--terracota-viva);}
+  .btn-publicar:hover{background:var(--azul-viva);}
   @media(max-width:760px){
     .btn-publicar{padding:8px 14px; font-size:13px;}
     .btn-publicar-extra{display:none;}
@@ -362,7 +355,7 @@
   /* Sirve a un enlace («Publicar el primero») y a un boton («Quitar filtros»),
      asi que anula el borde que el navegador le pone al segundo. */
   .btn-vacio{
-    display:inline-block; background:var(--terracota); color:var(--tinta-boton);
+    display:inline-block; background:var(--azul); color:var(--tinta-boton);
     border:none; border-radius:999px; padding:10px 20px; font-size:13.5px; font-weight:600;
   }
   .aviso-portada{
@@ -377,13 +370,13 @@
   .catitem .ic{
     width:58px; height:58px; border-radius:50%; border:1px solid var(--line);
     background:var(--paper); display:flex; align-items:center; justify-content:center;
-    font-size:22px; color:var(--terracota-texto); transition:background .15s, border-color .15s, transform .15s;
+    font-size:22px; color:var(--azul-texto); transition:background .15s, border-color .15s, transform .15s;
   }
   /* El tamaño del emoji (font-size, arriba) no toca al SVG: un icono de
      línea necesita su propio ancho/alto, y currentColor es lo que hace que
      tome el mismo --ink que ya tenía el emoji sin escribirlo dos veces. */
   .catitem .ic svg{width:26px; height:26px;}
-  .catitem:hover .ic{background:var(--arena); border-color:var(--jungle); transform:translateY(-2px);}
+  .catitem:hover .ic{background:var(--seccion); border-color:var(--jungle); transform:translateY(-2px);}
   .catitem .lbl{font-size:12.5px; color:var(--ink); text-align:center; line-height:1.25;}
   /* A la altura del circulo, no del bloque entero: si se centra con el texto
      incluido queda descolgada respecto a la fila de iconos. */
@@ -394,7 +387,7 @@
     display:flex; align-items:center; justify-content:center;
     box-shadow:0 4px 14px rgba(22,22,22,.14);
   }
-  .catnext:hover{background:var(--arena);}
+  .catnext:hover{background:var(--seccion);}
 
   /* ---------- proximos eventos: tarjetas en carril ---------- */
   .evrail-wrap{position:relative;}
@@ -432,7 +425,7 @@
   .ev-body{padding:16px 18px 18px; display:flex; flex-direction:column; gap:5px; flex:1;}
   .ev-cat{
     font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.12em;
-    text-transform:uppercase; color:var(--terracota-texto);
+    text-transform:uppercase; color:var(--azul-texto);
   }
   .ev-body h3{font-size:19px; line-height:1.25;}
   .ev-loc{font-size:12.5px; color:var(--ink); opacity:.8;}
@@ -442,7 +435,7 @@
   }
   .ev-org{color:var(--ink); opacity:.8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .ev-price{font-family:'IBM Plex Mono',monospace; color:var(--jungle); white-space:nowrap;}
-  .ev-price.free{color:var(--terracota-texto);}
+  .ev-price.free{color:var(--azul-texto);}
   .evnext{
     position:absolute; right:8px; top:86px;
     width:38px; height:38px; border-radius:50%; border:1px solid var(--line);
@@ -450,7 +443,7 @@
     display:flex; align-items:center; justify-content:center; z-index:2;
     box-shadow:0 5px 16px rgba(22,22,22,.18);
   }
-  .evnext:hover{background:var(--arena);}
+  .evnext:hover{background:var(--seccion);}
 
   /* ---------- section shells ---------- */
   section.block{padding-top:50px; padding-bottom:50px;}
@@ -502,7 +495,7 @@
   .nform input{flex:1; min-width:0; border:none; border-radius:5px; padding:11px 13px; font-size:13.5px;}
   .nform button{background:var(--marigold); border:none; color:var(--tinta-boton); font-weight:600; border-radius:5px; padding:0 18px; font-size:13.5px;}
   .nform button:hover{background:var(--marigold-deep);}
-  .toast{font-size:12.5px; color:var(--terracota-palida); margin-top:8px; display:none;}
+  .toast{font-size:12.5px; color:var(--azul-palida); margin-top:8px; display:none;}
   .toast.show{display:block;}
 
   /* ---------- resultados / filtros ---------- */
@@ -511,13 +504,17 @@
   .filters{background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:20px;}
   .filters h4{font-size:11px; text-transform:uppercase; letter-spacing:0.1em; font-family:'IBM Plex Mono',monospace; color:var(--jungle); margin:18px 0 8px;}
   .filters h4:first-child{margin-top:0;}
-  .filters select{width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:5px; background:var(--arena);}
+  /* Fondo blanco y no gris de seccion: el cliente pidio los filtros
+     "predominantemente blancos" 2026-09-08 —campo y panel (.filters) en el
+     mismo blanco, distinguidos solo por el borde—, y no un campo gris
+     dentro de un panel tambien blanco. */
+  .filters select{width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:5px; background:var(--paper);}
   /* El buscador por nombre comparte caja con los desplegables de al lado: si no
      se iguala el aspecto parece un campo de otro sitio. El appearance:none quita
      la lupa y la X que Safari le pone por su cuenta a los type=search. */
   .filters input[type=search]{
     width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:5px;
-    background:var(--arena); -webkit-appearance:none; appearance:none;
+    background:var(--paper); -webkit-appearance:none; appearance:none;
   }
   /* El titulo de cada filtro envuelve su etiqueta para que se pueda pulsar y
      lleve el foco al campo. Sin esto la etiqueta hereda el aspecto del h4 pero
@@ -530,7 +527,7 @@
     border:1px solid var(--line); border-radius:5px;
     background:var(--paper); color:var(--jungle); cursor:pointer;
   }
-  .filtros-limpiar:hover{background:var(--arena);}
+  .filtros-limpiar:hover{background:var(--seccion);}
   /* align-items:flex-start y no center: con nombres de dos palabras —"Sound
      Healing", "Cold Plunge"— la etiqueta a veces envuelve a dos líneas, y
      centrada la casilla queda flotando entre ambas en vez de pegada a la
@@ -579,7 +576,7 @@
     border:1px solid var(--line); border-radius:999px; padding:11px 26px;
     font-size:13.5px; font-weight:600; transition:background .15s;
   }
-  .btn-cargar-mas:hover{background:var(--arena);}
+  .btn-cargar-mas:hover{background:var(--seccion);}
   .btn-cargar-mas:disabled{opacity:.6; pointer-events:none;}
 
   /* ---------- evento detalle ---------- */
@@ -589,7 +586,7 @@
   .gallery > div{background-size:cover; background-position:center;}
   .gallery > div:first-child{grid-row:1/3;}
   .evento-meta-box{background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:22px;}
-  .evento-meta-box .cat-tag{display:inline-block; background:var(--arena); font-size:11px; padding:4px 10px; border-radius:20px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.05em; color:var(--jungle); margin-bottom:12px;}
+  .evento-meta-box .cat-tag{display:inline-block; background:var(--seccion); font-size:11px; padding:4px 10px; border-radius:20px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.05em; color:var(--jungle); margin-bottom:12px;}
   .evento-meta-box h1{font-size:26px; margin-bottom:14px;}
   .metaline{display:flex; gap:10px; font-size:13.5px; padding:8px 0; border-top:1px solid var(--line-soft);}
   .metaline .k{width:78px; flex-shrink:0; opacity:0.8; font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.05em; padding-top:2px;}
@@ -608,7 +605,7 @@
   .infolist li{display:flex; justify-content:space-between; border-bottom:1px dashed var(--line); padding-bottom:6px;}
   .infolist li span:first-child{opacity:0.8;}
   .mapbox{height:220px; border-radius:8px; border:1px solid var(--line); background:
-      repeating-linear-gradient(45deg, var(--blanco) 0 10px, var(--arena) 10px 20px);
+      repeating-linear-gradient(45deg, var(--blanco) 0 10px, var(--seccion) 10px 20px);
     display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--jungle); text-align:center; padding:16px; margin-top:16px;}
   .orgcard{background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:18px; display:flex; gap:14px; align-items:center; margin-top:16px; cursor:pointer;}
   .orgcard:hover{border-color:var(--jungle);}
@@ -630,13 +627,15 @@
   .card-blog .b-body{padding:16px;}
   .card-blog .eyebrow{margin-bottom:6px;}
   .card-blog h3{font-size:16px; line-height:1.35;}
-  .evergreen-note{margin-top:30px; border-left:3px solid var(--marigold); padding:14px 18px; background:var(--paper); font-size:13px; opacity:0.85; border-radius:0 6px 6px 0;}
+  .evergreen-note{margin-top:30px; border-left:3px solid var(--azul-texto); padding:14px 18px; background:var(--paper); font-size:13px; opacity:0.85; border-radius:0 6px 6px 0;}
   .evergreen-note a{text-decoration:underline; text-underline-offset:2px;}
 
   /* ---------- footer ---------- */
-  /* El negro de marca (--jungle → --negro), igual que la cabecera. No
-     --jungle-deep: ese apunta a --texto, el negro cálido de texto, y
-     dejaria el pie casi sin contraste con el resto de la pagina. */
+  /* Se queda oscuro (--jungle → --negro) aunque la cabecera pasara a blanco
+     2026-09-08: el cliente solo pidio blanco para la cabecera, y una franja
+     oscura de cierre es un recurso aparte que no toca esa decision. No
+     --jungle-deep: ese apunta a --texto, que hoy vale lo mismo que --negro,
+     asi que el pie quedaria sin ningun contraste consigo mismo. */
   footer{background:var(--jungle); color:rgba(255,255,255,0.85); margin-top:20px;}
   /* Seis columnas: la marca y las cinco de navegacion —"Sobre Omdara" se sumo
      el 2026-09-02, entre Explora y Para organizadores—. No son iguales de
@@ -662,10 +661,10 @@
     width:36px; height:36px; border-radius:50%; padding:0; opacity:.8;
     transition:background .15s, opacity .15s, color .15s;
   }
-  .foot-redes a:hover{background:rgba(255,255,255,0.12); opacity:1; color:var(--arena);}
-  footer h5{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--terracota-palida); margin-bottom:12px;}
+  .foot-redes a:hover{background:rgba(255,255,255,0.12); opacity:1; color:var(--seccion);}
+  footer h5{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--azul-palida); margin-bottom:12px;}
   footer a{display:block; font-size:13px; padding:4px 0; opacity:0.75; transition:opacity .15s, color .15s;}
-  footer a:hover{opacity:1; color:var(--arena);}
+  footer a:hover{opacity:1; color:var(--seccion);}
   /* El botón de preferencias de cookies (punto 8 de docs/pendientes.md) es un
      <button>, no un <a> —abre el panel, no lleva a ninguna parte—, así que
      "footer a" no lo alcanza y necesita su aspecto de enlace aparte. */
@@ -674,7 +673,7 @@
     font:inherit; color:inherit; cursor:pointer;
     font-size:13px; padding:4px 0; opacity:0.75; transition:opacity .15s, color .15s;
   }
-  footer button[data-cookies]:hover{opacity:1; color:var(--arena);}
+  footer button[data-cookies]:hover{opacity:1; color:var(--seccion);}
   /* El aviso de beta sustituye al copyright. Es una frase, no una linea de
      creditos, asi que sube de 11.5px y pierde la monoespaciada: hay que
      leerla, no ojearla. */
@@ -685,17 +684,17 @@
   /* ---------- ADMIN ---------- */
   .admin-shell{background:var(--ink); min-height:100vh; padding-bottom:60px;}
   .admin-header{padding:26px 0 6px;}
-  .admin-header .eyebrow{color:var(--terracota-palida);}
+  .admin-header .eyebrow{color:var(--azul-palida);}
   .admin-header h1{color:var(--paper); font-size:26px; margin-top:6px;}
   .stat-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin:26px 0 36px;}
   @media(max-width:900px){.stat-grid{grid-template-columns:repeat(2,1fr);}}
   .stat-card{background:var(--texto-suave); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:16px;}
-  .stat-card .num{font-family:'Fraunces',serif; font-size:26px; color:var(--terracota-palida);}
+  .stat-card .num{font-family:'Fraunces',serif; font-size:26px; color:var(--azul-palida);}
   .stat-card .lbl{font-size:11.5px; color:rgba(255,255,255,0.8); margin-top:4px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.04em;}
 
   .admin-tabs{display:flex; gap:4px; border-bottom:1px solid rgba(255,255,255,0.12); margin-bottom:22px; overflow-x:auto;}
   .admin-tabs button{background:none; border:none; color:rgba(255,255,255,0.8); padding:11px 14px; font-size:13px; white-space:nowrap; border-bottom:2px solid transparent;}
-  .admin-tabs button.active{color:var(--paper); border-bottom-color:var(--terracota-palida);}
+  .admin-tabs button.active{color:var(--paper); border-bottom-color:var(--azul-palida);}
 
   .admin-panel{display:none;}
   .admin-panel.active{display:block;}
@@ -709,11 +708,11 @@
   table.admtable td{padding:11px 14px; border-bottom:1px solid rgba(255,255,255,0.06); vertical-align:middle;}
   table.admtable tr:last-child td{border-bottom:none;}
   .badge{font-family:'IBM Plex Mono',monospace; font-size:10.5px; padding:3px 9px; border-radius:20px; text-transform:uppercase; letter-spacing:0.04em;}
-  .badge.on{background:rgba(181,85,31,0.20); color:var(--terracota-palida);}
+  .badge.on{background:rgba(49,95,140,0.20); color:var(--azul-palida);}
   .badge.off{background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.8);}
-  .badge.star{background:rgba(233,221,201,0.18); color:var(--arena);}
+  .badge.star{background:rgba(233,221,201,0.18); color:var(--seccion);}
   .actionbtn{background:none; border:1px solid rgba(255,255,255,0.16); color:rgba(255,255,255,0.8); font-size:11px; padding:5px 9px; border-radius:4px; margin-right:4px;}
-  .actionbtn:hover{border-color:var(--terracota-palida); color:var(--terracota-palida);}
+  .actionbtn:hover{border-color:var(--azul-palida); color:var(--azul-palida);}
 
   .catchip-admin{display:inline-flex; align-items:center; gap:8px; background:var(--texto-suave); border:1px solid rgba(255,255,255,0.12); color:var(--paper); padding:8px 14px; border-radius:20px; font-size:12.5px; margin:0 8px 8px 0;}
   .catchip-admin .n{font-family:'IBM Plex Mono',monospace; opacity:0.8; font-size:11px;}
@@ -757,11 +756,11 @@
   .doc-contenido li{font-size:14.5px; line-height:1.6; margin-bottom:4px;}
   .doc-contenido a{color:var(--jungle); text-decoration-color:rgba(90,90,86,.35);}
   .doc-contenido hr{border:none; border-top:1px solid var(--line); margin:24px 0;}
-  .doc-contenido code{background:var(--arena-suave); padding:1px 6px; border-radius:4px; font-family:'IBM Plex Mono',monospace; font-size:0.9em;}
+  .doc-contenido code{background:var(--hover); padding:1px 6px; border-radius:4px; font-family:'IBM Plex Mono',monospace; font-size:0.9em;}
   .doc-contenido pre{background:var(--ink); color:var(--paper); padding:16px 18px; border-radius:8px; overflow-x:auto; margin:16px 0;}
   .doc-contenido pre code{background:none; padding:0; color:inherit; font-size:13px;}
   .doc-contenido blockquote{
-    border-left:3px solid var(--marigold); padding:10px 18px; background:var(--arena-suave);
+    border-left:3px solid var(--azul-texto); padding:10px 18px; background:var(--hover);
     border-radius:0 6px 6px 0; margin:16px 0; font-size:13.5px;
   }
   .doc-tabla{overflow-x:auto; margin:16px 0;}
@@ -781,7 +780,7 @@
   @media(max-width:560px){.fgrid{grid-template-columns:1fr;}}
   .fgrid .full{grid-column:1/-1;}
   .field label{display:block; font-size:11.5px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.04em; opacity:0.8; margin-bottom:5px;}
-  .field input, .field select, .field textarea{width:100%; border:1px solid var(--line); background:var(--arena); border-radius:5px; padding:9px 10px; font-size:13px;}
+  .field input, .field select, .field textarea{width:100%; border:1px solid var(--line); background:var(--seccion); border-radius:5px; padding:9px 10px; font-size:13px;}
   .field textarea{resize:vertical; min-height:64px;}
   .switchrow{display:flex; gap:18px; margin-top:4px; flex-wrap:wrap;}
   .switchrow label{display:flex; align-items:center; gap:7px; font-size:13px;}
@@ -798,17 +797,17 @@
   /* Selector de idioma. Son enlaces —no botones— desde que cada idioma tiene
      su propia direccion, asi que hay que devolverles el aspecto de pastilla:
      "footer a" y los estilos de enlace no aplican aqui, pero si el
-     text-decoration heredado. Sobre la cabecera verde el borde va en blanco
-     diluido, como el resto de la cabecera. */
-  .langtoggle{display:flex; border:1px solid rgba(255,255,255,0.28); border-radius:20px; overflow:hidden;}
+     text-decoration heredado. Sobre la cabecera blanca el borde va en
+     --line, como el resto de la cabecera. */
+  .langtoggle{display:flex; border:1px solid var(--line); border-radius:20px; overflow:hidden;}
   .langtoggle a{
     display:block; padding:7px 12px; font-size:12px; font-family:'IBM Plex Mono',monospace;
-    color:var(--paper); text-decoration:none; opacity:.75; transition:background .15s, opacity .15s, color .15s;
+    color:var(--jungle); text-decoration:none; opacity:.75; transition:background .15s, opacity .15s, color .15s;
   }
-  .langtoggle a:hover{opacity:1; background:rgba(255,255,255,0.12);}
-  /* El idioma activo se marca con salvia y texto bosque, igual que la seccion
-     actual del menu: sobre una cabecera verde, un fondo verde no marcaria nada. */
-  .langtoggle a.active{background:var(--arena); color:var(--jungle); opacity:1;}
+  .langtoggle a:hover{opacity:1; background:var(--seccion);}
+  /* El idioma activo se marca con gris suave, igual que la seccion actual
+     del menu —nada de azul aqui, mismo criterio que el resto del menu—. */
+  .langtoggle a.active{background:var(--seccion); color:var(--jungle); opacity:1;}
   /* Con logo + Publicar + cuenta + hamburguesa, el selector de idioma es lo
      primero que deja de caber en un telefono en vertical. Se esconde antes de
      que el topbar empiece a desbordar la ventana (ver Caso 20). */
@@ -826,7 +825,7 @@
     font-size:13px; color:var(--ink); background:var(--paper);
     transition:border-color .15s, background .15s;
   }
-  .btn-cuenta:hover{border-color:var(--jungle); background:var(--arena-suave);}
+  .btn-cuenta:hover{border-color:var(--jungle); background:var(--hover);}
   @media(max-width:520px){ .btn-cuenta span{display:none;} .btn-cuenta{padding:8px;} }
 
   .cuenta{position:relative;}
@@ -850,17 +849,17 @@
   .cuenta-quien strong{display:block; font-size:14px;}
   .cuenta-quien span{display:block; font-size:12px; opacity:.8; overflow:hidden; text-overflow:ellipsis;}
   .cuenta-menu a{display:block; padding:9px 12px; border-radius:8px; font-size:13.5px;}
-  .cuenta-menu a:hover{background:var(--arena-suave);}
+  .cuenta-menu a:hover{background:var(--hover);}
   /* Antes vivia dentro del hero oscuro y por eso era blanco. Ahora cae debajo
      de la pastilla, sobre el fondo claro: en blanco seria invisible. Va
      centrado porque la pastilla tambien lo esta. */
   .hero-actions{display:flex; align-items:center; justify-content:center; gap:16px; margin-top:20px; flex-wrap:wrap;}
   .hero-actions .ghostlink{font-size:13px; color:var(--jungle); border-bottom:1px solid var(--jungle);}
-  .hero-actions .ghostlink:hover{color:var(--terracota-texto); border-bottom-color:var(--terracota-texto);}
+  .hero-actions .ghostlink:hover{color:var(--azul-texto); border-bottom-color:var(--azul-texto);}
 
   /* ---------- fuera de alcance ---------- */
   .scope-banner{background:var(--texto-hondo); border:1px dashed rgba(255,255,255,0.25); color:rgba(255,255,255,0.75); border-radius:8px; padding:16px 18px; font-size:12.5px; margin:26px 0;}
-  .scope-banner b{color:var(--terracota-palida);}
+  .scope-banner b{color:var(--azul-palida);}
   .scope-list{display:flex; flex-wrap:wrap; gap:6px 10px; margin-top:8px;}
   .scope-list span{opacity:0.9;}
 
@@ -880,7 +879,7 @@
   }
 
   .volver-admin{display:inline-block; color:rgba(255,255,255,0.8); font-size:13px; margin-bottom:18px;}
-  .volver-admin:hover{color:var(--terracota-palida);}
+  .volver-admin:hover{color:var(--azul-palida);}
 
   .rango-filtros{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:22px;}
   .rango-label{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:rgba(255,255,255,0.8); margin-right:2px;}
@@ -906,13 +905,13 @@
   .met-chart-wrap{position:relative;}
   .met-chart{display:block; width:100%; height:auto; overflow:visible;}
   .met-grid-line{stroke:rgba(255,255,255,0.1); stroke-width:1;}
-  .met-area-fill{fill:var(--terracota-palida); fill-opacity:0.12;}
-  .met-area-line{fill:none; stroke:var(--terracota-palida); stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
-  .met-area-dot{fill:var(--terracota-palida); stroke:var(--texto-suave); stroke-width:2;}
+  .met-area-fill{fill:var(--azul-palida); fill-opacity:0.12;}
+  .met-area-line{fill:none; stroke:var(--azul-palida); stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .met-area-dot{fill:var(--azul-palida); stroke:var(--texto-suave); stroke-width:2;}
   .met-axis-label{font-family:'IBM Plex Mono',monospace; font-size:10.5px; fill:rgba(255,255,255,0.8);}
-  .met-end-label{font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; fill:var(--terracota-palida);}
+  .met-end-label{font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; fill:var(--azul-palida);}
   .met-crosshair{stroke:rgba(255,255,255,0.3); stroke-width:1; pointer-events:none; opacity:0;}
-  .met-hover-dot{fill:var(--terracota-palida); stroke:var(--texto-suave); stroke-width:2; pointer-events:none; opacity:0;}
+  .met-hover-dot{fill:var(--azul-palida); stroke:var(--texto-suave); stroke-width:2; pointer-events:none; opacity:0;}
   .met-hit-col{fill:transparent; cursor:crosshair;}
   .met-tooltip{
     position:absolute; pointer-events:none; background:var(--tinta-boton); color:var(--paper);
@@ -939,7 +938,7 @@
   .met-rank-i{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:rgba(255,255,255,0.8); text-align:right;}
   .met-rank-name{font-size:12.5px; font-weight:500; color:var(--paper); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .met-rank-track{position:relative; height:13px; background:rgba(255,255,255,0.08); border-radius:5px; overflow:hidden;}
-  .met-rank-fill{position:absolute; left:0; top:0; bottom:0; background:var(--terracota-palida); opacity:0.9; border-radius:5px;}
+  .met-rank-fill{position:absolute; left:0; top:0; bottom:0; background:var(--azul-palida); opacity:0.9; border-radius:5px;}
   .met-rank-value{font-family:'IBM Plex Mono',monospace; font-size:12.5px; text-align:right; color:rgba(255,255,255,0.8); font-variant-numeric:tabular-nums;}
 
   /* ---------- panel organizador ---------- */
@@ -948,7 +947,7 @@
   .org-login p{font-size:13px; opacity:.8; margin-bottom:20px;}
   .org-login .field{margin-bottom:14px;}
   .org-login .field label{display:block; font-size:11.5px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; opacity:.8; margin-bottom:5px;}
-  .org-login .field input{width:100%; border:1px solid var(--line); background:var(--arena); border-radius:5px; padding:10px 12px; font-size:13.5px;}
+  .org-login .field input{width:100%; border:1px solid var(--line); background:var(--seccion); border-radius:5px; padding:10px 12px; font-size:13.5px;}
   .org-login .btn-primary{margin-top:6px;}
   .org-login .swap{text-align:center; font-size:12.5px; margin-top:16px; color:var(--jungle);}
 
@@ -961,13 +960,13 @@
   .op-header .avatar{width:44px; height:44px; background-color:var(--negro);}
   .op-tabs{display:flex; gap:4px; border-bottom:1px solid var(--line); margin:24px 0 20px; overflow-x:auto;}
   .op-tabs button{background:none; border:none; padding:10px 14px; font-size:13px; color:var(--ink); opacity:.8; border-bottom:2px solid transparent; white-space:nowrap;}
-  .op-tabs button.active{opacity:1; border-bottom-color:var(--terracota); font-weight:600;}
+  .op-tabs button.active{opacity:1; border-bottom-color:var(--azul-texto); font-weight:600;}
   .op-panel{display:none;}
   .op-panel.active{display:block;}
   .op-profile-form{max-width:520px;}
 
   /* ---------- relacionados / badges ---------- */
-  .badge-pending{background:rgba(181,85,31,0.18); color:var(--marigold-deep); font-family:'IBM Plex Mono',monospace; font-size:10.5px; padding:3px 9px; border-radius:20px; text-transform:uppercase;}
+  .badge-pending{background:rgba(49,95,140,0.18); color:var(--marigold-deep); font-family:'IBM Plex Mono',monospace; font-size:10.5px; padding:3px 9px; border-radius:20px; text-transform:uppercase;}
   .results-heading{margin-bottom:6px;}
   .results-heading .eyebrow{margin-bottom:6px;}
 
@@ -1001,7 +1000,7 @@
   @media(max-width:900px){
     .evento-meta-box{position:static; max-height:none;}
   }
-  .lowstock{font-size:11.5px; color:var(--terracota-texto); margin-top:8px; text-align:center;}
+  .lowstock{font-size:11.5px; color:var(--azul-texto); margin-top:8px; text-align:center;}
 
   /* (3) El grid de "Eventos destacados" del inicio se elimino: mostraba los
      mismos eventos que la lista de proximos, justo encima. El CSS del toggle

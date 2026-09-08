@@ -38,7 +38,7 @@ require __DIR__ . '/includes/layout.php';
           <h1 style="font-size:22px;"><?= e($u['nombre']) ?></h1>
         </div>
       </div>
-      <a class="btn-add" style="background:var(--terracota); color:var(--tinta-boton);"
+      <a class="btn-add" style="background:var(--azul); color:var(--tinta-boton);"
          href="<?= URL_BASE ?>/evento-nuevo.php">+ Nueva actividad</a>
     </div>
 

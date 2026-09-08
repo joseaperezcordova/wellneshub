@@ -284,15 +284,16 @@ function iconosLineaCategoria(): array
  * columna eventos.color y se pinta con style="background-color:…": ahí no hay
  * hoja de estilos que resuelva una variable.
  *
- * SIN NARANJA, a diferencia del resto de la interfaz. El naranja de Omdara es
- * el único acento —para los CTA, y debe rondar el 5% de la superficie—; un
+ * SIN AZUL, a diferencia del resto de la interfaz. El azul de Omdara es el
+ * único acento —para los CTA, y debe rondar el 2% de la superficie—; un
  * carril de tarjetas en la portada es de lo más grande que se ve de una vez, y
  * bastaría con que tres organizadores lo eligieran para convertirlo en el
  * color dominante del sitio, compitiendo con los botones por la atención.
  *
- * Los mismos seis papeles de siempre —negro de marca, gris medio, gris
- * oscuro, gris muy oscuro, gris claro, negro cálido de texto—, ahora en la
- * escala de grises de la paleta nueva en vez de verdes.
+ * Seis grises neutros, de mas oscuro a mas claro —negro de marca, gris
+ * secundario, gris oscuro, gris muy oscuro, gris medio, gris claro—, en la
+ * escala de la paleta 2026-09-08 (blanco/grises + azul) en vez de la
+ * anterior (blanco/negro/naranja).
  *
  * Las fichas publicadas antes del cambio de paleta conservan su hex viejo
  * hasta que alguien las vuelva a guardar: validarEvento() solo acepta valores
@@ -300,7 +301,7 @@ function iconosLineaCategoria(): array
  */
 function coloresEvento(): array
 {
-    return ['#161616', '#4A4A47', '#3A3A37', '#2A2A27', '#EDEDE9', '#221F1B'];
+    return ['#111111', '#555555', '#3A3A3A', '#2A2A2A', '#999999', '#F2F2F2'];
 }
 
 /** clave => etiqueta. Con qué frecuencia se repite una actividad recurrente. */

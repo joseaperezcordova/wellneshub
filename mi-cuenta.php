@@ -167,7 +167,7 @@ function filaCuenta(string $etiqueta, string $valor, string $pista = ''): void
           <h1 style="font-size:22px;">Información de contacto</h1>
         </div>
       </div>
-      <a class="btn-add" style="background:var(--terracota); color:var(--tinta-boton);"
+      <a class="btn-add" style="background:var(--azul); color:var(--tinta-boton);"
          href="<?= URL_BASE ?>/mis-eventos.php">Mis actividades →</a>
     </div>
 

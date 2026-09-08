@@ -72,11 +72,11 @@ require __DIR__ . '/includes/layout.php';
       <div class="b-body"><div class="eyebrow">Evergreen</div><h3>Centros de bienestar por estado</h3></div>
     </div>
     <div class="card-blog">
-      <div class="b-img" style="background-color:var(--terracota);"></div>
+      <div class="b-img" style="background-color:var(--azul);"></div>
       <div class="b-body"><div class="eyebrow">Evergreen</div><h3>Calendario wellness 2026</h3></div>
     </div>
     <div class="card-blog">
-      <div class="b-img" style="background-color:var(--arena);"></div>
+      <div class="b-img" style="background-color:var(--seccion);"></div>
       <div class="b-body"><div class="eyebrow">Guía</div><h3>Qué llevar a tu primer retiro de silencio</h3></div>
     </div>
   </div>

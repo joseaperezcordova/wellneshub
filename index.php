@@ -254,7 +254,7 @@ if (seccionVisible('blog')): ?>
       </div>
     </a>
     <a class="card-blog" href="<?= URL_BASE ?>/blog.php">
-      <div class="b-img" style="background-color:var(--terracota);"></div>
+      <div class="b-img" style="background-color:var(--azul);"></div>
       <div class="b-body">
         <div class="eyebrow">Ciudades</div>
         <h3>Tulum más allá de la playa: dónde se practica de verdad</h3>
