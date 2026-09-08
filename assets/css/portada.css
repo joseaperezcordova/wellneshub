@@ -136,27 +136,6 @@
      lejisimos del contenido en pantallas anchas. max() los engancha a la misma
      columna que el titulo cuando hay sitio, y a 28px del borde cuando no. */
 
-  /* Logotipo grafico real del cliente (2026-09-08), flotando arriba a la
-     izquierda del hero —la esquina que dejan libre .cctrl (derecha) y
-     .hero-content (abajo, con align-items:flex-end)—. Mismo truco que
-     .foot-logo: el PNG trae el trazo en gris, pensado para fondo claro, y
-     aqui va sobre el degradado oscuro del hero, asi que brightness(0)
-     invert(1) lo vuelve blanco. Es un adorno ademas del eyebrow/titulo/
-     subtitulo reales, no los sustituye. */
-  .hero-logo{
-    position:absolute; top:24px; left:max(28px, calc((100% - 1180px) / 2 + 28px));
-    z-index:4; width:170px; height:auto;
-    filter:brightness(0) invert(1); opacity:.92; pointer-events:none;
-  }
-  @media(max-width:640px){ .hero-logo{width:120px; top:18px; left:18px;} }
-  /* Antes se ocultaba del todo aqui: una ventana de escritorio con la barra
-     de navegador y marcadores visibles baja facilmente de 500px de alto sin
-     ser un telefono en horizontal, y el cliente pidio (2026-09-08) que el
-     logo SIEMPRE se vea arriba a la izquierda —se encoge en vez de
-     desaparecer, igual que .hero-content ya hace en este mismo punto de
-     quiebre. */
-  @media(max-height:500px){ .hero-logo{width:110px; top:14px;} }
-
   /* Controles arriba a la derecha, la unica esquina que queda libre. */
   .cctrl{position:absolute; top:20px; right:max(28px, calc((100% - 1180px) / 2 + 28px)); z-index:4; display:flex; align-items:center; gap:10px;}
   .cdots{display:flex; align-items:center; gap:6px;}
