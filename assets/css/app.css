@@ -141,17 +141,7 @@ input,select{font-family:inherit; font-size:14px;}
   padding:14px 28px; max-width:1180px; margin:0 auto;
 }
 .logo{display:flex; align-items:center; gap:10px;}
-.logo-mark{
-  width:30px; height:30px; border-radius:50%; flex-shrink:0;
-  background:conic-gradient(var(--azul-texto) 0deg 90deg, var(--blanco) 90deg 180deg,
-                            var(--negro-claro) 180deg 270deg, var(--seccion) 270deg 360deg);
-  border:1px solid var(--linea);
-}
-.logo-text{font-family:'Fraunces',serif; font-weight:600; font-size:19px; line-height:1.1; color:var(--negro);}
-.logo-text small{
-  display:block; font-family:'IBM Plex Mono',monospace; font-weight:400; font-size:10px;
-  letter-spacing:0.12em; text-transform:uppercase; color:var(--negro-claro); margin-top:2px;
-}
+.logo-img{display:block; height:34px; width:auto;}
 .mainnav{display:flex; gap:4px;}
 .mainnav a{padding:8px 14px; font-size:13.5px; border-radius:20px; color:var(--negro); transition:background .15s, color .15s;}
 .mainnav a:hover{background:var(--seccion); color:var(--negro);}

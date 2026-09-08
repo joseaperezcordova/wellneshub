@@ -850,27 +850,19 @@ formulario se carga dentro de un contenedor y se envía por `fetch`, con la pág
 actual como respaldo cuando falle. `.modal-overlay` ya existe en
 `assets/css/portada.css`, sin usar, desde el prototipo.
 
-### 3. El logotipo
+### 3. El logotipo — cerrado (2026-09-08)
 
-**Qué falta:** una marca gráfica para OMDARA.
+El cliente mandó su marca gráfica real (`OMDR 1-01.png`, guardada como
+`assets/img/marca-omdara-logo.png`) y sustituyó por completo el círculo
+`.logo-mark` (la rueda de cuatro cuartos, resto del nombre *Rueda*) y el
+nombre en texto `.logo-text`. Vive en `includes/layout.php`, cabecera.
 
-**Dónde:** `.logo-mark` en `assets/css/app.css` y `assets/css/portada.css`.
+### 4. El subtítulo de la marca — cerrado (2026-09-08)
 
-**El problema:** es una rueda de cuatro cuartos porque el sitio se llamaba
-*Rueda*. Con OMDARA el motivo ya no significa nada. Se ajustaron sus colores
-para que se lea sobre la cabecera verde, pero eso es un parche, no una
-identidad.
-
-**Para cerrarlo:** una decisión de diseño y sustituir el `conic-gradient` por lo
-que salga.
-
----
-
-### 4. El subtítulo de la marca
-
-**Qué falta:** decidir si "Directorio wellness MX" sigue siendo el claim.
-
-**Dónde:** `includes/layout.php`, el `<small>` dentro de `.logo-text`.
+El cliente decidió el claim: "Donde el bienestar conecta." (antes
+"Directorio wellness MX"), en `marca.subtitulo` de
+`includes/idiomas/es.php` y `en.php`. Además ya viene incluido en el
+logotipo gráfico del punto 3, así que no depende solo del texto.
 
 ---
 

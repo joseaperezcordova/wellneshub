@@ -66,9 +66,12 @@
   .topbar-inner{display:flex; align-items:center; justify-content:space-between; padding:16px 28px; max-width:1180px; margin:0 auto;}
   @media(max-width:640px){ .topbar-inner{padding:14px 18px;} }
   .logo{display:flex; align-items:center; gap:10px;}
-  .logo-mark{width:30px; height:30px; border-radius:50%; background:conic-gradient(var(--azul-texto) 0deg 90deg, var(--blanco) 90deg 180deg, var(--negro-claro) 180deg 270deg, var(--seccion) 270deg 360deg); border:1px solid var(--line); flex-shrink:0;}
-  .logo-text{font-family:'Fraunces',serif; font-weight:600; font-size:19px; color:var(--jungle);}
-  .logo-text small{display:block; font-family:'IBM Plex Mono',monospace; font-weight:400; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--negro-claro); opacity:0.92; margin-top:1px;}
+  /* Logotipo grafico real del cliente (2026-09-08), sustituye al circulo
+     .logo-mark y al nombre+lema en texto (.logo-text) que llevaba antes la
+     cabecera. El PNG trae el trazo en gris oscuro, pensado para fondo claro,
+     y aqui va sobre la cabecera blanca tal cual, sin invertir. */
+  .logo-img{display:block; height:34px; width:auto;}
+  @media(max-width:640px){ .logo-img{height:28px;} }
   /* Eran <button> mientras las vistas se conmutaban con JavaScript. Ahora son
      enlaces a páginas de verdad, y las dos formas se estilan igual para que el
      menú no cambie de aspecto. */
