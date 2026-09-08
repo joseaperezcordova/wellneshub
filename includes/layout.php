@@ -238,9 +238,7 @@ $scVerifica = trim((string) ($CONFIG['analytics']['search_console_verificacion']
 <div class="topbar">
   <div class="topbar-inner">
     <a class="logo" href="<?= e(url('inicio')) ?>">
-      <img class="logo-img" src="<?= URL_BASE ?>/assets/img/marca-omdara-logo.png"
-           alt="<?= e(et('marca.nombre') . ' — ' . et('marca.subtitulo')) ?>"
-           width="1042" height="417" loading="eager">
+      <div class="logo-text"><?= et('marca.nombre') ?><small><?= et('marca.subtitulo') ?></small></div>
     </a>
 
     <?php /* Enlaces de verdad y no botones con JavaScript: así funcionan el clic

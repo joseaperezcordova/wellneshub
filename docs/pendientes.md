@@ -852,17 +852,20 @@ actual como respaldo cuando falle. `.modal-overlay` ya existe en
 
 ### 3. El logotipo — cerrado (2026-09-08)
 
-El cliente mandó su marca gráfica real (`OMDR 1-01.png`, guardada como
-`assets/img/marca-omdara-logo.png`) y sustituyó por completo el círculo
-`.logo-mark` (la rueda de cuatro cuartos, resto del nombre *Rueda*) y el
-nombre en texto `.logo-text`. Vive en `includes/layout.php`, cabecera.
+Se probó primero como imagen (`OMDR 1-01.png`, la marca gráfica que mandó
+el cliente), pero es puro texto sin ningún icono —en una fuente genérica
+de Office/Canva, no una tipografía de marca—, así que se quitó el círculo
+`.logo-mark` (la rueda de cuatro cuartos, resto del nombre *Rueda*) y se
+dejó como texto real de nuevo (`.logo-text` en `includes/layout.php`),
+con las tipografías que ya usa el resto del sitio (Fraunces). Un PNG no
+se traduce solo al inglés y pierde nitidez si se agranda; texto sí.
 
 ### 4. El subtítulo de la marca — cerrado (2026-09-08)
 
 El cliente decidió el claim: "Donde el bienestar conecta." (antes
 "Directorio wellness MX"), en `marca.subtitulo` de
-`includes/idiomas/es.php` y `en.php`. Además ya viene incluido en el
-logotipo gráfico del punto 3, así que no depende solo del texto.
+`includes/idiomas/es.php` y `en.php`. Al ser texto real (punto 3) ya se
+traduce solo al inglés ("Where wellness connects.").
 
 ---
 
