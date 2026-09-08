@@ -415,7 +415,7 @@ function pie(): void
   <div class="foot-inner">
     <div class="foot-marca">
       <img class="foot-logo" src="<?= URL_BASE ?>/assets/img/marca-omdara-pie.png"
-           alt="<?= e(et('marca.nombre') . ' — ' . et('pie.lema')) ?>" width="1042" height="417" loading="lazy">
+           alt="<?= e(et('marca.nombre') . ' — ' . et('pie.lema')) ?>" width="1459" height="584" loading="lazy">
       <?php /* et('pie.lema') no tiene versión en inglés todavía (ver
                includes/idiomas/en.php) — el texto de la imagen ya era el
                único que se mostraba en /en, así que este cambio no pierde
