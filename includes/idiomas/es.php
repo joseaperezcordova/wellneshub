@@ -19,7 +19,7 @@ declare(strict_types=1);
 return [
     // ---- Marca ----
     'marca.nombre'    => 'Omdara',
-    'marca.subtitulo' => 'Directorio wellness MX',
+    'marca.subtitulo' => 'Donde el bienestar conecta.',
 
     // ---- Cabecera ----
     'nav.inicio'      => 'Inicio',
