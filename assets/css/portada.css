@@ -136,6 +136,21 @@
      lejisimos del contenido en pantallas anchas. max() los engancha a la misma
      columna que el titulo cuando hay sitio, y a 28px del borde cuando no. */
 
+  /* Logotipo grafico real del cliente (2026-09-08), flotando arriba a la
+     izquierda del hero —la esquina que dejan libre .cctrl (derecha) y
+     .hero-content (abajo, con align-items:flex-end)—. Mismo truco que
+     .foot-logo: el PNG trae el trazo en gris, pensado para fondo claro, y
+     aqui va sobre el degradado oscuro del hero, asi que brightness(0)
+     invert(1) lo vuelve blanco. Es un adorno ademas del eyebrow/titulo/
+     subtitulo reales, no los sustituye. */
+  .hero-logo{
+    position:absolute; top:24px; left:max(28px, calc((100% - 1180px) / 2 + 28px));
+    z-index:4; width:170px; height:auto;
+    filter:brightness(0) invert(1); opacity:.92; pointer-events:none;
+  }
+  @media(max-width:640px){ .hero-logo{width:120px; top:18px; left:18px;} }
+  @media(max-height:500px){ .hero-logo{display:none;} }
+
   /* Controles arriba a la derecha, la unica esquina que queda libre. */
   .cctrl{position:absolute; top:20px; right:max(28px, calc((100% - 1180px) / 2 + 28px)); z-index:4; display:flex; align-items:center; gap:10px;}
   .cdots{display:flex; align-items:center; gap:6px;}
@@ -152,32 +167,46 @@
   .cnav:hover{background:rgba(22,22,22,.65);}
   .cctrl :focus-visible{outline:2px solid var(--paper); outline-offset:2px;}
 
+  /* Escala propia del hero: el cliente pidio (2026-09-08) "menos negro, mas
+     grises y azules" —antes el degradado bajaba a --negro/--negro-hondo,
+     que a plena pantalla se ve como una franja negra lisa—. Son tonos solo
+     para esta escena (cielo/colinas de la pseudo-imagen), no roles
+     reutilizables en el resto del sitio, por eso viven aqui y no en el
+     :root de app.css. Los tres conservan buen contraste para el titulo
+     blanco de encima: 16.3:1, 9.7:1 y 5.11:1 sobre blanco. */
+  :root{
+    --hero-cielo:#5B7086;
+    --hero-colina:#33465A;
+    --hero-noche:#16212C;
+  }
+
   /* Pseudo-imagen: la fotografia todavia no existe, asi que cada escena se
      compone con gradientes —cielo, sol, dos lineas de colinas—. Cuando haya
      foto real basta con cambiar el background de cada .mN por la imagen. */
   .hero-media{position:absolute; inset:0;}
   .m1{background:
       radial-gradient(circle at 78% 24%, rgba(233,221,201,.95) 0 52px, rgba(233,221,201,0) 53px),
-      linear-gradient(178deg, var(--texto) 0%, var(--texto-suave) 44%, var(--negro-agua) 72%, var(--negro) 100%);}
-  .m2{background:linear-gradient(176deg, var(--texto-suave) 0%, var(--negro) 46%, var(--negro-hondo) 100%);}
+      linear-gradient(178deg, var(--hero-cielo) 0%, var(--hero-colina) 55%, var(--hero-noche) 100%);}
+  .m2{background:linear-gradient(176deg, var(--hero-colina) 0%, var(--hero-noche) 70%, var(--hero-noche) 100%);}
   .m3{background:
       radial-gradient(circle at 24% 30%, rgba(49,95,140,.9) 0 66px, rgba(49,95,140,0) 67px),
-      linear-gradient(180deg, var(--seccion) 0%, var(--azul-texto) 40%, var(--texto) 100%);}
-  .m4{background:linear-gradient(180deg, var(--texto) 0%, var(--negro-agua) 58%, var(--negro-claro) 100%);}
+      linear-gradient(180deg, var(--seccion) 0%, var(--azul-texto) 40%, var(--hero-noche) 100%);}
+  .m4{background:linear-gradient(180deg, var(--hero-cielo) 0%, var(--hero-colina) 58%, var(--hero-noche) 100%);}
   .hero-media::before{
     content:""; position:absolute; left:-8%; right:-8%; bottom:0; height:46%;
-    background:var(--negro); border-radius:50% 50% 0 0 / 26% 26% 0 0; opacity:.92;
+    background:var(--hero-noche); border-radius:50% 50% 0 0 / 26% 26% 0 0; opacity:.92;
   }
   .hero-media::after{
     content:""; position:absolute; left:-14%; right:24%; bottom:0; height:32%;
-    background:var(--negro-claro); border-radius:50% 50% 0 0 / 34% 34% 0 0; opacity:.55;
+    background:var(--hero-colina); border-radius:50% 50% 0 0 / 34% 34% 0 0; opacity:.55;
   }
 
-  /* Velo oscuro de abajo hacia arriba. No es decoracion: sin el, el titulo
-     blanco cae sobre el verde claro de las colinas y se queda en 2.6:1. */
+  /* Velo de abajo hacia arriba, en el mismo azul-gris de --hero-noche y no en
+     gris neutro: sin el, el titulo blanco cae sobre el cielo claro de arriba
+     y pierde contraste: no es decoracion. */
   .hero-scrim{
     position:absolute; inset:0;
-    background:linear-gradient(to top, rgba(22,22,22,.86) 0%, rgba(22,22,22,.58) 34%, rgba(22,22,22,.20) 72%, rgba(22,22,22,0) 100%);
+    background:linear-gradient(to top, rgba(22,33,44,.86) 0%, rgba(22,33,44,.58) 34%, rgba(22,33,44,.20) 72%, rgba(22,33,44,0) 100%);
   }
 
   /* Limitado y centrado para que el titulo caiga sobre la misma columna que el
@@ -652,7 +681,16 @@
   }
   @media(max-width:560px){ .foot-inner{grid-template-columns:1fr 1fr;} }
 
-  .foot-lema{font-size:13px; opacity:.85; margin-top:10px; max-width:280px; line-height:1.6;}
+  /* Logotipo grafico real del cliente (2026-09-08), sustituye al nombre en
+     <div class="logo-text"> mas el parrafo de lema que llevaba esta columna.
+     El PNG trae el trazo en gris oscuro —pensado para fondo claro—, y esta
+     columna vive sobre el pie oscuro: brightness(0) invert(1) lo vuelve
+     blanco solido conservando su transparencia, sin pedir un segundo archivo
+     al cliente para fondo oscuro. */
+  .foot-logo{
+    display:block; width:100%; max-width:230px; height:auto;
+    filter:brightness(0) invert(1); opacity:.95;
+  }
   /* Los iconos son enlaces, y "footer a" les pone display:block. En fila y
      con area de toque suficiente: 36px es el minimo comodo en un telefono. */
   .foot-redes{display:flex; gap:6px; margin-top:18px;}

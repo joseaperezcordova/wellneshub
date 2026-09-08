@@ -101,6 +101,13 @@ require __DIR__ . '/includes/layout.php';
       </div>
     </div>
 
+    <?php /* Decorativa: el nombre "Omdara" ya es texto real en la cabecera
+             (.logo-text), y el eyebrow/titulo/subtitulo de abajo ya dicen el
+             mensaje de la portada — alt="" para que un lector de pantalla no
+             repita la marca dos veces seguidas. */ ?>
+    <img class="hero-logo" src="<?= URL_BASE ?>/assets/img/marca-omdara-hero.png"
+         alt="" width="1042" height="417" loading="eager">
+
     <div class="cctrl">
       <div class="cdots" id="cdots">
         <button type="button" aria-current="true"  aria-label="<?= et('inicio.hero.ver_imagen') ?> 1"></button>

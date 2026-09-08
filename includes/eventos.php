@@ -89,6 +89,8 @@ function categoriasMenu(?string $idioma = null): array
         'Barre'              => ['🩰',  'Barre'],
         'Artes Marciales'    => ['🥋',  'Artes Marciales'],
         'Fitness'            => ['🏋️',  'Fitness'],
+        // Agregada, requerimiento del cliente 2026-09-08
+        'Hyrox'              => ['⏱️',  'Hyrox'],
 
         // Aire libre
         'Senderismo'         => ['🥾',  'Senderismo'],
@@ -137,6 +139,7 @@ function categoriasMenu(?string $idioma = null): array
         'Stretching' => 'Stretching', 'Movilidad' => 'Mobility', 'Danza' => 'Dance',
         'Calistenia' => 'Calisthenics', 'Barre' => 'Barre',
         'Artes Marciales' => 'Martial Arts', 'Fitness' => 'Fitness',
+        'Hyrox' => 'Hyrox',
         'Senderismo' => 'Hiking', 'Running' => 'Running', 'Carreras' => 'Races',
         'Ciclismo' => 'Cycling', 'Triatlón' => 'Triathlon', 'Surf' => 'Surf',
         'Natación' => 'Swimming', 'Paddleboard' => 'Paddleboarding', 'Kayak' => 'Kayaking',
@@ -267,6 +270,8 @@ function iconosLineaCategoria(): array
         'Barre'              => $svg('<path d="M4 16h16"/><path d="M7 16v4M17 16v4"/><path d="M9 20c1-5 3-8 6-9"/>'),
         'Artes Marciales'    => $svg('<path d="M3 12h18"/><path d="M9 9l-2 3 2 3M15 9l2 3-2 3"/>'),
         'Fitness'            => $svg('<path d="M6 12h12"/><path d="M8 9v6M16 9v6"/><path d="M4 10v4M20 10v4"/>'),
+        // Agregada, requerimiento del cliente 2026-09-08
+        'Hyrox'              => $svg('<circle cx="12" cy="13" r="7"/><path d="M12 13V9"/><path d="M12 3v2"/><path d="M9 3h6"/>'),
 
         // Salud mental (agregadas, requerimiento del cliente 2026-09-02)
         'Salud Mental'       => $svg('<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>'),
