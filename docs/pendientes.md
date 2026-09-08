@@ -852,13 +852,16 @@ actual como respaldo cuando falle. `.modal-overlay` ya existe en
 
 ### 3. El logotipo — cerrado (2026-09-08)
 
-Se probó primero como imagen (`OMDR 1-01.png`, la marca gráfica que mandó
-el cliente), pero es puro texto sin ningún icono —en una fuente genérica
-de Office/Canva, no una tipografía de marca—, así que se quitó el círculo
-`.logo-mark` (la rueda de cuatro cuartos, resto del nombre *Rueda*) y se
-dejó como texto real de nuevo (`.logo-text` en `includes/layout.php`),
-con las tipografías que ya usa el resto del sitio (Fraunces). Un PNG no
-se traduce solo al inglés y pierde nitidez si se agranda; texto sí.
+Se probó como texto real (`.logo-text`, tipografías del sitio) por ser más
+nítido y bilingüe de verdad, pero el cliente prefirió quedarse con su
+marca gráfica (`OMDR 1-01.png`, guardada como
+`assets/img/marca-omdara-logo.png`) a pesar de esa desventaja —es puro
+texto sin icono, en una fuente genérica de Office/Canva—. Queda como
+`.logo-img` en `includes/layout.php`, a 74px de alto (medida que probó el
+cliente a mano). Se quitó el círculo `.logo-mark` (la rueda de cuatro
+cuartos, resto del nombre *Rueda*) por completo, ya no se usa en ningún
+lado. Pendiente si se quiere en algún momento: el logotipo no se traduce
+al inglés, se queda en español en la versión EN.
 
 ### 4. El subtítulo de la marca — cerrado (2026-09-08)
 

@@ -66,15 +66,13 @@
   .topbar-inner{display:flex; align-items:center; justify-content:space-between; padding:16px 28px; max-width:1180px; margin:0 auto;}
   @media(max-width:640px){ .topbar-inner{padding:14px 18px;} }
   .logo{display:flex; align-items:center; gap:10px;}
-  /* Se probo el logotipo grafico del cliente como imagen (2026-09-08), pero
-     es puro texto sin icono —una fuente generica de Office/Canva—, asi que
-     se volvio a texto real: nitido a cualquier tamano, se traduce solo al
-     ingles (el PNG se quedaba en espanol), y pesa menos. El nombre usa
-     Fraunces igual que el resto del sitio; el eslogan ya no es una etiqueta
-     corta en mayusculas sino una frase completa, por eso ya no lleva el
-     tratamiento IBM Plex Mono/uppercase que tenia antes. */
-  .logo-text{font-family:'Fraunces',serif; font-weight:600; font-size:19px; color:var(--jungle);}
-  .logo-text small{display:block; font-size:11px; font-weight:400; color:var(--negro-claro); opacity:0.92; margin-top:2px;}
+  /* El cliente prefirio quedarse con su logotipo grafico (2026-09-08) a
+     pesar de ser puro texto en una fuente generica —pidio expresamente la
+     imagen en vez de .logo-text—. Sobre fondo claro va tal cual, sin
+     invertir, porque el PNG ya trae el trazo en gris oscuro pensado para
+     eso. Altura fija: probo 74px a mano y le parecio el tamano correcto. */
+  .logo-img{display:block; height:74px; width:auto;}
+  @media(max-width:640px){ .logo-img{height:56px;} }
   /* Eran <button> mientras las vistas se conmutaban con JavaScript. Ahora son
      enlaces a páginas de verdad, y las dos formas se estilan igual para que el
      menú no cambie de aspecto. */
