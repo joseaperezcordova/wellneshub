@@ -149,7 +149,13 @@
     filter:brightness(0) invert(1); opacity:.92; pointer-events:none;
   }
   @media(max-width:640px){ .hero-logo{width:120px; top:18px; left:18px;} }
-  @media(max-height:500px){ .hero-logo{display:none;} }
+  /* Antes se ocultaba del todo aqui: una ventana de escritorio con la barra
+     de navegador y marcadores visibles baja facilmente de 500px de alto sin
+     ser un telefono en horizontal, y el cliente pidio (2026-09-08) que el
+     logo SIEMPRE se vea arriba a la izquierda —se encoge en vez de
+     desaparecer, igual que .hero-content ya hace en este mismo punto de
+     quiebre. */
+  @media(max-height:500px){ .hero-logo{width:110px; top:14px;} }
 
   /* Controles arriba a la derecha, la unica esquina que queda libre. */
   .cctrl{position:absolute; top:20px; right:max(28px, calc((100% - 1180px) / 2 + 28px)); z-index:4; display:flex; align-items:center; gap:10px;}
