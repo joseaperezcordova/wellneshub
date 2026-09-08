@@ -358,11 +358,9 @@ cuántos intentos quedan), código correcto (cambia el correo, marca
 `email_verificado_en`, y llega el aviso al buzón viejo) y cancelar (vuelve
 al estado inicial sin cambiar nada).
 
-**Sigue pendiente ejecutar `database/migracion-25-cambio-correo-cuenta.sql`**
-en phpMyAdmin, en pruebas y en producción —solo crea la tabla nueva, no toca
-ninguna existente—. Mientras no se corra, el campo "Cambiar correo" de «Mi
-cuenta» falla con un error de tabla desconocida en cuanto alguien intenta
-usarlo.
+**Migración 25 confirmada en producción (2026-09-02):** verificado contra un
+export real (`omdaraco_bd.sql`) que José subió — la tabla `codigos_cambio_correo`
+ya existe con su estructura completa.
 
 ---
 
@@ -620,12 +618,12 @@ comprobó lo que están leyendo.
 
 ---
 
-### 2o. Ejecutar las migraciones 22 y 23 (métricas de "Contactar al organizador")
+### 2o. Ejecutar las migraciones 22 y 23 (métricas de "Contactar al organizador") — cerrado (2026-09-02)
 
-**Qué falta:** correr `database/migracion-22-metricas-contacto.sql` y
-`database/migracion-23-contactos-sobreviven-actividad.sql` en phpMyAdmin, en
-pruebas y en producción, **en ese orden** —la 23 le cambia la llave foránea a
-una columna que crea la 22—.
+**Migraciones 22 y 23 confirmadas en producción (2026-09-02):** verificado
+contra un export real (`omdaraco_bd.sql`) que José subió — `contactos` ya
+tiene `organizador_id`/`tipo_cta`/`ciudad`/`categoria`/`estado`, y su
+`evento_id` ya es `ON DELETE SET NULL`.
 
 **Qué piden y por qué:** requerimiento del cliente, 2026-09-02: medir la
 interacción real entre usuarios y actividades, para poder ofrecer más
@@ -655,7 +653,7 @@ sigue funcionando igual —nada de esto lo toca—. Antes de correr la 22, la
 tabla sigue como estaba: sin las columnas nuevas y con `ON DELETE CASCADE`
 todavía activo.
 
-**Para cerrarlo:** ejecutar los dos `.sql`, en orden, en los dos entornos.
+**Pendiente confirmar solo en pruebas** —producción ya verificada arriba—.
 Ninguna requiere quitar código después.
 
 ---
@@ -681,10 +679,11 @@ de contenido pendiente de traducir de la sección 3.
 
 ---
 
-### 2r. Ejecutar la migración 24 (correo de contacto por actividad)
+### 2r. Ejecutar la migración 24 (correo de contacto por actividad) — cerrado (2026-09-02)
 
-**Qué falta:** correr `database/migracion-24-correo-contacto-evento.sql` en
-phpMyAdmin, en pruebas y en producción.
+**Migración 24 confirmada en producción (2026-09-02):** verificado contra un
+export real (`omdaraco_bd.sql`) que José subió — `eventos.correo_contacto` y
+la tabla `codigos_correo_contacto` ya existen.
 
 **Qué piden y por qué:** requerimiento del cliente, 2026-09-02: separar el
 correo de la cuenta (con el que se inicia sesión) del correo donde cada
@@ -743,7 +742,7 @@ la sección de "Correo de contacto de esta actividad" no aparece —depende de
 que exista la columna `eventos.correo_contacto`—, y donde sí aparece intentar
 guardar algo falla con un error de columna desconocida.
 
-**Para cerrarlo:** ejecutar el `.sql`, en los dos entornos.
+**Pendiente confirmar solo en pruebas** —producción ya verificada arriba—.
 
 ---
 
