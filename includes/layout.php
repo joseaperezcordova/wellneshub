@@ -209,6 +209,7 @@ $scVerifica = trim((string) ($CONFIG['analytics']['search_console_verificacion']
       'porConfirmar'  => t('ficha.precio.por_confirmar'),
       'desde'         => t('tarjeta.desde'),
       'verActividad'  => t('tarjeta.ver_actividad'),
+      'fechaActualizada' => t('tarjeta.fecha_actualizada'),
   ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
   window.OMDARA_COOKIES = <?= json_encode([
       'cookie'       => CONSENTIMIENTO_COOKIE,
@@ -331,7 +332,7 @@ $scVerifica = trim((string) ($CONFIG['analytics']['search_console_verificacion']
               <a href="<?= URL_BASE ?>/admin.php">Panel admin</a>
               <a href="<?= URL_BASE ?>/documentacion.php">Documentación</a>
               <?php $pend = contarReportesPendientes(); ?>
-              <a href="<?= URL_BASE ?>/moderacion.php">
+              <a href="<?= URL_BASE ?>/admin.php?panel=reportes">
                 Moderación<?php if ($pend > 0): ?> <span class="pendientes"><?= $pend ?></span><?php endif; ?>
               </a>
             <?php endif; ?>

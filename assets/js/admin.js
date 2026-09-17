@@ -18,4 +18,23 @@
     var panel = document.getElementById('panel-' + boton.dataset.panel);
     if (panel) panel.classList.add('active');
   });
+
+  // Sub-pestañas de Actividades (Todas/Publicadas/Canceladas/Ocultas, Req.
+  // 17092026 punto 4): mismo patrón, pero filtrando filas de una sola tabla
+  // en vez de mostrar/ocultar paneles enteros.
+  var subbarra = document.getElementById('eventosSubtabs');
+  if (!subbarra) return;
+
+  subbarra.addEventListener('click', function (ev) {
+    var boton = ev.target.closest('button[data-situacion]');
+    if (!boton) return;
+
+    subbarra.querySelectorAll('button').forEach(function (b) { b.classList.remove('active'); });
+    boton.classList.add('active');
+
+    var situacion = boton.dataset.situacion;
+    document.querySelectorAll('#panel-eventos tbody tr[data-situacion]').forEach(function (fila) {
+      fila.hidden = situacion !== '' && fila.dataset.situacion !== situacion;
+    });
+  });
 })();

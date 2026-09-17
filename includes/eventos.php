@@ -11,16 +11,25 @@
 declare(strict_types=1);
 
 /**
- * Margen que tiene el organizador para ELIMINAR su evento después de
- * publicarlo. Pasado ese plazo solo el administrador puede retirarlo.
+ * Margen que tiene el organizador para RETIRAR su evento por su cuenta
+ * después de publicarlo (Req. 17092026, punto 8). Pasado ese plazo solo el
+ * administrador puede hacerlo.
  *
  * Hasta REQ-000-XX esta misma constante también limitaba EDITAR, y la
  * función se llamaba distinto (ver puedeEditarEvento() más abajo). Editar ya
- * no tiene plazo; borrar sigue teniéndolo, porque quitar la ficha y no volver
- * a subirla es la puerta de atrás para saltarse esa misma protección —dejar
- * tirado a quien ya contaba con lo que leyó—.
+ * no tiene plazo; retirar sigue teniéndolo, porque quitar la ficha y no
+ * volver a subirla es la puerta de atrás para saltarse esa misma protección
+ * —dejar tirado a quien ya contaba con lo que leyó—.
+ *
+ * Se llamó EVENTO_MARGEN_ELIMINACION_H hasta la migración 26: gobernaba
+ * ELIMINAR (borrado real, DELETE). Desde que el cliente confirmó que ni el
+ * organizador ni el administrador vuelven a borrar una fila de verdad —ver
+ * req_17092026_decisiones_cliente en la memoria del proyecto—, lo que este
+ * plazo protege es RETIRAR (ocultar, sin borrar), así que se renombró junto
+ * con puedeEliminarEvento()/minutosRestantesEliminacion()/eliminarEvento()
+ * de abajo.
  */
-const EVENTO_MARGEN_ELIMINACION_H = 24;
+const EVENTO_MARGEN_RETIRO_H = 24;
 
 /**
  * Cuántas categorías puede llevar una actividad a la vez.
@@ -31,6 +40,15 @@ const EVENTO_MARGEN_ELIMINACION_H = 24;
  * retiro de Temazcal y Meditación— sin llegar a eso.
  */
 const EVENTO_CATEGORIAS_MAX = 3;
+
+/**
+ * Cuántos días se enseña la etiqueta pública "FECHA ACTUALIZADA" después de
+ * un cambio de fecha/hora (Req. 17092026, punto 2B). El cliente lo pidió
+ * como "por ejemplo 3 días" —no es un número fijo del requerimiento, es el
+ * ejemplo que dio—; se deja aquí, no repartido en cada consulta, para que
+ * cambiarlo sea una sola línea.
+ */
+const EVENTO_FECHA_ACTUALIZADA_DIAS = 3;
 
 /**
  * El correo de contacto por actividad (migración 24, requerimiento del
@@ -383,10 +401,8 @@ function esAdmin(?array $u): bool
  * ¿Puede esta persona EDITAR este evento?
  *
  * El administrador, siempre. El dueño, siempre —sin límite de tiempo desde
- * REQ-000-XX—, mientras siga siendo suyo: borrador, publicada u oculta por
- * moderación entran los tres aquí. Una actividad retirada no tiene fila que
- * editar —eliminarEvento() la borra de verdad—, así que ese caso no hace
- * falta comprobarlo aparte.
+ * REQ-000-XX—, mientras siga siendo suyo: borrador, publicada, oculta
+ * (moderación o retiro, migración 26) o cancelada entran las cuatro aquí.
  *
  * Que el dueño pueda editar una oculta no le devuelve la visibilidad: eso
  * sigue siendo decisión del administrador (ver el "Volver a publicar" de
@@ -402,16 +418,16 @@ function puedeEditarEvento(array $ev, ?array $u): bool
 }
 
 /**
- * ¿Puede esta persona ELIMINAR este evento?
+ * ¿Puede esta persona RETIRAR este evento (ocultarlo, sin borrarlo)?
  *
  * A diferencia de editar, esto SÍ sigue teniendo plazo: el administrador,
  * siempre, y el dueño mientras sea borrador o esté dentro del margen de
- * EVENTO_MARGEN_ELIMINACION_H horas desde que lo publicó.
+ * EVENTO_MARGEN_RETIRO_H horas desde que lo publicó.
  *
  * El plazo se calcula sobre publicado_en y no sobre creado_en a propósito: un
  * borrador que estuvo tres días a medias no debe llegar publicado y ya caducado.
  */
-function puedeEliminarEvento(array $ev, ?array $u): bool
+function puedeRetirarEvento(array $ev, ?array $u): bool
 {
     if ($u === null)   return false;
     if (esAdmin($u))   return true;
@@ -419,29 +435,37 @@ function puedeEliminarEvento(array $ev, ?array $u): bool
     if ((int) $ev['usuario_id'] !== (int) $u['id']) return false;
     if ($ev['situacion'] === 'borrador')            return true;
 
-    return minutosRestantesEliminacion($ev) > 0;
+    return minutosRestantesRetiro($ev) > 0;
 }
 
 /**
- * Minutos que quedan para poder ELIMINAR, o 0 si ya pasó.
+ * Minutos que quedan para poder RETIRAR por su cuenta, o 0 si ya pasó.
  *
  * Sirve para dos cosas: decidir el permiso y avisar en pantalla de cuánto
  * queda, que es lo que evita que alguien descubra el plazo cuando ya expiró.
  */
-function minutosRestantesEliminacion(array $ev): int
+function minutosRestantesRetiro(array $ev): int
 {
     if (empty($ev['publicado_en'])) return 0;
 
-    $limite = strtotime($ev['publicado_en']) + EVENTO_MARGEN_ELIMINACION_H * 3600;
+    $limite = strtotime($ev['publicado_en']) + EVENTO_MARGEN_RETIRO_H * 3600;
     $quedan = (int) ceil(($limite - time()) / 60);
 
     return max(0, $quedan);
 }
 
-/** ¿Se puede ver esta ficha? Las no publicadas, solo su dueño y el admin. */
+/**
+ * ¿Se puede ver esta ficha?
+ *
+ * Publicada o cancelada: cualquiera. Una CANCELADA sigue siendo pública a
+ * propósito (Req. 17092026, decisión del cliente 2026-09-17: "Organizador
+ * cancela → permanece visible + estado CANCELADA"). Borrador u oculta
+ * (moderación o retiro): solo su dueño y el admin —"Administrador
+ * oculta/modera → deja de ser visible públicamente", misma decisión—.
+ */
 function puedeVerEvento(array $ev, ?array $u): bool
 {
-    if ($ev['situacion'] === 'publicado') return true;
+    if ($ev['situacion'] === 'publicado' || $ev['situacion'] === 'cancelado') return true;
 
     return $u !== null
         && (esAdmin($u) || (int) $ev['usuario_id'] === (int) $u['id']);
@@ -450,12 +474,33 @@ function puedeVerEvento(array $ev, ?array $u): bool
 
 // ------------------------------------------------------------- consultas ----
 
+/**
+ * Fragmento repetido en las 3 consultas que alimentan una ficha o una
+ * tarjeta pública (buscarEvento(), eventosPublicados(), eventosBuscar()):
+ * el último cambio de fecha/hora de cada actividad, si tiene alguno, para la
+ * etiqueta "FECHA ACTUALIZADA" —ver fechaActualizadaReciente() más abajo—.
+ * LEFT JOIN y no una subconsulta por fila: una actividad sin historial no
+ * debe caerse del resultado.
+ */
+const EVENTO_JOIN_ULTIMO_CAMBIO_FECHA = '
+    LEFT JOIN (SELECT evento_id, MAX(cambiado_en) AS cambiado
+                 FROM eventos_historial_fecha GROUP BY evento_id) hf
+           ON hf.evento_id = e.id';
+
+/** ¿El último cambio de fecha/hora de esta actividad fue hace poco? */
+function fechaActualizadaReciente(?string $ultimoCambio): bool
+{
+    return $ultimoCambio !== null
+        && strtotime($ultimoCambio) >= time() - EVENTO_FECHA_ACTUALIZADA_DIAS * 86400;
+}
+
 function buscarEvento(int $id): ?array
 {
     $st = db()->prepare(
-        'SELECT e.*, u.nombre AS organizador, u.email AS organizador_email
+        'SELECT e.*, u.nombre AS organizador, u.email AS organizador_email, hf.cambiado AS fecha_cambiada_en
            FROM eventos e
            JOIN usuarios u ON u.id = e.usuario_id
+           ' . EVENTO_JOIN_ULTIMO_CAMBIO_FECHA . '
           WHERE e.id = ? LIMIT 1'
     );
     $st->execute([$id]);
@@ -495,9 +540,10 @@ function descripcionEvento(array $ev, ?string $idioma = null): string
  */
 function eventosPublicados(?string $categoria = null, int $limite = 60): array
 {
-    $sql = 'SELECT e.*, u.nombre AS organizador
+    $sql = 'SELECT e.*, u.nombre AS organizador, hf.cambiado AS fecha_cambiada_en
               FROM eventos e
               JOIN usuarios u ON u.id = e.usuario_id
+              ' . EVENTO_JOIN_ULTIMO_CAMBIO_FECHA . '
              WHERE e.situacion = "publicado"
                AND COALESCE(e.fecha_fin, e.fecha_inicio) >= NOW()';
 
@@ -644,9 +690,10 @@ function eventosBuscar(array $f, int $limite, int $offset): array
     $orderBy = $ordenes[$f['orden']] ?? $ordenes['fecha'];
 
     $st = $pdo->prepare(
-        "SELECT e.*, u.nombre AS organizador
+        "SELECT e.*, u.nombre AS organizador, hf.cambiado AS fecha_cambiada_en
            FROM eventos e
            JOIN usuarios u ON u.id = e.usuario_id
+           " . EVENTO_JOIN_ULTIMO_CAMBIO_FECHA . "
           WHERE $whereSql
        ORDER BY $orderBy
           LIMIT " . (int) $limite . ' OFFSET ' . (int) $offset
@@ -689,8 +736,11 @@ function eventosDeUsuario(int $usuarioId): array
 /** Todos, para el panel de administración. */
 function eventosTodos(int $limite = 200): array
 {
+    // u.email AS organizador_email (Req. 17092026 punto 4): el "Contactar
+    // organizador" de la tabla de Actividades del panel admin es un mailto:,
+    // y sin este correo aquí ese enlace no tiene a dónde apuntar.
     $st = db()->query(
-        'SELECT e.*, u.nombre AS organizador
+        'SELECT e.*, u.nombre AS organizador, u.email AS organizador_email
            FROM eventos e
            JOIN usuarios u ON u.id = e.usuario_id
        ORDER BY e.creado_en DESC
@@ -1256,9 +1306,33 @@ function avisarAdminsNuevaActividad(array $ev): void
     }
 }
 
-function actualizarEvento(array $e, int $id): void
+/**
+ * Guarda los cambios del formulario de edición.
+ *
+ * $usuarioId es quien edita —puede ser el dueño o un admin, puedeEditarEvento()
+ * ya lo autorizó antes de llegar aquí—. Se usa solo para el historial de
+ * fecha/hora de abajo; el resto de columnas no llevan "quién" porque
+ * actualizado_en (ON UPDATE CURRENT_TIMESTAMP) ya cubre el "cuándo" genérico.
+ */
+function actualizarEvento(array $e, int $id, int $usuarioId): void
 {
-    db()->prepare(
+    $pdo = db();
+
+    /*
+     * Fecha/hora ANTES de escribir el cambio (Req. 17092026, punto 2B): es la
+     * última oportunidad de saber qué decía la ficha. Se compara contra lo
+     * nuevo después del UPDATE y, si algo de esto cambió, se deja constancia
+     * en eventos_historial_fecha —ver esa tabla, migración 26, para el
+     * porqué de guardar las 4 columnas juntas en vez de solo fecha_inicio—.
+     */
+    $st = $pdo->prepare(
+        'SELECT fecha_inicio, fecha_fin, hora_recurrente, hora_fin_recurrente
+           FROM eventos WHERE id = ?'
+    );
+    $st->execute([$id]);
+    $anterior = $st->fetch();
+
+    $pdo->prepare(
         'UPDATE eventos SET
             titulo = ?, titulo_en = ?, slug = ?, descripcion = ?, descripcion_en = ?, categoria = ?,
             tipo_actividad = ?, frecuencia = ?, hora_recurrente = ?, hora_fin_recurrente = ?,
@@ -1281,6 +1355,25 @@ function actualizarEvento(array $e, int $id): void
     ]);
 
     sincronizarCategoriasEvento($id, $e['categorias']);
+
+    if ($anterior !== false && (
+        $anterior['fecha_inicio'] !== $e['fecha_inicio']
+        || (string) $anterior['fecha_fin'] !== (string) ($e['fecha_fin'] ?? '')
+        || (string) $anterior['hora_recurrente'] !== (string) ($e['hora_recurrente'] ?? '')
+        || (string) $anterior['hora_fin_recurrente'] !== (string) ($e['hora_fin_recurrente'] ?? '')
+    )) {
+        $pdo->prepare(
+            'INSERT INTO eventos_historial_fecha
+                (evento_id, fecha_inicio_anterior, fecha_fin_anterior, hora_recurrente_anterior, hora_fin_recurrente_anterior,
+                 fecha_inicio_nueva, fecha_fin_nueva, hora_recurrente_nueva, hora_fin_recurrente_nueva, cambiado_por)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        )->execute([
+            $id,
+            $anterior['fecha_inicio'], $anterior['fecha_fin'], $anterior['hora_recurrente'], $anterior['hora_fin_recurrente'],
+            $e['fecha_inicio'], $e['fecha_fin'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
+            $usuarioId,
+        ]);
+    }
 }
 
 /**
@@ -1352,32 +1445,56 @@ function publicarEvento(int $id, int $usuarioId): void
 
 function cambiarSituacionEvento(int $id, string $situacion): void
 {
-    if (!in_array($situacion, ['borrador', 'publicado', 'oculto'], true)) return;
+    if (!in_array($situacion, ['borrador', 'publicado', 'oculto', 'cancelado'], true)) return;
 
     db()->prepare('UPDATE eventos SET situacion = ? WHERE id = ?')
         ->execute([$situacion, $id]);
 }
 
-function eliminarEvento(int $id): void
+/**
+ * Cancela una actividad publicada: sigue siendo pública, pero con el aviso
+ * "CANCELADA" (Req. 17092026, punto 2A). Distinto de retirarEvento(): una
+ * cancelada NO se oculta —ver puedeVerEvento()—.
+ *
+ * $infoCancelacion es el texto opcional del organizador para quienes ya la
+ * tenían planeada ("Información para los asistentes"); cadena vacía se
+ * guarda como NULL, igual que el resto de campos opcionales del proyecto.
+ */
+function cancelarEvento(int $id, ?string $infoCancelacion): void
 {
-    /*
-     * La imagen se va con él. Antes se quedaba en el disco para siempre: nadie
-     * volvía a apuntar a ese archivo y nadie sabía que estaba ahí, así que en un
-     * hosting compartido solo podía crecer.
-     *
-     * Se lee ANTES de borrar la fila, que es la última vez que se sabe cuál era,
-     * y se borra el archivo DESPUÉS, cuando la fila ya no está: al revés, un
-     * fallo al borrar dejaría un evento apuntando a un archivo que ya no existe.
-     */
-    $st = db()->prepare('SELECT imagen_url FROM eventos WHERE id = ?');
-    $st->execute([$id]);
-    $imagen = $st->fetchColumn();
+    $infoCancelacion = trim((string) $infoCancelacion);
 
-    db()->prepare('DELETE FROM eventos WHERE id = ?')->execute([$id]);
+    db()->prepare(
+        'UPDATE eventos SET situacion = "cancelado", info_cancelacion = ? WHERE id = ?'
+    )->execute([$infoCancelacion !== '' ? $infoCancelacion : null, $id]);
+}
 
-    if (is_string($imagen) && $imagen !== '') {
-        borrarImagenGuardada($imagen);
-    }
+/**
+ * Retira una actividad: la oculta (nunca la borra) y dejar constancia en
+ * eventos_retiros de quién lo pidió y quién lo ejecutó —aquí siempre la misma
+ * persona, en el mismo instante: es el caso "inmediato", el único que existe
+ * hasta que Fase 3 construya la cola de solicitudes >24h del Req. 17092026
+ * punto 8 (retirado_en quedaría en NULL mientras esté pendiente)—.
+ *
+ * Hasta la migración 26 esto se llamaba eliminarEvento() y hacía
+ * DELETE FROM eventos: borrado real, incluida la imagen. El cliente confirmó
+ * por escrito (2026-09-17) que ni el organizador ni el administrador vuelven
+ * a borrar una actividad de verdad —ver req_17092026_decisiones_cliente en
+ * la memoria del proyecto—, así que ahora solo oculta. La imagen YA NO se
+ * borra tampoco: la fila sigue existiendo y un admin puede volver a
+ * publicarla (evento.php, "Volver a publicar"), y esa ficha necesita su
+ * imagen intacta.
+ */
+function retirarEvento(int $id, int $actorId, ?string $motivo = null): void
+{
+    cambiarSituacionEvento($id, 'oculto');
+
+    $motivo = trim((string) $motivo);
+
+    db()->prepare(
+        'INSERT INTO eventos_retiros (evento_id, motivo, solicitado_por, solicitado_en, retirado_por, retirado_en)
+              VALUES (?, ?, ?, NOW(), ?, NOW())'
+    )->execute([$id, $motivo !== '' ? $motivo : null, $actorId, $actorId]);
 }
 
 
@@ -1607,6 +1724,12 @@ function eventoParaTarjeta(array $ev): array
         'pnum' => !empty($ev['gratuito'])
             ? 0.0
             : ($ev['precio'] !== null ? (float) $ev['precio'] : null),
+
+        // "FECHA ACTUALIZADA" (Req. 17092026 punto 2B): calculado aquí, no en
+        // el navegador, para no repetir la ventana de
+        // EVENTO_FECHA_ACTUALIZADA_DIAS en JavaScript aparte —mismo criterio
+        // que 'free'/'pnum' arriba, server decide, cliente solo pinta—.
+        'reciente_cambio_fecha' => fechaActualizadaReciente($ev['fecha_cambiada_en'] ?? null),
     ];
 }
 

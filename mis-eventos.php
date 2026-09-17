@@ -49,7 +49,7 @@ require __DIR__ . '/includes/layout.php';
       </div>
     <?php else: ?>
       <table class="admtable" style="background:var(--paper); color:var(--ink);">
-        <thead><tr><th>Título</th><th>Fecha</th><th>Actualizado</th><th>Situación</th><th></th></tr></thead>
+        <thead><tr><th>Actividad</th><th>Fecha</th><th>Actualizado</th><th>Estado</th><th>Acción</th></tr></thead>
         <tbody>
           <?php foreach ($misEventos as $me): $p = fechaPartes($me['fecha_inicio']); $pu = fechaPartes($me['actualizado_en']); ?>
             <tr>
@@ -65,26 +65,64 @@ require __DIR__ . '/includes/layout.php';
                   <span class="badge on" style="color:var(--jungle); background:rgba(22,22,22,0.08);">Publicada</span>
                 <?php elseif ($me['situacion'] === 'borrador'): ?>
                   <span class="badge-pending">Borrador · sin publicar</span>
+                <?php elseif ($me['situacion'] === 'cancelado'): ?>
+                  <span class="badge off">Cancelada</span>
                 <?php else: ?>
                   <span class="badge off">Oculta</span>
                 <?php endif; ?>
               </td>
               <td>
-                <a class="actionbtn" style="color:var(--ink); border-color:var(--line);"
-                   href="<?= e(urlEvento($me)) ?>">Ver</a>
-                <?php if (puedeEditarEvento($me, $u)): ?>
-                  <a class="actionbtn" style="color:var(--ink); border-color:var(--line);"
-                     href="<?= e(urlEditarEvento($me)) ?>">Editar</a>
-                <?php endif; ?>
+                <?php /* «Gestionar» (Req. 17092026 punto 3): <details> otra vez
+                         —mismo patrón sin JavaScript que el menú de «Mi cuenta»
+                         en includes/layout.php—, con las acciones reales que ya
+                         existen en la ficha (evento.php) en vez de duplicar su
+                         lógica de permisos aquí. Las de cancelar/retirar/reactivar
+                         postean directo contra la ficha, así que el resultado es
+                         el mismo que pulsar el botón ahí. */ ?>
+                <details class="gestionar">
+                  <summary class="actionbtn" style="color:var(--ink); border-color:var(--line);">Gestionar</summary>
+                  <div class="gestionar-menu">
+                    <a class="actionbtn" style="color:var(--ink); border-color:var(--line);" href="<?= e(urlEvento($me)) ?>">Información</a>
+                    <?php if (puedeEditarEvento($me, $u)): ?>
+                      <a class="actionbtn" style="color:var(--ink); border-color:var(--line);" href="<?= e(urlEditarEvento($me)) ?>">Editar actividad</a>
+                      <a class="actionbtn" style="color:var(--ink); border-color:var(--line);" href="<?= e(urlEditarEvento($me)) ?>#fecha_unica">Cambiar fecha y hora</a>
+                    <?php endif; ?>
+                    <?php if ($me['situacion'] === 'publicado'): ?>
+                      <form method="post" action="<?= e(urlEvento($me)) ?>" onsubmit="
+                        var info = prompt(<?= json_encode(t('ficha.prompt_info_cancelacion')) ?>, '');
+                        if (info === null) return false;
+                        this.elements['info_cancelacion'].value = info;
+                        return confirm(<?= json_encode(sprintf(t('ficha.confirmar_cancelar'), $me['titulo'])) ?>);
+                      ">
+                        <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+                        <input type="hidden" name="info_cancelacion" value="">
+                        <button class="actionbtn" style="color:var(--ink); border-color:var(--line);" type="submit" name="cancelar" value="1">Cancelar actividad</button>
+                      </form>
+                    <?php endif; ?>
+                    <?php if ($me['situacion'] === 'cancelado'): ?>
+                      <form method="post" action="<?= e(urlEvento($me)) ?>">
+                        <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+                        <button class="actionbtn" style="color:var(--ink); border-color:var(--line);" type="submit" name="publicar" value="1">Reactivar</button>
+                      </form>
+                    <?php endif; ?>
+                    <?php if (puedeRetirarEvento($me, $u)): ?>
+                      <form method="post" action="<?= e(urlEvento($me)) ?>"
+                            onsubmit="return confirm(<?= json_encode(sprintf(t('ficha.confirmar_retirar'), $me['titulo'])) ?>);">
+                        <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+                        <button class="actionbtn" style="color:var(--ink); border-color:var(--line);" type="submit" name="retirar" value="1">Retirar</button>
+                      </form>
+                    <?php endif; ?>
+                  </div>
+                </details>
               </td>
             </tr>
           <?php endforeach; ?>
         </tbody>
       </table>
       <div class="evergreen-note" style="margin-top:18px;">
-        Puedes editar una actividad publicada cuando quieras. Eliminarla se puede desde su ficha,
-        y solo dentro de las <?= EVENTO_MARGEN_ELIMINACION_H ?> horas siguientes a publicarla;
-        pasado ese plazo, pídeselo al administrador.
+        Puedes editar una actividad publicada cuando quieras. Retirarla —deja de verse, pero no se
+        borra— se puede desde su ficha, y solo dentro de las <?= EVENTO_MARGEN_RETIRO_H ?> horas
+        siguientes a publicarla; pasado ese plazo, pídeselo al administrador.
       </div>
     <?php endif; ?>
 

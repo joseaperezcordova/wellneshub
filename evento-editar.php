@@ -107,7 +107,7 @@ if ($puede && postDesbordado()) {
     }
 
     if (!$errores) {
-        actualizarEvento($e, (int) $ev['id']);
+        actualizarEvento($e, (int) $ev['id'], (int) $u['id']);
         olvidarImagenEnVuelo($e['imagen_url']);
 
         // La anterior se borra solo cuando el cambio ya está guardado. Al
@@ -221,14 +221,14 @@ require __DIR__ . '/includes/layout.php';
 
       <?php /* Guardado aparte de $puede (que ya solo mide EDITAR): desde que
                los dos permisos se separaron, alguien puede poder editar y ya
-               no poder eliminar —publicada hace más de EVENTO_MARGEN_ELIMINACION_H
+               no poder retirar —publicada hace más de EVENTO_MARGEN_RETIRO_H
                horas—, y mostrar este botón igual lo mandaría a un error en
                vez de simplemente no ofrecérselo. */ ?>
-      <?php if (puedeEliminarEvento($ev, $u)): ?>
+      <?php if (puedeRetirarEvento($ev, $u)): ?>
         <form method="post" action="<?= e(urlEvento($ev)) ?>"
-              onsubmit="return confirm(<?= json_encode(sprintf(t('evento.editar.confirmar_eliminar'), $ev['titulo'])) ?>);">
+              onsubmit="return confirm(<?= json_encode(sprintf(t('evento.editar.confirmar_retirar'), $ev['titulo'])) ?>);">
           <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-          <button class="btn-barra peligro" type="submit" name="eliminar" value="1"><?= et('evento.editar.eliminar') ?></button>
+          <button class="btn-barra peligro" type="submit" name="retirar" value="1"><?= et('evento.editar.retirar') ?></button>
         </form>
       <?php endif; ?>
     </div>

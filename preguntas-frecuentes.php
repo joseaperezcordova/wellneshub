@@ -208,14 +208,16 @@ $bloques = [
             /*
              * Cambiado: el panel del organizador no tiene «ocultar» —esa es una
              * acción de administración—. Lo que sí puede hacer su dueño es
-             * eliminarla mientras esté dentro del plazo de eliminación
+             * retirarla mientras esté dentro del plazo de retiro
              * (REQ-000-XX separó este plazo del de editar, que ya no tiene).
+             * Migración 26: retirar ya no borra nada, solo oculta.
              */
-            '¿Cómo elimino un evento?',
-            'Desde la página de tu actividad, mientras sigan sin pasar ' . EVENTO_MARGEN_ELIMINACION_H . ' horas '
+            '¿Cómo retiro un evento?',
+            'Desde la página de tu actividad, mientras sigan sin pasar ' . EVENTO_MARGEN_RETIRO_H . ' horas '
             . 'desde que la publicaste. Después de ese plazo, '
             . '<a href="' . e(url('contacto')) . '">escríbenos</a> y la retiramos: es para que una ficha no '
-            . 'desaparezca de golpe cuando ya hay gente que contaba con ella.',
+            . 'desaparezca de golpe cuando ya hay gente que contaba con ella. En ningún caso se borra: '
+            . 'queda oculta y se puede reactivar.',
         ],
     ],
 ];

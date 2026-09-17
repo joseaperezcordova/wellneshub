@@ -325,9 +325,16 @@ CREATE TABLE IF NOT EXISTS eventos (
   imagen_url    VARCHAR(500)  NULL DEFAULT NULL,
   color         CHAR(7)       NOT NULL DEFAULT '#89A67D',
 
-  situacion     ENUM('borrador','publicado','oculto')
+  -- 'cancelado' (migración 26): distinto de 'oculto' a propósito. El
+  -- organizador cancela su propia actividad y sigue siendo pública, con
+  -- aviso; 'oculto' es exclusivo de moderación del admin y hace la ficha
+  -- invisible —ver puedeVerEvento() en includes/eventos.php—.
+  situacion     ENUM('borrador','publicado','oculto','cancelado')
                               NOT NULL DEFAULT 'borrador',
   publicado_en  DATETIME      NULL DEFAULT NULL,
+  -- Texto opcional del organizador al cancelar (migración 26, Req 2A:
+  -- "Información para los asistentes"). NULL si no escribió nada.
+  info_cancelacion VARCHAR(500) NULL DEFAULT NULL,
 
   creado_en     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
   actualizado_en DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -412,6 +419,93 @@ CREATE TABLE IF NOT EXISTS reportes (
 
   CONSTRAINT fk_reporte_revisor
     FOREIGN KEY (revisado_por) REFERENCES usuarios (id)
+    ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ----------------------------------------------------------------------------
+--  eventos_historial_fecha (migración 26)
+--
+--  Rastro de cada cambio de fecha/hora de una actividad ya publicada (Req 2B
+--  del cliente): qué decía antes, qué dice ahora, cuándo y quién. Guarda las
+--  4 columnas de fecha/hora juntas —fecha_inicio, fecha_fin, hora_recurrente,
+--  hora_fin_recurrente— porque una actividad recurrente cambia de hora en las
+--  dos últimas, no en fecha_inicio/fecha_fin; una fila por cambio cubre los
+--  dos tipos de actividad sin ramificar el esquema. Tabla aparte y no
+--  columnas *_anterior en eventos porque puede haber más de un cambio en la
+--  vida de una actividad.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS eventos_historial_fecha (
+  id                            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  evento_id                     INT UNSIGNED    NOT NULL,
+
+  fecha_inicio_anterior         DATETIME NOT NULL,
+  fecha_fin_anterior            DATETIME NULL DEFAULT NULL,
+  hora_recurrente_anterior      TIME     NULL DEFAULT NULL,
+  hora_fin_recurrente_anterior  TIME     NULL DEFAULT NULL,
+
+  fecha_inicio_nueva            DATETIME NOT NULL,
+  fecha_fin_nueva               DATETIME NULL DEFAULT NULL,
+  hora_recurrente_nueva         TIME     NULL DEFAULT NULL,
+  hora_fin_recurrente_nueva     TIME     NULL DEFAULT NULL,
+
+  -- SET NULL y no CASCADE: si la cuenta de quien cambió la fecha se borra
+  -- después, el historial DE LA ACTIVIDAD se queda —igual que
+  -- reportes.revisado_por—.
+  cambiado_por                  INT UNSIGNED NULL DEFAULT NULL,
+  cambiado_en                   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+  KEY idx_ehf_evento (evento_id, cambiado_en),
+
+  CONSTRAINT fk_ehf_evento
+    FOREIGN KEY (evento_id) REFERENCES eventos (id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+
+  CONSTRAINT fk_ehf_usuario
+    FOREIGN KEY (cambiado_por) REFERENCES usuarios (id)
+    ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ----------------------------------------------------------------------------
+--  eventos_retiros (migración 26)
+--
+--  Req 8 del cliente: retirar una actividad ya no borra nada, solo la oculta
+--  (situacion = 'oculto'), y hay que conservar quién lo pidió, cuándo, por
+--  qué motivo (opcional) y cuándo se retiró de verdad. Dentro de las
+--  primeras 24h desde publicada el organizador lo hace directo —solicitado_en
+--  y retirado_en quedan iguales, en el mismo instante—; pasado ese plazo
+--  queda pendiente (retirado_en NULL) hasta que administración lo procese.
+--  La bandeja de pendientes del panel admin es "WHERE retirado_en IS NULL",
+--  mismo patrón que reportes.situacion.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS eventos_retiros (
+  id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  evento_id       INT UNSIGNED    NOT NULL,
+
+  motivo          VARCHAR(500) NULL DEFAULT NULL,
+
+  solicitado_por  INT UNSIGNED NULL DEFAULT NULL,
+  solicitado_en   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  retirado_por    INT UNSIGNED NULL DEFAULT NULL,
+  retirado_en     DATETIME     NULL DEFAULT NULL,
+
+  PRIMARY KEY (id),
+  KEY idx_er_evento (evento_id, solicitado_en),
+  KEY idx_er_pendientes (retirado_en, solicitado_en),
+
+  CONSTRAINT fk_er_evento
+    FOREIGN KEY (evento_id) REFERENCES eventos (id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+
+  CONSTRAINT fk_er_solicitante
+    FOREIGN KEY (solicitado_por) REFERENCES usuarios (id)
+    ON DELETE SET NULL ON UPDATE CASCADE,
+
+  CONSTRAINT fk_er_ejecutor
+    FOREIGN KEY (retirado_por) REFERENCES usuarios (id)
     ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

@@ -35,6 +35,61 @@ if (!esAdmin($u)) {
     exit;
 }
 
+/*
+ * Reportes (antes moderacion.php, página aparte): Req. 17092026 punto 4 pide
+ * las Actividades reportadas integradas en el mismo dashboard, no en su
+ * propia puerta. moderacion.php ahora solo redirige aquí —ver ese archivo—,
+ * así que su lógica de POST vive aquí en vez de ahí. Misma lógica de
+ * siempre: Descartar / Ocultar / Volver a publicar, sin borrado real (ver
+ * retirarEvento(), migración 26).
+ */
+$avisoReportes = '';
+$errorReportes  = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['evento_id'])) {
+    $eventoId = (int) $_POST['evento_id'];
+
+    if (!csrfValido($_POST['csrf'] ?? null)) {
+        $errorReportes = 'La sesión caducó. Vuelve a intentarlo.';
+
+    } elseif (!buscarEvento($eventoId)) {
+        $errorReportes = 'Esa actividad ya no existe.';
+
+    } elseif (isset($_POST['descartar'])) {
+        marcarReportesRevisados($eventoId, (int) $u['id']);
+        $avisoReportes = 'Reportes descartados. La actividad sigue publicada.';
+
+    } elseif (isset($_POST['ocultar_reporte'])) {
+        retirarEvento($eventoId, (int) $u['id']);
+        marcarReportesRevisados($eventoId, (int) $u['id']);
+        $avisoReportes = 'Actividad oculta. Ya no aparece en el listado.';
+
+    } elseif (isset($_POST['publicar_reporte'])) {
+        cambiarSituacionEvento($eventoId, 'publicado');
+        marcarReportesRevisados($eventoId, (int) $u['id']);
+        $avisoReportes = 'Actividad publicada otra vez.';
+    }
+}
+
+$pendientesReportes  = [];
+$sinTablaReportes    = false;
+$reportesPorEvento   = [];
+
+try {
+    $pendientesReportes = reportesPendientes();
+    $reportesPorEvento  = reportesDeEventos(array_column($pendientesReportes, 'id'));
+} catch (Throwable $ex) {
+    error_log('Panel admin, pestaña Reportes: ' . $ex->getMessage());
+    $sinTablaReportes = true;
+}
+
+// Deep-link (Req. 17092026 punto 4): moderacion.php redirige a
+// admin.php?panel=reportes, y el enlace "Moderación" del menú de cabecera
+// (includes/layout.php) ahora apunta aquí directo. Sin esto, cada visita
+// caía siempre en la pestaña Actividades y había que hacer un clic de más.
+$panelesValidos = ['eventos', 'reportes', 'organizadores', 'categorias', 'ciudades', 'usuarios', 'mensajes'];
+$panelActivo    = in_array($_GET['panel'] ?? '', $panelesValidos, true) ? $_GET['panel'] : 'eventos';
+
 $eventosAdmin      = eventosTodos();
 $organizadoresAdmin = organizadoresConConteo();
 $categoriasAdmin    = categoriasConConteo();
@@ -85,19 +140,31 @@ require __DIR__ . '/includes/layout.php';
     </div>
 
     <div class="admin-tabs" id="adminTabs">
-      <button data-panel="eventos" class="active">Actividades</button>
-      <button data-panel="organizadores">Organizadores</button>
-      <button data-panel="categorias">Categorías</button>
-      <button data-panel="ciudades">Ciudades y estados</button>
-      <button data-panel="usuarios">Usuarios</button>
-      <button data-panel="mensajes">Mensajes<?php if ($mensajesAdmin): ?> <span class="pendientes"><?= count($mensajesAdmin) ?></span><?php endif; ?></button>
+      <button data-panel="eventos" class="<?= $panelActivo === 'eventos' ? 'active' : '' ?>">Actividades</button>
+      <button data-panel="reportes" class="<?= $panelActivo === 'reportes' ? 'active' : '' ?>">Reportes<?php if ($cifras['reportes'] > 0): ?> <span class="pendientes"><?= $cifras['reportes'] ?></span><?php endif; ?></button>
+      <button data-panel="organizadores" class="<?= $panelActivo === 'organizadores' ? 'active' : '' ?>">Organizadores</button>
+      <button data-panel="categorias" class="<?= $panelActivo === 'categorias' ? 'active' : '' ?>">Categorías</button>
+      <button data-panel="ciudades" class="<?= $panelActivo === 'ciudades' ? 'active' : '' ?>">Ciudades y estados</button>
+      <button data-panel="usuarios" class="<?= $panelActivo === 'usuarios' ? 'active' : '' ?>">Usuarios</button>
+      <button data-panel="mensajes" class="<?= $panelActivo === 'mensajes' ? 'active' : '' ?>">Mensajes<?php if ($mensajesAdmin): ?> <span class="pendientes"><?= count($mensajesAdmin) ?></span><?php endif; ?></button>
     </div>
 
     <!-- ACTIVIDADES — la única pestaña con datos de verdad -->
-    <div class="admin-panel active" id="panel-eventos">
+    <div class="admin-panel <?= $panelActivo === 'eventos' ? 'active' : '' ?>" id="panel-eventos">
       <div class="panel-toolbar">
         <a class="btn-add" href="<?= URL_BASE ?>/evento-nuevo.php">+ Nueva actividad</a>
       </div>
+
+      <?php /* Sub-pestañas por estado (Req. 17092026 punto 4): filtran las
+               mismas filas en el navegador —mismo criterio que admin.js para
+               las pestañas grandes, sin pedir nada al servidor otra vez—. */ ?>
+      <div class="admin-tabs admin-subtabs" id="eventosSubtabs">
+        <button data-situacion="" class="active">Todas</button>
+        <button data-situacion="publicado">Publicadas</button>
+        <button data-situacion="cancelado">Canceladas</button>
+        <button data-situacion="oculto">Ocultas</button>
+      </div>
+
       <table class="admtable">
         <thead><tr><th>Título</th><th>Organiza</th><th>Ciudad</th><th>Fecha</th><th>Situación</th><th></th></tr></thead>
         <tbody>
@@ -105,7 +172,7 @@ require __DIR__ . '/includes/layout.php';
             <tr><td colspan="6" style="opacity:.8;">Todavía no hay actividades.</td></tr>
           <?php endif; ?>
           <?php foreach ($eventosAdmin as $ea): $p = fechaPartes($ea['fecha_inicio']); ?>
-            <tr>
+            <tr data-situacion="<?= e($ea['situacion']) ?>">
               <td><?= e($ea['titulo']) ?></td>
               <td><?= e($ea['organizador']) ?></td>
               <td><?= e($ea['ciudad']) ?></td>
@@ -118,19 +185,120 @@ require __DIR__ . '/includes/layout.php';
               <td>
                 <a class="actionbtn" href="<?= e(urlEvento($ea)) ?>?volver=admin">Ver</a>
                 <a class="actionbtn" href="<?= e(urlEditarEvento($ea) . '?volver=admin') ?>">Editar</a>
+                <?php if (!empty($ea['organizador_email'])): ?>
+                  <a class="actionbtn" href="mailto:<?= e($ea['organizador_email']) ?>">Contactar organizador</a>
+                <?php endif; ?>
+                <?php /* «Ocultar» pega directo contra la ficha —mismo botón,
+                         mismo permiso (esAdmin), misma retirarEvento() con su
+                         auditoría en eventos_retiros— para no duplicar esa
+                         lógica aquí. Solo tiene sentido sobre algo publicado:
+                         lo demás ya está oculto, cancelado o ni publicado. */ ?>
+                <?php if ($ea['situacion'] === 'publicado'): ?>
+                  <form method="post" action="<?= e(urlEvento($ea)) ?>?volver=admin" style="display:inline;">
+                    <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+                    <button class="actionbtn" type="submit" name="ocultar" value="1">Ocultar</button>
+                  </form>
+                <?php endif; ?>
               </td>
             </tr>
           <?php endforeach; ?>
         </tbody>
       </table>
       <div class="evergreen-note" style="margin-top:18px;">
-        Ocultar y eliminar se hacen desde la ficha de la actividad, con la confirmación delante.
-        Un botón «Eliminar» en una fila de tabla se pulsa por error con demasiada facilidad.
+        Eliminar de verdad ya no existe en ningún lado del sitio (Req. 17092026): ni el
+        organizador ni un administrador vuelven a borrar una actividad. «Ocultar» de aquí arriba
+        es la única acción, y conserva la fila.
       </div>
     </div>
 
+    <!-- REPORTES — antes moderacion.php, página aparte. Lo que alguien señaló:
+         reportes de visitantes y los que crea solo el filtro de palabras al
+         publicar. Las actividades siguen publicadas; aquí se decide qué
+         hacer con ellas. Misma lógica de siempre (ver el POST handling más
+         arriba): Descartar / Ocultar / Volver a publicar, nunca borrado. -->
+    <div class="admin-panel <?= $panelActivo === 'reportes' ? 'active' : '' ?>" id="panel-reportes">
+      <?php if ($avisoReportes): ?><div class="aviso aviso-ok"><?= e($avisoReportes) ?></div><?php endif; ?>
+      <?php if ($errorReportes): ?><div class="aviso aviso-error"><?= e($errorReportes) ?></div><?php endif; ?>
+
+      <?php if ($sinTablaReportes): ?>
+        <div class="aviso aviso-error" style="margin-bottom:0;">
+          <strong>Falta la tabla de reportes en la base de datos.</strong>
+          Entra a phpMyAdmin, selecciona tu base y ejecuta
+          <code>database/migracion-03-reportes.sql</code>. Hasta entonces nadie puede
+          reportar actividades y esta pestaña no funciona.
+        </div>
+
+      <?php elseif (!$pendientesReportes): ?>
+        <div class="aviso aviso-ok" style="margin-bottom:0;">
+          No hay nada que revisar. Es lo normal: las actividades se publican solas y
+          aquí solo aparece lo que alguien señala.
+        </div>
+
+      <?php else: foreach ($pendientesReportes as $rep): ?>
+        <div class="caso">
+          <div class="caso-cab">
+            <div>
+              <h2><a href="<?= e(urlEvento($rep)) ?>?volver=admin"><?= e($rep['titulo']) ?></a></h2>
+              <div class="caso-meta">
+                <?= e($rep['categoria']) ?> · <?= e($rep['ciudad']) ?> ·
+                organiza <?= e($rep['organizador']) ?> (<?= e($rep['organizador_email']) ?>)
+              </div>
+            </div>
+            <div class="caso-cifras">
+              <span class="cuenta"><?= (int) $rep['total'] ?></span>
+              <span class="cuenta-lbl">aviso<?= (int) $rep['total'] === 1 ? '' : 's' ?></span>
+            </div>
+          </div>
+
+          <?php if (!empty($rep['tiene_automatico'])): ?>
+            <div class="marca-auto">Lo levantó el filtro automático de palabras, no una persona.</div>
+          <?php endif; ?>
+
+          <?php if ($rep['situacion'] !== 'publicado'): ?>
+            <div class="marca-auto">Ahora mismo está <strong><?= e($rep['situacion']) ?></strong>.</div>
+          <?php endif; ?>
+
+          <ul class="caso-reportes">
+            <?php foreach ($reportesPorEvento[(int) $rep['id']] ?? [] as $r): ?>
+              <li>
+                <span class="motivo-tag"><?= e(motivosReporte()[$r['motivo']] ?? $r['motivo']) ?></span>
+                <?php if (!empty($r['comentario'])): ?>
+                  <span class="comentario"><?= e($r['comentario']) ?></span>
+                <?php endif; ?>
+                <span class="cuando"><?= e(fechaLarga($r['creado_en'])) ?><?= $r['situacion'] === 'revisado' ? ' · ya revisado' : '' ?></span>
+              </li>
+            <?php endforeach; ?>
+          </ul>
+
+          <div class="caso-acciones">
+            <form method="post">
+              <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+              <input type="hidden" name="evento_id" value="<?= (int) $rep['id'] ?>">
+              <button class="btn-barra" type="submit" name="descartar" value="1">Descartar avisos</button>
+            </form>
+
+            <?php if ($rep['situacion'] === 'publicado'): ?>
+              <form method="post">
+                <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+                <input type="hidden" name="evento_id" value="<?= (int) $rep['id'] ?>">
+                <button class="btn-barra" type="submit" name="ocultar_reporte" value="1">Ocultar</button>
+              </form>
+            <?php else: ?>
+              <form method="post">
+                <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+                <input type="hidden" name="evento_id" value="<?= (int) $rep['id'] ?>">
+                <button class="btn-barra" type="submit" name="publicar_reporte" value="1">Volver a publicar</button>
+              </form>
+            <?php endif; ?>
+
+            <a class="btn-barra" href="<?= e(urlEditarEvento($rep) . '?volver=admin') ?>">Editar</a>
+          </div>
+        </div>
+      <?php endforeach; endif; ?>
+    </div>
+
     <!-- ORGANIZADORES — quien ya publicó al menos una actividad (ver publicarEvento()) -->
-    <div class="admin-panel" id="panel-organizadores">
+    <div class="admin-panel <?= $panelActivo === 'organizadores' ? 'active' : '' ?>" id="panel-organizadores">
       <table class="admtable">
         <?php /* El teléfono es el que cada organizador pone en «Mi cuenta»
                  (REQ-00009). Es el único sitio donde se lee: no se publica en
@@ -160,7 +328,7 @@ require __DIR__ . '/includes/layout.php';
     </div>
 
     <!-- CATEGORIAS — catálogo fijo de categoriasMenu(), con conteo real de actividades publicadas -->
-    <div class="admin-panel" id="panel-categorias">
+    <div class="admin-panel <?= $panelActivo === 'categorias' ? 'active' : '' ?>" id="panel-categorias">
       <?php /* No hay «+ Nueva categoría»: el catálogo es un array fijo en
                includes/eventos.php (categoriasMenu()), no algo que se cree
                desde aquí. Agregar una implica tocar código, no un formulario. */ ?>
@@ -172,7 +340,7 @@ require __DIR__ . '/includes/layout.php';
     </div>
 
     <!-- CIUDADES / ESTADOS — agrupado real desde eventos publicados -->
-    <div class="admin-panel" id="panel-ciudades">
+    <div class="admin-panel <?= $panelActivo === 'ciudades' ? 'active' : '' ?>" id="panel-ciudades">
       <div class="twocol-admin">
         <div class="admin-card">
           <h4>Estados</h4>
@@ -196,7 +364,7 @@ require __DIR__ . '/includes/layout.php';
     </div>
 
     <!-- USUARIOS — toda la tabla usuarios -->
-    <div class="admin-panel" id="panel-usuarios">
+    <div class="admin-panel <?= $panelActivo === 'usuarios' ? 'active' : '' ?>" id="panel-usuarios">
       <table class="admtable">
         <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Último acceso</th></tr></thead>
         <tbody>
@@ -216,7 +384,7 @@ require __DIR__ . '/includes/layout.php';
          pide guardarlos "para tener un historial", y un historial que nadie
          puede leer no es un historial. Cambiar el estado de un mensaje es otra
          cosa y no está hecha (ver docs/pendientes.md). -->
-    <div class="admin-panel" id="panel-mensajes">
+    <div class="admin-panel <?= $panelActivo === 'mensajes' ? 'active' : '' ?>" id="panel-mensajes">
       <table class="admtable">
         <thead><tr><th>Cuándo</th><th>Quién</th><th>Motivo</th><th>Actividad</th><th>Mensaje</th><th>Estado</th></tr></thead>
         <tbody>

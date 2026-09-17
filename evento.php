@@ -99,15 +99,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit(t('ficha.error.no_permiso'));
 
     } elseif (isset($_POST['publicar']) && ($ev['situacion'] !== 'oculto' || esAdmin($u))) {
+        // La misma acción "publicar" sirve para publicar un borrador, para que
+        // el admin deshaga una decisión de moderación (oculta → publicada), y
+        // para que el dueño reactive una actividad que él mismo canceló
+        // (cancelada → publicada, Req. 17092026): las tres son "esto vuelve a
+        // estar en cartel", y solo la de oculta necesita ser cosa del admin.
+        //
         // Antes de publicar: si quien manda es todavía 'visitante', esto lo va a
         // convertir en organizador (publicarEvento() hace ese ascenso). Se mira
         // aquí, no después, porque después ya no hay forma de saber cuál era su
         // rol un segundo antes.
         $eraVisitante = $u['rol'] === 'visitante';
 
-        // Volver a publicar una actividad oculta deshace una decisión de moderación,
-        // así que es cosa de un administrador. Sin esto, el dueño podría mandar
-        // el POST a mano y saltarse por qué se ocultó en primer lugar.
         publicarEvento((int) $ev['id'], (int) $ev['usuario_id']);
 
         // El filtro de palabras se pasa DESPUÉS de publicar y no antes: no
@@ -125,21 +128,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirigir(urlEvento($ev));
 
     } elseif (isset($_POST['ocultar']) && esAdmin($u)) {
-        cambiarSituacionEvento((int) $ev['id'], 'oculto');
+        // Decisión de moderación: se retira lo publicado por otra persona, no
+        // lo propio. retirarEvento() no solo oculta —también deja constancia
+        // en eventos_retiros de quién y cuándo, migración 26—.
+        retirarEvento((int) $ev['id'], (int) $u['id']);
         $_SESSION['evento_aviso'] = t('ficha.aviso.oculto');
         redirigir(urlEvento($ev));
 
-    } elseif (isset($_POST['eliminar'])) {
-        // El dueño solo puede borrar mientras podría editar. Pasado ese plazo
-        // borrar sería la puerta de atrás para saltarse la regla de las 24
-        // horas: quitar la ficha y volver a subirla cambiada.
-        if (!puedeEliminarEvento($ev, $u)) {
-            $error = t('ficha.error.plazo_eliminar');
+    } elseif (isset($_POST['cancelar'])) {
+        // Cancelar es cosa del dueño (o el admin en su lugar) y solo tiene
+        // sentido sobre algo publicado —cancelar un borrador que nadie ha
+        // visto no es "cancelar", es "no publicarlo"—.
+        if (!$mando || $ev['situacion'] !== 'publicado') {
+            $error = t('ficha.error.no_permiso');
         } else {
-            eliminarEvento((int) $ev['id']);
-            $_SESSION['evento_aviso'] = t('ficha.aviso.eliminado');
+            cancelarEvento((int) $ev['id'], (string) ($_POST['info_cancelacion'] ?? ''));
+            $_SESSION['evento_aviso'] = t('ficha.aviso.cancelado');
             $_SESSION['eventos_ga'] = [
-                ['nombre' => 'eliminar_actividad', 'params' => ['id' => (int) $ev['id'], 'categoria' => $ev['categoria']]],
+                ['nombre' => 'cancelar_actividad', 'params' => ['id' => (int) $ev['id'], 'categoria' => $ev['categoria']]],
+            ];
+            redirigir(urlEvento($ev));
+        }
+
+    } elseif (isset($_POST['retirar'])) {
+        // El dueño solo puede retirar mientras podría editar. Pasado ese plazo
+        // sería la puerta de atrás para saltarse la regla de las 24 horas:
+        // quitar la ficha y volver a subirla cambiada.
+        if (!puedeRetirarEvento($ev, $u)) {
+            $error = t('ficha.error.plazo_retirar');
+        } else {
+            retirarEvento((int) $ev['id'], (int) $u['id'], (string) ($_POST['motivo_retiro'] ?? ''));
+            $_SESSION['evento_aviso'] = t('ficha.aviso.retirado');
+            $_SESSION['eventos_ga'] = [
+                ['nombre' => 'retirar_actividad', 'params' => ['id' => (int) $ev['id'], 'categoria' => $ev['categoria']]],
             ];
             redirigir('/');
         }
@@ -154,6 +175,10 @@ if (!empty($_SESSION['evento_aviso'])) {
 
 $esBorrador = $ev['situacion'] === 'borrador';
 $partes     = fechaPartes($ev['fecha_inicio']);
+
+// "FECHA ACTUALIZADA" (Req. 17092026 punto 2B): buscarEvento() ya trae
+// fecha_cambiada_en del LEFT JOIN a eventos_historial_fecha.
+$fechaActualizadaReciente = fechaActualizadaReciente($ev['fecha_cambiada_en'] ?? null);
 
 /*
  * A dónde vuelve el enlace de arriba.
@@ -220,6 +245,23 @@ require __DIR__ . '/includes/layout.php';
   <div class="ficha-envoltorio"><div class="aviso aviso-error"><?= e($error) ?></div></div>
 <?php endif; ?>
 
+<?php /* Aviso PÚBLICO, para cualquiera —no solo $mando—: Req. 17092026 punto
+         2A, confirmado por el cliente 2026-09-17. Una actividad cancelada
+         sigue siendo visible (puedeVerEvento() ya la deja pasar del 404 de
+         arriba), pero tiene que decirlo con todas sus letras tanto en la
+         ficha como, más adelante, en su tarjeta —esa parte de la tarjeta
+         sigue pendiente, Fase 3—. */ ?>
+<?php if ($ev['situacion'] === 'cancelado'): ?>
+  <div class="ficha-envoltorio">
+    <div class="aviso aviso-error">
+      <strong><?= et('ficha.cancelada.etiqueta') ?></strong> <?= et('ficha.cancelada.texto') ?>
+      <?php if (!empty($ev['info_cancelacion'])): ?>
+        <br><?= e($ev['info_cancelacion']) ?>
+      <?php endif; ?>
+    </div>
+  </div>
+<?php endif; ?>
+
 <?php if ($mando): ?>
   <div class="barra-gestion <?= $esBorrador ? 'es-borrador' : '' ?>">
     <div class="barra-inner">
@@ -228,21 +270,23 @@ require __DIR__ . '/includes/layout.php';
           <strong><?= et('ficha.barra.vista_previa_tit') ?></strong> <?= et('ficha.barra.vista_previa_texto') ?>
         <?php elseif ($ev['situacion'] === 'oculto'): ?>
           <strong><?= et('ficha.barra.oculta_tit') ?></strong> <?= et('ficha.barra.oculta_texto') ?>
+        <?php elseif ($ev['situacion'] === 'cancelado'): ?>
+          <strong><?= et('ficha.barra.cancelada_tit') ?></strong> <?= et('ficha.barra.cancelada_texto') ?>
         <?php else: ?>
           <?php
           /*
            * Editar ya no tiene plazo (REQ-000-XX): el organizador puede
            * corregir una actividad publicada en cualquier momento, así que
            * aquí no hay nada que contar sobre eso. Lo que SÍ sigue teniendo
-           * plazo es ELIMINAR, y por eso es lo único que se avisa —para que
-           * el botón "Eliminar" no desaparezca sin explicación cuando pasen
+           * plazo es RETIRAR, y por eso es lo único que se avisa —para que
+           * el botón "Retirar" no desaparezca sin explicación cuando pasen
            * las horas—.
            */
-          $quedanEliminar = minutosRestantesEliminacion($ev);
+          $quedanRetiro = minutosRestantesRetiro($ev);
           ?>
-          <?php if ($quedanEliminar > 0): ?>
-            <strong><?= et('ficha.barra.publicada_tit') ?></strong> <?= et('ficha.barra.puedes_eliminar') ?>
-            <?= $quedanEliminar >= 60 ? intdiv($quedanEliminar, 60) . ' h ' . ($quedanEliminar % 60) . ' min' : $quedanEliminar . ' min' ?> <?= et('ficha.barra.mas') ?>
+          <?php if ($quedanRetiro > 0): ?>
+            <strong><?= et('ficha.barra.publicada_tit') ?></strong> <?= et('ficha.barra.puedes_retirar') ?>
+            <?= $quedanRetiro >= 60 ? intdiv($quedanRetiro, 60) . ' h ' . ($quedanRetiro % 60) . ' min' : $quedanRetiro . ' min' ?> <?= et('ficha.barra.mas') ?>
           <?php elseif (esAdmin($u)): ?>
             <strong><?= et('ficha.barra.publicada_tit') ?></strong> <?= et('ficha.barra.admin_sin_plazo') ?>
           <?php else: ?>
@@ -265,6 +309,15 @@ require __DIR__ . '/includes/layout.php';
             <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
             <button class="btn-barra destacado" type="submit" name="publicar" value="1"><?= et('ficha.btn.volver_publicar') ?></button>
           </form>
+        <?php elseif ($ev['situacion'] === 'cancelado'): ?>
+          <!-- Cancelar sí lo puede deshacer quien lo canceló —dueño o admin—:
+               a diferencia de "oculto" (moderación), cancelar es una decisión
+               del propio organizador sobre su actividad, no del admin sobre
+               la de alguien más. -->
+          <form method="post">
+            <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+            <button class="btn-barra destacado" type="submit" name="publicar" value="1"><?= et('ficha.btn.reactivar') ?></button>
+          </form>
         <?php endif; ?>
 
         <?php if (puedeEditarEvento($ev, $u)): ?>
@@ -278,10 +331,37 @@ require __DIR__ . '/includes/layout.php';
           </form>
         <?php endif; ?>
 
-        <?php if (puedeEliminarEvento($ev, $u)): ?>
-          <form method="post" onsubmit="return confirm(<?= json_encode(sprintf(t('ficha.confirmar_eliminar'), tituloEvento($ev))) ?>);">
+        <?php if ($ev['situacion'] === 'publicado'): ?>
+          <!-- Cancelar (Req. 17092026 punto 2A): solo tiene sentido sobre algo
+               publicado.
+
+               El "Información para los asistentes" opcional de la maqueta del
+               cliente se pide con prompt() y no con un <details> propio: la
+               barra de acciones es una fila flex (.barra-acciones) compartida
+               con Editar/Ocultar/Retirar, y un panel expandible ahí adentro
+               —textarea incluida— se pelea con ese layout sin poder verlo
+               renderizado para ajustarlo. prompt() no necesita CSS nueva ni
+               arriesga nada visual, y de paso hace de "¿seguro?": cancelar el
+               cuadro (null) aborta el envío entero, así que no hace falta un
+               confirm() aparte encima. El mismo texto se usa igual en
+               mis-eventos.php, con su propio prompt() —dos pantallas, una
+               sola función del lado del servidor (cancelarEvento())—. -->
+          <form method="post" onsubmit="
+            var info = prompt(<?= json_encode(t('ficha.prompt_info_cancelacion')) ?>, '');
+            if (info === null) return false;
+            this.elements['info_cancelacion'].value = info;
+            return confirm(<?= json_encode(sprintf(t('ficha.confirmar_cancelar'), tituloEvento($ev))) ?>);
+          ">
             <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-            <button class="btn-barra peligro" type="submit" name="eliminar" value="1"><?= et('ficha.btn.eliminar') ?></button>
+            <input type="hidden" name="info_cancelacion" value="">
+            <button class="btn-barra peligro" type="submit" name="cancelar" value="1"><?= et('ficha.btn.cancelar') ?></button>
+          </form>
+        <?php endif; ?>
+
+        <?php if (puedeRetirarEvento($ev, $u)): ?>
+          <form method="post" onsubmit="return confirm(<?= json_encode(sprintf(t('ficha.confirmar_retirar'), tituloEvento($ev))) ?>);">
+            <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+            <button class="btn-barra peligro" type="submit" name="retirar" value="1"><?= et('ficha.btn.retirar') ?></button>
           </form>
         <?php endif; ?>
       </div>
@@ -314,6 +394,15 @@ require __DIR__ . '/includes/layout.php';
         $categoriasFicha
     ))) ?></div>
     <h1><?= e(tituloEvento($ev)) ?></h1>
+
+    <?php /* Público, igual que el aviso de CANCELADA de más arriba: no
+             depende de $mando, cualquiera que entre a la ficha lo ve. Solo
+             para 'publicado' —una cancelada ya tiene su propio aviso, y no
+             tiene sentido apilar los dos—. */ ?>
+    <?php if ($fechaActualizadaReciente && $ev['situacion'] === 'publicado'): ?>
+      <div class="badge-fecha-actualizada"><?= et('ficha.fecha_actualizada.etiqueta') ?></div>
+      <p class="sub" style="margin-top:-4px;"><?= et('ficha.fecha_actualizada.texto') ?></p>
+    <?php endif; ?>
 
     <div class="ficha-compartir">
       <button type="button" class="btn-barra" id="btnCompartir"

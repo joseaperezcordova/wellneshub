@@ -294,7 +294,7 @@ function avisarAdministradores(int $eventoId): void
         return;
     }
 
-    $enlace  = URL_BASE . '/moderacion.php';
+    $enlace  = URL_BASE . '/admin.php?panel=reportes';
     $cuerpo  = "Han reportado una actividad publicada en el directorio.\n\n"
              . 'Actividad:  ' . $ev['titulo'] . "\n"
              . 'Organiza:   ' . $ev['organizador'] . "\n"

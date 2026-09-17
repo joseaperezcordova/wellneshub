@@ -43,6 +43,15 @@ function precioTexto(e, prefijo) {
   return e.free ? TARJETA_T.gratis : (e.price ? prefijo + '$' + esc(e.price) + ' MXN' : TARJETA_T.porConfirmar);
 }
 
+/* "FECHA ACTUALIZADA" (Req. 17092026 punto 2B): eventoParaTarjeta() ya
+   decidió el sí/no —reciente_cambio_fecha—, aquí solo se pinta si viene en
+   true. Sin marcado si no aplica, igual que fondoTarjeta()/imgTarjeta(). */
+function badgeFechaActualizada(e) {
+  return e.reciente_cambio_fecha
+    ? '<span class="badge-fecha-actualizada">' + esc(TARJETA_T.fechaActualizada) + '</span>'
+    : '';
+}
+
 /* Tarjeta grande del carril de próximas actividades: fecha sobre la imagen,
    categoría, título, ubicación y, al pie, quién la organiza y desde cuánto. */
 function evCardHTML(e) {
@@ -54,6 +63,7 @@ function evCardHTML(e) {
     + '<div class="ev-body">'
     +   '<div class="ev-cat">' + esc(e.cat) + '</div>'
     +   '<h3>' + esc(e.t) + '</h3>'
+    +   badgeFechaActualizada(e)
     +   '<div class="ev-loc">' + esc(e.city) + '</div>'
     +   '<div class="ev-foot">'
     +     '<span class="ev-org">' + esc(e.org) + '</span>'
@@ -82,6 +92,7 @@ function cardHTML(e, cola) {
     + '<div class="card-body">'
     +   '<div class="card-date">' + esc(e.date) + '</div>'
     +   '<h3>' + esc(e.t) + '</h3>'
+    +   badgeFechaActualizada(e)
     +   '<div class="card-city">' + esc(e.city) + '</div>'
     +   '<div class="card-foot">'
     +     '<span class="price ' + (e.free ? 'free' : '') + '">' + precioTexto(e, '') + '</span>'
