@@ -127,7 +127,7 @@ $puedeEnviarCodigoCorreo = isset($e['id']);
       <label>
         <input type="checkbox" name="categorias[]" value="<?= e($catNombre) ?>"
                <?= in_array($catNombre, $categoriasSeleccionadas, true) ? 'checked' : '' ?>>
-        <?= e($catDatos[0] . '  ' . $catDatos[1]) ?>
+        <?= e($catDatos[1]) ?>
       </label>
     <?php endforeach; ?>
   </div>
