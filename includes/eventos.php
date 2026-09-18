@@ -725,8 +725,16 @@ function ubicacionesConActividad(): array
 /** Los eventos de una persona, incluidos borradores y pasados. */
 function eventosDeUsuario(int $usuarioId): array
 {
+    // hf.cambiado (Req. 17092026 punto 3): sin él, «Mis actividades» no puede
+    // distinguir PUBLICADA de FECHA ACTUALIZADA como pide el MVP del dashboard
+    // del organizador —la ficha pública ya lo hace, esta tabla se había
+    // quedado sin el mismo dato—.
     $st = db()->prepare(
-        'SELECT * FROM eventos WHERE usuario_id = ? ORDER BY fecha_inicio DESC'
+        'SELECT e.*, hf.cambiado AS fecha_cambiada_en
+           FROM eventos e
+           ' . EVENTO_JOIN_ULTIMO_CAMBIO_FECHA . '
+          WHERE e.usuario_id = ?
+       ORDER BY e.fecha_inicio DESC'
     );
     $st->execute([$usuarioId]);
 

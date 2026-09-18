@@ -2,20 +2,19 @@
 /**
  * Preguntas frecuentes.
  *
- * LAS RESPUESTAS DESCRIBEN LO QUE EL SITIO HACE HOY
+ * TEXTO DEL CLIENTE, REQ. 17092026 PUNTO 6
  *
- * Siete de las que traía el requerimiento no coincidían con el código, y todas
- * en la misma dirección: daban por hecho una revisión previa que no existe.
- * Aquí no hay cola de aprobación —publicarEvento() pone la actividad en línea
- * en el momento en que su dueño le da a publicar— y la moderación es posterior:
- * alguien reporta, un administrador mira y, si toca, la oculta.
+ * Reemplaza entero el bloque anterior (que ya venía corregido a mano porque un
+ * requerimiento todavía más viejo daba por hecha una revisión previa que
+ * nunca existió —ver docs/pendientes.md, pendiente 2l, cerrado por este mismo
+ * documento—). Este texto ya viene confirmado por el cliente: publicación
+ * automática, sin cola de aprobación, con revisión posterior conforme a
+ * políticas y criterios.
  *
- * Publicar «revisamos cada publicación, tarda entre 24 y 72 horas hábiles»
- * habría dejado a los organizadores esperando un correo que no llega, y a los
- * visitantes creyendo que alguien comprobó lo que están leyendo. Las respuestas
- * afectadas se reescribieron para decir lo que pasa de verdad; la redacción
- * original está en docs/pendientes.md, para restituirla el día que exista esa
- * revisión.
+ * Los enlaces, el correo de soporte dinámico y la lista de categorías del
+ * catálogo NO son del documento —ahí van en texto corrido—, pero SÍ son el
+ * patrón ya usado en esta misma página: escribir la ciudad o el correo a mano
+ * es una cosa más que se desactualiza sola.
  *
  * ACORDEONES CON <details>, NO CON JAVASCRIPT
  *
@@ -56,10 +55,6 @@ $categoriasTexto = implode(', ', array_keys(categoriasMenu()));
 $bloques = [
     'Para usuarios' => [
         [
-            /*
-             * Texto del cliente, 2026-09-02: reemplaza la pregunta y respuesta
-             * anteriores tal cual las mandó.
-             */
             '¿Qué es Omdara?',
             'Omdara es un directorio de actividades y experiencias de bienestar que conecta a personas con '
             . 'organizadores.',
@@ -74,31 +69,29 @@ $bloques = [
             . 'solicitar información, reservar o comprar boletos, según corresponda.',
         ],
         [
-            /* Texto del cliente, 2026-09-02: mismo criterio que la pregunta 1. */
             '¿Omdara organiza las actividades?',
             'No. Las actividades son organizadas y ofrecidas por terceros. Omdara funciona como una plataforma de '
             . 'conexión entre usuarios y organizadores.',
         ],
         [
-            /* Nueva, texto del cliente, 2026-09-02. */
             '¿Puedo reservar o comprar una actividad en Omdara?',
             'Depende del organizador. Algunas actividades permiten solicitar información, reservar o comprar entradas '
             . 'mediante los canales indicados en cada publicación.',
         ],
         [
-            /* Nueva, texto del cliente, 2026-09-02. */
             '¿Omdara garantiza las actividades publicadas?',
             'Omdara busca publicar información clara y verificable, pero no organiza ni presta los servicios '
             . 'ofrecidos por los organizadores.',
         ],
         [
-            '¿Cómo sé si un evento sigue disponible?',
-            'La información la proporciona el organizador. Te recomendamos confirmar directamente con él antes de asistir.',
+            '¿Cómo sé si una actividad sigue disponible?',
+            'La información la proporciona el organizador. Te recomendamos confirmar directamente con él antes de '
+            . 'asistir.',
         ],
         [
             '¿Puedo cancelar una reserva?',
-            'Las cancelaciones y reembolsos dependen de las políticas de cada organizador. OMDARA no gestiona pagos ni '
-            . 'reservas, así que no puede cancelarlas ni devolver un importe.',
+            'Las cancelaciones y reembolsos dependen de las políticas de cada organizador. Omdara no gestiona pagos '
+            . 'ni reservas, así que no puede cancelarlas ni devolver un importe.',
         ],
         [
             /*
@@ -144,80 +137,102 @@ $bloques = [
             'Durante la etapa beta, publicar actividades es gratuito.',
         ],
         [
-            /*
-             * Cambiado: no hay «enviar para revisión». El formulario guarda un
-             * borrador, se ve la vista previa y publicar es una decisión del
-             * propio organizador, que surte efecto en el momento.
-             */
-            '¿Cómo publico un evento?',
+            '¿Cómo publico una actividad?',
             'Crea una cuenta, completa el formulario de <a href="' . e(url('publicar')) . '">publicación</a> y verás una '
             . 'vista previa de tu actividad tal como la verá la gente. Desde ahí decides si publicarla. '
             . 'Se hace pública en ese momento.',
         ],
         [
-            /*
-             * Cambiado: la pregunta original —«¿Por qué mi evento debe ser
-             * revisado?»— parte de algo que no ocurre. Se reformula para
-             * responder la duda de fondo, que es si alguien vigila lo que se
-             * publica.
-             */
             '¿Revisan mi actividad antes de publicarla?',
             'No. Tu actividad se publica en cuanto la envías, sin esperar una aprobación. '
             . 'La revisión es posterior. Cualquier persona puede reportarla y, si no cumple con nuestros criterios '
-            . 'o políticas, podremos retirarla.',
+            . 'o políticas, podremos tomar medidas sobre ella.',
         ],
         [
-            /*
-             * Cambiado: no hay aprobación que esperar. La pregunta se queda
-             * porque es la que la gente va a buscar, con la respuesta correcta.
-             */
             '¿Cuánto tarda en aparecer mi actividad?',
             'Aparece de inmediato. En cuanto la publicas ya se puede encontrar en el buscador y compartir su enlace.',
         ],
         [
-            /*
-             * Cambiado: «antes o después de su publicación» es cierto solo a
-             * medias, y la mitad que falta es la que genera el problema.
-             */
-            '¿Puedo editar mi evento?',
-            'Sí, en cualquier momento: borrador o ya publicada, no hay plazo para corregirla. '
-            . 'Lo que sí conserva un plazo es <em>eliminarla</em> —ver la siguiente pregunta—, '
-            . 'que es distinto.',
+            '¿Qué tipo de actividades aceptan?',
+            'Omdara acepta actividades y experiencias relacionadas con el bienestar, en cualquiera de estas '
+            . 'categorías: ' . e($categoriasTexto) . '. Si tu actividad está relacionada con el bienestar y no '
+            . 'encuentras una categoría adecuada, <a href="' . e(url('contacto')) . '">dínoslo</a>.',
         ],
         [
-            '¿Qué tipo de actividades aceptan?',
-            'Experiencias de bienestar en cualquiera de estas categorías: ' . e($categoriasTexto) . '. '
-            . 'Si lo tuyo encaja en el bienestar y no ves su categoría, <a href="' . e(url('contacto')) . '">dínoslo</a>.',
+            /*
+             * Texto del cliente en lista, tal cual —también aparece, con la
+             * misma redacción, en como-funciona.php y en terminos-y-condiciones.php.
+             * No se comparte un solo array entre las tres porque cada
+             * documento lo dictó por separado y no hay garantía de que sigan
+             * coincidiendo palabra por palabra en la próxima actualización.
+             */
+            '¿Qué actividades no se pueden publicar?',
+            'No se pueden publicar actividades que:'
+            . '<ul>'
+            . '<li>No tengan relación con el propósito de Omdara.</li>'
+            . '<li>Contengan información falsa, engañosa o deliberadamente incompleta.</li>'
+            . '<li>Promuevan discriminación, acoso o violencia.</li>'
+            . '<li>Presenten afirmaciones de salud o resultados garantizados de manera engañosa.</li>'
+            . '<li>Puedan representar un riesgo indebido para los participantes.</li>'
+            . '<li>Infrinjan la legislación aplicable.</li>'
+            . '<li>Incluyan el consumo, administración o uso de sustancias psicoactivas, psicodélicas, '
+            . 'alucinógenas o de efectos farmacológicos significativos, incluyendo ayahuasca, 5-MeO-DMT '
+            . '(«sapo»), hongos psilocibios u otras sustancias de naturaleza similar.</li>'
+            . '<li>Incluyan la administración de sustancias o tratamientos médicos que requieran supervisión '
+            . 'profesional especializada y que no correspondan al propósito de Omdara.</li>'
+            . '<li>Contengan contenido sexual explícito o contenido que no corresponda al propósito de la '
+            . 'plataforma.</li>'
+            . '<li>Utilicen Omdara para promocionar productos o servicios que no correspondan a su línea de '
+            . 'contenido.</li>'
+            . '</ul>',
+        ],
+        [
+            '¿Qué información debo proporcionar al publicar?',
+            'La información de la actividad debe ser clara, veraz y suficiente para que las personas puedan '
+            . 'entender en qué consiste y decidir si desean participar.',
+        ],
+        [
+            '¿Puedo editar mi actividad?',
+            'Sí, en cualquier momento, tanto si está en borrador como si ya está publicada. No hay un plazo para '
+            . 'corregir o actualizar la información de una actividad.',
         ],
         [
             '¿Puedo incluir un enlace para reservas o boletos?',
             'Sí. Al publicar eliges la acción principal de tu actividad: contactarte, comprar boletos o reservar lugar. '
-            . 'En las dos últimas agregas el enlace que ya utilices —Eventbrite, Boletia, tu propio sitio, un formulario— '
-            . 'y el botón de la ficha lleva ahí.',
+            . 'En las dos últimas agregas el enlace que ya utilices —Eventbrite, Boletia, tu propio sitio, un formulario, '
+            . 'etc.— y el botón de la ficha lleva ahí.',
+        ],
+        [
+            '¿Qué pasa si alguien reporta mi actividad?',
+            'Un reporte no significa automáticamente que la actividad será retirada. Omdara revisará el caso para '
+            . 'determinar si existe un incumplimiento de los criterios de publicación, las políticas o los '
+            . '<a href="' . e(url('terminos')) . '">Términos y Condiciones</a>.',
+        ],
+        [
+            '¿Qué pasa si mi actividad incumple los criterios?',
+            'Si una actividad publicada incumple los criterios de publicación, las políticas o los '
+            . '<a href="' . e(url('terminos')) . '">Términos y Condiciones</a>, Omdara podrá ocultarla o retirarla '
+            . 'de la plataforma y avisarte del motivo cuando corresponda. Dejar de estar visible no significa '
+            . 'necesariamente que la actividad se haya eliminado de tu cuenta: puede permanecer en tu panel para '
+            . 'consulta o corrección.',
         ],
         [
             /*
-             * Cambiado: no existe «no aprobado». Lo que sí puede pasar es que
-             * se oculte después, y eso es lo que se explica.
+             * Migración 26 (Req. 17092026 punto 8): retirar ya no borra nada,
+             * solo oculta. ELIMINAR ya no es una acción del organizador —ni
+             * siquiera cuando administración interviene—, así que la
+             * respuesta no puede prometer una eliminación real; explica que
+             * "retirar" es lo que hay, aunque la pregunta (tal como la
+             * escribe la gente, y tal como la trae el requerimiento) siga
+             * diciendo "elimino".
              */
-            '¿Qué pasa si mi actividad se retira?',
-            'Si una actividad publicada incumple las reglas, se oculta y te avisamos del motivo para que puedas '
-            . 'corregirla. Dejar de estar visible no la borra: sigue en tu panel.',
-        ],
-        [
-            /*
-             * Cambiado: el panel del organizador no tiene «ocultar» —esa es una
-             * acción de administración—. Lo que sí puede hacer su dueño es
-             * retirarla mientras esté dentro del plazo de retiro
-             * (REQ-000-XX separó este plazo del de editar, que ya no tiene).
-             * Migración 26: retirar ya no borra nada, solo oculta.
-             */
-            '¿Cómo retiro un evento?',
-            'Desde la página de tu actividad, mientras sigan sin pasar ' . EVENTO_MARGEN_RETIRO_H . ' horas '
-            . 'desde que la publicaste. Después de ese plazo, '
-            . '<a href="' . e(url('contacto')) . '">escríbenos</a> y la retiramos: es para que una ficha no '
-            . 'desaparezca de golpe cuando ya hay gente que contaba con ella. En ningún caso se borra: '
-            . 'queda oculta y se puede reactivar.',
+            '¿Cómo retiro o elimino una actividad?',
+            'Puedes modificar la información de tu actividad en cualquier momento desde su página de gestión. '
+            . 'Si necesitas retirarla de Omdara, puedes hacerlo directamente desde la página de gestión durante '
+            . 'las primeras ' . EVENTO_MARGEN_RETIRO_H . ' horas después de publicarla. Después de ese plazo, '
+            . '<a href="' . e(url('contacto')) . '">escríbenos</a> para solicitar su retiro. Este plazo busca '
+            . 'evitar que una actividad desaparezca repentinamente cuando las personas ya pueden haberla '
+            . 'consultado o planeado asistir.',
         ],
     ],
 ];

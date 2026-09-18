@@ -416,7 +416,10 @@ return [
     'ficha.error.sesion_caducada'   => 'La sesión caducó. Vuelve a intentarlo.',
     'ficha.error.no_permiso'        => 'No puedes hacer eso.',
     'ficha.error.plazo_retirar'     => 'Ya pasó el plazo para retirar esta actividad tú mismo. Pídeselo al administrador.',
-    'ficha.aviso.publicado'         => '¡Publicado! Ya aparece en la portada.',
+    // Texto del cliente, Req. 17092026 punto 1: no debe sonar a que Omdara
+    // aprobó la actividad de antemano —no existe tal aprobación—, y debe
+    // avisar que puede haber revisión posterior.
+    'ficha.aviso.publicado'         => 'Tu actividad ya está disponible en Omdara. Recuerda que las actividades pueden ser revisadas posteriormente conforme a nuestras políticas y criterios de publicación.',
     'ficha.aviso.oculto'            => 'Actividad oculta. Ya no aparece en el listado.',
     'ficha.aviso.retirado'          => 'Actividad retirada. Ya no se ve en Omdara, pero no se borró.',
     'ficha.aviso.cancelado'         => 'Actividad cancelada. Sigue visible, con el aviso de cancelada.',

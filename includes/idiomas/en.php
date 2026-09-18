@@ -374,7 +374,10 @@ return [
     'ficha.error.sesion_caducada'   => 'Your session expired. Try again.',
     'ficha.error.no_permiso'        => 'You can\'t do that.',
     'ficha.error.plazo_retirar'     => 'The deadline to withdraw this activity yourself has passed. Ask an admin.',
-    'ficha.aviso.publicado'         => 'Published! It\'s now on the homepage.',
+    // Client text, Req. 17092026 item 1: must not sound like Omdara approved
+    // the activity beforehand —no such approval exists—, and must warn that
+    // a later review is possible.
+    'ficha.aviso.publicado'         => 'Your activity is now live on Omdara. Keep in mind activities may be reviewed later according to our publishing policies and criteria.',
     'ficha.aviso.oculto'            => 'Activity hidden. It no longer shows in listings.',
     'ficha.aviso.retirado'          => 'Activity withdrawn. It no longer shows on Omdara, but wasn\'t deleted.',
     'ficha.aviso.cancelado'         => 'Activity cancelled. It stays visible, with the cancelled notice.',

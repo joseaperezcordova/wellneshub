@@ -61,7 +61,13 @@ require __DIR__ . '/includes/layout.php';
                        porque pasadas 24 horas ya no se podía tocar—. */ ?>
               <td><?= e($pu['d'] . ' ' . $pu['m'] . ', ' . $pu['hora']) ?></td>
               <td>
-                <?php if ($me['situacion'] === 'publicado'): ?>
+                <?php if ($me['situacion'] === 'publicado' && fechaActualizadaReciente($me['fecha_cambiada_en'] ?? null)): ?>
+                  <?php /* Req. 17092026 punto 3: el MVP del dashboard distingue
+                           PUBLICADA de FECHA ACTUALIZADA en esta misma columna
+                           —es la ventana de EVENTO_FECHA_ACTUALIZADA_DIAS días,
+                           la misma que ya usan la ficha y las tarjetas. */ ?>
+                  <span class="badge on" style="color:var(--jungle); background:rgba(22,22,22,0.08);"><?= et('tarjeta.fecha_actualizada') ?></span>
+                <?php elseif ($me['situacion'] === 'publicado'): ?>
                   <span class="badge on" style="color:var(--jungle); background:rgba(22,22,22,0.08);">Publicada</span>
                 <?php elseif ($me['situacion'] === 'borrador'): ?>
                   <span class="badge-pending">Borrador · sin publicar</span>

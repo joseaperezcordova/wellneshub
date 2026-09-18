@@ -8,20 +8,18 @@
  *
  * EL PASO 2 NO ES «ENVIAR A REVISIÓN»
  *
- * El requerimiento describía un segundo paso de revisión previa —«envía tu
- * actividad a revisión», «nuestro equipo verificará… antes de hacerla
- * visible», «una vez aprobada»— y eso no es lo que hace el sitio:
+ * Un requerimiento anterior describía un segundo paso de revisión previa
+ * —«envía tu actividad a revisión», «nuestro equipo verificará… antes de
+ * hacerla visible», «una vez aprobada»— y eso nunca fue lo que hace el sitio:
  * publicarEvento() la pone en línea en el momento en que su dueño le da a
  * publicar. La moderación es posterior, cuando alguien reporta.
  *
- * Prometerlo aquí es peor que en las preguntas frecuentes: esta página se lee
- * ANTES de publicar, así que quien la crea espera un correo de aprobación,
- * no revisa que su actividad ya está pública, y descubre el error cuando le
- * escribe la primera persona. El paso 2 describe el que sí existe —la vista
- * previa—, que además es el punto donde de verdad se decide publicar.
- *
- * Está anotado en docs/pendientes.md junto con lo mismo de las FAQ, para
- * restituir la redacción original el día que exista esa revisión.
+ * El documento del cliente "Req. 17092026" (puntos 1, 5 y 6) LO CONFIRMA por
+ * escrito: publicación automática, sin cola de aprobación, con revisión
+ * posterior conforme a políticas y criterios. Cierra el pendiente 2l de
+ * docs/pendientes.md —ya no hace falta restituir ninguna redacción anterior—.
+ * Los cuatro pasos y las preguntas frecuentes de aquí abajo son el texto tal
+ * como lo mandó el cliente en ese documento.
  *
  * EL BOTÓN DE PUBLICAR NO COMPRUEBA LA SESIÓN, Y NO HACE FALTA
  *
@@ -57,30 +55,117 @@ $pasos = [
         . 'en Omdara es gratis para los organizadores.',
     ],
     [
-        /*
-         * Cambiado. El requerimiento decía «Envía tu actividad a revisión» y
-         * aquí no hay revisión previa. Este es el segundo paso de verdad, y es
-         * el que importa: nada se publica sin pasar por él.
-         */
         'Revísala en la vista previa',
-        'Antes de publicar nada verás tu actividad tal como la verá la gente, con sus fotos, su mapa '
-        . 'y su botón. Desde ahí decides si publicarla o volver a corregirla. Nada se hace público '
-        . 'hasta que tú lo dices.',
+        'Antes de publicar, podrás ver tu actividad tal como la verá la gente, con sus fotografías, '
+        . 'mapa e información de contacto. Desde ahí puedes corregir la información antes de hacerla '
+        . 'pública.',
     ],
     [
-        /*
-         * Cambiado: «una vez aprobada» daba por hecha una aprobación que no
-         * existe, y sobre todo hacía esperar.
-         */
         'Llega a nuevas personas',
-        'En cuanto la publicas aparece en Omdara y ya se puede encontrar en el buscador, filtrar por '
-        . 'ciudad o categoría y compartir con su propio enlace. Sin esperas.',
+        'En cuanto la publiques, tu actividad aparecerá en Omdara y podrá encontrarse mediante el '
+        . 'buscador, los filtros por ciudad o categoría y su propio enlace. No necesitas esperar una '
+        . 'aprobación previa.',
     ],
     [
         'Recibe contactos directamente',
         'Las personas interesadas podrán contactarte a través del formulario o de los canales de '
         . 'contacto que hayas proporcionado. Tú gestionas directamente con cada participante la '
         . 'disponibilidad, reservación, pago y demás detalles de la actividad.',
+    ],
+];
+
+/*
+ * Preguntas frecuentes de esta misma página (Req. 17092026 punto 5) —
+ * distintas de las de preguntas-frecuentes.php: aquí son las que le importan
+ * a alguien que está a punto de publicar, sobre todo la de si hace falta
+ * aprobación previa (no) y qué se puede y no se puede publicar.
+ *
+ * La respuesta admite HTML: dos mencionan los Términos y Condiciones y llevan
+ * su enlace, mismo criterio que preguntas-frecuentes.php.
+ */
+$faqOrganizador = [
+    [
+        '¿Qué tipo de actividades puedo publicar?',
+        'Puedes publicar actividades y experiencias relacionadas con el bienestar, como movimiento y '
+        . 'actividad física, yoga, meditación, relajación, bienestar emocional, desarrollo personal, '
+        . 'autocuidado, terapias y prácticas de bienestar, actividades de naturaleza, descanso, '
+        . 'conexión, comunidad, talleres y encuentros. La actividad debe tener una relación clara con '
+        . 'el propósito de Omdara y contar con información suficiente para que las personas puedan '
+        . 'entender en qué consiste y decidir si desean participar.',
+    ],
+    [
+        '¿Qué actividades no se pueden publicar?',
+        'No corresponden a Omdara las actividades que no tengan relación con el propósito de la '
+        . 'plataforma, que contengan información falsa o engañosa, promuevan discriminación, acoso o '
+        . 'violencia, presenten afirmaciones de salud o resultados garantizados de manera engañosa, '
+        . 'puedan representar un riesgo indebido para los participantes o infrinjan la legislación '
+        . 'aplicable. Tampoco se permiten actividades que incluyan el consumo, administración o uso de '
+        . 'sustancias psicoactivas, psicodélicas, alucinógenas o de efectos farmacológicos '
+        . 'significativos, como ayahuasca, 5-MeO-DMT («sapo»), hongos psilocibios u otras sustancias de '
+        . 'naturaleza similar. También quedan fuera las actividades que impliquen tratamientos o '
+        . 'administración de sustancias que requieran supervisión profesional especializada y que no '
+        . 'correspondan al propósito de Omdara, así como el contenido sexual explícito y la promoción '
+        . 'de productos o servicios que no correspondan a la línea de la plataforma.',
+    ],
+    [
+        '¿Mi actividad necesita ser aprobada antes de publicarse?',
+        'No. Las actividades pueden publicarse automáticamente una vez que completes el proceso de '
+        . 'publicación. Omdara puede revisarlas posteriormente para verificar que cumplan con los '
+        . 'criterios de publicación, las políticas de la plataforma y los '
+        . '<a href="' . e(url('terminos')) . '">Términos y Condiciones</a>.',
+    ],
+    [
+        '¿Qué pasa si mi actividad no cumple con los criterios de publicación?',
+        'Si después de su publicación se detecta que una actividad incumple los criterios de Omdara, '
+        . 'la plataforma podrá modificar su visibilidad, retirarla o tomar otras medidas conforme a sus '
+        . 'políticas y ' . '<a href="' . e(url('terminos')) . '">Términos y Condiciones</a>.',
+    ],
+    [
+        '¿Omdara revisa todas las actividades antes de publicarlas?',
+        'No. Omdara no realiza una aprobación manual previa de cada actividad. La publicación es '
+        . 'automática y puede existir una revisión posterior. Por eso, como organizador, eres '
+        . 'responsable de proporcionar información clara, veraz y suficiente sobre tu actividad y de '
+        . 'asegurarte de que cumple con los criterios de publicación.',
+    ],
+    [
+        '¿Quién gestiona las reservas y los pagos?',
+        'Tú. Omdara funciona como plataforma de descubrimiento y conexión. El organizador gestiona '
+        . 'directamente con las personas interesadas la disponibilidad, reservación, pago, cambios, '
+        . 'cancelaciones y demás condiciones de la actividad.',
+    ],
+    [
+        '¿Omdara cobra comisión por las actividades?',
+        'No. Publicar una actividad en Omdara es gratuito y actualmente Omdara no cobra una comisión '
+        . 'por las reservas o pagos que gestiones directamente con los participantes.',
+    ],
+    [
+        '¿Puedo modificar mi actividad después de publicarla?',
+        'Sí. Puedes actualizar la información de tu actividad cuando sea necesario. Es importante '
+        . 'mantener actualizados datos como fecha, horario, precio, ubicación, disponibilidad y '
+        . 'condiciones de participación.',
+    ],
+    [
+        '¿Qué pasa si mi actividad cambia o se cancela?',
+        'Si la actividad cambia, debes actualizar la información publicada para que las personas '
+        . 'encuentren datos correctos. Si la actividad se cancela, debes actualizarla o retirarla según '
+        . 'corresponda y comunicar la cancelación a las personas que ya hayan contactado contigo o '
+        . 'reservado directamente contigo.',
+    ],
+    [
+        '¿Qué responsabilidad tengo como organizador?',
+        'Como organizador eres responsable de que la información publicada sea verdadera, suficiente y '
+        . 'esté actualizada, así como de la organización y prestación de la actividad, las condiciones '
+        . 'de participación, las reservas, los pagos y la atención a las personas participantes. Omdara '
+        . 'facilita el descubrimiento y contacto, pero no organiza ni presta directamente las '
+        . 'actividades publicadas por terceros.',
+    ],
+    [
+        '¿Qué pasa si alguien reporta mi actividad?',
+        'Los reportes pueden ser revisados posteriormente por Omdara. Si se determina que una '
+        . 'actividad incumple los criterios de publicación, las políticas de la plataforma o los '
+        . 'Términos y Condiciones, Omdara podrá modificar su visibilidad, retirarla o tomar las medidas '
+        . 'correspondientes. Un reporte por sí solo no significa que la actividad sea retirada '
+        . 'automáticamente.',
     ],
 ];
 
@@ -131,6 +216,18 @@ require __DIR__ . '/includes/layout.php';
 
   <div class="guia-acciones">
     <a class="btn-principal btn-cta" href="<?= e(url('publicar')) ?>">Publicar una actividad</a>
+  </div>
+
+  <?php /* Mismo marcado <details> que preguntas-frecuentes.php: acordeón sin
+           JavaScript, encontrable con Ctrl+F aunque esté cerrado. */ ?>
+  <h3 class="guia-titulo" style="margin-top:48px;">Preguntas frecuentes</h3>
+  <div class="faq">
+    <?php foreach ($faqOrganizador as [$pregunta, $respuesta]): ?>
+      <details class="faq-item">
+        <summary><?= e($pregunta) ?></summary>
+        <div class="faq-respuesta"><?= $respuesta ?></div>
+      </details>
+    <?php endforeach; ?>
   </div>
 </section>
 

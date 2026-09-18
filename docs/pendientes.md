@@ -201,17 +201,24 @@ preferencias, que es donde la cláusula 7 dice que está.
 
 ---
 
-### 2ñ. Dos cosas que los Términos no dicen y el sitio sí hace
+### 2ñ. Dos cosas que los Términos no dicen y el sitio sí hace — cerrado (2026-09-17)
 
-**Qué pasa:** no es un error del documento —puede ser deliberado—, pero conviene
-que lo mire quien asesora.
+**Cerrado por el documento del cliente "Req. 17092026" punto 7**: los TyC se
+reemplazaron enteros con el texto que mandó el cliente, fechado 17 septiembre
+2026, y ya traen las dos cosas que faltaban —ahora en la cláusula nueva
+«Revisión y moderación de publicaciones»—. Ver terminos-y-condiciones.php.
 
-- El plazo de **24 horas** para corregir una actividad publicada, pasado el cual
-  se congela.
+**Qué pasaba:** no era un error del documento —podía ser deliberado—, pero
+convenía que lo mirara quien asesora.
+
 - Que la moderación es **posterior**, no previa.
+- El plazo de **24 horas** para retirar una actividad publicada por cuenta
+  propia (Req. 17092026 punto 8; ya NO hay plazo para *editarla*, eso se
+  puede en cualquier momento —distinto de lo que decía esta nota
+  originalmente—).
 
-Las dos son reglas que obligan a los organizadores y que hoy solo constan en las
-preguntas frecuentes y en «¿Cómo funciona?». Ver también 2l.
+Las dos eran reglas que obligaban a los organizadores y que solo constaban en
+las preguntas frecuentes y en «¿Cómo funciona?». Ver también 2l.
 
 ---
 
@@ -573,7 +580,16 @@ guarde. Media hora, cuando haya suficientes mensajes para que haga falta.
 
 ---
 
-### 2l. Dos páginas dan por hecha una revisión previa que no existe
+### 2l. Dos páginas dan por hecha una revisión previa que no existe — cerrado (2026-09-17)
+
+**Cerrado por el documento del cliente "Req. 17092026"** (puntos 1, 5 y 6),
+confirmado por escrito el 2026-09-17: opción 1 de las dos de abajo. No habrá
+revisión previa. Las preguntas frecuentes y «¿Cómo funciona?» se reescribieron
+completas con el texto que mandó el cliente en ese mismo documento —ver
+preguntas-frecuentes.php y como-funciona.php—, que además agrega una lista
+detallada de qué actividades no se pueden publicar y una mini-FAQ propia en
+«¿Cómo funciona?». Ver también memoria de proyecto
+`req17092026-decisiones-cliente`.
 
 **Dónde:** las preguntas frecuentes y «¿Cómo funciona?». Los dos requerimientos
 llegaron con el mismo supuesto, así que es una sola decisión.
