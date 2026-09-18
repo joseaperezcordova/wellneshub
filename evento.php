@@ -164,6 +164,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
             redirigir('/');
         }
+
+    } elseif (isset($_POST['solicitar_retiro'])) {
+        // Req. 17092026 punto 8, "revisión administrativa": pasado el plazo de
+        // retiro directo, el dueño ya no puede ejecutarlo él mismo, pero puede
+        // pedirlo. Queda pendiente (eventos_retiros.retirado_en NULL) hasta
+        // que un administrador lo procese desde admin.php.
+        if (!puedeSolicitarRetiroEvento($ev, $u) || tieneRetiroPendiente((int) $ev['id'])) {
+            $error = t('ficha.error.no_permiso');
+        } else {
+            solicitarRetiroEvento((int) $ev['id'], (int) $u['id'], (string) ($_POST['motivo_retiro'] ?? ''));
+            $_SESSION['evento_aviso'] = t('ficha.aviso.retiro_solicitado');
+            redirigir(urlEvento($ev));
+        }
     }
 }
 
@@ -363,6 +376,24 @@ require __DIR__ . '/includes/layout.php';
             <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
             <button class="btn-barra peligro" type="submit" name="retirar" value="1"><?= et('ficha.btn.retirar') ?></button>
           </form>
+        <?php elseif (puedeSolicitarRetiroEvento($ev, $u)): ?>
+          <?php if (tieneRetiroPendiente((int) $ev['id'])): ?>
+            <span class="btn-barra" style="opacity:.7; cursor:default;"><?= et('ficha.retiro_pendiente.texto') ?></span>
+          <?php else: ?>
+            <!-- Mismo patrón que "Cancelar" arriba: prompt() para el motivo
+                 opcional, sin panel expandible propio dentro de la fila flex
+                 de .barra-acciones. -->
+            <form method="post" onsubmit="
+              var motivo = prompt(<?= json_encode(t('ficha.prompt_motivo_retiro')) ?>, '');
+              if (motivo === null) return false;
+              this.elements['motivo_retiro'].value = motivo;
+              return confirm(<?= json_encode(sprintf(t('ficha.confirmar_solicitar_retiro'), tituloEvento($ev))) ?>);
+            ">
+              <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+              <input type="hidden" name="motivo_retiro" value="">
+              <button class="btn-barra" type="submit" name="solicitar_retiro" value="1"><?= et('ficha.btn.solicitar_retiro') ?></button>
+            </form>
+          <?php endif; ?>
         <?php endif; ?>
       </div>
     </div>

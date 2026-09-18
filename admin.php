@@ -68,6 +68,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['evento_id'])) {
         cambiarSituacionEvento($eventoId, 'publicado');
         marcarReportesRevisados($eventoId, (int) $u['id']);
         $avisoReportes = 'Actividad publicada otra vez.';
+
+    } elseif (isset($_POST['procesar_retiro'])) {
+        // Req. 17092026 punto 8, "revisión administrativa": la solicitud
+        // llegó pasadas las EVENTO_MARGEN_RETIRO_H horas del propio dueño.
+        // Aprobarla oculta la actividad y cierra la fila de eventos_retiros
+        // —no crea una nueva, por eso no pasa por retirarEvento()—.
+        procesarSolicitudRetiro((int) ($_POST['retiro_id'] ?? 0), (int) $u['id']);
+        $avisoReportes = 'Solicitud procesada: la actividad quedó oculta.';
+
+    } elseif (isset($_POST['descartar_retiro'])) {
+        descartarSolicitudRetiro((int) ($_POST['retiro_id'] ?? 0), (int) $u['id']);
+        $avisoReportes = 'Solicitud descartada. La actividad sigue como estaba.';
     }
 }
 
@@ -87,8 +99,19 @@ try {
 // admin.php?panel=reportes, y el enlace "Moderación" del menú de cabecera
 // (includes/layout.php) ahora apunta aquí directo. Sin esto, cada visita
 // caía siempre en la pestaña Actividades y había que hacer un clic de más.
-$panelesValidos = ['eventos', 'reportes', 'organizadores', 'categorias', 'ciudades', 'usuarios', 'mensajes'];
+$panelesValidos = ['eventos', 'reportes', 'retiros', 'organizadores', 'categorias', 'ciudades', 'usuarios', 'mensajes'];
 $panelActivo    = in_array($_GET['panel'] ?? '', $panelesValidos, true) ? $_GET['panel'] : 'eventos';
+
+// Solicitudes de retiro pendientes (Req. 17092026 punto 8): mismo patrón
+// defensivo que Reportes, por si la migración 26 todavía no corrió aquí.
+$retirosAdmin    = [];
+$sinTablaRetiros = false;
+try {
+    $retirosAdmin = retirosPendientes();
+} catch (Throwable $ex) {
+    error_log('Panel admin, pestaña Retiros: ' . $ex->getMessage());
+    $sinTablaRetiros = true;
+}
 
 $eventosAdmin      = eventosTodos();
 $organizadoresAdmin = organizadoresConConteo();
@@ -132,16 +155,11 @@ require __DIR__ . '/includes/layout.php';
 
     <a class="actionbtn" href="<?= URL_BASE ?>/metricas.php" style="display:inline-block; margin-bottom:10px;">Ver métricas completas →</a>
 
-    <div class="scope-banner">
-      <b>Fuera de alcance del MVP</b> — se diseña la arquitectura para permitirlo después, no se construye ahora.
-      <div class="scope-list">
-        <span>Procesamiento de pagos</span>·<span>Venta de boletos</span>·<span>App móvil</span>·<span>Chat</span>·<span>Reseñas</span>·<span>Afiliados</span>·<span>Automatizaciones de marketing</span>·<span>Integraciones externas</span>·<span>IA de recomendaciones</span>·<span>Notificaciones push</span>·<span>Favoritos</span>·<span>Calendario personal</span>·<span>Marketplace</span>·<span>Directorio de profesionales / hoteles</span>
-      </div>
-    </div>
-
     <div class="admin-tabs" id="adminTabs">
       <button data-panel="eventos" class="<?= $panelActivo === 'eventos' ? 'active' : '' ?>">Actividades</button>
       <button data-panel="reportes" class="<?= $panelActivo === 'reportes' ? 'active' : '' ?>">Reportes<?php if ($cifras['reportes'] > 0): ?> <span class="pendientes"><?= $cifras['reportes'] ?></span><?php endif; ?></button>
+      <?php $pendRetiros = contarRetirosPendientes(); ?>
+      <button data-panel="retiros" class="<?= $panelActivo === 'retiros' ? 'active' : '' ?>">Retiros<?php if ($pendRetiros > 0): ?> <span class="pendientes"><?= $pendRetiros ?></span><?php endif; ?></button>
       <button data-panel="organizadores" class="<?= $panelActivo === 'organizadores' ? 'active' : '' ?>">Organizadores</button>
       <button data-panel="categorias" class="<?= $panelActivo === 'categorias' ? 'active' : '' ?>">Categorías</button>
       <button data-panel="ciudades" class="<?= $panelActivo === 'ciudades' ? 'active' : '' ?>">Ciudades y estados</button>
@@ -292,6 +310,59 @@ require __DIR__ . '/includes/layout.php';
             <?php endif; ?>
 
             <a class="btn-barra" href="<?= e(urlEditarEvento($rep) . '?volver=admin') ?>">Editar</a>
+          </div>
+        </div>
+      <?php endforeach; endif; ?>
+    </div>
+
+    <!-- RETIROS — solicitudes de quien ya no puede retirar por su cuenta
+         (pasadas EVENTO_MARGEN_RETIRO_H horas), Req. 17092026 punto 8. Dos
+         salidas, ninguna borra nada: Aprobar oculta la actividad; Descartar
+         la deja como estaba. Las dos cierran la solicitud. -->
+    <div class="admin-panel <?= $panelActivo === 'retiros' ? 'active' : '' ?>" id="panel-retiros">
+      <?php if ($sinTablaRetiros): ?>
+        <div class="aviso aviso-error" style="margin-bottom:0;">
+          <strong>Falta la tabla de retiros en la base de datos.</strong>
+          Entra a phpMyAdmin, selecciona tu base y ejecuta
+          <code>database/migracion-26-cancelar-retirar-actividad.sql</code>.
+        </div>
+
+      <?php elseif (!$retirosAdmin): ?>
+        <div class="aviso aviso-ok" style="margin-bottom:0;">
+          No hay solicitudes de retiro esperando respuesta.
+        </div>
+
+      <?php else: foreach ($retirosAdmin as $ret): ?>
+        <div class="caso">
+          <div class="caso-cab">
+            <div>
+              <h2><a href="<?= e(urlEvento($ret)) ?>?volver=admin"><?= e($ret['titulo']) ?></a></h2>
+              <div class="caso-meta">
+                <?= e($ret['categoria']) ?> · <?= e($ret['ciudad']) ?> ·
+                organiza <?= e($ret['organizador']) ?> (<?= e($ret['organizador_email']) ?>) ·
+                solicitado <?= e(fechaLarga($ret['solicitado_en'])) ?>
+              </div>
+            </div>
+          </div>
+
+          <?php if (!empty($ret['motivo'])): ?>
+            <div class="marca-auto"><?= e($ret['motivo']) ?></div>
+          <?php endif; ?>
+
+          <div class="caso-acciones">
+            <form method="post">
+              <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+              <input type="hidden" name="evento_id" value="<?= (int) $ret['id'] ?>">
+              <input type="hidden" name="retiro_id" value="<?= (int) $ret['retiro_id'] ?>">
+              <button class="btn-barra" type="submit" name="procesar_retiro" value="1">Aprobar y ocultar</button>
+            </form>
+            <form method="post">
+              <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+              <input type="hidden" name="evento_id" value="<?= (int) $ret['id'] ?>">
+              <input type="hidden" name="retiro_id" value="<?= (int) $ret['retiro_id'] ?>">
+              <button class="btn-barra" type="submit" name="descartar_retiro" value="1">Descartar</button>
+            </form>
+            <a class="btn-barra" href="mailto:<?= e($ret['organizador_email']) ?>">Contactar organizador</a>
           </div>
         </div>
       <?php endforeach; endif; ?>

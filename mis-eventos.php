@@ -117,6 +117,21 @@ require __DIR__ . '/includes/layout.php';
                         <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
                         <button class="actionbtn" style="color:var(--ink); border-color:var(--line);" type="submit" name="retirar" value="1">Retirar</button>
                       </form>
+                    <?php elseif (puedeSolicitarRetiroEvento($me, $u)): ?>
+                      <?php if (tieneRetiroPendiente((int) $me['id'])): ?>
+                        <span class="actionbtn" style="opacity:.7; cursor:default;">Retiro en revisión</span>
+                      <?php else: ?>
+                        <form method="post" action="<?= e(urlEvento($me)) ?>" onsubmit="
+                          var motivo = prompt(<?= json_encode(t('ficha.prompt_motivo_retiro')) ?>, '');
+                          if (motivo === null) return false;
+                          this.elements['motivo_retiro'].value = motivo;
+                          return confirm(<?= json_encode(sprintf(t('ficha.confirmar_solicitar_retiro'), $me['titulo'])) ?>);
+                        ">
+                          <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+                          <input type="hidden" name="motivo_retiro" value="">
+                          <button class="actionbtn" style="color:var(--ink); border-color:var(--line);" type="submit" name="solicitar_retiro" value="1">Solicitar retiro</button>
+                        </form>
+                      <?php endif; ?>
                     <?php endif; ?>
                   </div>
                 </details>

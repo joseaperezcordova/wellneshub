@@ -396,7 +396,7 @@ return [
     'ficha.barra.puedes_retirar'     => 'You can withdraw it for another',
     'ficha.barra.mas'                => 'more.',
     'ficha.barra.admin_sin_plazo'    => 'You\'re an admin: you can withdraw it even past the deadline.',
-    'ficha.barra.plazo_pasado'       => 'The deadline to withdraw it has passed; ask an admin if needed.',
+    'ficha.barra.plazo_pasado'       => 'The deadline to withdraw it yourself has passed. You can request a withdrawal below.',
 
     'ficha.btn.publicar'         => 'Publish',
     'ficha.btn.volver_publicar'  => 'Publish again',
@@ -408,6 +408,12 @@ return [
     'ficha.confirmar_cancelar'   => 'Cancel "%s"? It stays visible, with the cancelled notice.',
     'ficha.btn.retirar'          => 'Withdraw',
     'ficha.confirmar_retirar'    => 'Withdraw "%s"? It stops showing on Omdara, but isn\'t deleted.',
+
+    'ficha.btn.solicitar_retiro'         => 'Request withdrawal',
+    'ficha.prompt_motivo_retiro'         => 'Why do you want to withdraw it? The admin reviewing your request will see this. You can leave it blank.',
+    'ficha.confirmar_solicitar_retiro'   => 'Request the withdrawal of "%s"? An admin will review it and hide it if appropriate.',
+    'ficha.aviso.retiro_solicitado'      => 'Request sent. An admin will review it soon.',
+    'ficha.retiro_pendiente.texto'       => 'You already requested the withdrawal of this activity. It\'s under review.',
 
     'ficha.cancelada.etiqueta'   => 'CANCELLED.',
     'ficha.cancelada.texto'      => 'This activity has been cancelled. For more information, contact the organizer directly.',

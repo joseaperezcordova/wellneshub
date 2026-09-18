@@ -1505,6 +1505,124 @@ function retirarEvento(int $id, int $actorId, ?string $motivo = null): void
     )->execute([$id, $motivo !== '' ? $motivo : null, $actorId, $actorId]);
 }
 
+/**
+ * ¿Ya hay una solicitud de retiro de esta actividad esperando respuesta?
+ * Evita que el mismo organizador la pida dos veces mientras espera.
+ */
+function tieneRetiroPendiente(int $eventoId): bool
+{
+    $st = db()->prepare(
+        'SELECT 1 FROM eventos_retiros WHERE evento_id = ? AND retirado_en IS NULL LIMIT 1'
+    );
+    $st->execute([$eventoId]);
+
+    return $st->fetchColumn() !== false;
+}
+
+/**
+ * ¿Puede esta persona SOLICITAR el retiro (no ejecutarlo directo)?
+ *
+ * Es el caso de en medio del Req. 17092026 punto 8: pasadas
+ * EVENTO_MARGEN_RETIRO_H horas el dueño ya no puede retirar por su cuenta
+ * (puedeRetirarEvento() devuelve false), pero sigue pudiendo pedirlo — y
+ * queda pendiente hasta que un administrador lo revise con
+ * procesarSolicitudRetiro(). El administrador no "solicita": ya puede
+ * retirar directo en cualquier momento.
+ */
+function puedeSolicitarRetiroEvento(array $ev, ?array $u): bool
+{
+    if ($u === null) return false;
+    if (esAdmin($u)) return false;
+    if ((int) $ev['usuario_id'] !== (int) $u['id']) return false;
+    if (!in_array($ev['situacion'], ['publicado', 'cancelado'], true)) return false;
+
+    return minutosRestantesRetiro($ev) <= 0;
+}
+
+/**
+ * Dueño de la actividad, pasado su plazo de retiro directo (Req. 17092026
+ * punto 8, "solicitud a Omdara"): deja constancia de la solicitud, pero NO
+ * oculta nada todavía —eso solo lo hace procesarSolicitudRetiro(), y solo un
+ * administrador—. retirado_por/retirado_en se quedan en NULL a propósito:
+ * es justo lo que hace que idx_er_pendientes (migración 26) encuentre esta
+ * fila en la bandeja de administración.
+ */
+function solicitarRetiroEvento(int $id, int $organizadorId, ?string $motivo = null): void
+{
+    $motivo = trim((string) $motivo);
+
+    db()->prepare(
+        'INSERT INTO eventos_retiros (evento_id, motivo, solicitado_por, solicitado_en)
+              VALUES (?, ?, ?, NOW())'
+    )->execute([$id, $motivo !== '' ? $motivo : null, $organizadorId]);
+}
+
+/** Solicitudes de retiro esperando que un administrador decida. La más antigua primero. */
+function retirosPendientes(int $limite = 100): array
+{
+    $st = db()->prepare(
+        'SELECT er.id AS retiro_id, er.motivo, er.solicitado_en,
+                e.id, e.slug, e.titulo, e.categoria, e.ciudad, e.situacion,
+                u.nombre AS organizador, u.email AS organizador_email
+           FROM eventos_retiros er
+           JOIN eventos  e ON e.id = er.evento_id
+           JOIN usuarios u ON u.id = er.solicitado_por
+          WHERE er.retirado_en IS NULL
+       ORDER BY er.solicitado_en ASC
+          LIMIT ' . (int) $limite
+    );
+    $st->execute();
+
+    return $st->fetchAll();
+}
+
+/** Cuántas solicitudes de retiro esperan respuesta. Es el número de la pestaña. */
+function contarRetirosPendientes(): int
+{
+    try {
+        return (int) db()->query(
+            'SELECT COUNT(*) FROM eventos_retiros WHERE retirado_en IS NULL'
+        )->fetchColumn();
+
+    } catch (Throwable $ex) {
+        error_log('No se pudieron contar las solicitudes de retiro pendientes: ' . $ex->getMessage());
+        return 0;
+    }
+}
+
+/**
+ * El administrador aprueba: oculta la actividad y cierra la solicitud en la
+ * MISMA fila de eventos_retiros —no crea una fila nueva, que es lo que haría
+ * retirarEvento() y dejaría la solicitud original eternamente "pendiente"—.
+ */
+function procesarSolicitudRetiro(int $retiroId, int $adminId): void
+{
+    $st = db()->prepare('SELECT evento_id FROM eventos_retiros WHERE id = ? AND retirado_en IS NULL');
+    $st->execute([$retiroId]);
+    $eventoId = $st->fetchColumn();
+    if ($eventoId === false) return;
+
+    cambiarSituacionEvento((int) $eventoId, 'oculto');
+
+    db()->prepare(
+        'UPDATE eventos_retiros SET retirado_por = ?, retirado_en = NOW() WHERE id = ?'
+    )->execute([$adminId, $retiroId]);
+}
+
+/**
+ * El administrador descarta la solicitud sin ocultar nada —lo vio, decidió
+ * que no correspondía retirarla—. Se cierra igual que si se hubiera
+ * procesado (retirado_por/retirado_en quedan puestos) para que no vuelva a
+ * aparecer en la bandeja, pero la actividad se queda exactamente como estaba.
+ */
+function descartarSolicitudRetiro(int $retiroId, int $adminId): void
+{
+    db()->prepare(
+        'UPDATE eventos_retiros SET retirado_por = ?, retirado_en = NOW()
+          WHERE id = ? AND retirado_en IS NULL'
+    )->execute([$adminId, $retiroId]);
+}
+
 
 // --------------------------------------------------------------- formato ----
 

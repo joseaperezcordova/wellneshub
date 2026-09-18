@@ -438,7 +438,7 @@ return [
     'ficha.barra.puedes_retirar'     => 'Puedes retirarla durante',
     'ficha.barra.mas'                => 'más.',
     'ficha.barra.admin_sin_plazo'    => 'Eres administrador: puedes retirarla aunque pasara el plazo.',
-    'ficha.barra.plazo_pasado'       => 'Pasó el plazo para retirarla; pídeselo al administrador si hace falta.',
+    'ficha.barra.plazo_pasado'       => 'Pasó el plazo para retirarla tú mismo. Puedes solicitar el retiro abajo.',
 
     'ficha.btn.publicar'         => 'Publicar',
     'ficha.btn.volver_publicar'  => 'Volver a publicar',
@@ -450,6 +450,16 @@ return [
     'ficha.confirmar_cancelar'   => '¿Cancelar «%s»? Sigue visible, con el aviso de cancelada.',
     'ficha.btn.retirar'          => 'Retirar',
     'ficha.confirmar_retirar'    => '¿Retirar «%s»? Deja de verse en Omdara, pero no se borra.',
+
+    // Solicitud de retiro pasadas las EVENTO_MARGEN_RETIRO_H horas
+    // (Req. 17092026 punto 8, "revisión administrativa"): el dueño ya no
+    // puede retirarla solo, pero puede pedirlo; queda pendiente hasta que
+    // un administrador la revise.
+    'ficha.btn.solicitar_retiro'         => 'Solicitar retiro',
+    'ficha.prompt_motivo_retiro'         => '¿Por qué quieres retirarla? Se lo verá el administrador que revise tu solicitud. Puedes dejarlo vacío.',
+    'ficha.confirmar_solicitar_retiro'   => '¿Solicitar el retiro de «%s»? Un administrador la revisará y la ocultará si corresponde.',
+    'ficha.aviso.retiro_solicitado'      => 'Solicitud enviada. Un administrador la revisará pronto.',
+    'ficha.retiro_pendiente.texto'       => 'Ya solicitaste el retiro de esta actividad. Está en revisión.',
 
     'ficha.cancelada.etiqueta'   => 'CANCELADA.',
     'ficha.cancelada.texto'      => 'Esta actividad ha sido cancelada. Para más información, contacta directamente al organizador.',
