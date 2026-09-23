@@ -817,10 +817,8 @@ function etiquetasCampos(): array
 {
     return [
         'titulo'          => t('evento.form.titulo_label'),
-        'titulo_en'       => t('evento.form.titulo_en_label'),
         'categorias'      => t('evento.form.categorias_label'),
         'descripcion'     => t('evento.form.descripcion_label'),
-        'descripcion_en'  => t('evento.form.descripcion_en_label'),
         'ciudad'          => t('evento.form.ciudad_label'),
         'entidad'         => t('evento.form.estado_label'),
         'lugar'           => t('evento.form.lugar_label'),
@@ -876,21 +874,17 @@ function validarEvento(array $in): array
     }
 
     /*
-     * Versión en inglés, opcional (REQ-00002 fase 5): la escribe el
-     * organizador, no se traduce sola. Sin mínimo —a diferencia de arriba—,
-     * porque dejarla vacía es una opción válida y no un error.
+     * Título y descripción en inglés: el organizador ya no los puede escribir
+     * (se quitó del formulario a pedido del cliente, 2026-09-23). Las llaves
+     * se quedan en null y no en el array de arriba porque crearEvento() las
+     * sigue leyendo para el INSERT de una actividad nueva —ahora siempre
+     * entran vacías, que es justo lo que antes pasaba si el organizador
+     * dejaba el campo en blanco—. actualizarEvento() ya no las toca, así que
+     * el título/descripción en inglés que alguien haya guardado antes de este
+     * cambio se queda intacto y se sigue mostrando en la ficha en inglés.
      */
-    $e['titulo_en'] = trim((string) ($in['titulo_en'] ?? ''));
-    if (mb_strlen($e['titulo_en']) > 160) {
-        $errores['titulo_en'] = t('evento.valida.titulo_en_largo');
-    }
-    if ($e['titulo_en'] === '') $e['titulo_en'] = null;
-
-    $e['descripcion_en'] = trim((string) ($in['descripcion_en'] ?? ''));
-    if (mb_strlen($e['descripcion_en']) > 2000) {
-        $errores['descripcion_en'] = t('evento.valida.descripcion_en_larga');
-    }
-    if ($e['descripcion_en'] === '') $e['descripcion_en'] = null;
+    $e['titulo_en']      = null;
+    $e['descripcion_en'] = null;
 
     /*
      * Una o varias categorías (checkboxes "categorias[]"), no ya un único
@@ -1340,9 +1334,16 @@ function actualizarEvento(array $e, int $id, int $usuarioId): void
     $st->execute([$id]);
     $anterior = $st->fetch();
 
+    /*
+     * titulo_en/descripcion_en NO van en este UPDATE (a propósito, 2026-09-23):
+     * ya no hay campo en el formulario para tocarlos, y si se incluyeran aquí
+     * con el null fijo que les pone validarEvento(), cada edición borraría el
+     * título/descripción en inglés que un organizador hubiera guardado antes
+     * de este cambio. Se dejan como estén.
+     */
     $pdo->prepare(
         'UPDATE eventos SET
-            titulo = ?, titulo_en = ?, slug = ?, descripcion = ?, descripcion_en = ?, categoria = ?,
+            titulo = ?, slug = ?, descripcion = ?, categoria = ?,
             tipo_actividad = ?, frecuencia = ?, hora_recurrente = ?, hora_fin_recurrente = ?,
             ciudad = ?,
             entidad = ?, lugar = ?, direccion = ?, mapa_url = ?, latitud = ?, longitud = ?,
@@ -1352,7 +1353,7 @@ function actualizarEvento(array $e, int $id, int $usuarioId): void
             imagen_url = ?, color = ?
           WHERE id = ?'
     )->execute([
-        $e['titulo'], $e['titulo_en'], generarSlug($e['titulo'], $id), $e['descripcion'], $e['descripcion_en'],
+        $e['titulo'], generarSlug($e['titulo'], $id), $e['descripcion'],
         $e['categoria'], $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
         $e['ciudad'], $e['entidad'], $e['lugar'], $e['direccion'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
