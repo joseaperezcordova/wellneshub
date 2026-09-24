@@ -11,25 +11,20 @@
 declare(strict_types=1);
 
 /**
- * Margen que tiene el organizador para RETIRAR su evento por su cuenta
- * después de publicarlo (Req. 17092026, punto 8). Pasado ese plazo solo el
- * administrador puede hacerlo.
+ * Vigencia de una actividad recurrente o por reserva (migración 27): cuántos
+ * meses se ve antes de tener que renovarla. Decisión del cliente
+ * (2026-09-23): "la vigencia sea mensual".
  *
- * Hasta REQ-000-XX esta misma constante también limitaba EDITAR, y la
- * función se llamaba distinto (ver puedeEditarEvento() más abajo). Editar ya
- * no tiene plazo; retirar sigue teniéndolo, porque quitar la ficha y no
- * volver a subirla es la puerta de atrás para saltarse esa misma protección
- * —dejar tirado a quien ya contaba con lo que leyó—.
- *
- * Se llamó EVENTO_MARGEN_ELIMINACION_H hasta la migración 26: gobernaba
- * ELIMINAR (borrado real, DELETE). Desde que el cliente confirmó que ni el
- * organizador ni el administrador vuelven a borrar una fila de verdad —ver
- * req_17092026_decisiones_cliente en la memoria del proyecto—, lo que este
- * plazo protege es RETIRAR (ocultar, sin borrar), así que se renombró junto
- * con puedeEliminarEvento()/minutosRestantesEliminacion()/eliminarEvento()
- * de abajo.
+ * Una de fecha específica no la usa —su corte es su propia fecha—.
  */
-const EVENTO_MARGEN_RETIRO_H = 24;
+const EVENTO_VIGENCIA_MESES = 1;
+
+/**
+ * Cuántos días antes de vencer aparece el botón "Renovar". Antes de eso no
+ * hace falta: renovar reinicia el mes desde hoy, así que pulsarlo el día 2
+ * solo acortaría lo que ya tenía.
+ */
+const EVENTO_AVISO_RENOVAR_DIAS = 7;
 
 /**
  * Cuántas categorías puede llevar una actividad a la vez.
@@ -327,17 +322,6 @@ function coloresEvento(): array
     return ['#111111', '#555555', '#3A3A3A', '#2A2A2A', '#999999', '#F2F2F2'];
 }
 
-/** clave => etiqueta. Con qué frecuencia se repite una actividad recurrente. */
-function frecuenciasRecurrencia(): array
-{
-    return [
-        'diaria'    => t('evento.frecuencia.diaria'),
-        'semanal'   => t('evento.frecuencia.semanal'),
-        'quincenal' => t('evento.frecuencia.quincenal'),
-        'mensual'   => t('evento.frecuencia.mensual'),
-    ];
-}
-
 /**
  * Qué se espera que haga quien ve la ficha, con el mismo texto que ya usa
  * includes/guia-accion.php: los dos hablan de las mismas tres opciones y
@@ -420,12 +404,14 @@ function puedeEditarEvento(array $ev, ?array $u): bool
 /**
  * ¿Puede esta persona RETIRAR este evento (ocultarlo, sin borrarlo)?
  *
- * A diferencia de editar, esto SÍ sigue teniendo plazo: el administrador,
- * siempre, y el dueño mientras sea borrador o esté dentro del margen de
- * EVENTO_MARGEN_RETIRO_H horas desde que lo publicó.
+ * El administrador, siempre. El dueño, también siempre, mientras la
+ * actividad siga visible o sea un borrador —una oculta ya está retirada—.
  *
- * El plazo se calcula sobre publicado_en y no sobre creado_en a propósito: un
- * borrador que estuvo tres días a medias no debe llegar publicado y ya caducado.
+ * Hasta el 2026-09-23 el dueño solo podía hacerlo en las primeras 24 horas
+ * después de publicar, y después tenía que pedírselo a un administrador (Req.
+ * 17092026, punto 8). El cliente quitó esa regla: "el organizador podrá
+ * retirar/despublicar su actividad sin esa restricción", en los tres tipos de
+ * programación.
  */
 function puedeRetirarEvento(array $ev, ?array $u): bool
 {
@@ -433,25 +419,83 @@ function puedeRetirarEvento(array $ev, ?array $u): bool
     if (esAdmin($u))   return true;
 
     if ((int) $ev['usuario_id'] !== (int) $u['id']) return false;
-    if ($ev['situacion'] === 'borrador')            return true;
 
-    return minutosRestantesRetiro($ev) > 0;
+    return in_array($ev['situacion'], ['borrador', 'publicado', 'cancelado'], true);
 }
 
 /**
- * Minutos que quedan para poder RETIRAR por su cuenta, o 0 si ya pasó.
- *
- * Sirve para dos cosas: decidir el permiso y avisar en pantalla de cuánto
- * queda, que es lo que evita que alguien descubra el plazo cuando ya expiró.
+ * ¿Es una actividad sin fecha —recurrente o por reserva— que se ve por
+ * vigencia mensual en vez de por su propia fecha?
  */
-function minutosRestantesRetiro(array $ev): int
+function eventoConVigencia(array $ev): bool
 {
-    if (empty($ev['publicado_en'])) return 0;
+    return in_array($ev['tipo_actividad'] ?? 'unico', ['recurrente', 'reserva'], true);
+}
 
-    $limite = strtotime($ev['publicado_en']) + EVENTO_MARGEN_RETIRO_H * 3600;
-    $quedan = (int) ceil(($limite - time()) / 60);
+/**
+ * ¿Ya se le acabó el mes a esta recurrente o por reserva? Una de fecha
+ * específica nunca "vence" por aquí: la suya es su propia fecha.
+ *
+ * vigente_hasta en NULL en una con vigencia es un borrador que todavía no se
+ * publica —publicarEvento() es quien la llena—, y eso no cuenta como vencida.
+ */
+function eventoVencido(array $ev): bool
+{
+    if (!eventoConVigencia($ev) || empty($ev['vigente_hasta'])) return false;
 
-    return max(0, $quedan);
+    return strtotime((string) $ev['vigente_hasta']) < time();
+}
+
+/**
+ * ¿Puede esta persona RENOVAR el mes de esta actividad?
+ *
+ * Solo recurrentes y por reserva publicadas, solo su dueño o un
+ * administrador, y solo cuando ya venció o le quedan
+ * EVENTO_AVISO_RENOVAR_DIAS días o menos.
+ */
+function puedeRenovarEvento(array $ev, ?array $u): bool
+{
+    if ($u === null || !eventoConVigencia($ev)) return false;
+    if ($ev['situacion'] !== 'publicado')       return false;
+    if (!esAdmin($u) && (int) $ev['usuario_id'] !== (int) $u['id']) return false;
+
+    if (empty($ev['vigente_hasta'])) return true;
+
+    return strtotime((string) $ev['vigente_hasta']) <= time() + EVENTO_AVISO_RENOVAR_DIAS * 86400;
+}
+
+/**
+ * Renueva una recurrente o por reserva: otro mes a partir de HOY —no a partir
+ * de cuando vencía—, así una vencida hace dos semanas vuelve con su mes
+ * completo y no con dos semanas.
+ */
+function renovarEvento(int $id): void
+{
+    db()->prepare(
+        'UPDATE eventos
+            SET vigente_hasta = DATE_ADD(NOW(), INTERVAL ' . EVENTO_VIGENCIA_MESES . ' MONTH)
+          WHERE id = ? AND tipo_actividad IN ("recurrente", "reserva")'
+    )->execute([$id]);
+}
+
+/**
+ * La condición SQL de "sigue en cartel" por fecha, para las consultas
+ * públicas.
+ *
+ * Fecha específica: hasta que termina —COALESCE(fecha_fin, fecha_inicio),
+ * para que un retiro de cinco días siga en cartel mientras dure—.
+ * Recurrente y por reserva: hasta vigente_hasta (vigencia mensual,
+ * migración 27).
+ *
+ * $alias es el de la tabla eventos en la consulta ('e'), o '' si va sin alias.
+ */
+function sqlEventoVigente(string $alias = 'e'): string
+{
+    $a = $alias !== '' ? $alias . '.' : '';
+
+    return "(CASE WHEN {$a}tipo_actividad = 'unico'
+                  THEN COALESCE({$a}fecha_fin, {$a}fecha_inicio)
+                  ELSE {$a}vigente_hasta END) >= NOW()";
 }
 
 /**
@@ -545,7 +589,7 @@ function eventosPublicados(?string $categoria = null, int $limite = 60): array
               JOIN usuarios u ON u.id = e.usuario_id
               ' . EVENTO_JOIN_ULTIMO_CAMBIO_FECHA . '
              WHERE e.situacion = "publicado"
-               AND COALESCE(e.fecha_fin, e.fecha_inicio) >= NOW()';
+               AND ' . sqlEventoVigente();
 
     $params = [];
 
@@ -554,7 +598,9 @@ function eventosPublicados(?string $categoria = null, int $limite = 60): array
         $params[] = $categoria;
     }
 
-    $sql .= ' ORDER BY e.fecha_inicio ASC LIMIT ' . (int) $limite;
+    // Las de fecha específica primero, por fecha; las recurrentes y por
+    // reserva (fecha_inicio NULL) al final.
+    $sql .= ' ORDER BY (e.fecha_inicio IS NULL), e.fecha_inicio ASC, e.publicado_en DESC LIMIT ' . (int) $limite;
 
     $st = db()->prepare($sql);
     $st->execute($params);
@@ -575,7 +621,7 @@ function eventosPublicadosParaSitemap(): array
         "SELECT id, slug, actualizado_en
            FROM eventos
           WHERE situacion = 'publicado'
-            AND COALESCE(fecha_fin, fecha_inicio) >= NOW()
+            AND " . sqlEventoVigente('') . "
        ORDER BY actualizado_en DESC"
     );
 
@@ -635,7 +681,7 @@ function eventosBuscar(array $f, int $limite, int $offset): array
     // Igual que eventosPublicados(): una actividad ya terminada sigue
     // "publicada" —la ficha se puede seguir viendo—, pero no aparece al
     // buscar ni al explorar.
-    $where  = ["e.situacion = 'publicado'", "COALESCE(e.fecha_fin, e.fecha_inicio) >= NOW()"];
+    $where  = ["e.situacion = 'publicado'", sqlEventoVigente()];
     $params = [];
 
     if ($f['entidad'] !== '') {
@@ -666,7 +712,11 @@ function eventosBuscar(array $f, int $limite, int $offset): array
 
     [$desde, $hasta] = rangoFechaBusqueda($f['fecha']);
     if ($desde !== null) {
-        $where[]  = 'e.fecha_inicio <= ? AND COALESCE(e.fecha_fin, e.fecha_inicio) >= ?';
+        // Solo fecha específica: recurrente y por reserva no tienen una fecha
+        // con la que comparar, y el cliente pidió que no salgan en "hoy",
+        // "esta semana" ni "este mes" (2026-09-23) —sí en la búsqueda sin
+        // filtro de fecha—.
+        $where[]  = "e.tipo_actividad = 'unico' AND e.fecha_inicio <= ? AND COALESCE(e.fecha_fin, e.fecha_inicio) >= ?";
         $params[] = $hasta;
         $params[] = $desde;
     }
@@ -683,9 +733,11 @@ function eventosBuscar(array $f, int $limite, int $offset): array
     $ordenes = [
         // gratuito primero deja las de precio 0 antes que "por confirmar"
         // (precio NULL), igual que pnum=0 vence a pnum=null en el JS de antes.
-        'precio' => 'e.gratuito DESC, (e.precio IS NULL) ASC, e.precio ASC, e.fecha_inicio ASC',
+        // (e.fecha_inicio IS NULL) manda al final las recurrentes y por
+        // reserva, que no tienen fecha: MySQL pone los NULL primero en ASC.
+        'precio' => 'e.gratuito DESC, (e.precio IS NULL) ASC, e.precio ASC, (e.fecha_inicio IS NULL), e.fecha_inicio ASC',
         'nuevos' => 'e.publicado_en DESC, e.fecha_inicio ASC',
-        'fecha'  => 'e.fecha_inicio ASC',
+        'fecha'  => '(e.fecha_inicio IS NULL), e.fecha_inicio ASC, e.publicado_en DESC',
     ];
     $orderBy = $ordenes[$f['orden']] ?? $ordenes['fecha'];
 
@@ -706,7 +758,7 @@ function eventosBuscar(array $f, int $limite, int $offset): array
 /** Estados y ciudades con al menos una actividad publicada, para el panel de filtros. */
 function ubicacionesConActividad(): array
 {
-    $vigente = "situacion = 'publicado' AND COALESCE(fecha_fin, fecha_inicio) >= NOW()";
+    $vigente = "situacion = 'publicado' AND " . sqlEventoVigente('');
 
     $entidades = db()->query(
         "SELECT DISTINCT entidad FROM eventos WHERE $vigente AND entidad != ''"
@@ -831,12 +883,9 @@ function etiquetasCampos(): array
         'hora_fin_unica'     => t('evento.form.hora_fin_label'),
         'fecha_fin_unica'    => t('evento.campo.fecha_fin_unica'),
 
-        // Actividad recurrente.
-        'fecha_inicio_rec'   => t('evento.form.fecha_inicio_label'),
-        'fecha_fin_rec'      => t('evento.form.fecha_fin_label'),
-        'frecuencia'         => t('evento.form.frecuencia_label'),
-        'hora_recurrente'    => t('evento.form.hora_inicio_label'),
-        'hora_fin_recurrente' => t('evento.form.hora_fin_label'),
+        // Recurrente y por reserva (migración 27).
+        'programacion_recurrente' => t('evento.form.programacion_recurrente_label'),
+        'programacion_reserva'    => t('evento.form.programacion_reserva_label'),
 
         'precio'          => t('evento.campo.precio'),
         'forma_pago'      => t('evento.form.forma_pago_label'),
@@ -955,62 +1004,46 @@ function validarEvento(array $in): array
     }
 
     /*
-     * Única o recurrente cambia de dónde salen fecha_inicio y fecha_fin, pero
-     * no lo que significan una vez guardadas: el resto del sitio —agenda,
-     * buscador, ficha— sigue leyendo las mismas dos columnas DATETIME de
-     * siempre y no necesita saber cuál de los dos formularios las llenó.
+     * Tipo de programación (migración 27): tres, y cada uno con lo suyo.
+     *
+     * - 'unico' (fecha específica): fecha_inicio/fecha_fin, igual que siempre.
+     * - 'recurrente': un texto libre de frecuencia/horario, sin fechas.
+     * - 'reserva' (por reserva / disponibilidad): un texto libre de
+     *   disponibilidad, sin fechas.
+     *
+     * Los dos textos llegan en campos distintos —programacion_recurrente y
+     * programacion_reserva, uno en cada tarjeta del formulario— para que
+     * cambiar de tarjeta no pise lo que ya se había escrito en la otra; aquí
+     * solo se lee el del tipo elegido, y se guarda en la misma columna.
+     *
+     * frecuencia/hora_recurrente/hora_fin_recurrente son del formato de
+     * recurrente anterior y ya no se llenan.
      */
-    $e['tipo_actividad'] = ($in['tipo_actividad'] ?? '') === 'recurrente' ? 'recurrente' : 'unico';
+    $tipo = (string) ($in['tipo_actividad'] ?? '');
+    $e['tipo_actividad'] = in_array($tipo, ['recurrente', 'reserva'], true) ? $tipo : 'unico';
 
-    $horaValida = static function (string $hora): ?string {
-        return preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $hora) ? $hora : null;
-    };
+    $e['frecuencia']          = null;
+    $e['hora_recurrente']     = null;
+    $e['hora_fin_recurrente'] = null;
+    $e['programacion_texto']  = null;
 
-    if ($e['tipo_actividad'] === 'recurrente') {
-        $e['frecuencia'] = (string) ($in['frecuencia'] ?? '');
-        if (!isset(frecuenciasRecurrencia()[$e['frecuencia']])) {
-            $errores['frecuencia'] = t('evento.valida.frecuencia_falta');
-            $e['frecuencia'] = null;
+    if ($e['tipo_actividad'] !== 'unico') {
+        $campo = 'programacion_' . $e['tipo_actividad'];
+        $texto = trim((string) ($in[$campo] ?? ''));
+
+        if ($texto === '') {
+            $errores[$campo] = t('evento.valida.' . $campo . '_falta');
+        } elseif (mb_strlen($texto) > 500) {
+            $errores[$campo] = t('evento.valida.programacion_larga');
         }
 
-        $e['hora_recurrente'] = $horaValida(trim((string) ($in['hora_recurrente'] ?? '')));
-        if ($e['hora_recurrente'] === null) {
-            $errores['hora_recurrente'] = t('evento.valida.hora_inicio_sesion_falta');
-        }
-
-        $e['hora_fin_recurrente'] = $horaValida(trim((string) ($in['hora_fin_recurrente'] ?? '')));
-        if ($e['hora_fin_recurrente'] === null) {
-            $errores['hora_fin_recurrente'] = t('evento.valida.hora_fin_sesion_falta');
-        } elseif ($e['hora_recurrente'] !== null && $e['hora_fin_recurrente'] <= $e['hora_recurrente']) {
-            $errores['hora_fin_recurrente'] = t('evento.valida.hora_fin_antes_inicio');
-        }
-
-        $inicioRec = trim((string) ($in['fecha_inicio_rec'] ?? ''));
-        $inicioRecValido = ($inicioRec !== '' && strtotime($inicioRec) !== false) ? $inicioRec : null;
-        if ($inicioRecValido === null) {
-            $errores['fecha_inicio_rec'] = t('evento.valida.fecha_inicio_rec_falta');
-        }
-
-        $finRec = trim((string) ($in['fecha_fin_rec'] ?? ''));
-        $finRecValido = ($finRec !== '' && strtotime($finRec) !== false) ? $finRec : null;
-        if ($finRecValido === null) {
-            $errores['fecha_fin_rec'] = t('evento.valida.fecha_fin_rec_falta');
-        }
-
-        $e['fecha_inicio'] = ($inicioRecValido !== null && $e['hora_recurrente'] !== null)
-            ? normalizarFecha($inicioRecValido . 'T' . $e['hora_recurrente']) : null;
-
-        $e['fecha_fin'] = ($finRecValido !== null && $e['hora_fin_recurrente'] !== null)
-            ? normalizarFecha($finRecValido . 'T' . $e['hora_fin_recurrente']) : null;
-
-        if ($e['fecha_fin'] !== null && $e['fecha_inicio'] !== null
-            && strtotime($e['fecha_fin']) < strtotime($e['fecha_inicio'])) {
-            $errores['fecha_fin_rec'] = t('evento.valida.fecha_fin_antes_inicio');
-        }
+        $e['programacion_texto'] = $texto !== '' ? $texto : null;
+        $e['fecha_inicio']       = null;
+        $e['fecha_fin']          = null;
     } else {
-        $e['frecuencia']          = null;
-        $e['hora_recurrente']     = null;
-        $e['hora_fin_recurrente'] = null;
+        $horaValida = static function (string $hora): ?string {
+            return preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $hora) ? $hora : null;
+        };
 
         $fechaUnica = trim((string) ($in['fecha_unica'] ?? ''));
         $fechaUnicaValida = ($fechaUnica !== '' && strtotime($fechaUnica) !== false) ? $fechaUnica : null;
@@ -1043,27 +1076,22 @@ function validarEvento(array $in): array
             && strtotime($e['fecha_fin']) < strtotime($e['fecha_inicio'])) {
             $errores['hora_fin_unica'] = t('evento.valida.fecha_fin_antes_inicio');
         }
-    }
 
-    // Un evento que ya terminó se puede guardar, pero no aparecería en el
-    // listado —la agenda corta por COALESCE(fecha_fin, fecha_inicio) >= NOW()—
-    // y quien lo publicara se quedaría esperando a verlo. Mejor decirlo aquí.
-    //
-    // Se mira el final y no el principio: un retiro de cinco días que empezó
-    // ayer sigue vigente, y rechazarlo por la fecha de inicio sería un error.
-    $recurrente    = $e['tipo_actividad'] === 'recurrente';
-    $huboErrorFecha = $recurrente
-        ? (isset($errores['fecha_inicio_rec']) || isset($errores['fecha_fin_rec'])
-            || isset($errores['hora_recurrente']) || isset($errores['hora_fin_recurrente']))
-        : (isset($errores['fecha_unica']) || isset($errores['hora_inicio_unica'])
-            || isset($errores['hora_fin_unica']));
+        // Un evento que ya terminó se puede guardar, pero no aparecería en el
+        // listado —la agenda corta por COALESCE(fecha_fin, fecha_inicio) >= NOW()—
+        // y quien lo publicara se quedaría esperando a verlo. Mejor decirlo aquí.
+        //
+        // Se mira el final y no el principio: un retiro de cinco días que empezó
+        // ayer sigue vigente, y rechazarlo por la fecha de inicio sería un error.
+        $huboErrorFecha = isset($errores['fecha_unica']) || isset($errores['hora_inicio_unica'])
+            || isset($errores['hora_fin_unica']);
 
-    if (!$huboErrorFecha) {
-        $termina = $e['fecha_fin'] ?? $e['fecha_inicio'];
+        if (!$huboErrorFecha) {
+            $termina = $e['fecha_fin'] ?? $e['fecha_inicio'];
 
-        if ($termina !== null && strtotime($termina) < time()) {
-            $campo = $recurrente ? 'fecha_fin_rec' : 'fecha_unica';
-            $errores[$campo] = t('evento.valida.fecha_pasada');
+            if ($termina !== null && strtotime($termina) < time()) {
+                $errores['fecha_unica'] = t('evento.valida.fecha_pasada');
+            }
         }
     }
 
@@ -1210,9 +1238,12 @@ function eventoDuplicado(
     string $entidad,
     string $ciudad,
     string $categoria,
-    string $fechaInicio,
+    ?string $fechaInicio,
     ?int $excluirId = null
 ): bool {
+    // Recurrente y por reserva no tienen día con el que comparar.
+    if ($fechaInicio === null) return false;
+
     $sql = 'SELECT COUNT(*) FROM eventos
              WHERE usuario_id = ? AND entidad = ? AND ciudad = ? AND categoria = ?
                AND DATE(fecha_inicio) = DATE(?)';
@@ -1237,15 +1268,15 @@ function crearEvento(array $e, int $usuarioId): int
     $pdo->prepare(
         'INSERT INTO eventos
            (usuario_id, titulo, titulo_en, slug, descripcion, descripcion_en, categoria, tipo_actividad,
-            frecuencia, hora_recurrente, hora_fin_recurrente,
+            frecuencia, hora_recurrente, hora_fin_recurrente, programacion_texto,
             ciudad, entidad, lugar, direccion, mapa_url, latitud, longitud, fecha_inicio, fecha_fin,
             gratuito, precio, forma_pago, cupo_maximo,
             url_boletos, url_reserva, sitio_web, accion_principal,
             imagen_url, color, situacion)
-         VALUES (?, ?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
+         VALUES (?, ?, ?, "", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "borrador")'
     )->execute([
         $usuarioId, $e['titulo'], $e['titulo_en'], $e['descripcion'], $e['descripcion_en'], $e['categoria'],
-        $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
+        $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'], $e['programacion_texto'],
         $e['ciudad'], $e['entidad'], $e['lugar'], $e['direccion'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
@@ -1328,7 +1359,7 @@ function actualizarEvento(array $e, int $id, int $usuarioId): void
      * porqué de guardar las 4 columnas juntas en vez de solo fecha_inicio—.
      */
     $st = $pdo->prepare(
-        'SELECT fecha_inicio, fecha_fin, hora_recurrente, hora_fin_recurrente
+        'SELECT tipo_actividad, fecha_inicio, fecha_fin, hora_recurrente, hora_fin_recurrente
            FROM eventos WHERE id = ?'
     );
     $st->execute([$id]);
@@ -1345,9 +1376,13 @@ function actualizarEvento(array $e, int $id, int $usuarioId): void
         'UPDATE eventos SET
             titulo = ?, slug = ?, descripcion = ?, categoria = ?,
             tipo_actividad = ?, frecuencia = ?, hora_recurrente = ?, hora_fin_recurrente = ?,
+            programacion_texto = ?,
             ciudad = ?,
             entidad = ?, lugar = ?, direccion = ?, mapa_url = ?, latitud = ?, longitud = ?,
             fecha_inicio = ?, fecha_fin = ?,
+            vigente_hasta = CASE
+                WHEN tipo_actividad = "unico" OR situacion = "borrador" THEN NULL
+                ELSE COALESCE(vigente_hasta, DATE_ADD(NOW(), INTERVAL ' . EVENTO_VIGENCIA_MESES . ' MONTH)) END,
             gratuito = ?, precio = ?, forma_pago = ?, cupo_maximo = ?,
             url_boletos = ?, url_reserva = ?, sitio_web = ?, accion_principal = ?,
             imagen_url = ?, color = ?
@@ -1355,6 +1390,7 @@ function actualizarEvento(array $e, int $id, int $usuarioId): void
     )->execute([
         $e['titulo'], generarSlug($e['titulo'], $id), $e['descripcion'],
         $e['categoria'], $e['tipo_actividad'], $e['frecuencia'], $e['hora_recurrente'], $e['hora_fin_recurrente'],
+        $e['programacion_texto'],
         $e['ciudad'], $e['entidad'], $e['lugar'], $e['direccion'],
         $e['mapa_url'], $e['latitud'], $e['longitud'],
         $e['fecha_inicio'], $e['fecha_fin'], $e['gratuito'], $e['precio'],
@@ -1365,7 +1401,11 @@ function actualizarEvento(array $e, int $id, int $usuarioId): void
 
     sincronizarCategoriasEvento($id, $e['categorias']);
 
-    if ($anterior !== false && (
+    // Solo entre dos fechas específicas: recurrente y por reserva no tienen
+    // una fecha que "cambie" —y eventos_historial_fecha pide fecha_inicio—.
+    // Pasar de un tipo a otro tampoco es un cambio de fecha que anunciar.
+    if ($anterior !== false
+        && $anterior['tipo_actividad'] === 'unico' && $e['tipo_actividad'] === 'unico' && (
         $anterior['fecha_inicio'] !== $e['fecha_inicio']
         || (string) $anterior['fecha_fin'] !== (string) ($e['fecha_fin'] ?? '')
         || (string) $anterior['hora_recurrente'] !== (string) ($e['hora_recurrente'] ?? '')
@@ -1428,11 +1468,15 @@ function categoriasDeEvento(int $eventoId): array
 }
 
 /**
- * Publica el evento y arranca el reloj de las 24 horas.
+ * Publica el evento.
  *
- * publicado_en solo se pone la primera vez: si un administrador oculta y vuelve
- * a publicar una ficha, eso no le regala al organizador otras 24 horas de
- * edición sobre algo que lleva semanas en cartel.
+ * publicado_en solo se pone la primera vez: es la fecha de "más nuevas" del
+ * buscador, y volver a publicar algo que un administrador ocultó o que su
+ * dueño canceló no lo hace nuevo.
+ *
+ * Recurrente y por reserva: aquí empieza su mes de vigencia (migración 27).
+ * Si ya tenía uno corriendo se respeta; si no tenía —un borrador— o ya había
+ * vencido —se reactiva una cancelada meses después—, empieza uno desde hoy.
  */
 function publicarEvento(int $id, int $usuarioId): void
 {
@@ -1441,7 +1485,12 @@ function publicarEvento(int $id, int $usuarioId): void
     $pdo->prepare(
         'UPDATE eventos
             SET situacion = "publicado",
-                publicado_en = COALESCE(publicado_en, NOW())
+                publicado_en = COALESCE(publicado_en, NOW()),
+                vigente_hasta = CASE
+                    WHEN tipo_actividad = "unico" THEN NULL
+                    WHEN vigente_hasta IS NULL OR vigente_hasta < NOW()
+                        THEN DATE_ADD(NOW(), INTERVAL ' . EVENTO_VIGENCIA_MESES . ' MONTH)
+                    ELSE vigente_hasta END
           WHERE id = ?'
     )->execute([$id]);
 
@@ -1481,9 +1530,7 @@ function cancelarEvento(int $id, ?string $infoCancelacion): void
 /**
  * Retira una actividad: la oculta (nunca la borra) y dejar constancia en
  * eventos_retiros de quién lo pidió y quién lo ejecutó —aquí siempre la misma
- * persona, en el mismo instante: es el caso "inmediato", el único que existe
- * hasta que Fase 3 construya la cola de solicitudes >24h del Req. 17092026
- * punto 8 (retirado_en quedaría en NULL mientras esté pendiente)—.
+ * persona, en el mismo instante—.
  *
  * Hasta la migración 26 esto se llamaba eliminarEvento() y hacía
  * DELETE FROM eventos: borrado real, incluida la imagen. El cliente confirmó
@@ -1506,57 +1553,12 @@ function retirarEvento(int $id, int $actorId, ?string $motivo = null): void
     )->execute([$id, $motivo !== '' ? $motivo : null, $actorId, $actorId]);
 }
 
-/**
- * ¿Ya hay una solicitud de retiro de esta actividad esperando respuesta?
- * Evita que el mismo organizador la pida dos veces mientras espera.
+/*
+ * Ya no hay "solicitar retiro" del lado del organizador: desde el 2026-09-23
+ * lo retira él mismo siempre (ver puedeRetirarEvento()). Lo de abajo es la
+ * bandeja de administración, que se queda para atender las solicitudes que
+ * hubieran llegado antes de ese cambio.
  */
-function tieneRetiroPendiente(int $eventoId): bool
-{
-    $st = db()->prepare(
-        'SELECT 1 FROM eventos_retiros WHERE evento_id = ? AND retirado_en IS NULL LIMIT 1'
-    );
-    $st->execute([$eventoId]);
-
-    return $st->fetchColumn() !== false;
-}
-
-/**
- * ¿Puede esta persona SOLICITAR el retiro (no ejecutarlo directo)?
- *
- * Es el caso de en medio del Req. 17092026 punto 8: pasadas
- * EVENTO_MARGEN_RETIRO_H horas el dueño ya no puede retirar por su cuenta
- * (puedeRetirarEvento() devuelve false), pero sigue pudiendo pedirlo — y
- * queda pendiente hasta que un administrador lo revise con
- * procesarSolicitudRetiro(). El administrador no "solicita": ya puede
- * retirar directo en cualquier momento.
- */
-function puedeSolicitarRetiroEvento(array $ev, ?array $u): bool
-{
-    if ($u === null) return false;
-    if (esAdmin($u)) return false;
-    if ((int) $ev['usuario_id'] !== (int) $u['id']) return false;
-    if (!in_array($ev['situacion'], ['publicado', 'cancelado'], true)) return false;
-
-    return minutosRestantesRetiro($ev) <= 0;
-}
-
-/**
- * Dueño de la actividad, pasado su plazo de retiro directo (Req. 17092026
- * punto 8, "solicitud a Omdara"): deja constancia de la solicitud, pero NO
- * oculta nada todavía —eso solo lo hace procesarSolicitudRetiro(), y solo un
- * administrador—. retirado_por/retirado_en se quedan en NULL a propósito:
- * es justo lo que hace que idx_er_pendientes (migración 26) encuentre esta
- * fila en la bandeja de administración.
- */
-function solicitarRetiroEvento(int $id, int $organizadorId, ?string $motivo = null): void
-{
-    $motivo = trim((string) $motivo);
-
-    db()->prepare(
-        'INSERT INTO eventos_retiros (evento_id, motivo, solicitado_por, solicitado_en)
-              VALUES (?, ?, ?, NOW())'
-    )->execute([$id, $motivo !== '' ? $motivo : null, $organizadorId]);
-}
 
 /** Solicitudes de retiro esperando que un administrador decida. La más antigua primero. */
 function retirosPendientes(int $limite = 100): array
@@ -1641,6 +1643,61 @@ function fechaPartes(string $fecha): array
     ];
 }
 
+/**
+ * "Recurrente" o "Por reserva": la etiqueta corta del tipo de programación,
+ * para donde una actividad sin fecha enseñaría su fecha. Cadena vacía en una
+ * de fecha específica.
+ */
+function etiquetaProgramacion(array $ev): string
+{
+    switch ($ev['tipo_actividad'] ?? 'unico') {
+        case 'recurrente': return t('programacion.recurrente');
+        case 'reserva':    return t('programacion.reserva');
+        default:           return '';
+    }
+}
+
+/**
+ * fechaPartes() de una actividad, sabiendo que recurrente y por reserva no
+ * tienen fecha_inicio: en esas, 'd' va vacío y 'm' lleva la etiqueta del tipo
+ * en mayúsculas, que es lo que cabe en la cajita de fecha de la tarjeta y de
+ * la ficha.
+ */
+function fechaPartesEvento(array $ev): array
+{
+    if (eventoConVigencia($ev) || empty($ev['fecha_inicio'])) {
+        return ['d' => '', 'm' => mb_strtoupper(etiquetaProgramacion($ev), 'UTF-8'), 'hora' => ''];
+    }
+
+    return fechaPartes((string) $ev['fecha_inicio']);
+}
+
+/**
+ * La columna "Fecha" de las tablas de gestión (Mis actividades, panel
+ * admin): "16 AGO 2026" en una de fecha específica; en recurrente y por
+ * reserva, el tipo y hasta cuándo se ve —"Por reserva · hasta 23 OCT" o
+ * "Por reserva · vencida"—, que es lo que ahí le importa a quien la gestiona.
+ */
+function fechaTablaEvento(array $ev): string
+{
+    if (!eventoConVigencia($ev)) {
+        if (empty($ev['fecha_inicio'])) return '';
+        $p = fechaPartes((string) $ev['fecha_inicio']);
+        return $p['d'] . ' ' . $p['m'] . ' ' . date('Y', (int) strtotime((string) $ev['fecha_inicio']));
+    }
+
+    $texto = etiquetaProgramacion($ev);
+
+    if (eventoVencido($ev)) return $texto . ' · vencida';
+
+    if (!empty($ev['vigente_hasta'])) {
+        $p = fechaPartes((string) $ev['vigente_hasta']);
+        $texto .= ' · hasta ' . $p['d'] . ' ' . $p['m'];
+    }
+
+    return $texto;
+}
+
 /** "16 de agosto de 2026, 19:30" */
 function fechaLarga(string $fecha): string
 {
@@ -1653,13 +1710,7 @@ function fechaLarga(string $fecha): string
          . ' de ' . date('Y', $ts) . ', ' . date('H:i', $ts);
 }
 
-/**
- * "16 de agosto de 2026", sin hora.
- *
- * Para una actividad recurrente: fecha_inicio/fecha_fin son la primera y
- * última ocurrencia, y su hora es la de esa sesión —no la de todas—, así
- * que mezclarla en el rango de fechas confundiría más de lo que aclara.
- */
+/** "16 de agosto de 2026", sin hora. */
 function fechaCorta(string $fecha): string
 {
     static $meses = ['enero','febrero','marzo','abril','mayo','junio','julio',
@@ -1688,9 +1739,10 @@ function fechaResumen(array $ev): string
     static $meses = ['enero','febrero','marzo','abril','mayo','junio','julio',
                      'agosto','septiembre','octubre','noviembre','diciembre'];
 
-    if (($ev['tipo_actividad'] ?? '') === 'recurrente') {
-        return (frecuenciasRecurrencia()[$ev['frecuencia']] ?? t('ficha.varias_fechas'))
-             . ', ' . substr((string) $ev['hora_recurrente'], 0, 5);
+    // Recurrente y por reserva no tienen fecha: su "cuándo" es el texto que
+    // escribió el organizador, con la etiqueta del tipo delante.
+    if (eventoConVigencia($ev)) {
+        return etiquetaProgramacion($ev) . ': ' . (string) ($ev['programacion_texto'] ?? '');
     }
 
     $ts = (int) strtotime((string) $ev['fecha_inicio']);
@@ -1810,7 +1862,7 @@ function precioTexto(array $ev): string
  */
 function eventoParaTarjeta(array $ev): array
 {
-    $p = fechaPartes($ev['fecha_inicio']);
+    $p = fechaPartesEvento($ev);
 
     return [
         'id'    => (int) $ev['id'],
@@ -1818,7 +1870,7 @@ function eventoParaTarjeta(array $ev): array
         'cat'   => $ev['categoria'],
         'city'  => $ev['ciudad'] . ', ' . $ev['entidad'],
         'org'   => $ev['organizador'] ?? '',
-        'date'  => $p['d'] . ' ' . $p['m'],
+        'date'  => trim($p['d'] . ' ' . $p['m']),
         'd'     => $p['d'],
         'm'     => $p['m'],
         'price' => $ev['precio'] !== null ? number_format((float) $ev['precio'], 0, '.', ',') : '',
@@ -1895,8 +1947,13 @@ function fechaIso(?string $fecha): ?string
  * que Google pueda anunciar sin mentir, así que ahí se omite el bloque
  * entero en vez de inventar un valor.
  */
-function datosEstructuradosEvento(array $ev): array
+function datosEstructuradosEvento(array $ev): ?array
 {
+    // Schema.org/Event exige startDate, y recurrente y por reserva no tienen
+    // (migración 27). Mejor sin marcado que con uno inventado: Google
+    // penaliza los datos estructurados que no coinciden con la página.
+    if (eventoConVigencia($ev) || empty($ev['fecha_inicio'])) return null;
+
     $datos = [
         '@context'            => 'https://schema.org',
         '@type'               => 'Event',

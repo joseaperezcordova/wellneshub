@@ -14,7 +14,7 @@
  *
  * Reemplaza entero el texto anterior (14 Agosto, 2026, once cláusulas) y
  * cierra el pendiente 2ñ de docs/pendientes.md: las dos cosas que el sitio ya
- * hacía y los TyC no decían —el plazo de 24 horas para retirar una actividad
+ * hacía y los TyC no decían —el plazo de 24 horas para retirar una actividad (quitado el 2026-09-23)
  * y que la moderación es posterior, no previa— ya están aquí, en la cláusula
  * nueva «Revisión y moderación de publicaciones». Se comprobó de nuevo que
  * ninguna cláusula contradice al código.

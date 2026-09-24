@@ -45,13 +45,17 @@ function contarActividadesProximas(int $dias = 7): int
     return (int) $st->fetchColumn();
 }
 
-/** Publicadas cuyo último día ya pasó —siguen en el sitio, pero no en el listado. */
+/**
+ * Publicadas cuyo último día ya pasó —o, si son recurrentes o por reserva,
+ * cuyo mes de vigencia se acabó sin renovar—: siguen en el sitio, pero no en
+ * el listado.
+ */
 function contarActividadesExpiradas(): int
 {
     return (int) db()->query(
         "SELECT COUNT(*) FROM eventos
           WHERE situacion = 'publicado'
-            AND COALESCE(fecha_fin, fecha_inicio) < NOW()"
+            AND NOT " . sqlEventoVigente('')
     )->fetchColumn();
 }
 

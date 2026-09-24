@@ -53,15 +53,27 @@ La tabla central. Dos aclaraciones que evitan releer el código cada vez:
 - **`entidad` vs. `situacion`** — "estado" significa dos cosas en español
   (la entidad federativa y la situación de la publicación), así que aquí son
   dos columnas con nombres que no chocan.
-- **`publicado_en` vs. `creado_en`** — el organizador tiene 24 horas para
-  *eliminar* su actividad *desde que la publica*, no desde que empezó a
-  escribirla (editarla no tiene plazo, REQ-000-XX). Un borrador que estuvo
-  tres días a medias no gasta ese margen.
+- **`publicado_en` vs. `creado_en`** — `publicado_en` es la primera vez que
+  se publicó (el orden "más nuevas" del buscador). Hasta el 2026-09-23 también
+  marcaba el plazo de 24 horas para retirar; esa regla ya no existe: el
+  organizador retira su actividad cuando quiera.
 
-`situacion` es `borrador` → `publicado` → (`oculto` si un administrador lo
-retira). `tipo_actividad` distingue única de recurrente; si es recurrente,
-`frecuencia` y las horas vienen llenas, pero `fecha_inicio`/`fecha_fin` siguen
-siendo el rango real (primera y última ocurrencia), no un dato aparte.
+`situacion` es `borrador` → `publicado` → (`cancelado` si su dueño la cancela,
+`oculto` si se retira o la oculta un administrador).
+
+`tipo_actividad` es el tipo de programación (migración 27):
+
+- `unico` — **fecha específica**: `fecha_inicio`/`fecha_fin`. Deja de verse
+  en la agenda cuando termina.
+- `recurrente` y `reserva` (**por reserva / disponibilidad**) — sin fecha
+  (`fecha_inicio` en NULL); lo que se muestra es el texto libre de
+  `programacion_texto`. Se ven hasta `vigente_hasta`, un mes desde que se
+  publican, y el organizador las renueva con un botón. No salen en los
+  filtros de fecha del buscador. La condición completa de "sigue en cartel"
+  vive en `sqlEventoVigente()` (`includes/eventos.php`).
+
+`frecuencia`, `hora_recurrente` y `hora_fin_recurrente` son del formato de
+recurrente anterior a la migración 27 y ya no se llenan.
 
 `categoria` es texto libre (`VARCHAR(60)`), sin FK a una tabla de categorías
 — el catálogo de las 20 categorías válidas vive en código
@@ -132,6 +144,8 @@ previa donde no). Orden y qué agrega cada una:
 | 12 | `migracion-12-quitar-modalidad.sql` | Quita la columna de la 07 — decisión de producto revertida. |
 | 13 | `migracion-13-direccion.sql` | `direccion`, aparte de `lugar`. |
 | 14 | `migracion-14-contacto-sitio.sql` | La tabla `mensajes_contacto`, para el formulario de contacto general. |
+| … | | |
+| 27 | `migracion-27-programacion-tres-tipos.sql` | Programación en tres tipos (`reserva` nuevo), `programacion_texto`, `vigente_hasta`; `fecha_inicio` acepta NULL. |
 
 `schema.sql` siempre refleja el estado **final** — ya incluye todo lo de
 arriba. Las migraciones son solo para una base que ya estaba en un estado

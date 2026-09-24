@@ -30,21 +30,21 @@ $horaDeFecha = function (string $campo) use ($e) {
     return $ts === false ? '' : date('H:i', $ts);
 };
 
-/** Formato que exige type="time": 19:30. Hora de inicio de una recurrente. */
-$horaInput = function () use ($e) {
-    if (empty($e['hora_recurrente'])) return '';
-    $ts = strtotime((string) $e['hora_recurrente']);
-    return $ts === false ? '' : date('H:i', $ts);
-};
+/*
+ * Tipo de programación (migración 27): fecha específica ('unico'),
+ * recurrente o por reserva. $esUnico gobierna los valores y el required de
+ * la tarjeta de fecha; el texto de recurrente/por reserva sale de
+ * programacion_texto —o, tras un envío fallido, de lo que se había escrito
+ * en cada tarjeta—.
+ */
+$tipoProgramacion = in_array($e['tipo_actividad'] ?? '', ['recurrente', 'reserva'], true)
+    ? (string) $e['tipo_actividad'] : 'unico';
+$esUnico = $tipoProgramacion === 'unico';
 
-/** Hora de fin de una recurrente. */
-$horaFinRecurrenteInput = function () use ($e) {
-    if (empty($e['hora_fin_recurrente'])) return '';
-    $ts = strtotime((string) $e['hora_fin_recurrente']);
-    return $ts === false ? '' : date('H:i', $ts);
+$textoProgramacion = function (string $tipo) use ($e, $tipoProgramacion): string {
+    if (isset($e['programacion_' . $tipo])) return (string) $e['programacion_' . $tipo];
+    return $tipoProgramacion === $tipo ? (string) ($e['programacion_texto'] ?? '') : '';
 };
-
-$esRecurrente = ($e['tipo_actividad'] ?? 'unico') === 'recurrente';
 
 /*
  * Las categorías marcadas. Tras un envío fallido ya vienen en $e['categorias']
@@ -159,40 +159,40 @@ $puedeEnviarCodigoCorreo = isset($e['id']);
 <div class="tipo-fecha-grupo">
   <div class="tipo-fecha-tarjeta">
     <label class="tipo-fecha-header">
-      <input type="radio" name="tipo_actividad" value="unico" id="tipoUnico" <?= $esRecurrente ? '' : 'checked' ?>>
+      <input type="radio" name="tipo_actividad" value="unico" id="tipoUnico" <?= $esUnico ? 'checked' : '' ?>>
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"
            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="3.5" y="5" width="17" height="15" rx="2"/>
         <path d="M3.5 9.5h17"/>
         <path d="M8 3v4M16 3v4"/>
       </svg>
-      <span><?= et('evento.form.dia_unico') ?></span>
+      <span><?= et('evento.form.fecha_especifica') ?></span>
     </label>
     <div class="tipo-fecha-campos">
       <div class="campo<?= $mal('fecha_unica') ?>">
         <label for="fecha_unica"><?= et('evento.form.fecha_label') ?></label>
-        <input id="fecha_unica" name="fecha_unica" type="date" <?= $esRecurrente ? '' : 'required' ?>
-               value="<?= e($esRecurrente ? '' : $fechaSoloInput('fecha_inicio')) ?>">
+        <input id="fecha_unica" name="fecha_unica" type="date" <?= $esUnico ? 'required' : '' ?>
+               value="<?= e($esUnico ? $fechaSoloInput('fecha_inicio') : '') ?>">
         <?= $err('fecha_unica') ?>
       </div>
       <div class="campo-fila">
         <div class="campo<?= $mal('hora_inicio_unica') ?>">
           <label for="hora_inicio_unica"><?= et('evento.form.hora_inicio_label') ?></label>
-          <input id="hora_inicio_unica" name="hora_inicio_unica" type="time" <?= $esRecurrente ? '' : 'required' ?>
-                 value="<?= e($esRecurrente ? '' : $horaDeFecha('fecha_inicio')) ?>">
+          <input id="hora_inicio_unica" name="hora_inicio_unica" type="time" <?= $esUnico ? 'required' : '' ?>
+                 value="<?= e($esUnico ? $horaDeFecha('fecha_inicio') : '') ?>">
           <?= $err('hora_inicio_unica') ?>
         </div>
         <div class="campo<?= $mal('hora_fin_unica') ?>">
           <label for="hora_fin_unica"><?= et('evento.form.hora_fin_label') ?></label>
-          <input id="hora_fin_unica" name="hora_fin_unica" type="time" <?= $esRecurrente ? '' : 'required' ?>
-                 value="<?= e($esRecurrente ? '' : $horaDeFecha('fecha_fin')) ?>">
+          <input id="hora_fin_unica" name="hora_fin_unica" type="time" <?= $esUnico ? 'required' : '' ?>
+                 value="<?= e($esUnico ? $horaDeFecha('fecha_fin') : '') ?>">
           <?= $err('hora_fin_unica') ?>
         </div>
       </div>
       <div class="campo">
         <label for="fecha_fin_unica"><?= et('evento.form.termina_otro_dia') ?> <span class="opcional"><?= et('campo.opcional') ?></span></label>
         <input id="fecha_fin_unica" name="fecha_fin_unica" type="date"
-               value="<?= e((!$esRecurrente && $fechaSoloInput('fecha_fin') !== '' && $fechaSoloInput('fecha_fin') !== $fechaSoloInput('fecha_inicio')) ? $fechaSoloInput('fecha_fin') : '') ?>">
+               value="<?= e(($esUnico && $fechaSoloInput('fecha_fin') !== '' && $fechaSoloInput('fecha_fin') !== $fechaSoloInput('fecha_inicio')) ? $fechaSoloInput('fecha_fin') : '') ?>">
         <div class="pista"><?= et('evento.form.termina_otro_dia_ayuda') ?></div>
       </div>
     </div>
@@ -200,7 +200,7 @@ $puedeEnviarCodigoCorreo = isset($e['id']);
 
   <div class="tipo-fecha-tarjeta">
     <label class="tipo-fecha-header">
-      <input type="radio" name="tipo_actividad" value="recurrente" id="tipoRecurrente" <?= $esRecurrente ? 'checked' : '' ?>>
+      <input type="radio" name="tipo_actividad" value="recurrente" id="tipoRecurrente" <?= $tipoProgramacion === 'recurrente' ? 'checked' : '' ?>>
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"
            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M4 7h13a3 3 0 0 1 3 3v1"/>
@@ -211,47 +211,42 @@ $puedeEnviarCodigoCorreo = isset($e['id']);
       <span><?= et('evento.form.recurrente') ?></span>
     </label>
     <div class="tipo-fecha-campos">
-      <div class="campo-fila">
-        <div class="campo<?= $mal('fecha_inicio_rec') ?>">
-          <label for="fecha_inicio_rec"><?= et('evento.form.fecha_inicio_label') ?></label>
-          <input id="fecha_inicio_rec" name="fecha_inicio_rec" type="date" <?= $esRecurrente ? 'required' : '' ?>
-                 value="<?= e($esRecurrente ? $fechaSoloInput('fecha_inicio') : '') ?>">
-          <?= $err('fecha_inicio_rec') ?>
-        </div>
-        <div class="campo<?= $mal('fecha_fin_rec') ?>">
-          <label for="fecha_fin_rec"><?= et('evento.form.fecha_fin_label') ?></label>
-          <input id="fecha_fin_rec" name="fecha_fin_rec" type="date" <?= $esRecurrente ? 'required' : '' ?>
-                 value="<?= e($esRecurrente ? $fechaSoloInput('fecha_fin') : '') ?>">
-          <?= $err('fecha_fin_rec') ?>
-        </div>
+      <div class="campo<?= $mal('programacion_recurrente') ?>">
+        <label for="programacion_recurrente"><?= et('evento.form.programacion_recurrente_label') ?></label>
+        <textarea id="programacion_recurrente" name="programacion_recurrente" rows="3" maxlength="500"
+                  <?= $tipoProgramacion === 'recurrente' ? 'required' : '' ?>
+                  placeholder="<?= et('evento.form.programacion_recurrente_placeholder') ?>"><?= e($textoProgramacion('recurrente')) ?></textarea>
+        <div class="pista"><?= et('evento.form.programacion_recurrente_ayuda') ?></div>
+        <?= $err('programacion_recurrente') ?>
       </div>
-      <div class="campo<?= $mal('frecuencia') ?>">
-        <label for="frecuencia"><?= et('evento.form.frecuencia_label') ?></label>
-        <select id="frecuencia" name="frecuencia" <?= $esRecurrente ? 'required' : '' ?>>
-          <option value=""><?= et('evento.form.frecuencia_placeholder') ?></option>
-          <?php foreach (frecuenciasRecurrencia() as $clave => $etiqueta): ?>
-            <option value="<?= e($clave) ?>" <?= $v('frecuencia') === $clave ? 'selected' : '' ?>><?= e($etiqueta) ?></option>
-          <?php endforeach; ?>
-        </select>
-        <?= $err('frecuencia') ?>
-      </div>
-      <div class="campo-fila">
-        <div class="campo<?= $mal('hora_recurrente') ?>">
-          <label for="hora_recurrente"><?= et('evento.form.hora_inicio_label') ?></label>
-          <input id="hora_recurrente" name="hora_recurrente" type="time" <?= $esRecurrente ? 'required' : '' ?>
-                 value="<?= e($horaInput()) ?>">
-          <?= $err('hora_recurrente') ?>
-        </div>
-        <div class="campo<?= $mal('hora_fin_recurrente') ?>">
-          <label for="hora_fin_recurrente"><?= et('evento.form.hora_fin_label') ?></label>
-          <input id="hora_fin_recurrente" name="hora_fin_recurrente" type="time" <?= $esRecurrente ? 'required' : '' ?>
-                 value="<?= e($horaFinRecurrenteInput()) ?>">
-          <?= $err('hora_fin_recurrente') ?>
-        </div>
+    </div>
+  </div>
+
+  <div class="tipo-fecha-tarjeta">
+    <label class="tipo-fecha-header">
+      <input type="radio" name="tipo_actividad" value="reserva" id="tipoReserva" <?= $tipoProgramacion === 'reserva' ? 'checked' : '' ?>>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="8.5"/>
+        <path d="M12 7.5V12l3 2"/>
+      </svg>
+      <span><?= et('evento.form.reserva') ?></span>
+    </label>
+    <div class="tipo-fecha-campos">
+      <div class="campo<?= $mal('programacion_reserva') ?>">
+        <label for="programacion_reserva"><?= et('evento.form.programacion_reserva_label') ?></label>
+        <textarea id="programacion_reserva" name="programacion_reserva" rows="3" maxlength="500"
+                  <?= $tipoProgramacion === 'reserva' ? 'required' : '' ?>
+                  placeholder="<?= et('evento.form.programacion_reserva_placeholder') ?>"><?= e($textoProgramacion('reserva')) ?></textarea>
+        <div class="pista"><?= et('evento.form.programacion_reserva_ayuda') ?></div>
+        <?= $err('programacion_reserva') ?>
       </div>
     </div>
   </div>
 </div>
+<?php /* Recurrente y por reserva se ven un mes; después se renuevan con un
+         botón, sin volver a capturar nada (decisión del cliente, 2026-09-23). */ ?>
+<div class="pista" style="margin:-6px 0 16px;"><?= et('evento.form.vigencia_ayuda') ?></div>
 
 <div class="form-seccion-titulo">
   <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"
@@ -600,6 +595,7 @@ $puedeEnviarCodigoCorreo = isset($e['id']);
           <label for="url_boletos"><?= et('evento.form.url_compra_label') ?> <span class="obligatorio-si">*</span></label>
           <input id="url_boletos" name="url_boletos" type="url" maxlength="500"
                  value="<?= e($v('url_boletos')) ?>" placeholder="https://…">
+          <div class="pista"><?= et('evento.form.url_compra_ayuda') ?></div>
           <?= $err('url_boletos') ?>
         </div>
       </div>
@@ -622,6 +618,7 @@ $puedeEnviarCodigoCorreo = isset($e['id']);
           <label for="url_reserva"><?= et('evento.form.url_reserva_label') ?> <span class="obligatorio-si">*</span></label>
           <input id="url_reserva" name="url_reserva" type="url" maxlength="500"
                  value="<?= e($v('url_reserva')) ?>" placeholder="https://…">
+          <div class="pista"><?= et('evento.form.url_reserva_ayuda') ?></div>
           <?= $err('url_reserva') ?>
         </div>
       </div>
@@ -814,26 +811,27 @@ var EVENTO_T = <?= json_encode([
   sync();
 })();
 
-/* De un día / recurrente son dos tarjetas que se ven las dos completas a la
-   vez —así lo pide el diseño—, así que aquí no hay nada que mostrar u
-   ocultar. Lo único que cambia es cuál de los dos juegos de campos es
-   obligatorio: los de la tarjeta que no se eligió se marcan no-requeridos
-   para que no bloqueen el envío con un campo que la persona decidió no usar. */
+/* Fecha específica / recurrente / por reserva son tres tarjetas que se ven
+   completas a la vez —así lo pide el diseño—, así que aquí no hay nada que
+   mostrar u ocultar. Lo único que cambia es qué campos son obligatorios: los
+   de las tarjetas que no se eligieron se marcan no-requeridos para que no
+   bloqueen el envío con un campo que la persona decidió no usar. */
 (function(){
   var radios = document.querySelectorAll('input[name="tipo_actividad"]');
   if (!radios.length) return;
 
-  var camposUnico = document.querySelectorAll(
-    '[name="fecha_unica"], [name="hora_inicio_unica"], [name="hora_fin_unica"]'
-  );
-  var camposRecurrente = document.querySelectorAll(
-    '[name="fecha_inicio_rec"], [name="fecha_fin_rec"], [name="frecuencia"], [name="hora_recurrente"], [name="hora_fin_recurrente"]'
-  );
+  var campos = {
+    unico:      document.querySelectorAll('[name="fecha_unica"], [name="hora_inicio_unica"], [name="hora_fin_unica"]'),
+    recurrente: document.querySelectorAll('[name="programacion_recurrente"]'),
+    reserva:    document.querySelectorAll('[name="programacion_reserva"]')
+  };
 
   function sync(){
-    var recurrente = document.querySelector('input[name="tipo_actividad"]:checked').value === 'recurrente';
-    camposUnico.forEach(function(campo){ campo.required = !recurrente; });
-    camposRecurrente.forEach(function(campo){ campo.required = recurrente; });
+    var elegido = document.querySelector('input[name="tipo_actividad"]:checked');
+    var tipo = elegido ? elegido.value : 'unico';
+    Object.keys(campos).forEach(function(clave){
+      campos[clave].forEach(function(campo){ campo.required = clave === tipo; });
+    });
   }
 
   radios.forEach(function(r){ r.addEventListener('change', sync); });

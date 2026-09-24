@@ -228,11 +228,9 @@ $bloques = [
              */
             '¿Cómo retiro o elimino una actividad?',
             'Puedes modificar la información de tu actividad en cualquier momento desde su página de gestión. '
-            . 'Si necesitas retirarla de Omdara, puedes hacerlo directamente desde la página de gestión durante '
-            . 'las primeras ' . EVENTO_MARGEN_RETIRO_H . ' horas después de publicarla. Después de ese plazo, '
-            . '<a href="' . e(url('contacto')) . '">escríbenos</a> para solicitar su retiro. Este plazo busca '
-            . 'evitar que una actividad desaparezca repentinamente cuando las personas ya pueden haberla '
-            . 'consultado o planeado asistir.',
+            . 'Si necesitas retirarla de Omdara, también puedes hacerlo directamente desde ahí, en cualquier '
+            . 'momento. Si la actividad solo cambió o se canceló, considera actualizarla o marcarla como '
+            . 'cancelada: así, quienes ya la habían consultado o planeaban asistir sabrán qué pasó.',
         ],
     ],
 ];

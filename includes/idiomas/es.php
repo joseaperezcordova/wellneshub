@@ -187,12 +187,11 @@ return [
     'evento.form.fecha_label'        => 'Fecha',
     'evento.form.hora_inicio_label'  => 'Hora de inicio',
     'evento.form.hora_fin_label'     => 'Hora de fin',
-    'evento.form.fecha_inicio_label' => 'Fecha de inicio',
-    'evento.form.fecha_fin_label'    => 'Fecha de fin',
-    'evento.form.frecuencia_label'   => 'Frecuencia',
     'evento.form.forma_pago_label'   => 'Forma de pago',
-    'evento.form.url_compra_label'   => 'URL de compra',
-    'evento.form.url_reserva_label'  => 'URL de reserva',
+    'evento.form.url_compra_label'   => 'Enlace para comprar boletos',
+    'evento.form.url_reserva_label'  => 'Enlace para reservar o registrarse',
+    'evento.form.url_compra_ayuda' => 'Agrega el enlace donde las personas pueden comprar boletos o realizar el pago/inscripción. Por ejemplo: Eventbrite, Boletia, Ticketmaster, tu sitio web o una landing page de pago.',
+    'evento.form.url_reserva_ayuda' => 'Agrega el enlace donde las personas pueden reservar su lugar o registrarse. Puede ser WhatsApp, Google Forms, Calendly, un formulario propio o una landing page de registro.',
 
     // Solo para el aviso de errores: el texto real del campo es distinto.
     'evento.campo.mapa_url'          => 'Enlace de Google Maps',
@@ -212,16 +211,21 @@ return [
     'evento.form.descripcion_ayuda'  => 'Se muestra tal cual en la ficha. Los saltos de línea se respetan.',
 
     // Sección 2
-    'evento.form.seccion2'           => '2. Fecha y horario',
-    'evento.form.dia_unico'          => 'Actividad de un día',
+    'evento.form.seccion2'           => '2. Tipo de programación',
+    'evento.form.fecha_especifica' => 'Fecha específica',
+    'evento.form.reserva' => 'Por reserva / disponibilidad',
+    'evento.form.programacion_recurrente_label' => 'Frecuencia / horario',
+    'evento.form.programacion_recurrente_placeholder' => 'Todos los martes a las 6:00 p.m.',
+    'evento.form.programacion_recurrente_ayuda' => 'Ejemplo: «Lunes, miércoles y viernes de 8:00 a 9:00 a.m.». No necesitas registrar cada fecha.',
+    'evento.form.programacion_reserva_label' => 'Disponibilidad / indicaciones para reservar',
+    'evento.form.programacion_reserva_placeholder' => 'Sesiones disponibles de lunes a viernes. Horarios sujetos a disponibilidad. Contacta al organizador para consultar horarios y reservar.',
+    'evento.form.programacion_reserva_ayuda' => 'Para actividades sin fecha fija en las que se acuerda el horario con el organizador: pilates personalizado, entrenamiento personal, masajes, sesiones privadas o clases individuales.',
+    'evento.form.vigencia_ayuda' => 'Las actividades recurrentes y por reserva se muestran durante un mes. Cuando estén por vencer puedes renovarlas con un clic, sin volver a capturarlas.',
+    'programacion.recurrente' => 'Recurrente',
+    'programacion.reserva' => 'Por reserva',
     'evento.form.termina_otro_dia'   => 'Termina otro día',
     'evento.form.termina_otro_dia_ayuda' => 'Para retiros de varios días. Si no se pone, se asume el mismo día.',
-    'evento.form.recurrente'         => 'Actividad recurrente',
-    'evento.form.frecuencia_placeholder' => 'Selecciona una frecuencia',
-    'evento.frecuencia.diaria'    => 'Diaria',
-    'evento.frecuencia.semanal'   => 'Semanal',
-    'evento.frecuencia.quincenal' => 'Quincenal',
-    'evento.frecuencia.mensual'   => 'Mensual',
+    'evento.form.recurrente'         => 'Recurrente',
 
     // Sección 3
     'evento.form.seccion3'           => '3. Ubicación',
@@ -351,13 +355,10 @@ return [
     'evento.valida.ciudad_falta'      => 'Elige una ciudad de la lista.',
     'evento.valida.lugar_falta'       => 'Falta el lugar donde se realiza.',
     'evento.valida.direccion_larga'   => 'La dirección no puede pasar de 255 caracteres.',
-    'evento.valida.frecuencia_falta'  => 'Elige cada cuánto se repite.',
-    'evento.valida.hora_inicio_sesion_falta' => 'Pon la hora a la que empieza cada sesión.',
-    'evento.valida.hora_fin_sesion_falta'    => 'Pon la hora a la que termina cada sesión.',
-    'evento.valida.hora_fin_antes_inicio'    => 'El final no puede ser antes que el inicio.',
-    'evento.valida.fecha_inicio_rec_falta'   => 'Pon la fecha en la que empieza a repetirse.',
-    'evento.valida.fecha_fin_rec_falta'      => 'Pon la fecha en la que termina de repetirse.',
     'evento.valida.fecha_fin_antes_inicio'   => 'El final no puede ser anterior al principio.',
+    'evento.valida.programacion_recurrente_falta' => 'Escribe la frecuencia y el horario.',
+    'evento.valida.programacion_reserva_falta' => 'Escribe la disponibilidad o cómo reservar.',
+    'evento.valida.programacion_larga' => 'Máximo 500 caracteres.',
     'evento.valida.fecha_falta'       => 'Pon la fecha de la actividad.',
     'evento.valida.hora_inicio_falta' => 'Pon la hora de inicio.',
     'evento.valida.hora_fin_falta'    => 'Pon la hora de fin.',
@@ -403,7 +404,6 @@ return [
 
     'ficha.error.sesion_caducada'   => 'La sesión caducó. Vuelve a intentarlo.',
     'ficha.error.no_permiso'        => 'No puedes hacer eso.',
-    'ficha.error.plazo_retirar'     => 'Ya pasó el plazo para retirar esta actividad tú mismo. Pídeselo al administrador.',
     // Texto del cliente, Req. 17092026 punto 1: no debe sonar a que Omdara
     // aprobó la actividad de antemano —no existe tal aprobación—, y debe
     // avisar que puede haber revisión posterior.
@@ -423,10 +423,9 @@ return [
     'ficha.barra.cancelada_tit'      => 'Cancelada.',
     'ficha.barra.cancelada_texto'    => 'Sigue visible al público, con el aviso de cancelada.',
     'ficha.barra.publicada_tit'      => 'Publicada.',
-    'ficha.barra.puedes_retirar'     => 'Puedes retirarla durante',
-    'ficha.barra.mas'                => 'más.',
-    'ficha.barra.admin_sin_plazo'    => 'Eres administrador: puedes retirarla aunque pasara el plazo.',
-    'ficha.barra.plazo_pasado'       => 'Pasó el plazo para retirarla tú mismo. Puedes solicitar el retiro abajo.',
+    'ficha.barra.publicada_texto' => 'Puedes editarla, cancelarla o retirarla cuando quieras.',
+    'ficha.vigencia.hasta' => 'Se muestra hasta el %s.',
+    'ficha.vigencia.vencida' => 'Ya pasó su mes de vigencia: no aparece en la agenda ni en el buscador hasta que la renueves.',
 
     'ficha.btn.publicar'         => 'Publicar',
     'ficha.btn.volver_publicar'  => 'Volver a publicar',
@@ -438,16 +437,8 @@ return [
     'ficha.confirmar_cancelar'   => '¿Cancelar «%s»? Sigue visible, con el aviso de cancelada.',
     'ficha.btn.retirar'          => 'Retirar',
     'ficha.confirmar_retirar'    => '¿Retirar «%s»? Deja de verse en Omdara, pero no se borra.',
-
-    // Solicitud de retiro pasadas las EVENTO_MARGEN_RETIRO_H horas
-    // (Req. 17092026 punto 8, "revisión administrativa"): el dueño ya no
-    // puede retirarla solo, pero puede pedirlo; queda pendiente hasta que
-    // un administrador la revise.
-    'ficha.btn.solicitar_retiro'         => 'Solicitar retiro',
-    'ficha.prompt_motivo_retiro'         => '¿Por qué quieres retirarla? Se lo verá el administrador que revise tu solicitud. Puedes dejarlo vacío.',
-    'ficha.confirmar_solicitar_retiro'   => '¿Solicitar el retiro de «%s»? Un administrador la revisará y la ocultará si corresponde.',
-    'ficha.aviso.retiro_solicitado'      => 'Solicitud enviada. Un administrador la revisará pronto.',
-    'ficha.retiro_pendiente.texto'       => 'Ya solicitaste el retiro de esta actividad. Está en revisión.',
+    'ficha.btn.renovar' => 'Renovar un mes',
+    'ficha.aviso.renovado' => 'Listo: tu actividad se muestra un mes más.',
 
     'ficha.cancelada.etiqueta'   => 'CANCELADA.',
     'ficha.cancelada.texto'      => 'Esta actividad ha sido cancelada. Para más información, contacta directamente al organizador.',
@@ -486,13 +477,12 @@ return [
     'tarjeta.fecha_actualizada' => 'Fecha actualizada',
 
     'ficha.btn.comprar_boletos' => 'Comprar boletos',
-    'ficha.btn.reservar'        => 'Reservar mi lugar',
+    'ficha.btn.reservar'        => 'Reservar lugar',
     'ficha.btn.contactar'       => 'Contactar al organizador',
 
     'ficha.mapa_titulo_prefijo' => 'Mapa con la ubicación de',
     'ficha.como_llegar'         => 'Cómo llegar →',
     'ficha.reportar'            => 'Reportar esta actividad',
-    'ficha.varias_fechas'       => 'Varias fechas',
 
     // Mensaje de la sesión que evento-editar.php deja para cuando se vuelve
     // a la ficha tras guardar cambios.

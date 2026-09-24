@@ -151,11 +151,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
     } elseif (isset($_POST['retirar'])) {
-        // El dueño solo puede retirar mientras podría editar. Pasado ese plazo
-        // sería la puerta de atrás para saltarse la regla de las 24 horas:
-        // quitar la ficha y volver a subirla cambiada.
+        // Sin plazo desde el 2026-09-23: el dueño retira su actividad cuando
+        // quiera —ver puedeRetirarEvento()—. Lo que sí se sigue mirando es
+        // que sea suya (o que quien lo pide sea administrador).
         if (!puedeRetirarEvento($ev, $u)) {
-            $error = t('ficha.error.plazo_retirar');
+            $error = t('ficha.error.no_permiso');
         } else {
             retirarEvento((int) $ev['id'], (int) $u['id'], (string) ($_POST['motivo_retiro'] ?? ''));
             $_SESSION['evento_aviso'] = t('ficha.aviso.retirado');
@@ -165,16 +165,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirigir('/');
         }
 
-    } elseif (isset($_POST['solicitar_retiro'])) {
-        // Req. 17092026 punto 8, "revisión administrativa": pasado el plazo de
-        // retiro directo, el dueño ya no puede ejecutarlo él mismo, pero puede
-        // pedirlo. Queda pendiente (eventos_retiros.retirado_en NULL) hasta
-        // que un administrador lo procese desde admin.php.
-        if (!puedeSolicitarRetiroEvento($ev, $u) || tieneRetiroPendiente((int) $ev['id'])) {
+    } elseif (isset($_POST['renovar'])) {
+        // Recurrente y por reserva: otro mes de vigencia (migración 27).
+        if (!puedeRenovarEvento($ev, $u)) {
             $error = t('ficha.error.no_permiso');
         } else {
-            solicitarRetiroEvento((int) $ev['id'], (int) $u['id'], (string) ($_POST['motivo_retiro'] ?? ''));
-            $_SESSION['evento_aviso'] = t('ficha.aviso.retiro_solicitado');
+            renovarEvento((int) $ev['id']);
+            $_SESSION['evento_aviso'] = t('ficha.aviso.renovado');
             redirigir(urlEvento($ev));
         }
     }
@@ -187,7 +184,7 @@ if (!empty($_SESSION['evento_aviso'])) {
 }
 
 $esBorrador = $ev['situacion'] === 'borrador';
-$partes     = fechaPartes($ev['fecha_inicio']);
+$partes     = fechaPartesEvento($ev);
 
 // "FECHA ACTUALIZADA" (Req. 17092026 punto 2B): buscarEvento() ya trae
 // fecha_cambiada_en del LEFT JOIN a eventos_historial_fecha.
@@ -244,7 +241,10 @@ require __DIR__ . '/includes/layout.php';
    * es la misma razón por la que las URL de aquí abajo se ven con barras
    * escapadas y no es un error.
    */ ?>
-  <script type="application/ld+json"><?= json_encode(datosEstructuradosEvento($ev), JSON_UNESCAPED_UNICODE) ?></script>
+  <?php $datosEstructurados = datosEstructuradosEvento($ev); ?>
+  <?php if ($datosEstructurados !== null): ?>
+    <script type="application/ld+json"><?= json_encode($datosEstructurados, JSON_UNESCAPED_UNICODE) ?></script>
+  <?php endif; ?>
 <?php endif; ?>
 
 <div class="ficha-envoltorio">
@@ -286,24 +286,13 @@ require __DIR__ . '/includes/layout.php';
         <?php elseif ($ev['situacion'] === 'cancelado'): ?>
           <strong><?= et('ficha.barra.cancelada_tit') ?></strong> <?= et('ficha.barra.cancelada_texto') ?>
         <?php else: ?>
-          <?php
-          /*
-           * Editar ya no tiene plazo (REQ-000-XX): el organizador puede
-           * corregir una actividad publicada en cualquier momento, así que
-           * aquí no hay nada que contar sobre eso. Lo que SÍ sigue teniendo
-           * plazo es RETIRAR, y por eso es lo único que se avisa —para que
-           * el botón "Retirar" no desaparezca sin explicación cuando pasen
-           * las horas—.
-           */
-          $quedanRetiro = minutosRestantesRetiro($ev);
-          ?>
-          <?php if ($quedanRetiro > 0): ?>
-            <strong><?= et('ficha.barra.publicada_tit') ?></strong> <?= et('ficha.barra.puedes_retirar') ?>
-            <?= $quedanRetiro >= 60 ? intdiv($quedanRetiro, 60) . ' h ' . ($quedanRetiro % 60) . ' min' : $quedanRetiro . ' min' ?> <?= et('ficha.barra.mas') ?>
-          <?php elseif (esAdmin($u)): ?>
-            <strong><?= et('ficha.barra.publicada_tit') ?></strong> <?= et('ficha.barra.admin_sin_plazo') ?>
-          <?php else: ?>
-            <strong><?= et('ficha.barra.publicada_tit') ?></strong> <?= et('ficha.barra.plazo_pasado') ?>
+          <strong><?= et('ficha.barra.publicada_tit') ?></strong> <?= et('ficha.barra.publicada_texto') ?>
+          <?php /* Recurrente y por reserva: hasta cuándo se ve, o que ya
+                   no se ve, para que "Renovar" no aparezca sin explicación. */ ?>
+          <?php if (eventoVencido($ev)): ?>
+            <br><?= et('ficha.vigencia.vencida') ?>
+          <?php elseif (eventoConVigencia($ev) && !empty($ev['vigente_hasta'])): ?>
+            <br><?= e(sprintf(t('ficha.vigencia.hasta'), fechaCorta((string) $ev['vigente_hasta']))) ?>
           <?php endif; ?>
         <?php endif; ?>
       </div>
@@ -371,29 +360,18 @@ require __DIR__ . '/includes/layout.php';
           </form>
         <?php endif; ?>
 
+        <?php if (puedeRenovarEvento($ev, $u)): ?>
+          <form method="post">
+            <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+            <button class="btn-barra destacado" type="submit" name="renovar" value="1"><?= et('ficha.btn.renovar') ?></button>
+          </form>
+        <?php endif; ?>
+
         <?php if (puedeRetirarEvento($ev, $u)): ?>
           <form method="post" onsubmit="return confirm(<?= json_encode(sprintf(t('ficha.confirmar_retirar'), tituloEvento($ev))) ?>);">
             <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
             <button class="btn-barra peligro" type="submit" name="retirar" value="1"><?= et('ficha.btn.retirar') ?></button>
           </form>
-        <?php elseif (puedeSolicitarRetiroEvento($ev, $u)): ?>
-          <?php if (tieneRetiroPendiente((int) $ev['id'])): ?>
-            <span class="btn-barra" style="opacity:.7; cursor:default;"><?= et('ficha.retiro_pendiente.texto') ?></span>
-          <?php else: ?>
-            <!-- Mismo patrón que "Cancelar" arriba: prompt() para el motivo
-                 opcional, sin panel expandible propio dentro de la fila flex
-                 de .barra-acciones. -->
-            <form method="post" onsubmit="
-              var motivo = prompt(<?= json_encode(t('ficha.prompt_motivo_retiro')) ?>, '');
-              if (motivo === null) return false;
-              this.elements['motivo_retiro'].value = motivo;
-              return confirm(<?= json_encode(sprintf(t('ficha.confirmar_solicitar_retiro'), tituloEvento($ev))) ?>);
-            ">
-              <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-              <input type="hidden" name="motivo_retiro" value="">
-              <button class="btn-barra" type="submit" name="solicitar_retiro" value="1"><?= et('ficha.btn.solicitar_retiro') ?></button>
-            </form>
-          <?php endif; ?>
         <?php endif; ?>
       </div>
     </div>
@@ -449,12 +427,11 @@ require __DIR__ . '/includes/layout.php';
       <div class="dato">
         <span class="k"><?= et('ficha.dato.cuando') ?></span>
         <span class="val">
-          <?php if ($ev['tipo_actividad'] === 'recurrente'): ?>
-            <?= e(frecuenciasRecurrencia()[$ev['frecuencia']] ?? '') ?>
-            · <?= e(substr((string) $ev['hora_recurrente'], 0, 5)) ?>–<?= e(substr((string) $ev['hora_fin_recurrente'], 0, 5)) ?>
-            <br><span class="tenue">
-              <?= et('ficha.del') ?> <?= e(fechaCorta($ev['fecha_inicio'])) ?> <?= et('ficha.al') ?> <?= e(fechaCorta($ev['fecha_fin'])) ?>
-            </span>
+          <?php if (eventoConVigencia($ev)): ?>
+            <?php /* Recurrente y por reserva (migración 27): la etiqueta del
+                     tipo y, debajo, el texto del organizador tal cual. */ ?>
+            <?= e(etiquetaProgramacion($ev)) ?>
+            <br><span class="tenue"><?= nl2br(e((string) ($ev['programacion_texto'] ?? ''))) ?></span>
           <?php elseif (terminaOtroDia($ev)): ?>
             <?php /* Un retiro: aquí las dos fechas completas sí hacen falta. */ ?>
             <?= e(fechaLarga($ev['fecha_inicio'])) ?>

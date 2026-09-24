@@ -317,12 +317,12 @@ input,select{font-family:inherit; font-size:14px;}
   color:var(--texto); margin:0;
 }
 
-/* De un día / recurrente: dos tarjetas lado a lado, cada una con sus propios
-   campos de fecha dentro. La tarjeta entera se resalta con :has() cuando su
+/* Fecha específica / recurrente / por reserva (migración 27): tres tarjetas
+   lado a lado, cada una con sus propios campos dentro. La tarjeta entera se resalta con :has() cuando su
    radio está marcado —el radio y el encabezado van en un <label> chico
    aparte, y no envolviendo toda la tarjeta, para que el clic dentro de un
    campo de fecha no compita con el clic que selecciona la tarjeta. */
-.tipo-fecha-grupo{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;}
+.tipo-fecha-grupo{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:16px;}
 .tipo-fecha-tarjeta{
   min-width:0; border:1px solid var(--linea); border-radius:12px; padding:16px;
   transition:border-color .15s, background .15s;
@@ -338,7 +338,10 @@ input,select{font-family:inherit; font-size:14px;}
 .tipo-fecha-tarjeta:has(input:checked) .tipo-fecha-header svg{opacity:1; color:var(--azul-texto);}
 .tipo-fecha-header:has(input:focus-visible){outline:2px solid var(--azul-texto); outline-offset:2px;}
 .tipo-fecha-campos .campo:last-child{margin-bottom:0;}
-@media(max-width:640px){ .tipo-fecha-grupo{grid-template-columns:1fr;} }
+/* Las horas de inicio y fin no caben lado a lado en un tercio de ancho. */
+.tipo-fecha-campos .campo-fila{grid-template-columns:1fr;}
+.tipo-fecha-campos textarea{width:100%; resize:vertical;}
+@media(max-width:900px){ .tipo-fecha-grupo{grid-template-columns:1fr;} }
 
 /* Sin costo / de pago: dos tarjetas a la par, cada una con su icono y su
    título en una sola línea. Sin descripción debajo: "Sin costo" y "De pago"

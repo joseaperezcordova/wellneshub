@@ -51,10 +51,10 @@ require __DIR__ . '/includes/layout.php';
       <table class="admtable" style="background:var(--paper); color:var(--ink);">
         <thead><tr><th>Actividad</th><th>Fecha</th><th>Actualizado</th><th>Estado</th><th>Acción</th></tr></thead>
         <tbody>
-          <?php foreach ($misEventos as $me): $p = fechaPartes($me['fecha_inicio']); $pu = fechaPartes($me['actualizado_en']); ?>
+          <?php foreach ($misEventos as $me): $pu = fechaPartes($me['actualizado_en']); ?>
             <tr>
               <td><?= e($me['titulo']) ?></td>
-              <td><?= e($p['d'] . ' ' . $p['m'] . ' ' . date('Y', strtotime($me['fecha_inicio']))) ?></td>
+              <td><?= e(fechaTablaEvento($me)) ?></td>
               <?php /* REQ-000-XX: con la edición sin plazo, esto es lo que le
                        dice al organizador si una ficha sigue vigente o lleva
                        meses sin tocarse —antes esa pregunta no hacía falta,
@@ -91,7 +91,7 @@ require __DIR__ . '/includes/layout.php';
                     <a class="actionbtn" style="color:var(--ink); border-color:var(--line);" href="<?= e(urlEvento($me)) ?>">Información</a>
                     <?php if (puedeEditarEvento($me, $u)): ?>
                       <a class="actionbtn" style="color:var(--ink); border-color:var(--line);" href="<?= e(urlEditarEvento($me)) ?>">Editar actividad</a>
-                      <a class="actionbtn" style="color:var(--ink); border-color:var(--line);" href="<?= e(urlEditarEvento($me)) ?>#fecha_unica">Cambiar fecha y hora</a>
+                      <a class="actionbtn" style="color:var(--ink); border-color:var(--line);" href="<?= e(urlEditarEvento($me)) ?>#tipoUnico">Cambiar programación</a>
                     <?php endif; ?>
                     <?php if ($me['situacion'] === 'publicado'): ?>
                       <form method="post" action="<?= e(urlEvento($me)) ?>" onsubmit="
@@ -111,27 +111,18 @@ require __DIR__ . '/includes/layout.php';
                         <button class="actionbtn" style="color:var(--ink); border-color:var(--line);" type="submit" name="publicar" value="1">Reactivar</button>
                       </form>
                     <?php endif; ?>
+                    <?php if (puedeRenovarEvento($me, $u)): ?>
+                      <form method="post" action="<?= e(urlEvento($me)) ?>">
+                        <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
+                        <button class="actionbtn" style="color:var(--ink); border-color:var(--line);" type="submit" name="renovar" value="1"><?= et('ficha.btn.renovar') ?></button>
+                      </form>
+                    <?php endif; ?>
                     <?php if (puedeRetirarEvento($me, $u)): ?>
                       <form method="post" action="<?= e(urlEvento($me)) ?>"
                             onsubmit="return confirm(<?= json_encode(sprintf(t('ficha.confirmar_retirar'), $me['titulo'])) ?>);">
                         <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
                         <button class="actionbtn" style="color:var(--ink); border-color:var(--line);" type="submit" name="retirar" value="1">Retirar</button>
                       </form>
-                    <?php elseif (puedeSolicitarRetiroEvento($me, $u)): ?>
-                      <?php if (tieneRetiroPendiente((int) $me['id'])): ?>
-                        <span class="actionbtn" style="opacity:.7; cursor:default;">Retiro en revisión</span>
-                      <?php else: ?>
-                        <form method="post" action="<?= e(urlEvento($me)) ?>" onsubmit="
-                          var motivo = prompt(<?= json_encode(t('ficha.prompt_motivo_retiro')) ?>, '');
-                          if (motivo === null) return false;
-                          this.elements['motivo_retiro'].value = motivo;
-                          return confirm(<?= json_encode(sprintf(t('ficha.confirmar_solicitar_retiro'), $me['titulo'])) ?>);
-                        ">
-                          <input type="hidden" name="csrf" value="<?= e(tokenCsrf()) ?>">
-                          <input type="hidden" name="motivo_retiro" value="">
-                          <button class="actionbtn" style="color:var(--ink); border-color:var(--line);" type="submit" name="solicitar_retiro" value="1">Solicitar retiro</button>
-                        </form>
-                      <?php endif; ?>
                     <?php endif; ?>
                   </div>
                 </details>
@@ -141,9 +132,9 @@ require __DIR__ . '/includes/layout.php';
         </tbody>
       </table>
       <div class="evergreen-note" style="margin-top:18px;">
-        Puedes editar una actividad publicada cuando quieras. Retirarla —deja de verse, pero no se
-        borra— se puede desde su ficha, y solo dentro de las <?= EVENTO_MARGEN_RETIRO_H ?> horas
-        siguientes a publicarla; pasado ese plazo, pídeselo al administrador.
+        Puedes editar, cancelar o retirar tus actividades cuando quieras —retirar deja de mostrarla,
+        pero no la borra—. Las recurrentes y por reserva se muestran un mes: cuando estén por vencer
+        aparece «<?= et('ficha.btn.renovar') ?>» en «Gestionar».
       </div>
     <?php endif; ?>
 

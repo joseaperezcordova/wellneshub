@@ -240,16 +240,19 @@ CREATE TABLE IF NOT EXISTS eventos (
   -- lectura para pintar una tarjeta no aporta nada.
   categoria     VARCHAR(60)   NOT NULL,
 
-  -- De un día (de siempre) o recurrente. Si es recurrente, frecuencia y
-  -- hora_recurrente/hora_fin_recurrente vienen llenas; fecha_inicio/fecha_fin
-  -- siguen siendo el rango real —primera y última ocurrencia—, no un dato
-  -- aparte.
-  tipo_actividad  ENUM('unico','recurrente')
+  -- Tipo de programación (migración 27): 'unico' es "fecha específica" y
+  -- usa fecha_inicio/fecha_fin; 'recurrente' y 'reserva' no tienen fecha,
+  -- solo el texto libre de programacion_texto, y se ven hasta vigente_hasta.
+  -- frecuencia y hora_recurrente/hora_fin_recurrente son del formato de
+  -- recurrente anterior a la migración 27: ya no se llenan.
+  tipo_actividad  ENUM('unico','recurrente','reserva')
                                 NOT NULL DEFAULT 'unico',
   frecuencia      ENUM('diaria','semanal','quincenal','mensual')
                                 NULL DEFAULT NULL,
   hora_recurrente     TIME      NULL DEFAULT NULL COMMENT 'Hora de inicio de cada sesión',
   hora_fin_recurrente TIME      NULL DEFAULT NULL COMMENT 'Hora de fin de cada sesión',
+  programacion_texto  VARCHAR(500) NULL DEFAULT NULL
+                      COMMENT 'Recurrente: frecuencia/horario. Por reserva: disponibilidad/indicaciones',
 
   ciudad        VARCHAR(90)   NOT NULL,
   entidad       VARCHAR(90)   NOT NULL COMMENT 'Entidad federativa: Jalisco, Oaxaca…',
@@ -274,8 +277,11 @@ CREATE TABLE IF NOT EXISTS eventos (
   -- falta, se tira con un ALTER y no antes.
   enlace_acceso VARCHAR(500)  NULL DEFAULT NULL,
 
-  fecha_inicio  DATETIME      NOT NULL,
+  -- NULL solo en recurrente y por reserva (migración 27).
+  fecha_inicio  DATETIME      NULL DEFAULT NULL,
   fecha_fin     DATETIME      NULL DEFAULT NULL,
+  -- Vigencia mensual de recurrente y por reserva; NULL en fecha específica.
+  vigente_hasta DATETIME      NULL DEFAULT NULL,
 
   -- Gratuito aparte del precio en vez de deducirlo de precio = 0: "gratis" y
   -- "todavía no sé el precio" son cosas distintas y con un solo campo se

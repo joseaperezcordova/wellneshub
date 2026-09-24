@@ -219,11 +219,9 @@ require __DIR__ . '/includes/layout.php';
         </form>
       <?php endif; ?>
 
-      <?php /* Guardado aparte de $puede (que ya solo mide EDITAR): desde que
-               los dos permisos se separaron, alguien puede poder editar y ya
-               no poder retirar —publicada hace más de EVENTO_MARGEN_RETIRO_H
-               horas—, y mostrar este botón igual lo mandaría a un error en
-               vez de simplemente no ofrecérselo. */ ?>
+      <?php /* Guardado aparte de $puede (que solo mide EDITAR): se puede
+               editar una actividad oculta, pero no retirar lo que ya está
+               retirado —ver puedeRetirarEvento()—. */ ?>
       <?php if (puedeRetirarEvento($ev, $u)): ?>
         <form method="post" action="<?= e(urlEvento($ev)) ?>"
               onsubmit="return confirm(<?= json_encode(sprintf(t('evento.editar.confirmar_retirar'), $ev['titulo'])) ?>);">

@@ -70,9 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['evento_id'])) {
         $avisoReportes = 'Actividad publicada otra vez.';
 
     } elseif (isset($_POST['procesar_retiro'])) {
-        // Req. 17092026 punto 8, "revisión administrativa": la solicitud
-        // llegó pasadas las EVENTO_MARGEN_RETIRO_H horas del propio dueño.
-        // Aprobarla oculta la actividad y cierra la fila de eventos_retiros
+        // Solicitudes que quedaron de cuando el dueño solo podía retirar en
+        // las primeras 24 horas (Req. 17092026 punto 8, regla quitada el
+        // 2026-09-23: ya no se crean nuevas). Aprobarla oculta la actividad y cierra la fila de eventos_retiros
         // —no crea una nueva, por eso no pasa por retirarEvento()—.
         procesarSolicitudRetiro((int) ($_POST['retiro_id'] ?? 0), (int) $u['id']);
         $avisoReportes = 'Solicitud procesada: la actividad quedó oculta.';
@@ -189,12 +189,12 @@ require __DIR__ . '/includes/layout.php';
           <?php if (!$eventosAdmin): ?>
             <tr><td colspan="6" style="opacity:.8;">Todavía no hay actividades.</td></tr>
           <?php endif; ?>
-          <?php foreach ($eventosAdmin as $ea): $p = fechaPartes($ea['fecha_inicio']); ?>
+          <?php foreach ($eventosAdmin as $ea): ?>
             <tr data-situacion="<?= e($ea['situacion']) ?>">
               <td><?= e($ea['titulo']) ?></td>
               <td><?= e($ea['organizador']) ?></td>
               <td><?= e($ea['ciudad']) ?></td>
-              <td><?= e($p['d'] . ' ' . $p['m'] . ' ' . date('Y', strtotime($ea['fecha_inicio']))) ?></td>
+              <td><?= e(fechaTablaEvento($ea)) ?></td>
               <td>
                 <span class="badge <?= $ea['situacion'] === 'publicado' ? 'on' : 'off' ?>">
                   <?= e(ucfirst($ea['situacion'])) ?>
@@ -315,8 +315,9 @@ require __DIR__ . '/includes/layout.php';
       <?php endforeach; endif; ?>
     </div>
 
-    <!-- RETIROS — solicitudes de quien ya no puede retirar por su cuenta
-         (pasadas EVENTO_MARGEN_RETIRO_H horas), Req. 17092026 punto 8. Dos
+    <!-- RETIROS — solicitudes que quedaron de la regla de las 24 horas
+         (Req. 17092026 punto 8), quitada el 2026-09-23: el organizador ya
+         retira por su cuenta y no se crean nuevas. Dos
          salidas, ninguna borra nada: Aprobar oculta la actividad; Descartar
          la deja como estaba. Las dos cierran la solicitud. -->
     <div class="admin-panel <?= $panelActivo === 'retiros' ? 'active' : '' ?>" id="panel-retiros">
